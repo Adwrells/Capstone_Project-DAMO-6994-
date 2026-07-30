@@ -102,17 +102,15 @@ The project includes automated tests for the preprocessing modules.
 Create and activate a virtual environment:
 
 ```cmd
-cd path\to\your\project
-python -m venv venv
-venv\Scripts\activate
+python -m venv .venv
+.venv\Scripts\activate
 ```
 
 If you are using PowerShell, use:
 
 ```powershell
-cd path\to\your\project
-python -m venv venv
-.\venv\Scripts\Activate.ps1
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
 ```
 
 Install the required Python packages:
