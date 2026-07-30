@@ -102,9 +102,17 @@ The project includes automated tests for the preprocessing modules.
 Create and activate a virtual environment:
 
 ```cmd
-cd C:\Users\amitd\Downloads\Desktoppp\UNF\UNF Assignment _ Notes_Class Practise\Term 5\Capstone\Github\Capstone_Project-DAMO-6994-
+cd path\to\your\project
 python -m venv venv
 venv\Scripts\activate
+```
+
+If you are using PowerShell, use:
+
+```powershell
+cd path\to\your\project
+python -m venv venv
+.\venv\Scripts\Activate.ps1
 ```
 
 Install the required Python packages:
@@ -116,7 +124,7 @@ python -m pip install -r requirements.txt
 If your system uses a different Python interpreter, use the same interpreter for both install and test commands. In this workspace, the verified command is:
 
 ```bash
-C:/Users/amitd/AppData/Local/Microsoft/WindowsApps/python3.11.exe -m pip install -r requirements.txt
+py -3.11 -m pip install -r requirements.txt
 ```
 
 ### How to run tests
@@ -124,26 +132,26 @@ C:/Users/amitd/AppData/Local/Microsoft/WindowsApps/python3.11.exe -m pip install
 Run the complete test suite:
 
 ```bash
-C:/Users/amitd/AppData/Local/Microsoft/WindowsApps/python3.11.exe -m pytest tests/ -v --tb=short
+py -3.11 -m pytest tests/ -v --tb=short
 ```
 
 Run a specific test file:
 
 ```bash
-C:/Users/amitd/AppData/Local/Microsoft/WindowsApps/python3.11.exe -m pytest tests/test_preprocessing.py -v
+py -3.11 -m pytest tests/test_preprocessing.py -v
 ```
 
 Run one test class or one test case:
 
 ```bash
-C:/Users/amitd/AppData/Local/Microsoft/WindowsApps/python3.11.exe -m pytest tests/test_preprocessing.py::TestCleanMissingValues -v
-C:/Users/amitd/AppData/Local/Microsoft/WindowsApps/python3.11.exe -m pytest tests/test_preprocessing.py::TestIntegration::test_full_cleaning_pipeline -v
+py -3.11 -m pytest tests/test_preprocessing.py::TestCleanMissingValues -v
+py -3.11 -m pytest tests/test_preprocessing.py::TestIntegration::test_full_cleaning_pipeline -v
 ```
 
 Run with coverage output:
 
 ```bash
-C:/Users/amitd/AppData/Local/Microsoft/WindowsApps/python3.11.exe -m pytest tests/ --cov=backend/preprocessing --cov-report=term-missing
+py -3.11 -m pytest tests/ --cov=backend/preprocessing --cov-report=term-missing
 ```
 
 Current testing focus includes:
@@ -160,6 +168,6 @@ The project uses the logs directory to store run logs and progress notes.
 
 Current tracking files:
 
-- [logs/PROJECT_PROGRESS.md](logs/PROJECT_PROGRESS.md) — milestone and progress tracking log
+- logs/PROJECT_PROGRESS.md — milestone and progress tracking log
 
 Logging is also used during test execution to record test session activity.
