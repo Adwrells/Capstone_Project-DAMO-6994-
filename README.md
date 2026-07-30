@@ -162,12 +162,3 @@ Current testing focus includes:
 
 ---
 
-## Logging and Progress Tracking
-
-The project uses the logs directory to store run logs and progress notes.
-
-Current tracking files:
-
-- logs/PROJECT_PROGRESS.md — milestone and progress tracking log
-
-Logging is also used during test execution to record test session activity.
