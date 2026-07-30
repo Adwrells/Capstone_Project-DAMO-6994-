@@ -29,6 +29,7 @@ logs/*.txt
 logs/**/*.log
 *.log
 logs/
+ARCHITECTURE.md
 
 # ─── Data & Outputs (raw / processed) ───────────────────────────────────────
 data/raw/
