@@ -2,7 +2,7 @@
 
 This repository contains a Python-based healthcare analytics preprocessing pipeline designed to clean, validate, transform, and enrich raw healthcare data for downstream analytics and reporting.
 
-The project is currently focused on building a modular, testable backend foundation for data preprocessing with strong logging and architecture documentation.
+The project focuses on building a modular preprocessing workflow for healthcare data with validation, transformation, and feature engineering support.
 
 ---
 
@@ -22,44 +22,21 @@ This work is documented in the architecture guide and supported by automated tes
 
 ## Current Project Status
 
-### Completed so far
+### Completed
 
-- Built a modular preprocessing package under backend/preprocessing
-- Implemented core functions for:
-  - cleaning and null handling
-  - schema validation
-  - null ratio calculation
-  - data aggregation
-  - feature engineering
-- Added a test suite covering the main preprocessing workflow
-- Added logging support for test runs in the logs directory
-- Created an architecture document describing the system design and pipeline flow
+- Implemented a modular preprocessing package under backend/preprocessing
+- Added functions for cleaning, validation, aggregation, and feature engineering
+- Added automated tests for the preprocessing workflow
+- Added logging support for test execution
+- Documented the project structure and workflow
 
-### In progress
+### Next steps
 
-- Expanding the preprocessing pipeline for more real-world healthcare scenarios
-- Improving documentation and project tracking
-- Preparing for future integration with larger ETL or analytics workflows
-
-### Planned next steps
-
-- Add data ingestion support for Excel/CSV-based sources
-- Introduce more advanced feature engineering
-- Add a reusable pipeline runner and configuration layer
-- Extend logging and monitoring for production-style execution
+- Extend the preprocessing pipeline for additional healthcare data scenarios
+- Improve documentation and project tracking
+- Add further data processing capabilities as the project grows
 
 ---
-
-## Architecture
-
-The project architecture is documented in [ARCHITECTURE.md](ARCHITECTURE.md).
-
-It describes:
-
-- the preprocessing module structure,
-- the data flow through cleaning, validation, transformation, and feature engineering,
-- the testing and logging strategy,
-- the overall design principles for the platform.
 
 ---
 
@@ -179,24 +156,10 @@ Current testing focus includes:
 
 ## Logging and Progress Tracking
 
-The project uses the logs directory to store run logs and project progress notes.
+The project uses the logs directory to store run logs and progress notes.
 
 Current tracking files:
 
 - [logs/PROJECT_PROGRESS.md](logs/PROJECT_PROGRESS.md) — milestone and progress tracking log
 
 Logging is also used during test execution to record test session activity.
-
----
-
-## Development Notes
-
-This repository is being developed as a modular, maintainable foundation for healthcare data preprocessing. The emphasis is on:
-
-- clear separation of responsibilities,
-- reliable validation,
-- reproducible testing,
-- transparent documentation,
-- dependable progress tracking.
-
-This README will continue to be updated as the project evolves.
