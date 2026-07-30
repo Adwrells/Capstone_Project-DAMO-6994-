@@ -122,6 +122,14 @@ The project includes automated tests for the preprocessing modules.
 
 ### Setup
 
+Create and activate a virtual environment:
+
+```cmd
+cd C:\Users\amitd\Downloads\Desktoppp\UNF\UNF Assignment _ Notes_Class Practise\Term 5\Capstone\Github\Capstone_Project-DAMO-6994-
+python -m venv venv
+venv\Scripts\activate
+```
+
 Install the required Python packages:
 
 ```bash
