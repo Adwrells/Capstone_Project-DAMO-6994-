@@ -120,31 +120,45 @@ The feature engineering module handles:
 
 The project includes automated tests for the preprocessing modules.
 
+### Setup
+
+Install the required Python packages:
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+If your system uses a different Python interpreter, use the same interpreter for both install and test commands. In this workspace, the verified command is:
+
+```bash
+C:/Users/amitd/AppData/Local/Microsoft/WindowsApps/python3.11.exe -m pip install -r requirements.txt
+```
+
 ### How to run tests
 
 Run the complete test suite:
 
 ```bash
-python -m pytest tests/ -v --tb=short
+C:/Users/amitd/AppData/Local/Microsoft/WindowsApps/python3.11.exe -m pytest tests/ -v --tb=short
 ```
 
 Run a specific test file:
 
 ```bash
-python -m pytest tests/test_preprocessing.py -v
+C:/Users/amitd/AppData/Local/Microsoft/WindowsApps/python3.11.exe -m pytest tests/test_preprocessing.py -v
 ```
 
 Run one test class or one test case:
 
 ```bash
-python -m pytest tests/test_preprocessing.py::TestCleanMissingValues -v
-python -m pytest tests/test_preprocessing.py::TestIntegration::test_full_cleaning_pipeline -v
+C:/Users/amitd/AppData/Local/Microsoft/WindowsApps/python3.11.exe -m pytest tests/test_preprocessing.py::TestCleanMissingValues -v
+C:/Users/amitd/AppData/Local/Microsoft/WindowsApps/python3.11.exe -m pytest tests/test_preprocessing.py::TestIntegration::test_full_cleaning_pipeline -v
 ```
 
 Run with coverage output:
 
 ```bash
-python -m pytest tests/ --cov=backend/preprocessing --cov-report=term-missing
+C:/Users/amitd/AppData/Local/Microsoft/WindowsApps/python3.11.exe -m pytest tests/ --cov=backend/preprocessing --cov-report=term-missing
 ```
 
 Current testing focus includes:
