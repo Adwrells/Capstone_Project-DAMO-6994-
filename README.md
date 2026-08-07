@@ -42,18 +42,36 @@ unavailable.
 
 ---
 
-## Getting Started
+## Installation
 
-### One-shot bootstrap
+The bootstrap script is the fastest path on a development machine. A containerised
+alternative requiring no local Node or Python install is described under
+[Docker Deployment](#docker-deployment) at the end of this document.
+
+### Option 1 — Bootstrap script (recommended)
 
 ```bash
 python launch.py
 ```
 
-This installs Node dependencies, creates or repairs the Python virtual environment, installs
-`requirements.txt`, and starts the development server.
+`launch.py` performs the entire setup in sequence and requires no other command:
 
-### Manual setup
+| Step | Action |
+| :-- | :--- |
+| 1 | Installs Node dependencies via `npm install` |
+| 2 | Creates the Python virtual environment at `.venv`, and **recreates it if broken** — for example when the project was copied from another machine |
+| 3 | Installs `requirements.txt` into that environment |
+| 4 | Runs the test suite as a smoke check. Failures are reported but do not halt startup |
+| 5 | Starts the development server and opens `http://localhost:3000` in the default browser |
+
+The script keeps the server in the foreground; `Ctrl+C` stops it cleanly.
+
+Prerequisites: Python 3.10 or later, and Node.js 20 or later.
+
+> `launch.py` starts the **Node server only**. The FastAPI analytics backend is launched
+> separately — see *Running the platform* below.
+
+### Option 2 — Manual setup
 
 ```bash
 npm install
@@ -63,19 +81,25 @@ npm install
 pip install -r requirements.txt
 ```
 
-### Running the platform
+---
 
-The frontend and Node server:
+## Running the platform
+
+The frontend and Node server, on port **3000**:
 
 ```bash
 npm run dev
 ```
 
-The Python analytics backend, in a separate terminal:
+The Python analytics backend, on port **8000**, in a separate terminal:
 
 ```bash
 python -m backend.main
 ```
+
+Both are required for the full feature set. The Node server proxies
+`/api/model-diagnostics/*` and `/api/user-datasets/*` through to FastAPI; the interface
+remains usable without it, reporting those two features as unavailable.
 
 All Python commands must be run from the repository root — every module imports `backend.*`,
 which resolves only when the root is the working directory.
@@ -86,6 +110,7 @@ which resolves only when the root is the working directory.
 | :--- | :--- |
 | TypeScript type check | `npm run lint` |
 | Production build | `npm run build` |
+| Start the production build | `npm start` |
 | Rebuild the database | `python -m backend.database.load_csv` |
 | Preview a rebuild | `python -m backend.database.load_csv --dry-run` |
 | Initialise schema only | `python -m backend.database.init_database` |
@@ -271,8 +296,66 @@ python -m pytest tests
 ├── docs/                  Capstone documentation
 ├── tests/                 Automated test suites
 ├── server.ts              Express server
+├── Dockerfile             Container image — Node 20 with Python 3
 └── launch.py              One-shot bootstrap
 ```
+
+---
+
+## Docker Deployment
+
+A `Dockerfile` builds a self-contained image carrying both runtimes, so neither Node nor
+Python needs to be installed on the host.
+
+### Build and run
+
+```bash
+docker build -t healthcare-analytics .
+```
+
+```bash
+docker run -p 3000:3000 healthcare-analytics
+```
+
+The application is then available at `http://localhost:3000`.
+
+### What the image contains
+
+| Stage | Detail |
+| :--- | :--- |
+| Base | `node:20-slim` |
+| System packages | `python3`, `python3-pip`, `python3-venv`, with apt caches cleared to keep the layer small |
+| Node dependencies | `npm install` against the copied `package*.json` |
+| Python environment | Virtual environment at `/opt/venv`, placed on `PATH`, populated from `requirements.txt` |
+| Build | `npm run build` — Vite compiles the frontend, esbuild bundles the server to `dist/server.cjs` |
+| Runtime | `npm start`, exposing port 3000 |
+
+Dependency files are copied before the application source, so Docker's layer cache reuses
+the dependency install whenever only application code has changed.
+
+`.dockerignore` keeps `node_modules/`, `.venv/`, `__pycache__/`, `dist/`, `uploads/` and
+`.git/` out of the build context. Host artefacts therefore cannot leak into the image, and
+the build stays fast.
+
+### Persisting uploads
+
+The container creates `uploads/` at build time, but its contents are lost when the container
+is removed. Mount a volume to retain them:
+
+```bash
+docker run -p 3000:3000 -v ${PWD}/uploads:/app/uploads healthcare-analytics
+```
+
+### Scope of the container
+
+> The image runs the **Node server only**. Model fit diagnostics and cleaned-dataset
+> persistence proxy to the FastAPI backend on port 8000, and report as unavailable unless
+> that service also runs. Data cleaning, exploration, dashboards, hypothesis views and
+> report export all function normally.
+>
+> To include the analytics backend, run FastAPI alongside the container and point the server
+> at it with the `PYTHON_API_URL` environment variable, or extend the image with a process
+> manager that supervises both services.
 
 ---
 
