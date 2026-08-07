@@ -1,1 +1,1 @@
-﻿"""Tests package for Healthcare Analytics Platform"""
+"""Healthcare Analytics Platform Tests Package"""

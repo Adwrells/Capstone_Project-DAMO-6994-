@@ -1,64 +1,36 @@
-# =============================================================================
-# Capstone Project DAMO-6994 — .gitignore
-# Healthcare Analytics Platform
-# =============================================================================
-
-# ─── Python ──────────────────────────────────────────────────────────────────
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-*.egg
-*.egg-info/
-dist/
+node_modules/
 build/
-.eggs/
-.Python
-pip-wheel-metadata/
-
-# ─── Virtual Environments ────────────────────────────────────────────────────
-.venv/
-venv/
-env/
-ENV/
-.env
-
-# ─── Logs ────────────────────────────────────────────────────────────────────
-logs/*.log
-logs/*.txt
-logs/**/*.log
-*.log
-logs/
-/ARCHITECTURE.md
-
-# ─── Data & Outputs (raw / processed) ───────────────────────────────────────
-data/raw/
-data/processed/
-*.csv
-*.xlsx
-*.xls
-output/
-
-# ─── Testing & Coverage ──────────────────────────────────────────────────────
-.pytest_cache/
-.coverage
-htmlcov/
-coverage.xml
-*.coveragerc
-
-# ─── IDE / Editor ────────────────────────────────────────────────────────────
-.vscode/
-.idea/
-*.sublime-project
-*.sublime-workspace
-*.swp
-*.swo
+dist/
+coverage/
 .DS_Store
-Thumbs.db
+*.log
+.env*
+!.env.example
+.vscode
+uploads/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+htmlcov/
+.coverage
 
-# ─── Jupyter ─────────────────────────────────────────────────────────────────
-.ipynb_checkpoints/
-*.ipynb
+# CodeQL local scan artifacts (databases are large; SARIF is regenerated per run)
+.codeql-db-*/
+*.sarif
 
-# ─── OS ──────────────────────────────────────────────────────────────────────
-desktop.ini
+# ─── Databases ──────────────────────────────────────────────────────────
+# SQLite databases are ignored by default...
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+
+# ...except the seeded analytical database, which is COMMITTED ON PURPOSE.
+# It is the project's only copy of the ~17,200 cleaned CIHI rows: schema.sql
+# creates the tables but leaves them empty, and load_csv.py cannot refill them
+# (it reads data/optimized/, which does not exist). Deleting this file leaves
+# every dashboard, hypothesis test, and chart with no data.
+# See README.md → "Database & Data Provenance".
+!backend/database/healthcare.db

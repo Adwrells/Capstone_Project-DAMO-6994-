@@ -1,0 +1,61 @@
+# CodeQL — static security analysis
+#
+# Runs on every push and PR to main, and once a day on a schedule so that newly published
+# vulnerability patterns are caught against unchanged code. A daily run matters because
+# CodeQL's query packs are updated continuously: code that was clean last week can be
+# flagged this week without a single line changing.
+#
+# Results appear under the repository's Security → Code scanning tab.
+#
+# NOTE: CodeQL is free for public repositories. On a private repository it requires
+# GitHub Advanced Security; without it this workflow fails with a licensing error.
+
+name: CodeQL
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # 07:17 UTC daily. Deliberately off the hour — scheduled jobs queued exactly on the
+    # hour compete with the rest of GitHub and get delayed.
+    - cron: '17 7 * * *'
+  workflow_dispatch: # lets you trigger a scan by hand from the Actions tab
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    permissions:
+      security-events: write # upload findings to the Security tab
+      actions: read
+      contents: read
+
+    strategy:
+      fail-fast: false # one language failing must not hide the other's results
+      matrix:
+        language: ['javascript-typescript', 'python']
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          language: ${{ matrix.language }}
+          # security-extended adds lower-severity and precision queries beyond the
+          # default set. Worth it here: this is coursework, not a high-traffic service,
+          # so a slower scan with more findings is the better trade.
+          queries: security-extended
+
+      # No build step: this project is interpreted TypeScript (Vite/tsx) and Python,
+      # so CodeQL can analyse the sources directly.
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: '/language:${{ matrix.language }}'
