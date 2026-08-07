@@ -324,10 +324,25 @@ export default function DataCleaning({
             });
 
             // Deduplicate
+            //
+            // Deduplicate on a real identity, never on a guessed subset of columns.
+            //
+            // The previous key was `Visit ID || FiscalYear-Province-CTAS-Age`. Any row
+            // differing only OUTSIDE those four columns was discarded as a duplicate. On
+            // the merged cohort — where cleaning had already filled Fiscal Year and CTAS
+            // Level with constants — all ten "Top 10 Main Problems" rows produced the same
+            // key and nine were destroyed, leaving a single usable row.
+            //
+            // A composite key is only safe when it is genuinely unique. Absent a real
+            // identifier, whole-row equality is the only key that cannot delete distinct
+            // data: it removes exact duplicates and nothing else.
             const uniqueData: any[] = [];
             const seenKeys = new Set<string>();
             processed.forEach(r => {
-              const k = String(r["Visit ID"] || `${r["Fiscal Year"]}-${r["Province"]}-${r["CTAS Level"]}-${r["Age"]}`);
+              const visitId = r["Visit ID"];
+              const k = (visitId !== undefined && visitId !== null && visitId !== "")
+                ? `id:${String(visitId)}`
+                : `row:${JSON.stringify(r)}`;
               if (!seenKeys.has(k)) {
                 seenKeys.add(k);
                 uniqueData.push(r);
