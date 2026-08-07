@@ -500,6 +500,29 @@ export default function App() {
       </div>
     )}
 
+    {/* Without a dataset the section above renders nothing. Say so rather than
+        presenting an empty page that looks like a failed render. */}
+    {currentSection === 'analytics' && !datasetName && (
+      <div className="w-full flex items-center justify-center py-24">
+        <div className={`max-w-md text-center p-8 rounded-2xl border ${
+          isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-slate-200 bg-white'
+        }`}>
+          <BarChart3 size={32} className="mx-auto text-slate-400 mb-3" />
+          <h3 className="text-lg font-bold text-slate-900 dark:text-white">No dataset loaded</h3>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
+            Hypothesis testing runs against a cleaned cohort. Load a dataset in the
+            Prep &amp; Quality Engine, then return to this stage.
+          </p>
+          <button
+            onClick={() => setCurrentSection('clean')}
+            className="mt-5 h-11 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-md transition-all cursor-pointer"
+          >
+            Go to Prep &amp; Quality Engine
+          </button>
+        </div>
+      </div>
+    )}
+
     {currentSection === 'dashboard' && datasetName && (
       <div className="w-full">
         <ExecutiveDashboard

@@ -615,24 +615,43 @@ const DATASET_TABLE_MAP: Record<string, string> = {
 };
 
 // Official dataset file paths (source Excel files)
+// Cleaned datasets served to the UI on startup. These point at data/Explorer Dataset/,
+// which is where the cleaning notebooks write. An earlier revision read data/optimized/ —
+// a directory that does not exist — so every preload failed silently, no dataset was
+// selected, and pages gated on `datasetName` (Explorer, Hypothesis Testing, Dashboard)
+// rendered blank with no error shown.
+const PRELOAD_DATA_DIR = path.join(process.cwd(), "data", "Explorer Dataset");
+
 const PRELOAD_DATASET_CONFIGS = [
   {
     key: "dataset_1",
     label: "Dataset 1",
-    name: "Top 10 Main Problems",
-    filePath: path.join(process.cwd(), "data", "optimized", "Top 10 Main Problems.csv")
+    name: "ED Visits",
+    filePath: path.join(PRELOAD_DATA_DIR, "ED_Visits.csv")
   },
   {
     key: "dataset_2",
     label: "Dataset 2",
-    name: "ED Visits from 2003 - 2021",
-    filePath: path.join(process.cwd(), "data", "optimized", "ED Visits from 2003 - 2021.csv")
+    name: "CTAS Triage Levels",
+    filePath: path.join(PRELOAD_DATA_DIR, "CTAS_Triage.csv")
   },
   {
     key: "dataset_3",
     label: "Dataset 3",
-    name: "ED Visits by Month, Age and Sex, Participating Provinces",
-    filePath: path.join(process.cwd(), "data", "optimized", "ED visits by month, age and sex, participating provinces.csv")
+    name: "Visit Disposition",
+    filePath: path.join(PRELOAD_DATA_DIR, "Visit_Disposition.csv")
+  },
+  {
+    key: "dataset_4",
+    label: "Dataset 4",
+    name: "Main Problems",
+    filePath: path.join(PRELOAD_DATA_DIR, "Main_Problems.csv")
+  },
+  {
+    key: "dataset_5",
+    label: "Dataset 5",
+    name: "Demographics",
+    filePath: path.join(PRELOAD_DATA_DIR, "Demographics.csv")
   }
 ];
 
