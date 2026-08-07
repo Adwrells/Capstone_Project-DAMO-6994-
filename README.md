@@ -34,7 +34,7 @@ dashboard, all reading from a reproducible analytical database.
 | Node server | Express (`server.ts`), port **3000** — serves Vite in middleware mode, handles uploads, Excel parsing and Gemini insight calls |
 | Python backend | FastAPI (`backend/main.py`), port **8000** — 31 routes |
 | Database | SQLite, schema in `backend/database/schema.sql` |
-| Testing | pytest — 189 tests across 18 suites |
+| Testing | pytest — 212 tests across 18 suites |
 
 The platform runs as two services on two ports. The user interface remains functional
 without the Python backend, though model diagnostics and dataset persistence report as
@@ -247,6 +247,63 @@ Four visualisations accompany the verdict: a learning curve, a complexity curve 
 optimal polynomial degree, a predicted-versus-actual scatter split by train and holdout, and
 a residual plot.
 
+### Running the diagnostics
+
+```bash
+python -m pytest tests/test_model_diagnostics_service.py -v
+```
+
+That suite asserts all three verdicts are reachable and correctly assigned. In the browser,
+the panel appears at the end of the Prep & Quality Engine stage once cleaning completes; the
+FastAPI backend must be running for it to compute.
+
+### What these datasets actually show
+
+The verdicts below were measured against the cleaned datasets in this repository, at
+polynomial degree 1. They are reported as found rather than as hoped for.
+
+| Dataset | Predictor → Target | n | Train R² | Holdout R² | Verdict |
+| :--- | :--- | ---: | ---: | ---: | :--- |
+| `Visit_Disposition` | admission flag → LOS hours | 936 | 0.642 | 0.657 | **Good Fit** |
+| `CTAS_Triage` | CTAS urgency → LOS hours | 912 | 0.424 | 0.318 | **Good Fit** |
+| `ED_Visits` | admission flag → LOS hours | 7,296 | 0.219 | 0.204 | Underfitting |
+| `Main_Problems` | ED visits → LOS hours | 1,063 | 0.094 | 0.094 | Underfitting |
+| `ED_Visits` | CTAS urgency → LOS hours | 7,296 | 0.008 | 0.011 | Underfitting |
+| `ED_Visits` | ED visits → LOS hours | 7,296 | 0.000 | −0.000 | Underfitting |
+
+**Two relationships hold.** Admission status explains roughly 64% of the variance in length
+of stay, and holdout R² slightly *exceeds* training R² — the model generalises cleanly, with
+no sign of memorisation. CTAS urgency explains around 42%. Both are clinically expected:
+admitted patients occupy beds longer, and higher-acuity presentations take longer to
+resolve. These support H2 and H3 respectively.
+
+**Most other pairings explain almost nothing**, and the platform says so rather than
+presenting a weak model as a finding. Volume (`ED visits`) does not predict length of stay
+at all — R² of 0.000 — which is itself a defensible negative result.
+
+**Aggregation level decides whether the CTAS signal is visible.** The same predictor scores
+0.424 in `CTAS_Triage` but 0.008 in `ED_Visits`. `ED_Visits` is disaggregated by main problem
+and disposition, so case-mix variation swamps the acuity effect. The relationship is real;
+it is only detectable once the data is aggregated to the level at which acuity is the
+dominant driver. Any claim about CTAS and length of stay should state the aggregation it was
+measured at.
+
+### A caution on polynomial degree
+
+The complexity curve for CTAS urgency shows why degree should not be raised casually:
+
+```
+degree 1   train R²  0.4243   validation R²  0.3177
+degree 2   train R²  0.5454   validation R²  0.4325   ← optimal
+degree 3+  train R² -2.9129   validation R² -3.6682
+```
+
+`ctas_urgency_score` takes only five distinct values, so a polynomial above degree 2 is
+unidentifiable and the fit collapses — the negative R² means it predicts worse than the
+mean. R² is deliberately not clamped at zero, because that collapse is a real signal and
+hiding it would misrepresent the model. Five-fold cross-validation gives 0.380 ± 0.064,
+consistent with the holdout result.
+
 ---
 
 ## Report Export
@@ -260,7 +317,7 @@ as the print destination.
 
 ## Testing
 
-The platform ships **189 tests across 18 suites**.
+The platform ships **212 tests across 18 suites**.
 
 ```bash
 python -m pytest tests
@@ -283,6 +340,7 @@ python -m pytest tests
 | `test_dashboard_services.py` | 29 | Dashboard, insights and dataset service layers |
 | `test_user_datasets.py` | 28 | Cleaned-dataset persistence and cohort isolation |
 | `test_user_dataset_isolation.py` | 12 | Session-scoped isolation between concurrent users |
+| `test_model_diagnostics_service.py` | 23 | Underfitting, overfitting and good-fit verdicts end to end |
 | `test_data_loader.py` | 15 | Cleaned-dataset to schema column contract |
 | `test_preprocessing.py` | 13 | Cleaning, feature engineering, validation |
 | `test_h1.py`–`test_h5.py` | 37 | The five hypotheses and their statistical routines |
