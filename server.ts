@@ -439,9 +439,15 @@ const PYTHON_PROXY_PREFIXES = ["/api/model-diagnostics", "/api/user-datasets"];
 app.all(PYTHON_PROXY_PREFIXES.map(p => `${p}/*`).concat(PYTHON_PROXY_PREFIXES), async (req, res) => {
   const target = `${PYTHON_API_URL}${req.originalUrl}`;
   try {
+    // The session id must survive the hop. Without forwarding it the backend sees an
+    // unscoped request and returns every user's datasets, silently defeating isolation.
+    const forwarded: Record<string, string> = { "Content-Type": "application/json" };
+    const sessionId = req.headers["x-session-id"];
+    if (typeof sessionId === "string") forwarded["X-Session-Id"] = sessionId;
+
     const upstream = await fetch(target, {
       method: req.method,
-      headers: { "Content-Type": "application/json" },
+      headers: forwarded,
       body: req.method === "GET" || req.method === "HEAD" ? undefined : JSON.stringify(req.body ?? {}),
       signal: AbortSignal.timeout(60000)
     });

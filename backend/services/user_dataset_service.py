@@ -44,7 +44,8 @@ CREATE TABLE IF NOT EXISTS {REGISTRY_TABLE} (
     row_count     INTEGER NOT NULL DEFAULT 0,
     column_count  INTEGER NOT NULL DEFAULT 0,
     quality_score REAL,
-    created_at    TEXT NOT NULL
+    created_at    TEXT NOT NULL,
+    owner_id      TEXT
 )
 """
 
@@ -109,13 +110,26 @@ class UserDatasetService:
 
     @staticmethod
     def _ensure_registry(manager: Optional[Any] = None) -> None:
-        (manager or db_manager).execute_script(REGISTRY_DDL)
+        """Creates the registry, and migrates one that predates session scoping.
+
+        ALTER TABLE ADD COLUMN rather than a rebuild: the registry is the index of every
+        persisted upload, so recreating it would orphan all of them. Existing rows keep
+        owner_id NULL and remain visible only to unscoped callers.
+        """
+        db = manager or db_manager
+        db.execute_script(REGISTRY_DDL)
+
+        # execute_query returns dicts, so read the column by name rather than by position.
+        columns = [row["name"] for row in db.execute_query(f"PRAGMA table_info({REGISTRY_TABLE})")]
+        if "owner_id" not in columns:
+            db.execute_command(f"ALTER TABLE {REGISTRY_TABLE} ADD COLUMN owner_id TEXT")
 
     @staticmethod
     def persist(
         records: List[Dict[str, Any]],
         display_name: str = "Cleaned Dataset",
         quality_score: Optional[float] = None,
+        owner_id: Optional[str] = None,
         manager: Optional[Any] = None,
     ) -> Dict[str, Any]:
         """Writes cleaned records to a new isolated table and registers it.
@@ -158,8 +172,8 @@ class UserDatasetService:
             conn.executemany(insert_sql, rows)
             conn.execute(
                 f"INSERT INTO {REGISTRY_TABLE} "
-                "(dataset_id, table_name, display_name, row_count, column_count, quality_score, created_at) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?)",
+                "(dataset_id, table_name, display_name, row_count, column_count, quality_score, created_at, owner_id) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                 (
                     dataset_id,
                     table_name,
@@ -168,6 +182,7 @@ class UserDatasetService:
                     len(columns),
                     quality_score,
                     datetime.now().isoformat(),
+                    owner_id,
                 ),
             )
             conn.commit()
@@ -179,27 +194,44 @@ class UserDatasetService:
             "row_count": len(rows),
             "column_count": len(columns),
             "quality_score": quality_score,
+            "owner_id": owner_id,
         }
 
     @staticmethod
-    def list_datasets(manager: Optional[Any] = None) -> List[Dict[str, Any]]:
-        """Registry entries, newest first."""
+    def list_datasets(
+        owner_id: Optional[str] = None,
+        manager: Optional[Any] = None,
+    ) -> List[Dict[str, Any]]:
+        """Registry entries, newest first.
+
+        With `owner_id`, only that session's datasets are returned — rows belonging to
+        other sessions, and legacy rows with no owner, are excluded. Without it, every row
+        is returned, which is what administrative and offline callers need.
+        """
         db = manager or db_manager
         UserDatasetService._ensure_registry(db)
+
+        if owner_id is None:
+            return db.execute_query(
+                f"SELECT * FROM {REGISTRY_TABLE} ORDER BY created_at DESC"
+            )
         return db.execute_query(
-            f"SELECT * FROM {REGISTRY_TABLE} ORDER BY created_at DESC"
+            f"SELECT * FROM {REGISTRY_TABLE} WHERE owner_id = ? ORDER BY created_at DESC",
+            (str(owner_id),),
         )
 
     @staticmethod
     def get_records(
         dataset_id: str,
         limit: int = DEFAULT_ROW_LIMIT,
+        owner_id: Optional[str] = None,
         manager: Optional[Any] = None,
     ) -> Optional[Dict[str, Any]]:
-        """Rows for one persisted dataset, or None when the id is unknown.
+        """Rows for one persisted dataset, or None when the id is unknown or not owned.
 
         The table name is read from the registry rather than built from the caller's input,
-        so an arbitrary identifier can never reach the query.
+        so an arbitrary identifier can never reach the query. Knowing a dataset id is not
+        sufficient to read it — the owner must match when scoping is in use.
         """
         db = manager or db_manager
         UserDatasetService._ensure_registry(db)
@@ -208,6 +240,10 @@ class UserDatasetService:
             f"SELECT * FROM {REGISTRY_TABLE} WHERE dataset_id = ?", (str(dataset_id),)
         )
         if not entry:
+            return None
+        if owner_id is not None and entry[0].get("owner_id") != str(owner_id):
+            # Same response as a missing dataset: revealing that an id exists but belongs
+            # to someone else would leak the existence of other users' data.
             return None
 
         table_name = entry[0]["table_name"]
@@ -220,15 +256,26 @@ class UserDatasetService:
         return {**entry[0], "data": rows, "returned_rows": len(rows)}
 
     @staticmethod
-    def delete_dataset(dataset_id: str, manager: Optional[Any] = None) -> bool:
-        """Drops a persisted dataset and its registry row. False when the id is unknown."""
+    def delete_dataset(
+        dataset_id: str,
+        owner_id: Optional[str] = None,
+        manager: Optional[Any] = None,
+    ) -> bool:
+        """Drops a persisted dataset and its registry row.
+
+        False when the id is unknown, or when scoping is in use and the caller does not
+        own it — one session must never be able to destroy another's data.
+        """
         db = manager or db_manager
         UserDatasetService._ensure_registry(db)
 
         entry = db.execute_query(
-            f"SELECT table_name FROM {REGISTRY_TABLE} WHERE dataset_id = ?", (str(dataset_id),)
+            f"SELECT table_name, owner_id FROM {REGISTRY_TABLE} WHERE dataset_id = ?",
+            (str(dataset_id),),
         )
         if not entry:
+            return False
+        if owner_id is not None and entry[0].get("owner_id") != str(owner_id):
             return False
 
         with db.connection() as conn:
