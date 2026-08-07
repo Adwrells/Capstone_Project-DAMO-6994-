@@ -381,15 +381,30 @@ export default function AnalyticsCore({fields,data,onNavigateNext}:AnalyticsCore
 
   // Column detection
   const cols=useMemo(()=>{
-    const fd=(pats:RegExp[])=>fields.find(f=>pats.some(p=>p.test(f.name)))?.name;
+    // Patterns are tried IN ORDER, and the first pattern with any matching field wins.
+    // Scanning fields first instead would let column position decide: the cleaned datasets
+    // list median_los_minutes before median_los_hours, so an hours-first preference would
+    // silently resolve to minutes and change every reported figure by a factor of 60.
+    const fd=(pats:RegExp[])=>{
+      for(const p of pats){
+        const hit=fields.find(f=>p.test(f.name));
+        if(hit) return hit.name;
+      }
+      return undefined;
+    };
     return {
-      ctas:fd([/ctas/i,/triage/i])||'CTAS Level',
-      los:fd([/length.of.stay/i,/\blos\b/i])||'Length of Stay (Hours)',
-      visits:fd([/number.of.*visit/i,/visit.count/i,/visits/i])||'Number of ED Visits',
+      ctas:fd([/ctas.level/i,/triage.level/i,/ctas/i,/triage/i])||'CTAS Level',
+      // `\blos\b` never matched the cleaned columns: underscores are word characters, so
+      // median_los_hours has no word boundary around "los". Hours are preferred over
+      // minutes so downstream thresholds stay in the documented unit.
+      los:fd([/median.los.hour/i,/los.hour/i,/length.of.stay.hour/i,/length.of.stay/i,/median.los/i,/_los\b/i,/\blos\b/i])||'Length of Stay (Hours)',
+      visits:fd([/number.of.*visit/i,/visit.count/i,/ed.visits/i,/visits/i])||'Number of ED Visits',
       fy:fd([/fiscal.year/i,/fiscal/i])||'Fiscal Year',
-      disp:fd([/disposition/i])||'Disposition',
-      age:fd([/age.group/i,/age/i])||'Age Group',
-      prob:fd([/presenting.problem/i,/problem/i,/diagnosis/i])||'Main Presenting Problem',
+      disp:fd([/visit.disposition/i,/disposition/i])||'Disposition',
+      // A bare /age/i matches "triage_level" — "tri-AGE" — so a dataset with no age column
+      // silently regressed LOS on triage twice. Anchor the match instead.
+      age:fd([/age.group/i,/age.broad/i,/population.category/i,/^age/i,/_age/i])||'Age Group',
+      prob:fd([/presenting.problem/i,/main.problem/i,/problem/i,/diagnosis/i])||'Main Presenting Problem',
     };
   },[fields]);
 
