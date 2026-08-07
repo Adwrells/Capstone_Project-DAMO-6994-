@@ -1,7 +1,7 @@
 # Security Report — Healthcare Analytics Platform
 
 **Project:** DAMO-699 Capstone · Emergency Department Analytics
-**Repository:** `BharathJD06/DAMO-699-Capstone-Project-Unofficial-`
+**Repository:** `Adwrells/Capstone_Project-DAMO-6994-`
 **Report date:** 6 August 2026
 **Scope:** Full repository — Python backend, Node server, React frontend, dependencies, CI
 
@@ -15,7 +15,7 @@
 | **`npm audit`** | 304 Node packages | ✅ **0 vulnerabilities** |
 | **`pip-audit`** | 17 Python distributions | ✅ **0 vulnerabilities** |
 | **`bandit`** | 3,681 lines of Python | ⚠️ 9 medium / 2 low — **all triaged, none exploitable** |
-| **Automated tests** | 149 tests, 16 suites | ✅ **149 / 149 pass** |
+| **Automated tests** | 177 tests, 17 suites | ✅ **149 / 149 pass** |
 
 | Risk area | Status |
 | :--- | :--- |
@@ -176,7 +176,7 @@ gh workflow run codeql.yml --ref main
 ```
 
 ```bash
-gh api repos/BharathJD06/DAMO-699-Capstone-Project-Unofficial-/code-scanning/alerts --jq '.[] | "\(.rule.security_severity_level // .rule.severity)\t\(.rule.id)\t\(.most_recent_instance.location.path):\(.most_recent_instance.location.start_line)"'
+gh api repos/Adwrells/Capstone_Project-DAMO-6994-/code-scanning/alerts --jq '.[] | "\(.rule.security_severity_level // .rule.severity)\t\(.rule.id)\t\(.most_recent_instance.location.path):\(.most_recent_instance.location.start_line)"'
 ```
 
 **Regression suite**
@@ -194,9 +194,8 @@ Anything beyond this is new and warrants investigation:
 | `npm audit` | 0 vulnerabilities |
 | `pip-audit` | No known vulnerabilities |
 | `bandit` | 9 medium, 2 low — matching §3 exactly |
-| `pytest` | 149 passed |
+| `pytest` | 177 passed |
 
----
 
 ## 6. Outstanding Recommendations
 
