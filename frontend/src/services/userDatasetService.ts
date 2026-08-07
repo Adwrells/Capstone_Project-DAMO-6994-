@@ -24,6 +24,36 @@ export interface PersistResult extends Partial<UserDatasetEntry> {
 }
 
 const BASE = '/api/user-datasets';
+const SESSION_KEY = 'ha-session-id';
+
+/**
+ * Opaque per-browser identifier scoping uploads to this session.
+ *
+ * Isolation, not authentication: the value is generated client-side and sent unverified,
+ * so it can be forged. It stops users seeing each other's uploads by accident; it is not
+ * a confidentiality control. See architecture.md §6.4.
+ *
+ * Persisted in localStorage so a refresh keeps the same identity — sessionStorage would
+ * orphan every dataset the moment the tab closed.
+ */
+export function getSessionId(): string {
+  try {
+    let id = localStorage.getItem(SESSION_KEY);
+    if (!id) {
+      id = (crypto.randomUUID?.() ?? `sess-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+      localStorage.setItem(SESSION_KEY, id);
+    }
+    return id;
+  } catch {
+    // Private browsing can block localStorage. A per-page-load id still isolates this
+    // caller from others; it just will not survive a refresh.
+    return `sess-ephemeral-${Math.random().toString(36).slice(2)}`;
+  }
+}
+
+function sessionHeaders(extra: Record<string, string> = {}): Record<string, string> {
+  return { 'X-Session-Id': getSessionId(), ...extra };
+}
 
 /** Writes cleaned rows to their own table. Resolves with success:false rather than throwing. */
 export async function persistCleanedDataset(
@@ -34,7 +64,7 @@ export async function persistCleanedDataset(
   try {
     const response = await fetch(BASE, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: sessionHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({
         records,
         display_name: displayName,
@@ -56,7 +86,7 @@ export async function persistCleanedDataset(
 /** Every persisted dataset, newest first. */
 export async function listUserDatasets(): Promise<UserDatasetEntry[]> {
   try {
-    const response = await fetch(BASE);
+    const response = await fetch(BASE, { headers: sessionHeaders() });
     if (!response.ok) return [];
     return (await response.json()).datasets || [];
   } catch {
@@ -66,13 +96,16 @@ export async function listUserDatasets(): Promise<UserDatasetEntry[]> {
 
 /** Rows for one persisted dataset. */
 export async function fetchUserDataset(datasetId: string, limit = 1000) {
-  const response = await fetch(`${BASE}/${encodeURIComponent(datasetId)}?limit=${limit}`);
+  const response = await fetch(
+    `${BASE}/${encodeURIComponent(datasetId)}?limit=${limit}`,
+    { headers: sessionHeaders() }
+  );
   if (!response.ok) throw new Error(`Dataset ${datasetId} not found`);
   return response.json();
 }
 
 /** Drops a persisted dataset and its registry entry. */
 export async function deleteUserDataset(datasetId: string): Promise<boolean> {
-  const response = await fetch(`${BASE}/${encodeURIComponent(datasetId)}`, { method: 'DELETE' });
+  const response = await fetch(`${BASE}/${encodeURIComponent(datasetId)}`, { method: 'DELETE', headers: sessionHeaders() });
   return response.ok;
 }

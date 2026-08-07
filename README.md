@@ -34,7 +34,7 @@ dashboard, all reading from a reproducible analytical database.
 | Node server | Express (`server.ts`), port **3000** — serves Vite in middleware mode, handles uploads, Excel parsing and Gemini insight calls |
 | Python backend | FastAPI (`backend/main.py`), port **8000** — 31 routes |
 | Database | SQLite, schema in `backend/database/schema.sql` |
-| Testing | pytest — 177 tests across 17 suites |
+| Testing | pytest — 189 tests across 18 suites |
 
 The platform runs as two services on two ports. The user interface remains functional
 without the Python backend, though model diagnostics and dataset persistence report as
@@ -148,6 +148,21 @@ offline from the cleaned master workbook by `load_csv.py`.
 A user's upload never writes the six seeded tables. This is what keeps the H1–H5 cohort
 fixed, and the figures reported in the capstone reproducible, regardless of platform use.
 
+### Concurrent users
+
+Uploads are scoped by an opaque session identifier the browser generates on first load and
+sends as an `X-Session-Id` header. Each session lists and reads only its own datasets; a
+request for another session's dataset returns 404, which avoids confirming that the
+identifier exists at all.
+
+Concurrency was verified with two simultaneous uploads: both succeeded, each landed in its
+own table with no cross-contamination, and the seeded cohort was unchanged.
+
+> This is isolation, not authentication. The identifier is generated client-side and sent
+> unverified, so it prevents users from encountering each other's data by accident rather
+> than defending against a determined caller. Genuine confidentiality for clinical data
+> requires authenticated identity and transport security.
+
 ---
 
 ## The Five Hypotheses
@@ -245,7 +260,7 @@ as the print destination.
 
 ## Testing
 
-The platform ships **177 tests across 17 suites**.
+The platform ships **189 tests across 18 suites**.
 
 ```bash
 python -m pytest tests
@@ -267,6 +282,7 @@ python -m pytest tests
 | `test_model_validation.py` | 33 | Splitting, polynomial fitting, metrics, curves, fit verdict |
 | `test_dashboard_services.py` | 29 | Dashboard, insights and dataset service layers |
 | `test_user_datasets.py` | 28 | Cleaned-dataset persistence and cohort isolation |
+| `test_user_dataset_isolation.py` | 12 | Session-scoped isolation between concurrent users |
 | `test_data_loader.py` | 15 | Cleaned-dataset to schema column contract |
 | `test_preprocessing.py` | 13 | Cleaning, feature engineering, validation |
 | `test_h1.py`–`test_h5.py` | 37 | The five hypotheses and their statistical routines |

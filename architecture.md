@@ -237,6 +237,48 @@ drops and recreates its tables, so declaring `user_datasets` there would make ev
 `load_csv` rebuild silently destroy user uploads. `tests/test_user_datasets.py` asserts the
 registry is absent from `schema.sql`.
 
+### Session-scoped isolation
+
+Concurrent users are isolated by an opaque session identifier the browser generates on first
+load and stores in `localStorage`. It travels as an `X-Session-Id` header, is forwarded by
+the Express proxy, and is recorded in `user_datasets.owner_id`.
+
+```
+browser (localStorage uuid) ──X-Session-Id──► Express proxy ──► FastAPI ──► owner_id
+```
+
+| Operation | Scoped behaviour |
+| --- | --- |
+| `POST /api/user-datasets` | Stamps the caller's session as `owner_id` |
+| `GET /api/user-datasets` | Returns only that session's datasets |
+| `GET /api/user-datasets/{id}` | **404** when the dataset belongs to another session |
+| `DELETE /api/user-datasets/{id}` | **404**; one session cannot destroy another's data |
+
+**404 rather than 403 is deliberate.** Confirming that an id exists but belongs to someone
+else would leak the existence of other users' data.
+
+**Omitting the header returns everything.** Offline scripts and administrative callers keep
+working, and rows created before scoping existed (`owner_id IS NULL`) remain reachable that
+way — but they are *not* inherited by the first scoped session to arrive, which would
+otherwise adopt everyone's history.
+
+**Migration is additive.** `_ensure_registry()` issues `ALTER TABLE ADD COLUMN` when
+`owner_id` is absent, rather than recreating the registry — a rebuild would orphan every
+persisted upload.
+
+> ### This is isolation, not authentication
+>
+> The session id is generated client-side and sent unverified, so anyone can forge it with
+> `curl`. It reliably prevents users from seeing each other's uploads **by accident**; it is
+> not a defence against a determined caller, and it is not a confidentiality control for
+> real clinical data.
+>
+> Genuine multi-tenancy needs authenticated identity, transport security, and per-request
+> authorisation. Tracked in §6.4.
+
+`tests/test_user_dataset_isolation.py` (12 tests) covers cross-session read, delete, listing,
+the legacy-row rule, and the additive migration.
+
 | Endpoint | Purpose |
 | --- | --- |
 | `POST /api/user-datasets` | Persist cleaned rows into a new isolated table |
@@ -464,22 +506,37 @@ To transition this platform from an 8.7/10 to a **9.8 – 10.0 / 10.0 Capstone R
 
 > **Current posture: [docs/Reports/Security-Report.md](docs/Reports/Security-Report.md)** —
 > full findings, triage, controls, and reproduction commands.
+>
+> `npm audit` 0 · `pip-audit` 0 · `bandit` 9 medium (all triaged non-exploitable) ·
+> CodeQL daily · **0 reachable injection vectors**.
 
 **Completed**
 
 - [x] **SQL identifier allow-listing.** Every dynamic-table query validates the name against
       `get_tables()` before it reaches SQL. A table name cannot be a bound parameter, so this
-      is the correct control, and it is enforced by the test suite.
-- [x] **Network binding.** The FastAPI server binds `127.0.0.1` by default, overridable via
-      `API_HOST` for containerised deployment.
-- [x] **Dependency declaration check.** `tests/test_dependencies.py` fails the suite when a
-      third-party import is missing from `requirements.txt`.
-- [x] **Dataset isolation.** User-cleaned datasets persist to namespaced tables, never to the
-      seeded H1–H5 tables, so uploads cannot alter the reported cohort.
+      is the correct control. Enforced by `TestTableNameAllowListing` — removing the
+      allow-list fails the suite.
+- [x] **Network binding.** FastAPI defaults to `127.0.0.1` (was `0.0.0.0`, which published
+      the full clinical dataset to the LAN). Override with `API_HOST`.
+- [x] **Dependency scanning.** `npm audit` + `pip-audit`, plus
+      `tests/test_dependencies.py` failing the suite on undeclared imports.
+- [x] **Static analysis in CI.** CodeQL, `security-extended`, daily 07:17 UTC —
+      `.github/workflows/codeql.yml`.
+- [x] **Vulnerable dependency removed.** `xlsx` 0.18.5 → 0.20.3 from the SheetJS CDN
+      (prototype pollution + ReDoS; npm had no fix path).
+- [x] **Session-scoped dataset isolation.** Uploads are owned by an `X-Session-Id` and are
+      invisible to other sessions (§4A). Closes accidental cross-user visibility — a
+      verified gap where `GET /api/user-datasets` previously returned every user's data to
+      every caller.
 
 **Outstanding**
 
-- [ ] **Branch protection on `main`** — nothing currently gates a direct push.
+- [ ] **Branch protection on `main`** — highest-value remaining item. Nothing currently gates
+      a direct push, so a future change can bypass every control above.
+- [ ] **Authenticated identity.** Session scoping (§4A) prevents *accidental* cross-user
+      visibility, but the identifier is client-generated and unverified, so it can be
+      forged. Real confidentiality for clinical data needs authentication, transport
+      security, and per-request authorisation.
 - [ ] **Restrict CORS.** `allow_origins=["*"]` is acceptable locally, not for a deployed instance.
 - [ ] **Delete `analytics/preprocessing/sqlite_loader.py`** — dead code containing raw SQL writes.
 - [ ] **API Rate Limiting**: Integrate `slowapi` to prevent API denial-of-service on resource-heavy statistical endpoints.
