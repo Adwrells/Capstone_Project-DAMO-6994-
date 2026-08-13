@@ -1,0 +1,2 @@
+Hypothesis,Research_Question,Primary_Test,Matched_Records,Wilcoxon_Statistic,P_Value,Alpha,Matched_Rank_Biserial,Median_Difference_Minutes,Decision
+H2,Did reported median ED LOS differ during FY 2020–2021 compared with the matched pre-pandemic fiscal-year baseline?,Wilcoxon signed-rank test,384,14764.0,0.0004008181376755058,0.05,-0.24403481822836662,0.0,Reject H₀
