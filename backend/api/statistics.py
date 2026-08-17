@@ -8,7 +8,12 @@ Provides standardized statistical endpoints:
 - GET /statistics/h4
 - GET /statistics/h5
 - GET /statistics/dashboard
+- GET /statistics/methods
 All statistical hypothesis testing and metrics are computed EXCLUSIVELY from SQLite database tables.
+
+H1/H2/H4 are frequency-weighted by ed_visits: each row is an aggregate summarising many
+visits, so the tests run over the weight-expanded population rather than over the
+aggregate row count. See backend/analytics/statistics/weighted.py.
 """
 
 from typing import Dict, Any, List, Optional
@@ -29,7 +34,14 @@ except ImportError:
     class BaseModel: pass
 
 from backend.analytics.descriptive import get_table_descriptive_metrics, calculate_five_number_summary, calculate_mean, calculate_std
-from backend.analytics.hypothesis_testing import run_h1_test, run_h2_test, run_h4_test
+from backend.analytics.hypothesis_testing import (
+    ALPHA,
+    TEST_KRUSKAL,
+    TEST_MANN_WHITNEY,
+    run_h1_test,
+    run_h2_test,
+    run_h4_test,
+)
 from backend.analytics.regression import run_h3_regression, linear_regression
 from backend.analytics.trend_analysis import run_ed_visits_trend_analysis, mann_kendall_test
 from backend.analytics.forecasting import run_ed_visits_forecasting
@@ -133,16 +145,25 @@ async def get_statistics_dashboard() -> Dict[str, Any]:
         return {
             "success": True,
             "source": "SQLite Database (healthcare.db)",
+            "alpha": ALPHA,
             "summary_dashboard": {
                 "H1_Triage_Difference": {
                     "test": h1.get("test_name"),
                     "decision": h1.get("decision"),
-                    "p_value": h1.get("p_value")
+                    "p_value": h1.get("p_value"),
+                    "degrees_of_freedom": h1.get("degrees_of_freedom"),
+                    "effect_size": h1.get("epsilon_squared"),
+                    "effect_size_metric": "epsilon_squared",
+                    "effect_size_magnitude": h1.get("effect_size_magnitude"),
+                    "weighted_n": h1.get("weighted_n"),
                 },
                 "H2_Admission_Difference": {
                     "test": h2.get("test_name"),
                     "decision": h2.get("decision"),
-                    "p_value": h2.get("p_value")
+                    "p_value": h2.get("p_value"),
+                    "effect_size": h2.get("rank_biserial"),
+                    "effect_size_metric": "rank_biserial",
+                    "weighted_n": h2.get("weighted_n"),
                 },
                 "H3_Urgency_WLS_Regression": {
                     "model": h3.get("regression_type"),
@@ -153,7 +174,12 @@ async def get_statistics_dashboard() -> Dict[str, Any]:
                 "H4_Age_Group_Difference": {
                     "test": h4.get("test_name"),
                     "decision": h4.get("decision"),
-                    "p_value": h4.get("p_value")
+                    "p_value": h4.get("p_value"),
+                    "degrees_of_freedom": h4.get("degrees_of_freedom"),
+                    "effect_size": h4.get("epsilon_squared"),
+                    "effect_size_metric": "epsilon_squared",
+                    "effect_size_magnitude": h4.get("effect_size_magnitude"),
+                    "weighted_n": h4.get("weighted_n"),
                 },
                 "H5_Volume_Trend": {
                     "test": "Mann-Kendall Trend Test",
@@ -167,6 +193,37 @@ async def get_statistics_dashboard() -> Dict[str, Any]:
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Dashboard error: {str(e)}")
+
+
+@router.get("/methods")
+async def get_statistical_methods() -> Dict[str, Any]:
+    """GET /statistics/methods: the algorithms actually executed by the engine.
+
+    Read from the analytics modules rather than restated here, so this endpoint cannot
+    drift from the code the way a hardcoded methodology list would.
+    """
+    return {
+        "success": True,
+        "alpha": ALPHA,
+        "weighting": {
+            "applied": True,
+            "weight_column": "ed_visits",
+            "rationale": (
+                "Rows are aggregates carrying a visit count, so ed_visits is a frequency "
+                "weight. Tests run over the weight-expanded population."
+            ),
+        },
+        "engine": "backend.analytics.statistics.weighted",
+        "methods": {
+            "H1": {"test": TEST_KRUSKAL, "effect_size": "epsilon_squared", "post_hoc": "Dunn (Bonferroni-adjusted)"},
+            "H2": {"test": TEST_MANN_WHITNEY, "effect_size": "rank_biserial", "post_hoc": None},
+            "H3": {"test": "Weighted Least Squares Linear Regression", "effect_size": "r_squared", "post_hoc": None},
+            "H4": {"test": TEST_KRUSKAL, "effect_size": "epsilon_squared", "post_hoc": "Dunn (Bonferroni-adjusted)"},
+            "H5": {"test": "Mann-Kendall Trend Test", "effect_size": "kendall_tau", "post_hoc": None},
+        },
+        "p_value_computation": "Exact chi-square / normal survival functions (pure Python, SciPy-independent)",
+        "tie_handling": "Midrank assignment with 1 - sum(t^3 - t) / (N^3 - N) correction",
+    }
 
 
 @router.post("/regression")

@@ -1,0 +1,1064 @@
+fiscal_year,fiscal_year_start,sex,main_problem,age_group,population_category,ed_visits,median_los_minutes,median_los_hours,erbi,is_suppressed
+2021-2022,2021,Female,Acute Myocardial Infarction,0-19,Pediatric & Youth,0,216.0,3.6,0,1
+2021-2022,2021,Female,Acute Myocardial Infarction,20-44,Young Adult,291,450.0,7.5,130950,0
+2021-2022,2021,Female,Acute Myocardial Infarction,45-64,Middle Adult,2485,408.0,6.8,1013880,0
+2021-2022,2021,Female,Acute Myocardial Infarction,65+,Older Adult,6555,498.0,8.3,3264390,0
+2021-2022,2021,Female,Asthma,0-19,Pediatric & Youth,7013,222.0,3.7,1556886,0
+2021-2022,2021,Female,Asthma,20-44,Young Adult,7392,186.0,3.1,1374912,0
+2021-2022,2021,Female,Asthma,45-64,Middle Adult,3715,216.0,3.6,802440,0
+2021-2022,2021,Female,Asthma,65+,Older Adult,2010,276.0,4.6,554760,0
+2021-2022,2021,Female,Influenzal Pneumonia,0-19,Pediatric & Youth,8,186.0,3.1,1488,0
+2021-2022,2021,Female,Influenzal Pneumonia,20-44,Young Adult,9,198.0,3.3,1782,0
+2021-2022,2021,Female,Influenzal Pneumonia,45-64,Middle Adult,11,486.0,8.1,5346,0
+2021-2022,2021,Female,Influenzal Pneumonia,65+,Older Adult,8,345.0,5.75,2760,0
+2021-2022,2021,Female,Motor Vehicle Collisions,0-19,Pediatric & Youth,13882,150.0,2.5,2082300,0
+2021-2022,2021,Female,Motor Vehicle Collisions,20-44,Young Adult,27461,174.0,2.9,4778214,0
+2021-2022,2021,Female,Motor Vehicle Collisions,45-64,Middle Adult,14557,192.0,3.2,2794944,0
+2021-2022,2021,Female,Motor Vehicle Collisions,65+,Older Adult,6199,228.0,3.8,1413372,0
+2021-2022,2021,Female,Pneumonia,0-19,Pediatric & Youth,5884,204.0,3.4,1200336,0
+2021-2022,2021,Female,Pneumonia,20-44,Young Adult,4527,276.0,4.6,1249452,0
+2021-2022,2021,Female,Pneumonia,45-64,Middle Adult,6137,324.0,5.4,1988388,0
+2021-2022,2021,Female,Pneumonia,65+,Older Adult,12619,474.0,7.9,5981406,0
+2021-2022,2021,Female,Trauma,0-19,Pediatric & Youth,213633,132.0,2.2,28199556,0
+2021-2022,2021,Female,Trauma,20-44,Young Adult,263151,144.0,2.4,37893744,0
+2021-2022,2021,Female,Trauma,45-64,Middle Adult,186777,156.0,2.6,29137212,0
+2021-2022,2021,Female,Trauma,65+,Older Adult,188252,240.0,4.0,45180480,0
+2021-2022,2021,Female,Unintentional Falls,0-19,Pediatric & Youth,80327,132.0,2.2,10603164,0
+2021-2022,2021,Female,Unintentional Falls,20-44,Young Adult,68985,150.0,2.5,10347750,0
+2021-2022,2021,Female,Unintentional Falls,45-64,Middle Adult,78181,174.0,2.9,13603494,0
+2021-2022,2021,Female,Unintentional Falls,65+,Older Adult,130230,288.0,4.8,37506240,0
+2021-2022,2021,Male,Acute Myocardial Infarction,0-19,Pediatric & Youth,12,342.0,5.7,4104,0
+2021-2022,2021,Male,Acute Myocardial Infarction,20-44,Young Adult,940,258.0,4.3,242520,0
+2021-2022,2021,Male,Acute Myocardial Infarction,45-64,Middle Adult,7145,294.0,4.9,2100630,0
+2021-2022,2021,Male,Acute Myocardial Infarction,65+,Older Adult,9065,396.0,6.6,3589740,0
+2021-2022,2021,Male,Asthma,0-19,Pediatric & Youth,11875,222.0,3.7,2636250,0
+2021-2022,2021,Male,Asthma,20-44,Young Adult,5077,174.0,2.9,883398,0
+2021-2022,2021,Male,Asthma,45-64,Middle Adult,2108,204.0,3.4,430032,0
+2021-2022,2021,Male,Asthma,65+,Older Adult,937,258.0,4.3,241746,0
+2021-2022,2021,Male,Influenzal Pneumonia,0-19,Pediatric & Youth,7,150.0,2.5,1050,0
+2021-2022,2021,Male,Influenzal Pneumonia,20-44,Young Adult,7,348.0,5.8,2436,0
+2021-2022,2021,Male,Influenzal Pneumonia,45-64,Middle Adult,5,198.0,3.3,990,0
+2021-2022,2021,Male,Influenzal Pneumonia,65+,Older Adult,9,504.0,8.4,4536,0
+2021-2022,2021,Male,Motor Vehicle Collisions,0-19,Pediatric & Youth,21691,150.0,2.5,3253650,0
+2021-2022,2021,Male,Motor Vehicle Collisions,20-44,Young Adult,37835,174.0,2.9,6583290,0
+2021-2022,2021,Male,Motor Vehicle Collisions,45-64,Middle Adult,19859,192.0,3.2,3812928,0
+2021-2022,2021,Male,Motor Vehicle Collisions,65+,Older Adult,7638,228.0,3.8,1741464,0
+2021-2022,2021,Male,Pneumonia,0-19,Pediatric & Youth,7415,204.0,3.4,1512660,0
+2021-2022,2021,Male,Pneumonia,20-44,Young Adult,4627,288.0,4.8,1332576,0
+2021-2022,2021,Male,Pneumonia,45-64,Middle Adult,7354,342.0,5.7,2515068,0
+2021-2022,2021,Male,Pneumonia,65+,Older Adult,14681,468.0,7.8,6870708,0
+2021-2022,2021,Male,Trauma,0-19,Pediatric & Youth,287564,132.0,2.2,37958448,0
+2021-2022,2021,Male,Trauma,20-44,Young Adult,367484,144.0,2.4,52917696,0
+2021-2022,2021,Male,Trauma,45-64,Middle Adult,205014,150.0,2.5,30752100,0
+2021-2022,2021,Male,Trauma,65+,Older Adult,140174,210.0,3.5,29436540,0
+2021-2022,2021,Male,Unintentional Falls,0-19,Pediatric & Youth,98840,138.0,2.3,13639920,0
+2021-2022,2021,Male,Unintentional Falls,20-44,Young Adult,69042,156.0,2.6,10770552,0
+2021-2022,2021,Male,Unintentional Falls,45-64,Middle Adult,57265,186.0,3.1,10651290,0
+2021-2022,2021,Male,Unintentional Falls,65+,Older Adult,76912,270.0,4.5,20766240,0
+2020-2021,2020,Female,Acute Myocardial Infarction,0-19,Pediatric & Youth,0,132.0,2.2,0,1
+2020-2021,2020,Female,Acute Myocardial Infarction,20-44,Young Adult,241,408.0,6.8,98328,0
+2020-2021,2020,Female,Acute Myocardial Infarction,45-64,Middle Adult,2483,366.0,6.1,908778,0
+2020-2021,2020,Female,Acute Myocardial Infarction,65+,Older Adult,6174,438.0,7.3,2704212,0
+2020-2021,2020,Female,Asthma,0-19,Pediatric & Youth,2900,162.0,2.7,469800,0
+2020-2021,2020,Female,Asthma,20-44,Young Adult,5965,162.0,2.7,966330,0
+2020-2021,2020,Female,Asthma,45-64,Middle Adult,3082,192.0,3.2,591744,0
+2020-2021,2020,Female,Asthma,65+,Older Adult,1639,258.0,4.3,422862,0
+2020-2021,2020,Female,Influenzal Pneumonia,0-19,Pediatric & Youth,5,162.0,2.7,810,0
+2020-2021,2020,Female,Influenzal Pneumonia,20-44,Young Adult,19,198.0,3.3,3762,0
+2020-2021,2020,Female,Influenzal Pneumonia,45-64,Middle Adult,15,324.0,5.4,4860,0
+2020-2021,2020,Female,Influenzal Pneumonia,65+,Older Adult,9,354.0,5.9,3186,0
+2020-2021,2020,Female,Motor Vehicle Collisions,0-19,Pediatric & Youth,13647,132.0,2.2,1801404,0
+2020-2021,2020,Female,Motor Vehicle Collisions,20-44,Young Adult,23176,156.0,2.6,3615456,0
+2020-2021,2020,Female,Motor Vehicle Collisions,45-64,Middle Adult,12335,174.0,2.9,2146290,0
+2020-2021,2020,Female,Motor Vehicle Collisions,65+,Older Adult,4956,210.0,3.5,1040760,0
+2020-2021,2020,Female,Pneumonia,0-19,Pediatric & Youth,1348,186.0,3.1,250728,0
+2020-2021,2020,Female,Pneumonia,20-44,Young Adult,3387,258.0,4.3,873846,0
+2020-2021,2020,Female,Pneumonia,45-64,Middle Adult,5148,300.0,5.0,1544400,0
+2020-2021,2020,Female,Pneumonia,65+,Older Adult,10716,438.0,7.3,4693608,0
+2020-2021,2020,Female,Trauma,0-19,Pediatric & Youth,171877,108.0,1.8,18562716,0
+2020-2021,2020,Female,Trauma,20-44,Young Adult,223107,120.0,2.0,26772840,0
+2020-2021,2020,Female,Trauma,45-64,Middle Adult,162633,132.0,2.2,21467556,0
+2020-2021,2020,Female,Trauma,65+,Older Adult,156151,216.0,3.6,33728616,0
+2020-2021,2020,Female,Unintentional Falls,0-19,Pediatric & Youth,66839,114.0,1.9,7619646,0
+2020-2021,2020,Female,Unintentional Falls,20-44,Young Adult,57720,126.0,2.1,7272720,0
+2020-2021,2020,Female,Unintentional Falls,45-64,Middle Adult,68084,156.0,2.6,10621104,0
+2020-2021,2020,Female,Unintentional Falls,65+,Older Adult,109377,258.0,4.3,28219266,0
+2020-2021,2020,Male,Acute Myocardial Infarction,0-19,Pediatric & Youth,0,198.0,3.3,0,1
+2020-2021,2020,Male,Acute Myocardial Infarction,20-44,Young Adult,856,282.0,4.7,241392,0
+2020-2021,2020,Male,Acute Myocardial Infarction,45-64,Middle Adult,6840,264.0,4.4,1805760,0
+2020-2021,2020,Male,Acute Myocardial Infarction,65+,Older Adult,8527,366.0,6.1,3120882,0
+2020-2021,2020,Male,Asthma,0-19,Pediatric & Youth,4248,168.0,2.8,713664,0
+2020-2021,2020,Male,Asthma,20-44,Young Adult,4391,144.0,2.4,632304,0
+2020-2021,2020,Male,Asthma,45-64,Middle Adult,1959,174.0,2.9,340866,0
+2020-2021,2020,Male,Asthma,65+,Older Adult,761,216.0,3.6,164376,0
+2020-2021,2020,Male,Influenzal Pneumonia,0-19,Pediatric & Youth,0,159.0,2.65,0,1
+2020-2021,2020,Male,Influenzal Pneumonia,20-44,Young Adult,13,354.0,5.9,4602,0
+2020-2021,2020,Male,Influenzal Pneumonia,45-64,Middle Adult,22,285.0,4.75,6270,0
+2020-2021,2020,Male,Influenzal Pneumonia,65+,Older Adult,17,528.0,8.8,8976,0
+2020-2021,2020,Male,Motor Vehicle Collisions,0-19,Pediatric & Youth,22360,132.0,2.2,2951520,0
+2020-2021,2020,Male,Motor Vehicle Collisions,20-44,Young Adult,35830,156.0,2.6,5589480,0
+2020-2021,2020,Male,Motor Vehicle Collisions,45-64,Middle Adult,18000,174.0,2.9,3132000,0
+2020-2021,2020,Male,Motor Vehicle Collisions,65+,Older Adult,6446,204.0,3.4,1314984,0
+2020-2021,2020,Male,Pneumonia,0-19,Pediatric & Youth,1775,180.0,3.0,319500,0
+2020-2021,2020,Male,Pneumonia,20-44,Young Adult,3734,270.0,4.5,1008180,0
+2020-2021,2020,Male,Pneumonia,45-64,Middle Adult,6629,318.0,5.3,2108022,0
+2020-2021,2020,Male,Pneumonia,65+,Older Adult,13039,420.0,7.0,5476380,0
+2020-2021,2020,Male,Trauma,0-19,Pediatric & Youth,221690,108.0,1.8,23942520,0
+2020-2021,2020,Male,Trauma,20-44,Young Adult,310549,120.0,2.0,37265880,0
+2020-2021,2020,Male,Trauma,45-64,Middle Adult,183327,132.0,2.2,24199164,0
+2020-2021,2020,Male,Trauma,65+,Older Adult,118917,180.0,3.0,21405060,0
+2020-2021,2020,Male,Unintentional Falls,0-19,Pediatric & Youth,80742,114.0,1.9,9204588,0
+2020-2021,2020,Male,Unintentional Falls,20-44,Young Adult,56135,132.0,2.2,7409820,0
+2020-2021,2020,Male,Unintentional Falls,45-64,Middle Adult,49702,162.0,2.7,8051724,0
+2020-2021,2020,Male,Unintentional Falls,65+,Older Adult,64260,246.0,4.1,15807960,0
+2019-2020,2019,Female,Acute Myocardial Infarction,0-19,Pediatric & Youth,8,375.0,6.25,3000,0
+2019-2020,2019,Female,Acute Myocardial Infarction,20-44,Young Adult,272,438.0,7.3,119136,0
+2019-2020,2019,Female,Acute Myocardial Infarction,45-64,Middle Adult,2637,378.0,6.3,996786,0
+2019-2020,2019,Female,Acute Myocardial Infarction,65+,Older Adult,6948,480.0,8.0,3335040,0
+2019-2020,2019,Female,Asthma,0-19,Pediatric & Youth,10552,186.0,3.1,1962672,0
+2019-2020,2019,Female,Asthma,20-44,Young Adult,10939,168.0,2.8,1837752,0
+2019-2020,2019,Female,Asthma,45-64,Middle Adult,6421,192.0,3.2,1232832,0
+2019-2020,2019,Female,Asthma,65+,Older Adult,3620,252.0,4.2,912240,0
+2019-2020,2019,Female,Influenzal Pneumonia,0-19,Pediatric & Youth,77,234.0,3.9,18018,0
+2019-2020,2019,Female,Influenzal Pneumonia,20-44,Young Adult,144,252.0,4.2,36288,0
+2019-2020,2019,Female,Influenzal Pneumonia,45-64,Middle Adult,110,300.0,5.0,33000,0
+2019-2020,2019,Female,Influenzal Pneumonia,65+,Older Adult,142,549.0,9.15,77958,0
+2019-2020,2019,Female,Motor Vehicle Collisions,0-19,Pediatric & Youth,14967,138.0,2.3,2065446,0
+2019-2020,2019,Female,Motor Vehicle Collisions,20-44,Young Adult,30983,162.0,2.7,5019246,0
+2019-2020,2019,Female,Motor Vehicle Collisions,45-64,Middle Adult,17329,180.0,3.0,3119220,0
+2019-2020,2019,Female,Motor Vehicle Collisions,65+,Older Adult,7659,216.0,3.6,1654344,0
+2019-2020,2019,Female,Pneumonia,0-19,Pediatric & Youth,17421,180.0,3.0,3135780,0
+2019-2020,2019,Female,Pneumonia,20-44,Young Adult,12976,204.0,3.4,2647104,0
+2019-2020,2019,Female,Pneumonia,45-64,Middle Adult,13842,234.0,3.9,3239028,0
+2019-2020,2019,Female,Pneumonia,65+,Older Adult,24212,384.0,6.4,9297408,0
+2019-2020,2019,Female,Trauma,0-19,Pediatric & Youth,248608,120.0,2.0,29832960,0
+2019-2020,2019,Female,Trauma,20-44,Young Adult,274063,138.0,2.3,37820694,0
+2019-2020,2019,Female,Trauma,45-64,Middle Adult,198857,144.0,2.4,28635408,0
+2019-2020,2019,Female,Trauma,65+,Older Adult,187350,222.0,3.7,41591700,0
+2019-2020,2019,Female,Unintentional Falls,0-19,Pediatric & Youth,89070,126.0,2.1,11222820,0
+2019-2020,2019,Female,Unintentional Falls,20-44,Young Adult,67298,144.0,2.4,9690912,0
+2019-2020,2019,Female,Unintentional Falls,45-64,Middle Adult,79897,168.0,2.8,13422696,0
+2019-2020,2019,Female,Unintentional Falls,65+,Older Adult,126262,258.0,4.3,32575596,0
+2019-2020,2019,Male,Acute Myocardial Infarction,0-19,Pediatric & Youth,10,132.0,2.2,1320,0
+2019-2020,2019,Male,Acute Myocardial Infarction,20-44,Young Adult,1039,240.0,4.0,249360,0
+2019-2020,2019,Male,Acute Myocardial Infarction,45-64,Middle Adult,7666,282.0,4.7,2161812,0
+2019-2020,2019,Male,Acute Myocardial Infarction,65+,Older Adult,9227,396.0,6.6,3653892,0
+2019-2020,2019,Male,Asthma,0-19,Pediatric & Youth,16397,198.0,3.3,3246606,0
+2019-2020,2019,Male,Asthma,20-44,Young Adult,7451,156.0,2.6,1162356,0
+2019-2020,2019,Male,Asthma,45-64,Middle Adult,3544,186.0,3.1,659184,0
+2019-2020,2019,Male,Asthma,65+,Older Adult,1575,234.0,3.9,368550,0
+2019-2020,2019,Male,Influenzal Pneumonia,0-19,Pediatric & Youth,104,225.0,3.75,23400,0
+2019-2020,2019,Male,Influenzal Pneumonia,20-44,Young Adult,128,216.0,3.6,27648,0
+2019-2020,2019,Male,Influenzal Pneumonia,45-64,Middle Adult,110,348.0,5.8,38280,0
+2019-2020,2019,Male,Influenzal Pneumonia,65+,Older Adult,164,534.0,8.9,87576,0
+2019-2020,2019,Male,Motor Vehicle Collisions,0-19,Pediatric & Youth,20531,138.0,2.3,2833278,0
+2019-2020,2019,Male,Motor Vehicle Collisions,20-44,Young Adult,39236,162.0,2.7,6356232,0
+2019-2020,2019,Male,Motor Vehicle Collisions,45-64,Middle Adult,21049,180.0,3.0,3788820,0
+2019-2020,2019,Male,Motor Vehicle Collisions,65+,Older Adult,7878,210.0,3.5,1654380,0
+2019-2020,2019,Male,Pneumonia,0-19,Pediatric & Youth,21091,180.0,3.0,3796380,0
+2019-2020,2019,Male,Pneumonia,20-44,Young Adult,11276,204.0,3.4,2300304,0
+2019-2020,2019,Male,Pneumonia,45-64,Middle Adult,14476,258.0,4.3,3734808,0
+2019-2020,2019,Male,Pneumonia,65+,Older Adult,24511,396.0,6.6,9706356,0
+2019-2020,2019,Male,Trauma,0-19,Pediatric & Youth,326241,120.0,2.0,39148920,0
+2019-2020,2019,Male,Trauma,20-44,Young Adult,383132,132.0,2.2,50573424,0
+2019-2020,2019,Male,Trauma,45-64,Middle Adult,218736,144.0,2.4,31497984,0
+2019-2020,2019,Male,Trauma,65+,Older Adult,136112,192.0,3.2,26133504,0
+2019-2020,2019,Male,Unintentional Falls,0-19,Pediatric & Youth,106624,126.0,2.1,13434624,0
+2019-2020,2019,Male,Unintentional Falls,20-44,Young Adult,67420,144.0,2.4,9708480,0
+2019-2020,2019,Male,Unintentional Falls,45-64,Middle Adult,58895,174.0,2.9,10247730,0
+2019-2020,2019,Male,Unintentional Falls,65+,Older Adult,73294,246.0,4.1,18030324,0
+2018-2019,2018,Female,Acute Myocardial Infarction,0-19,Pediatric & Youth,0,72.0,1.2,0,1
+2018-2019,2018,Female,Acute Myocardial Infarction,20-44,Young Adult,306,432.0,7.2,132192,0
+2018-2019,2018,Female,Acute Myocardial Infarction,45-64,Middle Adult,2637,390.0,6.5,1028430,0
+2018-2019,2018,Female,Acute Myocardial Infarction,65+,Older Adult,6615,492.0,8.2,3254580,0
+2018-2019,2018,Female,Asthma,0-19,Pediatric & Youth,10375,180.0,3.0,1867500,0
+2018-2019,2018,Female,Asthma,20-44,Young Adult,10728,162.0,2.7,1737936,0
+2018-2019,2018,Female,Asthma,45-64,Middle Adult,6436,189.0,3.15,1216404,0
+2018-2019,2018,Female,Asthma,65+,Older Adult,3721,252.0,4.2,937692,0
+2018-2019,2018,Female,Influenzal Pneumonia,0-19,Pediatric & Youth,72,246.0,4.1,17712,0
+2018-2019,2018,Female,Influenzal Pneumonia,20-44,Young Adult,89,228.0,3.8,20292,0
+2018-2019,2018,Female,Influenzal Pneumonia,45-64,Middle Adult,105,252.0,4.2,26460,0
+2018-2019,2018,Female,Influenzal Pneumonia,65+,Older Adult,97,690.0,11.5,66930,0
+2018-2019,2018,Female,Motor Vehicle Collisions,0-19,Pediatric & Youth,15313,132.0,2.2,2021316,0
+2018-2019,2018,Female,Motor Vehicle Collisions,20-44,Young Adult,32746,156.0,2.6,5108376,0
+2018-2019,2018,Female,Motor Vehicle Collisions,45-64,Middle Adult,17950,174.0,2.9,3123300,0
+2018-2019,2018,Female,Motor Vehicle Collisions,65+,Older Adult,7506,210.0,3.5,1576260,0
+2018-2019,2018,Female,Pneumonia,0-19,Pediatric & Youth,15521,174.0,2.9,2700654,0
+2018-2019,2018,Female,Pneumonia,20-44,Young Adult,10799,204.0,3.4,2202996,0
+2018-2019,2018,Female,Pneumonia,45-64,Middle Adult,12914,240.0,4.0,3099360,0
+2018-2019,2018,Female,Pneumonia,65+,Older Adult,23247,378.0,6.3,8787366,0
+2018-2019,2018,Female,Trauma,0-19,Pediatric & Youth,251642,120.0,2.0,30197040,0
+2018-2019,2018,Female,Trauma,20-44,Young Adult,281307,132.0,2.2,37132524,0
+2018-2019,2018,Female,Trauma,45-64,Middle Adult,207847,144.0,2.4,29929968,0
+2018-2019,2018,Female,Trauma,65+,Older Adult,187501,216.0,3.6,40500216,0
+2018-2019,2018,Female,Unintentional Falls,0-19,Pediatric & Youth,89377,120.0,2.0,10725240,0
+2018-2019,2018,Female,Unintentional Falls,20-44,Young Adult,70927,144.0,2.4,10213488,0
+2018-2019,2018,Female,Unintentional Falls,45-64,Middle Adult,85623,162.0,2.7,13870926,0
+2018-2019,2018,Female,Unintentional Falls,65+,Older Adult,126835,252.0,4.2,31962420,0
+2018-2019,2018,Male,Acute Myocardial Infarction,0-19,Pediatric & Youth,6,255.0,4.25,1530,0
+2018-2019,2018,Male,Acute Myocardial Infarction,20-44,Young Adult,961,270.0,4.5,259470,0
+2018-2019,2018,Male,Acute Myocardial Infarction,45-64,Middle Adult,7502,264.0,4.4,1980528,0
+2018-2019,2018,Male,Acute Myocardial Infarction,65+,Older Adult,8928,402.0,6.7,3589056,0
+2018-2019,2018,Male,Asthma,0-19,Pediatric & Youth,16379,192.0,3.2,3144768,0
+2018-2019,2018,Male,Asthma,20-44,Young Adult,7494,150.0,2.5,1124100,0
+2018-2019,2018,Male,Asthma,45-64,Middle Adult,3605,180.0,3.0,648900,0
+2018-2019,2018,Male,Asthma,65+,Older Adult,1492,222.0,3.7,331224,0
+2018-2019,2018,Male,Influenzal Pneumonia,0-19,Pediatric & Youth,116,210.0,3.5,24360,0
+2018-2019,2018,Male,Influenzal Pneumonia,20-44,Young Adult,96,225.0,3.75,21600,0
+2018-2019,2018,Male,Influenzal Pneumonia,45-64,Middle Adult,99,288.0,4.8,28512,0
+2018-2019,2018,Male,Influenzal Pneumonia,65+,Older Adult,87,546.0,9.1,47502,0
+2018-2019,2018,Male,Motor Vehicle Collisions,0-19,Pediatric & Youth,19761,132.0,2.2,2608452,0
+2018-2019,2018,Male,Motor Vehicle Collisions,20-44,Young Adult,39042,156.0,2.6,6090552,0
+2018-2019,2018,Male,Motor Vehicle Collisions,45-64,Middle Adult,21534,174.0,2.9,3746916,0
+2018-2019,2018,Male,Motor Vehicle Collisions,65+,Older Adult,7871,204.0,3.4,1605684,0
+2018-2019,2018,Male,Pneumonia,0-19,Pediatric & Youth,18294,174.0,2.9,3183156,0
+2018-2019,2018,Male,Pneumonia,20-44,Young Adult,10090,204.0,3.4,2058360,0
+2018-2019,2018,Male,Pneumonia,45-64,Middle Adult,13731,252.0,4.2,3460212,0
+2018-2019,2018,Male,Pneumonia,65+,Older Adult,23703,390.0,6.5,9244170,0
+2018-2019,2018,Male,Trauma,0-19,Pediatric & Youth,323819,120.0,2.0,38858280,0
+2018-2019,2018,Male,Trauma,20-44,Young Adult,394026,132.0,2.2,52011432,0
+2018-2019,2018,Male,Trauma,45-64,Middle Adult,226868,138.0,2.3,31307784,0
+2018-2019,2018,Male,Trauma,65+,Older Adult,135383,186.0,3.1,25181238,0
+2018-2019,2018,Male,Unintentional Falls,0-19,Pediatric & Youth,105554,120.0,2.0,12666480,0
+2018-2019,2018,Male,Unintentional Falls,20-44,Young Adult,71366,144.0,2.4,10276704,0
+2018-2019,2018,Male,Unintentional Falls,45-64,Middle Adult,64201,168.0,2.8,10785768,0
+2018-2019,2018,Male,Unintentional Falls,65+,Older Adult,74275,234.0,3.9,17380350,0
+2017-2018,2017,Female,Acute Myocardial Infarction,0-19,Pediatric & Youth,0,126.0,2.1,0,1
+2017-2018,2017,Female,Acute Myocardial Infarction,20-44,Young Adult,276,390.0,6.5,107640,0
+2017-2018,2017,Female,Acute Myocardial Infarction,45-64,Middle Adult,2488,390.0,6.5,970320,0
+2017-2018,2017,Female,Acute Myocardial Infarction,65+,Older Adult,6527,468.0,7.8,3054636,0
+2017-2018,2017,Female,Asthma,0-19,Pediatric & Youth,11011,174.0,2.9,1915914,0
+2017-2018,2017,Female,Asthma,20-44,Young Adult,11299,162.0,2.7,1830438,0
+2017-2018,2017,Female,Asthma,45-64,Middle Adult,7226,186.0,3.1,1344036,0
+2017-2018,2017,Female,Asthma,65+,Older Adult,3832,246.0,4.1,942672,0
+2017-2018,2017,Female,Influenzal Pneumonia,0-19,Pediatric & Youth,43,225.0,3.75,9675,0
+2017-2018,2017,Female,Influenzal Pneumonia,20-44,Young Adult,73,234.0,3.9,17082,0
+2017-2018,2017,Female,Influenzal Pneumonia,45-64,Middle Adult,108,249.0,4.15,26892,0
+2017-2018,2017,Female,Influenzal Pneumonia,65+,Older Adult,225,924.0,15.4,207900,0
+2017-2018,2017,Female,Motor Vehicle Collisions,0-19,Pediatric & Youth,15861,132.0,2.2,2093652,0
+2017-2018,2017,Female,Motor Vehicle Collisions,20-44,Young Adult,33209,150.0,2.5,4981350,0
+2017-2018,2017,Female,Motor Vehicle Collisions,45-64,Middle Adult,18509,168.0,2.8,3109512,0
+2017-2018,2017,Female,Motor Vehicle Collisions,65+,Older Adult,7498,204.0,3.4,1529592,0
+2017-2018,2017,Female,Pneumonia,0-19,Pediatric & Youth,16488,174.0,2.9,2868912,0
+2017-2018,2017,Female,Pneumonia,20-44,Young Adult,11470,192.0,3.2,2202240,0
+2017-2018,2017,Female,Pneumonia,45-64,Middle Adult,14137,228.0,3.8,3223236,0
+2017-2018,2017,Female,Pneumonia,65+,Older Adult,26122,366.0,6.1,9560652,0
+2017-2018,2017,Female,Trauma,0-19,Pediatric & Youth,259846,114.0,1.9,29622444,0
+2017-2018,2017,Female,Trauma,20-44,Young Adult,276877,126.0,2.1,34886502,0
+2017-2018,2017,Female,Trauma,45-64,Middle Adult,202931,138.0,2.3,28004478,0
+2017-2018,2017,Female,Trauma,65+,Older Adult,181001,210.0,3.5,38010210,0
+2017-2018,2017,Female,Unintentional Falls,0-19,Pediatric & Youth,90353,120.0,2.0,10842360,0
+2017-2018,2017,Female,Unintentional Falls,20-44,Young Adult,66555,138.0,2.3,9184590,0
+2017-2018,2017,Female,Unintentional Falls,45-64,Middle Adult,79791,162.0,2.7,12926142,0
+2017-2018,2017,Female,Unintentional Falls,65+,Older Adult,120817,252.0,4.2,30445884,0
+2017-2018,2017,Male,Acute Myocardial Infarction,0-19,Pediatric & Youth,5,186.0,3.1,930,0
+2017-2018,2017,Male,Acute Myocardial Infarction,20-44,Young Adult,921,264.0,4.4,243144,0
+2017-2018,2017,Male,Acute Myocardial Infarction,45-64,Middle Adult,7483,270.0,4.5,2020410,0
+2017-2018,2017,Male,Acute Myocardial Infarction,65+,Older Adult,8798,390.0,6.5,3431220,0
+2017-2018,2017,Male,Asthma,0-19,Pediatric & Youth,17819,180.0,3.0,3207420,0
+2017-2018,2017,Male,Asthma,20-44,Young Adult,7830,150.0,2.5,1174500,0
+2017-2018,2017,Male,Asthma,45-64,Middle Adult,4016,180.0,3.0,722880,0
+2017-2018,2017,Male,Asthma,65+,Older Adult,1661,228.0,3.8,378708,0
+2017-2018,2017,Male,Influenzal Pneumonia,0-19,Pediatric & Youth,63,216.0,3.6,13608,0
+2017-2018,2017,Male,Influenzal Pneumonia,20-44,Young Adult,88,201.0,3.35,17688,0
+2017-2018,2017,Male,Influenzal Pneumonia,45-64,Middle Adult,94,330.0,5.5,31020,0
+2017-2018,2017,Male,Influenzal Pneumonia,65+,Older Adult,175,702.0,11.7,122850,0
+2017-2018,2017,Male,Motor Vehicle Collisions,0-19,Pediatric & Youth,22234,132.0,2.2,2934888,0
+2017-2018,2017,Male,Motor Vehicle Collisions,20-44,Young Adult,40852,156.0,2.6,6372912,0
+2017-2018,2017,Male,Motor Vehicle Collisions,45-64,Middle Adult,22181,174.0,2.9,3859494,0
+2017-2018,2017,Male,Motor Vehicle Collisions,65+,Older Adult,7804,204.0,3.4,1592016,0
+2017-2018,2017,Male,Pneumonia,0-19,Pediatric & Youth,19518,168.0,2.8,3279024,0
+2017-2018,2017,Male,Pneumonia,20-44,Young Adult,10325,186.0,3.1,1920450,0
+2017-2018,2017,Male,Pneumonia,45-64,Middle Adult,14779,234.0,3.9,3458286,0
+2017-2018,2017,Male,Pneumonia,65+,Older Adult,25648,372.0,6.2,9541056,0
+2017-2018,2017,Male,Trauma,0-19,Pediatric & Youth,347104,114.0,1.9,39569856,0
+2017-2018,2017,Male,Trauma,20-44,Young Adult,399962,126.0,2.1,50395212,0
+2017-2018,2017,Male,Trauma,45-64,Middle Adult,225403,138.0,2.3,31105614,0
+2017-2018,2017,Male,Trauma,65+,Older Adult,129204,180.0,3.0,23256720,0
+2017-2018,2017,Male,Unintentional Falls,0-19,Pediatric & Youth,110963,120.0,2.0,13315560,0
+2017-2018,2017,Male,Unintentional Falls,20-44,Young Adult,68732,144.0,2.4,9897408,0
+2017-2018,2017,Male,Unintentional Falls,45-64,Middle Adult,59426,168.0,2.8,9983568,0
+2017-2018,2017,Male,Unintentional Falls,65+,Older Adult,68860,234.0,3.9,16113240,0
+2016-2017,2016,Female,Acute Myocardial Infarction,0-19,Pediatric & Youth,0,0.0,0.0,0,1
+2016-2017,2016,Female,Acute Myocardial Infarction,20-44,Young Adult,260,360.0,6.0,93600,0
+2016-2017,2016,Female,Acute Myocardial Infarction,45-64,Middle Adult,2577,372.0,6.2,958644,0
+2016-2017,2016,Female,Acute Myocardial Infarction,65+,Older Adult,6311,468.0,7.8,2953548,0
+2016-2017,2016,Female,Asthma,0-19,Pediatric & Youth,10952,168.0,2.8,1839936,0
+2016-2017,2016,Female,Asthma,20-44,Young Adult,10918,162.0,2.7,1768716,0
+2016-2017,2016,Female,Asthma,45-64,Middle Adult,6705,186.0,3.1,1247130,0
+2016-2017,2016,Female,Asthma,65+,Older Adult,3493,246.0,4.1,859278,0
+2016-2017,2016,Female,Influenzal Pneumonia,0-19,Pediatric & Youth,39,198.0,3.3,7722,0
+2016-2017,2016,Female,Influenzal Pneumonia,20-44,Young Adult,55,198.0,3.3,10890,0
+2016-2017,2016,Female,Influenzal Pneumonia,45-64,Middle Adult,65,222.0,3.7,14430,0
+2016-2017,2016,Female,Influenzal Pneumonia,65+,Older Adult,110,525.0,8.75,57750,0
+2016-2017,2016,Female,Motor Vehicle Collisions,0-19,Pediatric & Youth,15664,126.0,2.1,1973664,0
+2016-2017,2016,Female,Motor Vehicle Collisions,20-44,Young Adult,32862,144.0,2.4,4732128,0
+2016-2017,2016,Female,Motor Vehicle Collisions,45-64,Middle Adult,18197,162.0,2.7,2947914,0
+2016-2017,2016,Female,Motor Vehicle Collisions,65+,Older Adult,7428,198.0,3.3,1470744,0
+2016-2017,2016,Female,Pneumonia,0-19,Pediatric & Youth,14653,168.0,2.8,2461704,0
+2016-2017,2016,Female,Pneumonia,20-44,Young Adult,9679,180.0,3.0,1742220,0
+2016-2017,2016,Female,Pneumonia,45-64,Middle Adult,12271,222.0,3.7,2724162,0
+2016-2017,2016,Female,Pneumonia,65+,Older Adult,23283,366.0,6.1,8521578,0
+2016-2017,2016,Female,Trauma,0-19,Pediatric & Youth,256372,114.0,1.9,29226408,0
+2016-2017,2016,Female,Trauma,20-44,Young Adult,272154,126.0,2.1,34291404,0
+2016-2017,2016,Female,Trauma,45-64,Middle Adult,200696,138.0,2.3,27696048,0
+2016-2017,2016,Female,Trauma,65+,Older Adult,175006,204.0,3.4,35701224,0
+2016-2017,2016,Female,Unintentional Falls,0-19,Pediatric & Youth,90269,114.0,1.9,10290666,0
+2016-2017,2016,Female,Unintentional Falls,20-44,Young Adult,65870,132.0,2.2,8694840,0
+2016-2017,2016,Female,Unintentional Falls,45-64,Middle Adult,79712,156.0,2.6,12435072,0
+2016-2017,2016,Female,Unintentional Falls,65+,Older Adult,117186,240.0,4.0,28124640,0
+2016-2017,2016,Male,Acute Myocardial Infarction,0-19,Pediatric & Youth,9,192.0,3.2,1728,0
+2016-2017,2016,Male,Acute Myocardial Infarction,20-44,Young Adult,908,240.0,4.0,217920,0
+2016-2017,2016,Male,Acute Myocardial Infarction,45-64,Middle Adult,7595,258.0,4.3,1959510,0
+2016-2017,2016,Male,Acute Myocardial Infarction,65+,Older Adult,8661,390.0,6.5,3377790,0
+2016-2017,2016,Male,Asthma,0-19,Pediatric & Youth,17272,180.0,3.0,3108960,0
+2016-2017,2016,Male,Asthma,20-44,Young Adult,7625,138.0,2.3,1052250,0
+2016-2017,2016,Male,Asthma,45-64,Middle Adult,3654,168.0,2.8,613872,0
+2016-2017,2016,Male,Asthma,65+,Older Adult,1566,216.0,3.6,338256,0
+2016-2017,2016,Male,Influenzal Pneumonia,0-19,Pediatric & Youth,42,129.0,2.15,5418,0
+2016-2017,2016,Male,Influenzal Pneumonia,20-44,Young Adult,60,177.0,2.95,10620,0
+2016-2017,2016,Male,Influenzal Pneumonia,45-64,Middle Adult,52,252.0,4.2,13104,0
+2016-2017,2016,Male,Influenzal Pneumonia,65+,Older Adult,84,966.0,16.1,81144,0
+2016-2017,2016,Male,Motor Vehicle Collisions,0-19,Pediatric & Youth,21789,126.0,2.1,2745414,0
+2016-2017,2016,Male,Motor Vehicle Collisions,20-44,Young Adult,40627,150.0,2.5,6094050,0
+2016-2017,2016,Male,Motor Vehicle Collisions,45-64,Middle Adult,21864,162.0,2.7,3541968,0
+2016-2017,2016,Male,Motor Vehicle Collisions,65+,Older Adult,7454,192.0,3.2,1431168,0
+2016-2017,2016,Male,Pneumonia,0-19,Pediatric & Youth,17777,168.0,2.8,2986536,0
+2016-2017,2016,Male,Pneumonia,20-44,Young Adult,8890,180.0,3.0,1600200,0
+2016-2017,2016,Male,Pneumonia,45-64,Middle Adult,12489,228.0,3.8,2847492,0
+2016-2017,2016,Male,Pneumonia,65+,Older Adult,23094,372.0,6.2,8590968,0
+2016-2017,2016,Male,Trauma,0-19,Pediatric & Youth,341323,114.0,1.9,38910822,0
+2016-2017,2016,Male,Trauma,20-44,Young Adult,398289,120.0,2.0,47794680,0
+2016-2017,2016,Male,Trauma,45-64,Middle Adult,222502,132.0,2.2,29370264,0
+2016-2017,2016,Male,Trauma,65+,Older Adult,123933,174.0,2.9,21564342,0
+2016-2017,2016,Male,Unintentional Falls,0-19,Pediatric & Youth,110022,114.0,1.9,12542508,0
+2016-2017,2016,Male,Unintentional Falls,20-44,Young Adult,68017,138.0,2.3,9386346,0
+2016-2017,2016,Male,Unintentional Falls,45-64,Middle Adult,58910,162.0,2.7,9543420,0
+2016-2017,2016,Male,Unintentional Falls,65+,Older Adult,66013,222.0,3.7,14654886,0
+2015-2016,2015,Female,Acute Myocardial Infarction,0-19,Pediatric & Youth,0,333.0,5.55,0,1
+2015-2016,2015,Female,Acute Myocardial Infarction,20-44,Young Adult,259,330.0,5.5,85470,0
+2015-2016,2015,Female,Acute Myocardial Infarction,45-64,Middle Adult,2515,354.0,5.9,890310,0
+2015-2016,2015,Female,Acute Myocardial Infarction,65+,Older Adult,6188,450.0,7.5,2784600,0
+2015-2016,2015,Female,Asthma,0-19,Pediatric & Youth,10960,162.0,2.7,1775520,0
+2015-2016,2015,Female,Asthma,20-44,Young Adult,11864,150.0,2.5,1779600,0
+2015-2016,2015,Female,Asthma,45-64,Middle Adult,7154,180.0,3.0,1287720,0
+2015-2016,2015,Female,Asthma,65+,Older Adult,3400,234.0,3.9,795600,0
+2015-2016,2015,Female,Influenzal Pneumonia,0-19,Pediatric & Youth,172,186.0,3.1,31992,0
+2015-2016,2015,Female,Influenzal Pneumonia,20-44,Young Adult,147,186.0,3.1,27342,0
+2015-2016,2015,Female,Influenzal Pneumonia,45-64,Middle Adult,156,225.0,3.75,35100,0
+2015-2016,2015,Female,Influenzal Pneumonia,65+,Older Adult,87,456.0,7.6,39672,0
+2015-2016,2015,Female,Motor Vehicle Collisions,0-19,Pediatric & Youth,15852,126.0,2.1,1997352,0
+2015-2016,2015,Female,Motor Vehicle Collisions,20-44,Young Adult,31648,144.0,2.4,4557312,0
+2015-2016,2015,Female,Motor Vehicle Collisions,45-64,Middle Adult,17456,162.0,2.7,2827872,0
+2015-2016,2015,Female,Motor Vehicle Collisions,65+,Older Adult,7035,192.0,3.2,1350720,0
+2015-2016,2015,Female,Pneumonia,0-19,Pediatric & Youth,16109,168.0,2.8,2706312,0
+2015-2016,2015,Female,Pneumonia,20-44,Young Adult,11000,180.0,3.0,1980000,0
+2015-2016,2015,Female,Pneumonia,45-64,Middle Adult,13006,222.0,3.7,2887332,0
+2015-2016,2015,Female,Pneumonia,65+,Older Adult,21636,360.0,6.0,7788960,0
+2015-2016,2015,Female,Trauma,0-19,Pediatric & Youth,250131,108.0,1.8,27014148,0
+2015-2016,2015,Female,Trauma,20-44,Young Adult,262209,120.0,2.0,31465080,0
+2015-2016,2015,Female,Trauma,45-64,Middle Adult,190366,132.0,2.2,25128312,0
+2015-2016,2015,Female,Trauma,65+,Older Adult,163226,198.0,3.3,32318748,0
+2015-2016,2015,Female,Unintentional Falls,0-19,Pediatric & Youth,86097,114.0,1.9,9815058,0
+2015-2016,2015,Female,Unintentional Falls,20-44,Young Adult,59997,132.0,2.2,7919604,0
+2015-2016,2015,Female,Unintentional Falls,45-64,Middle Adult,71720,150.0,2.5,10758000,0
+2015-2016,2015,Female,Unintentional Falls,65+,Older Adult,108128,234.0,3.9,25301952,0
+2015-2016,2015,Male,Acute Myocardial Infarction,0-19,Pediatric & Youth,9,324.0,5.4,2916,0
+2015-2016,2015,Male,Acute Myocardial Infarction,20-44,Young Adult,1003,210.0,3.5,210630,0
+2015-2016,2015,Male,Acute Myocardial Infarction,45-64,Middle Adult,7147,246.0,4.1,1758162,0
+2015-2016,2015,Male,Acute Myocardial Infarction,65+,Older Adult,8216,384.0,6.4,3154944,0
+2015-2016,2015,Male,Asthma,0-19,Pediatric & Youth,17751,168.0,2.8,2982168,0
+2015-2016,2015,Male,Asthma,20-44,Young Adult,8566,138.0,2.3,1182108,0
+2015-2016,2015,Male,Asthma,45-64,Middle Adult,3853,165.0,2.75,635745,0
+2015-2016,2015,Male,Asthma,65+,Older Adult,1506,210.0,3.5,316260,0
+2015-2016,2015,Male,Influenzal Pneumonia,0-19,Pediatric & Youth,188,207.0,3.45,38916,0
+2015-2016,2015,Male,Influenzal Pneumonia,20-44,Young Adult,155,198.0,3.3,30690,0
+2015-2016,2015,Male,Influenzal Pneumonia,45-64,Middle Adult,124,228.0,3.8,28272,0
+2015-2016,2015,Male,Influenzal Pneumonia,65+,Older Adult,58,339.0,5.65,19662,0
+2015-2016,2015,Male,Motor Vehicle Collisions,0-19,Pediatric & Youth,22896,126.0,2.1,2884896,0
+2015-2016,2015,Male,Motor Vehicle Collisions,20-44,Young Adult,40584,150.0,2.5,6087600,0
+2015-2016,2015,Male,Motor Vehicle Collisions,45-64,Middle Adult,21188,162.0,2.7,3432456,0
+2015-2016,2015,Male,Motor Vehicle Collisions,65+,Older Adult,6983,192.0,3.2,1340736,0
+2015-2016,2015,Male,Pneumonia,0-19,Pediatric & Youth,19382,162.0,2.7,3139884,0
+2015-2016,2015,Male,Pneumonia,20-44,Young Adult,10309,180.0,3.0,1855620,0
+2015-2016,2015,Male,Pneumonia,45-64,Middle Adult,13724,228.0,3.8,3129072,0
+2015-2016,2015,Male,Pneumonia,65+,Older Adult,21625,360.0,6.0,7785000,0
+2015-2016,2015,Male,Trauma,0-19,Pediatric & Youth,335239,108.0,1.8,36205812,0
+2015-2016,2015,Male,Trauma,20-44,Young Adult,393607,120.0,2.0,47232840,0
+2015-2016,2015,Male,Trauma,45-64,Middle Adult,214926,126.0,2.1,27080676,0
+2015-2016,2015,Male,Trauma,65+,Older Adult,114218,168.0,2.8,19188624,0
+2015-2016,2015,Male,Unintentional Falls,0-19,Pediatric & Youth,105005,114.0,1.9,11970570,0
+2015-2016,2015,Male,Unintentional Falls,20-44,Young Adult,63346,132.0,2.2,8361672,0
+2015-2016,2015,Male,Unintentional Falls,45-64,Middle Adult,53746,156.0,2.6,8384376,0
+2015-2016,2015,Male,Unintentional Falls,65+,Older Adult,59287,222.0,3.7,13161714,0
+2014-2015,2014,Female,Acute Myocardial Infarction,0-19,Pediatric & Youth,0,0.0,0.0,0,1
+2014-2015,2014,Female,Acute Myocardial Infarction,20-44,Young Adult,238,378.0,6.3,89964,0
+2014-2015,2014,Female,Acute Myocardial Infarction,45-64,Middle Adult,2329,354.0,5.9,824466,0
+2014-2015,2014,Female,Acute Myocardial Infarction,65+,Older Adult,6167,480.0,8.0,2960160,0
+2014-2015,2014,Female,Asthma,0-19,Pediatric & Youth,12582,168.0,2.8,2113776,0
+2014-2015,2014,Female,Asthma,20-44,Young Adult,12523,150.0,2.5,1878450,0
+2014-2015,2014,Female,Asthma,45-64,Middle Adult,7119,180.0,3.0,1281420,0
+2014-2015,2014,Female,Asthma,65+,Older Adult,3497,240.0,4.0,839280,0
+2014-2015,2014,Female,Influenzal Pneumonia,0-19,Pediatric & Youth,103,144.0,2.4,14832,0
+2014-2015,2014,Female,Influenzal Pneumonia,20-44,Young Adult,97,159.0,2.65,15423,0
+2014-2015,2014,Female,Influenzal Pneumonia,45-64,Middle Adult,86,174.0,2.9,14964,0
+2014-2015,2014,Female,Influenzal Pneumonia,65+,Older Adult,223,630.0,10.5,140490,0
+2014-2015,2014,Female,Motor Vehicle Collisions,0-19,Pediatric & Youth,15496,126.0,2.1,1952496,0
+2014-2015,2014,Female,Motor Vehicle Collisions,20-44,Young Adult,31095,144.0,2.4,4477680,0
+2014-2015,2014,Female,Motor Vehicle Collisions,45-64,Middle Adult,16985,156.0,2.6,2649660,0
+2014-2015,2014,Female,Motor Vehicle Collisions,65+,Older Adult,6476,192.0,3.2,1243392,0
+2014-2015,2014,Female,Pneumonia,0-19,Pediatric & Youth,15693,162.0,2.7,2542266,0
+2014-2015,2014,Female,Pneumonia,20-44,Young Adult,9960,180.0,3.0,1792800,0
+2014-2015,2014,Female,Pneumonia,45-64,Middle Adult,12017,216.0,3.6,2595672,0
+2014-2015,2014,Female,Pneumonia,65+,Older Adult,23146,378.0,6.3,8749188,0
+2014-2015,2014,Female,Trauma,0-19,Pediatric & Youth,241480,108.0,1.8,26079840,0
+2014-2015,2014,Female,Trauma,20-44,Young Adult,255279,120.0,2.0,30633480,0
+2014-2015,2014,Female,Trauma,45-64,Middle Adult,184714,132.0,2.2,24382248,0
+2014-2015,2014,Female,Trauma,65+,Older Adult,155801,198.0,3.3,30848598,0
+2014-2015,2014,Female,Unintentional Falls,0-19,Pediatric & Youth,82284,114.0,1.9,9380376,0
+2014-2015,2014,Female,Unintentional Falls,20-44,Young Adult,60505,132.0,2.2,7986660,0
+2014-2015,2014,Female,Unintentional Falls,45-64,Middle Adult,70501,150.0,2.5,10575150,0
+2014-2015,2014,Female,Unintentional Falls,65+,Older Adult,104292,234.0,3.9,24404328,0
+2014-2015,2014,Male,Acute Myocardial Infarction,0-19,Pediatric & Youth,9,144.0,2.4,1296,0
+2014-2015,2014,Male,Acute Myocardial Infarction,20-44,Young Adult,1007,222.0,3.7,223554,0
+2014-2015,2014,Male,Acute Myocardial Infarction,45-64,Middle Adult,6953,246.0,4.1,1710438,0
+2014-2015,2014,Male,Acute Myocardial Infarction,65+,Older Adult,7984,384.0,6.4,3065856,0
+2014-2015,2014,Male,Asthma,0-19,Pediatric & Youth,20586,168.0,2.8,3458448,0
+2014-2015,2014,Male,Asthma,20-44,Young Adult,8780,138.0,2.3,1211640,0
+2014-2015,2014,Male,Asthma,45-64,Middle Adult,3955,162.0,2.7,640710,0
+2014-2015,2014,Male,Asthma,65+,Older Adult,1426,210.0,3.5,299460,0
+2014-2015,2014,Male,Influenzal Pneumonia,0-19,Pediatric & Youth,149,180.0,3.0,26820,0
+2014-2015,2014,Male,Influenzal Pneumonia,20-44,Young Adult,77,162.0,2.7,12474,0
+2014-2015,2014,Male,Influenzal Pneumonia,45-64,Middle Adult,89,222.0,3.7,19758,0
+2014-2015,2014,Male,Influenzal Pneumonia,65+,Older Adult,163,534.0,8.9,87042,0
+2014-2015,2014,Male,Motor Vehicle Collisions,0-19,Pediatric & Youth,22932,126.0,2.1,2889432,0
+2014-2015,2014,Male,Motor Vehicle Collisions,20-44,Young Adult,39720,144.0,2.4,5719680,0
+2014-2015,2014,Male,Motor Vehicle Collisions,45-64,Middle Adult,20298,162.0,2.7,3288276,0
+2014-2015,2014,Male,Motor Vehicle Collisions,65+,Older Adult,6355,186.0,3.1,1182030,0
+2014-2015,2014,Male,Pneumonia,0-19,Pediatric & Youth,19199,162.0,2.7,3110238,0
+2014-2015,2014,Male,Pneumonia,20-44,Young Adult,9714,180.0,3.0,1748520,0
+2014-2015,2014,Male,Pneumonia,45-64,Middle Adult,12758,228.0,3.8,2908824,0
+2014-2015,2014,Male,Pneumonia,65+,Older Adult,22659,372.0,6.2,8429148,0
+2014-2015,2014,Male,Trauma,0-19,Pediatric & Youth,330188,108.0,1.8,35660304,0
+2014-2015,2014,Male,Trauma,20-44,Young Adult,395006,120.0,2.0,47400720,0
+2014-2015,2014,Male,Trauma,45-64,Middle Adult,211190,126.0,2.1,26609940,0
+2014-2015,2014,Male,Trauma,65+,Older Adult,107374,168.0,2.8,18038832,0
+2014-2015,2014,Male,Unintentional Falls,0-19,Pediatric & Youth,101478,114.0,1.9,11568492,0
+2014-2015,2014,Male,Unintentional Falls,20-44,Young Adult,65403,132.0,2.2,8633196,0
+2014-2015,2014,Male,Unintentional Falls,45-64,Middle Adult,54091,156.0,2.6,8438196,0
+2014-2015,2014,Male,Unintentional Falls,65+,Older Adult,56605,222.0,3.7,12566310,0
+2013-2014,2013,Female,Acute Myocardial Infarction,0-19,Pediatric & Youth,0,792.0,13.2,0,1
+2013-2014,2013,Female,Acute Myocardial Infarction,20-44,Young Adult,228,390.0,6.5,88920,0
+2013-2014,2013,Female,Acute Myocardial Infarction,45-64,Middle Adult,2245,342.0,5.7,767790,0
+2013-2014,2013,Female,Acute Myocardial Infarction,65+,Older Adult,6016,468.0,7.8,2815488,0
+2013-2014,2013,Female,Asthma,0-19,Pediatric & Youth,11105,150.0,2.5,1665750,0
+2013-2014,2013,Female,Asthma,20-44,Young Adult,12271,144.0,2.4,1767024,0
+2013-2014,2013,Female,Asthma,45-64,Middle Adult,7027,174.0,2.9,1222698,0
+2013-2014,2013,Female,Asthma,65+,Older Adult,3125,240.0,4.0,750000,0
+2013-2014,2013,Female,Influenzal Pneumonia,0-19,Pediatric & Youth,163,144.0,2.4,23472,0
+2013-2014,2013,Female,Influenzal Pneumonia,20-44,Young Adult,223,183.0,3.05,40809,0
+2013-2014,2013,Female,Influenzal Pneumonia,45-64,Middle Adult,130,222.0,3.7,28860,0
+2013-2014,2013,Female,Influenzal Pneumonia,65+,Older Adult,62,564.0,9.4,34968,0
+2013-2014,2013,Female,Motor Vehicle Collisions,0-19,Pediatric & Youth,15931,120.0,2.0,1911720,0
+2013-2014,2013,Female,Motor Vehicle Collisions,20-44,Young Adult,32161,138.0,2.3,4438218,0
+2013-2014,2013,Female,Motor Vehicle Collisions,45-64,Middle Adult,17478,156.0,2.6,2726568,0
+2013-2014,2013,Female,Motor Vehicle Collisions,65+,Older Adult,6411,186.0,3.1,1192446,0
+2013-2014,2013,Female,Pneumonia,0-19,Pediatric & Youth,13450,162.0,2.7,2178900,0
+2013-2014,2013,Female,Pneumonia,20-44,Young Adult,9069,186.0,3.1,1686834,0
+2013-2014,2013,Female,Pneumonia,45-64,Middle Adult,11477,216.0,3.6,2479032,0
+2013-2014,2013,Female,Pneumonia,65+,Older Adult,19167,372.0,6.2,7130124,0
+2013-2014,2013,Female,Trauma,0-19,Pediatric & Youth,238998,108.0,1.8,25811784,0
+2013-2014,2013,Female,Trauma,20-44,Young Adult,259166,120.0,2.0,31099920,0
+2013-2014,2013,Female,Trauma,45-64,Middle Adult,187457,132.0,2.2,24744324,0
+2013-2014,2013,Female,Trauma,65+,Older Adult,150283,198.0,3.3,29756034,0
+2013-2014,2013,Female,Unintentional Falls,0-19,Pediatric & Youth,81284,114.0,1.9,9266376,0
+2013-2014,2013,Female,Unintentional Falls,20-44,Young Adult,64281,132.0,2.2,8485092,0
+2013-2014,2013,Female,Unintentional Falls,45-64,Middle Adult,74266,150.0,2.5,11139900,0
+2013-2014,2013,Female,Unintentional Falls,65+,Older Adult,100271,234.0,3.9,23463414,0
+2013-2014,2013,Male,Acute Myocardial Infarction,0-19,Pediatric & Youth,7,84.0,1.4,588,0
+2013-2014,2013,Male,Acute Myocardial Infarction,20-44,Young Adult,947,198.0,3.3,187506,0
+2013-2014,2013,Male,Acute Myocardial Infarction,45-64,Middle Adult,6794,228.0,3.8,1549032,0
+2013-2014,2013,Male,Acute Myocardial Infarction,65+,Older Adult,7712,378.0,6.3,2915136,0
+2013-2014,2013,Male,Asthma,0-19,Pediatric & Youth,18335,156.0,2.6,2860260,0
+2013-2014,2013,Male,Asthma,20-44,Young Adult,8977,132.0,2.2,1184964,0
+2013-2014,2013,Male,Asthma,45-64,Middle Adult,3875,168.0,2.8,651000,0
+2013-2014,2013,Male,Asthma,65+,Older Adult,1357,198.0,3.3,268686,0
+2013-2014,2013,Male,Influenzal Pneumonia,0-19,Pediatric & Youth,174,162.0,2.7,28188,0
+2013-2014,2013,Male,Influenzal Pneumonia,20-44,Young Adult,228,201.0,3.35,45828,0
+2013-2014,2013,Male,Influenzal Pneumonia,45-64,Middle Adult,143,246.0,4.1,35178,0
+2013-2014,2013,Male,Influenzal Pneumonia,65+,Older Adult,46,330.0,5.5,15180,0
+2013-2014,2013,Male,Motor Vehicle Collisions,0-19,Pediatric & Youth,22628,120.0,2.0,2715360,0
+2013-2014,2013,Male,Motor Vehicle Collisions,20-44,Young Adult,39484,144.0,2.4,5685696,0
+2013-2014,2013,Male,Motor Vehicle Collisions,45-64,Middle Adult,20803,156.0,2.6,3245268,0
+2013-2014,2013,Male,Motor Vehicle Collisions,65+,Older Adult,6267,180.0,3.0,1128060,0
+2013-2014,2013,Male,Pneumonia,0-19,Pediatric & Youth,16544,162.0,2.7,2680128,0
+2013-2014,2013,Male,Pneumonia,20-44,Young Adult,9283,180.0,3.0,1670940,0
+2013-2014,2013,Male,Pneumonia,45-64,Middle Adult,12335,228.0,3.8,2812380,0
+2013-2014,2013,Male,Pneumonia,65+,Older Adult,19055,378.0,6.3,7202790,0
+2013-2014,2013,Male,Trauma,0-19,Pediatric & Youth,330403,108.0,1.8,35683524,0
+2013-2014,2013,Male,Trauma,20-44,Young Adult,396914,120.0,2.0,47629680,0
+2013-2014,2013,Male,Trauma,45-64,Middle Adult,214830,126.0,2.1,27068580,0
+2013-2014,2013,Male,Trauma,65+,Older Adult,104555,162.0,2.7,16937910,0
+2013-2014,2013,Male,Unintentional Falls,0-19,Pediatric & Youth,100981,114.0,1.9,11511834,0
+2013-2014,2013,Male,Unintentional Falls,20-44,Young Adult,67974,132.0,2.2,8972568,0
+2013-2014,2013,Male,Unintentional Falls,45-64,Middle Adult,57965,150.0,2.5,8694750,0
+2013-2014,2013,Male,Unintentional Falls,65+,Older Adult,55885,210.0,3.5,11735850,0
+2012-2013,2012,Female,Acute Myocardial Infarction,0-19,Pediatric & Youth,0,158.0,2.6333,0,1
+2012-2013,2012,Female,Acute Myocardial Infarction,20-44,Young Adult,244,363.0,6.05,88572,0
+2012-2013,2012,Female,Acute Myocardial Infarction,45-64,Middle Adult,2270,340.0,5.6667,771800,0
+2012-2013,2012,Female,Acute Myocardial Infarction,65+,Older Adult,5845,474.0,7.9,2770530,0
+2012-2013,2012,Female,Asthma,0-19,Pediatric & Youth,12539,156.0,2.6,1956084,0
+2012-2013,2012,Female,Asthma,20-44,Young Adult,12982,145.0,2.4167,1882390,0
+2012-2013,2012,Female,Asthma,45-64,Middle Adult,7635,170.0,2.8333,1297950,0
+2012-2013,2012,Female,Asthma,65+,Older Adult,3289,238.0,3.9667,782782,0
+2012-2013,2012,Female,Influenzal Pneumonia,0-19,Pediatric & Youth,130,165.0,2.75,21450,0
+2012-2013,2012,Female,Influenzal Pneumonia,20-44,Young Adult,123,168.0,2.8,20664,0
+2012-2013,2012,Female,Influenzal Pneumonia,45-64,Middle Adult,79,188.0,3.1333,14852,0
+2012-2013,2012,Female,Influenzal Pneumonia,65+,Older Adult,89,510.0,8.5,45390,0
+2012-2013,2012,Female,Motor Vehicle Collisions,0-19,Pediatric & Youth,15929,120.0,2.0,1911480,0
+2012-2013,2012,Female,Motor Vehicle Collisions,20-44,Young Adult,31189,141.0,2.35,4397649,0
+2012-2013,2012,Female,Motor Vehicle Collisions,45-64,Middle Adult,16542,156.0,2.6,2580552,0
+2012-2013,2012,Female,Motor Vehicle Collisions,65+,Older Adult,5974,190.0,3.1667,1135060,0
+2012-2013,2012,Female,Pneumonia,0-19,Pediatric & Youth,14629,162.0,2.7,2369898,0
+2012-2013,2012,Female,Pneumonia,20-44,Young Adult,9044,177.0,2.95,1600788,0
+2012-2013,2012,Female,Pneumonia,45-64,Middle Adult,11523,211.0,3.5167,2431353,0
+2012-2013,2012,Female,Pneumonia,65+,Older Adult,21147,374.0,6.2333,7908978,0
+2012-2013,2012,Female,Trauma,0-19,Pediatric & Youth,233717,107.0,1.7833,25007719,0
+2012-2013,2012,Female,Trauma,20-44,Young Adult,250235,119.0,1.9833,29777965,0
+2012-2013,2012,Female,Trauma,45-64,Middle Adult,178972,129.0,2.15,23087388,0
+2012-2013,2012,Female,Trauma,65+,Older Adult,141773,195.0,3.25,27645735,0
+2012-2013,2012,Female,Unintentional Falls,0-19,Pediatric & Youth,79491,111.0,1.85,8823501,0
+2012-2013,2012,Female,Unintentional Falls,20-44,Young Adult,59790,130.0,2.1667,7772700,0
+2012-2013,2012,Female,Unintentional Falls,45-64,Middle Adult,68100,148.0,2.4667,10078800,0
+2012-2013,2012,Female,Unintentional Falls,65+,Older Adult,93970,232.0,3.8667,21801040,0
+2012-2013,2012,Male,Acute Myocardial Infarction,0-19,Pediatric & Youth,11,322.0,5.3667,3542,0
+2012-2013,2012,Male,Acute Myocardial Infarction,20-44,Young Adult,954,227.0,3.7833,216558,0
+2012-2013,2012,Male,Acute Myocardial Infarction,45-64,Middle Adult,6707,231.0,3.85,1549317,0
+2012-2013,2012,Male,Acute Myocardial Infarction,65+,Older Adult,7266,385.0,6.4167,2797410,0
+2012-2013,2012,Male,Asthma,0-19,Pediatric & Youth,20280,156.0,2.6,3163680,0
+2012-2013,2012,Male,Asthma,20-44,Young Adult,9288,133.0,2.2167,1235304,0
+2012-2013,2012,Male,Asthma,45-64,Middle Adult,4171,165.0,2.75,688215,0
+2012-2013,2012,Male,Asthma,65+,Older Adult,1371,195.0,3.25,267345,0
+2012-2013,2012,Male,Influenzal Pneumonia,0-19,Pediatric & Youth,145,151.0,2.5167,21895,0
+2012-2013,2012,Male,Influenzal Pneumonia,20-44,Young Adult,107,165.0,2.75,17655,0
+2012-2013,2012,Male,Influenzal Pneumonia,45-64,Middle Adult,72,156.0,2.6,11232,0
+2012-2013,2012,Male,Influenzal Pneumonia,65+,Older Adult,81,529.0,8.8167,42849,0
+2012-2013,2012,Male,Motor Vehicle Collisions,0-19,Pediatric & Youth,24233,121.0,2.0167,2932193,0
+2012-2013,2012,Male,Motor Vehicle Collisions,20-44,Young Adult,39901,143.0,2.3833,5705843,0
+2012-2013,2012,Male,Motor Vehicle Collisions,45-64,Middle Adult,20287,159.0,2.65,3225633,0
+2012-2013,2012,Male,Motor Vehicle Collisions,65+,Older Adult,5925,180.0,3.0,1066500,0
+2012-2013,2012,Male,Pneumonia,0-19,Pediatric & Youth,18397,158.0,2.6333,2906726,0
+2012-2013,2012,Male,Pneumonia,20-44,Young Adult,9380,177.0,2.95,1660260,0
+2012-2013,2012,Male,Pneumonia,45-64,Middle Adult,12768,222.0,3.7,2834496,0
+2012-2013,2012,Male,Pneumonia,65+,Older Adult,20571,374.0,6.2333,7693554,0
+2012-2013,2012,Male,Trauma,0-19,Pediatric & Youth,332196,107.0,1.7833,35544972,0
+2012-2013,2012,Male,Trauma,20-44,Young Adult,398540,119.0,1.9833,47426260,0
+2012-2013,2012,Male,Trauma,45-64,Middle Adult,206917,126.0,2.1,26071542,0
+2012-2013,2012,Male,Trauma,65+,Older Adult,95511,165.0,2.75,15759315,0
+2012-2013,2012,Male,Unintentional Falls,0-19,Pediatric & Youth,99826,111.0,1.85,11080686,0
+2012-2013,2012,Male,Unintentional Falls,20-44,Young Adult,65493,132.0,2.2,8645076,0
+2012-2013,2012,Male,Unintentional Falls,45-64,Middle Adult,52001,153.0,2.55,7956153,0
+2012-2013,2012,Male,Unintentional Falls,65+,Older Adult,49505,213.0,3.55,10544565,0
+2011-2012,2011,Female,Acute Myocardial Infarction,0-19,Pediatric & Youth,0,502.0,8.3667,0,1
+2011-2012,2011,Female,Acute Myocardial Infarction,20-44,Young Adult,225,328.0,5.4667,73800,0
+2011-2012,2011,Female,Acute Myocardial Infarction,45-64,Middle Adult,1968,343.0,5.7167,675024,0
+2011-2012,2011,Female,Acute Myocardial Infarction,65+,Older Adult,5526,449.0,7.4833,2481174,0
+2011-2012,2011,Female,Asthma,0-19,Pediatric & Youth,12566,150.0,2.5,1884900,0
+2011-2012,2011,Female,Asthma,20-44,Young Adult,12962,143.0,2.3833,1853566,0
+2011-2012,2011,Female,Asthma,45-64,Middle Adult,7403,172.0,2.8667,1273316,0
+2011-2012,2011,Female,Asthma,65+,Older Adult,2853,230.0,3.8333,656190,0
+2011-2012,2011,Female,Influenzal Pneumonia,0-19,Pediatric & Youth,60,150.0,2.5,9000,0
+2011-2012,2011,Female,Influenzal Pneumonia,20-44,Young Adult,43,138.0,2.3,5934,0
+2011-2012,2011,Female,Influenzal Pneumonia,45-64,Middle Adult,23,207.0,3.45,4761,0
+2011-2012,2011,Female,Influenzal Pneumonia,65+,Older Adult,12,348.0,5.8,4176,0
+2011-2012,2011,Female,Motor Vehicle Collisions,0-19,Pediatric & Youth,16478,124.0,2.0667,2043272,0
+2011-2012,2011,Female,Motor Vehicle Collisions,20-44,Young Adult,30206,141.0,2.35,4259046,0
+2011-2012,2011,Female,Motor Vehicle Collisions,45-64,Middle Adult,16396,156.0,2.6,2557776,0
+2011-2012,2011,Female,Motor Vehicle Collisions,65+,Older Adult,5826,191.0,3.1833,1112766,0
+2011-2012,2011,Female,Pneumonia,0-19,Pediatric & Youth,16717,162.0,2.7,2708154,0
+2011-2012,2011,Female,Pneumonia,20-44,Young Adult,9894,175.0,2.9167,1731450,0
+2011-2012,2011,Female,Pneumonia,45-64,Middle Adult,11120,212.0,3.5333,2357440,0
+2011-2012,2011,Female,Pneumonia,65+,Older Adult,18736,366.0,6.1,6857376,0
+2011-2012,2011,Female,Trauma,0-19,Pediatric & Youth,233294,109.0,1.8167,25429046,0
+2011-2012,2011,Female,Trauma,20-44,Young Adult,241286,120.0,2.0,28954320,0
+2011-2012,2011,Female,Trauma,45-64,Middle Adult,174295,129.0,2.15,22484055,0
+2011-2012,2011,Female,Trauma,65+,Older Adult,135902,195.0,3.25,26500890,0
+2011-2012,2011,Female,Unintentional Falls,0-19,Pediatric & Youth,78360,113.0,1.8833,8854680,0
+2011-2012,2011,Female,Unintentional Falls,20-44,Young Adult,57143,131.0,2.1833,7485733,0
+2011-2012,2011,Female,Unintentional Falls,45-64,Middle Adult,65301,149.0,2.4833,9729849,0
+2011-2012,2011,Female,Unintentional Falls,65+,Older Adult,89947,230.0,3.8333,20687810,0
+2011-2012,2011,Male,Acute Myocardial Infarction,0-19,Pediatric & Youth,5,98.0,1.6333,490,0
+2011-2012,2011,Male,Acute Myocardial Infarction,20-44,Young Adult,962,214.0,3.5667,205868,0
+2011-2012,2011,Male,Acute Myocardial Infarction,45-64,Middle Adult,6237,233.0,3.8833,1453221,0
+2011-2012,2011,Male,Acute Myocardial Infarction,65+,Older Adult,6829,371.0,6.1833,2533559,0
+2011-2012,2011,Male,Asthma,0-19,Pediatric & Youth,20140,156.0,2.6,3141840,0
+2011-2012,2011,Male,Asthma,20-44,Young Adult,9344,131.0,2.1833,1224064,0
+2011-2012,2011,Male,Asthma,45-64,Middle Adult,3865,158.0,2.6333,610670,0
+2011-2012,2011,Male,Asthma,65+,Older Adult,1294,196.0,3.2667,253624,0
+2011-2012,2011,Male,Influenzal Pneumonia,0-19,Pediatric & Youth,40,156.0,2.6,6240,0
+2011-2012,2011,Male,Influenzal Pneumonia,20-44,Young Adult,47,160.0,2.6667,7520,0
+2011-2012,2011,Male,Influenzal Pneumonia,45-64,Middle Adult,27,236.0,3.9333,6372,0
+2011-2012,2011,Male,Influenzal Pneumonia,65+,Older Adult,14,285.0,4.75,3990,0
+2011-2012,2011,Male,Motor Vehicle Collisions,0-19,Pediatric & Youth,25801,125.0,2.0833,3225125,0
+2011-2012,2011,Male,Motor Vehicle Collisions,20-44,Young Adult,38729,145.0,2.4167,5615705,0
+2011-2012,2011,Male,Motor Vehicle Collisions,45-64,Middle Adult,19595,160.0,2.6667,3135200,0
+2011-2012,2011,Male,Motor Vehicle Collisions,65+,Older Adult,5764,186.0,3.1,1072104,0
+2011-2012,2011,Male,Pneumonia,0-19,Pediatric & Youth,20273,160.0,2.6667,3243680,0
+2011-2012,2011,Male,Pneumonia,20-44,Young Adult,9725,173.0,2.8833,1682425,0
+2011-2012,2011,Male,Pneumonia,45-64,Middle Adult,11707,223.0,3.7167,2610661,0
+2011-2012,2011,Male,Pneumonia,65+,Older Adult,18747,368.0,6.1333,6898896,0
+2011-2012,2011,Male,Trauma,0-19,Pediatric & Youth,340598,110.0,1.8333,37465780,0
+2011-2012,2011,Male,Trauma,20-44,Young Adult,395022,119.0,1.9833,47007618,0
+2011-2012,2011,Male,Trauma,45-64,Middle Adult,203028,126.0,2.1,25581528,0
+2011-2012,2011,Male,Trauma,65+,Older Adult,90631,164.0,2.7333,14863484,0
+2011-2012,2011,Male,Unintentional Falls,0-19,Pediatric & Youth,100097,115.0,1.9167,11511155,0
+2011-2012,2011,Male,Unintentional Falls,20-44,Young Adult,63298,132.0,2.2,8355336,0
+2011-2012,2011,Male,Unintentional Falls,45-64,Middle Adult,49477,152.0,2.5333,7520504,0
+2011-2012,2011,Male,Unintentional Falls,65+,Older Adult,46472,210.0,3.5,9759120,0
+2010-2011,2010,Female,Acute Myocardial Infarction,0-19,Pediatric & Youth,7,203.0,3.3833,1421,0
+2010-2011,2010,Female,Acute Myocardial Infarction,20-44,Young Adult,248,416.0,6.9333,103168,0
+2010-2011,2010,Female,Acute Myocardial Infarction,45-64,Middle Adult,1930,340.0,5.6667,656200,0
+2010-2011,2010,Female,Acute Myocardial Infarction,65+,Older Adult,5283,477.0,7.95,2519991,0
+2010-2011,2010,Female,Asthma,0-19,Pediatric & Youth,13078,153.0,2.55,2000934,0
+2010-2011,2010,Female,Asthma,20-44,Young Adult,13609,146.0,2.4333,1986914,0
+2010-2011,2010,Female,Asthma,45-64,Middle Adult,7556,170.0,2.8333,1284520,0
+2010-2011,2010,Female,Asthma,65+,Older Adult,3065,226.0,3.7667,692690,0
+2010-2011,2010,Female,Influenzal Pneumonia,0-19,Pediatric & Youth,67,166.0,2.7667,11122,0
+2010-2011,2010,Female,Influenzal Pneumonia,20-44,Young Adult,82,154.0,2.5667,12628,0
+2010-2011,2010,Female,Influenzal Pneumonia,45-64,Middle Adult,46,213.0,3.55,9798,0
+2010-2011,2010,Female,Influenzal Pneumonia,65+,Older Adult,40,578.0,9.6333,23120,0
+2010-2011,2010,Female,Motor Vehicle Collisions,0-19,Pediatric & Youth,16182,122.0,2.0333,1974204,0
+2010-2011,2010,Female,Motor Vehicle Collisions,20-44,Young Adult,31871,144.0,2.4,4589424,0
+2010-2011,2010,Female,Motor Vehicle Collisions,45-64,Middle Adult,16853,156.0,2.6,2629068,0
+2010-2011,2010,Female,Motor Vehicle Collisions,65+,Older Adult,5679,189.0,3.15,1073331,0
+2010-2011,2010,Female,Pneumonia,0-19,Pediatric & Youth,13787,168.0,2.8,2316216,0
+2010-2011,2010,Female,Pneumonia,20-44,Young Adult,8465,175.0,2.9167,1481375,0
+2010-2011,2010,Female,Pneumonia,45-64,Middle Adult,10409,212.0,3.5333,2206708,0
+2010-2011,2010,Female,Pneumonia,65+,Older Adult,18518,385.0,6.4167,7129430,0
+2010-2011,2010,Female,Trauma,0-19,Pediatric & Youth,223772,109.0,1.8167,24391148,0
+2010-2011,2010,Female,Trauma,20-44,Young Adult,237551,121.0,2.0167,28743671,0
+2010-2011,2010,Female,Trauma,45-64,Middle Adult,170562,131.0,2.1833,22343622,0
+2010-2011,2010,Female,Trauma,65+,Older Adult,131787,198.0,3.3,26093826,0
+2010-2011,2010,Female,Unintentional Falls,0-19,Pediatric & Youth,75656,114.0,1.9,8624784,0
+2010-2011,2010,Female,Unintentional Falls,20-44,Young Adult,56950,132.0,2.2,7517400,0
+2010-2011,2010,Female,Unintentional Falls,45-64,Middle Adult,64375,150.0,2.5,9656250,0
+2010-2011,2010,Female,Unintentional Falls,65+,Older Adult,87443,234.0,3.9,20461662,0
+2010-2011,2010,Male,Acute Myocardial Infarction,0-19,Pediatric & Youth,5,212.0,3.5333,1060,0
+2010-2011,2010,Male,Acute Myocardial Infarction,20-44,Young Adult,890,231.0,3.85,205590,0
+2010-2011,2010,Male,Acute Myocardial Infarction,45-64,Middle Adult,6320,225.0,3.75,1422000,0
+2010-2011,2010,Male,Acute Myocardial Infarction,65+,Older Adult,6387,392.0,6.5333,2503704,0
+2010-2011,2010,Male,Asthma,0-19,Pediatric & Youth,21136,156.0,2.6,3297216,0
+2010-2011,2010,Male,Asthma,20-44,Young Adult,9842,130.0,2.1667,1279460,0
+2010-2011,2010,Male,Asthma,45-64,Middle Adult,3983,155.0,2.5833,617365,0
+2010-2011,2010,Male,Asthma,65+,Older Adult,1329,199.0,3.3167,264471,0
+2010-2011,2010,Male,Influenzal Pneumonia,0-19,Pediatric & Youth,75,138.0,2.3,10350,0
+2010-2011,2010,Male,Influenzal Pneumonia,20-44,Young Adult,65,184.0,3.0667,11960,0
+2010-2011,2010,Male,Influenzal Pneumonia,45-64,Middle Adult,33,183.0,3.05,6039,0
+2010-2011,2010,Male,Influenzal Pneumonia,65+,Older Adult,33,682.0,11.3667,22506,0
+2010-2011,2010,Male,Motor Vehicle Collisions,0-19,Pediatric & Youth,24747,124.0,2.0667,3068628,0
+2010-2011,2010,Male,Motor Vehicle Collisions,20-44,Young Adult,40060,144.0,2.4,5768640,0
+2010-2011,2010,Male,Motor Vehicle Collisions,45-64,Middle Adult,19784,160.0,2.6667,3165440,0
+2010-2011,2010,Male,Motor Vehicle Collisions,65+,Older Adult,5454,180.0,3.0,981720,0
+2010-2011,2010,Male,Pneumonia,0-19,Pediatric & Youth,17021,166.0,2.7667,2825486,0
+2010-2011,2010,Male,Pneumonia,20-44,Young Adult,8665,175.0,2.9167,1516375,0
+2010-2011,2010,Male,Pneumonia,45-64,Middle Adult,11283,224.0,3.7333,2527392,0
+2010-2011,2010,Male,Pneumonia,65+,Older Adult,18245,381.0,6.35,6951345,0
+2010-2011,2010,Male,Trauma,0-19,Pediatric & Youth,329966,110.0,1.8333,36296260,0
+2010-2011,2010,Male,Trauma,20-44,Young Adult,392081,120.0,2.0,47049720,0
+2010-2011,2010,Male,Trauma,45-64,Middle Adult,199764,127.0,2.1167,25370028,0
+2010-2011,2010,Male,Trauma,65+,Older Adult,86643,165.0,2.75,14296095,0
+2010-2011,2010,Male,Unintentional Falls,0-19,Pediatric & Youth,95974,115.0,1.9167,11037010,0
+2010-2011,2010,Male,Unintentional Falls,20-44,Young Adult,63555,133.0,2.2167,8452815,0
+2010-2011,2010,Male,Unintentional Falls,45-64,Middle Adult,49180,154.0,2.5667,7573720,0
+2010-2011,2010,Male,Unintentional Falls,65+,Older Adult,44753,212.0,3.5333,9487636,0
+2009-2010,2009,Female,Acute Myocardial Infarction,0-19,Pediatric & Youth,0,804.0,13.4,0,1
+2009-2010,2009,Female,Acute Myocardial Infarction,20-44,Young Adult,150,282.0,4.7,42300,0
+2009-2010,2009,Female,Acute Myocardial Infarction,45-64,Middle Adult,1462,318.0,5.3,464916,0
+2009-2010,2009,Female,Acute Myocardial Infarction,65+,Older Adult,4130,461.0,7.6833,1903930,0
+2009-2010,2009,Female,Asthma,0-19,Pediatric & Youth,10130,155.0,2.5833,1570150,0
+2009-2010,2009,Female,Asthma,20-44,Young Adult,10921,153.0,2.55,1670913,0
+2009-2010,2009,Female,Asthma,45-64,Middle Adult,6101,179.0,2.9833,1092079,0
+2009-2010,2009,Female,Asthma,65+,Older Adult,2346,246.0,4.1,577116,0
+2009-2010,2009,Female,Influenzal Pneumonia,0-19,Pediatric & Youth,1997,136.0,2.2667,271592,0
+2009-2010,2009,Female,Influenzal Pneumonia,20-44,Young Adult,1278,136.0,2.2667,173808,0
+2009-2010,2009,Female,Influenzal Pneumonia,45-64,Middle Adult,551,160.0,2.6667,88160,0
+2009-2010,2009,Female,Influenzal Pneumonia,65+,Older Adult,110,171.0,2.85,18810,0
+2009-2010,2009,Female,Motor Vehicle Collisions,0-19,Pediatric & Youth,11714,130.0,2.1667,1522820,0
+2009-2010,2009,Female,Motor Vehicle Collisions,20-44,Young Adult,21405,150.0,2.5,3210750,0
+2009-2010,2009,Female,Motor Vehicle Collisions,45-64,Middle Adult,11829,163.0,2.7167,1928127,0
+2009-2010,2009,Female,Motor Vehicle Collisions,65+,Older Adult,4365,192.0,3.2,838080,0
+2009-2010,2009,Female,Pneumonia,0-19,Pediatric & Youth,11640,178.0,2.9667,2071920,0
+2009-2010,2009,Female,Pneumonia,20-44,Young Adult,6914,187.0,3.1167,1292918,0
+2009-2010,2009,Female,Pneumonia,45-64,Middle Adult,8391,229.0,3.8167,1921539,0
+2009-2010,2009,Female,Pneumonia,65+,Older Adult,13645,400.0,6.6667,5458000,0
+2009-2010,2009,Female,Trauma,0-19,Pediatric & Youth,163683,115.0,1.9167,18823545,0
+2009-2010,2009,Female,Trauma,20-44,Young Adult,164978,125.0,2.0833,20622250,0
+2009-2010,2009,Female,Trauma,45-64,Middle Adult,123797,135.0,2.25,16712595,0
+2009-2010,2009,Female,Trauma,65+,Older Adult,101309,204.0,3.4,20667036,0
+2009-2010,2009,Female,Unintentional Falls,0-19,Pediatric & Youth,56061,120.0,2.0,6727320,0
+2009-2010,2009,Female,Unintentional Falls,20-44,Young Adult,39013,136.0,2.2667,5305768,0
+2009-2010,2009,Female,Unintentional Falls,45-64,Middle Adult,46205,155.0,2.5833,7161775,0
+2009-2010,2009,Female,Unintentional Falls,65+,Older Adult,67823,238.0,3.9667,16141874,0
+2009-2010,2009,Male,Acute Myocardial Infarction,0-19,Pediatric & Youth,9,362.0,6.0333,3258,0
+2009-2010,2009,Male,Acute Myocardial Infarction,20-44,Young Adult,722,236.0,3.9333,170392,0
+2009-2010,2009,Male,Acute Myocardial Infarction,45-64,Middle Adult,4618,253.0,4.2167,1168354,0
+2009-2010,2009,Male,Acute Myocardial Infarction,65+,Older Adult,4997,392.0,6.5333,1958824,0
+2009-2010,2009,Male,Asthma,0-19,Pediatric & Youth,16675,160.0,2.6667,2668000,0
+2009-2010,2009,Male,Asthma,20-44,Young Adult,7175,136.0,2.2667,975800,0
+2009-2010,2009,Male,Asthma,45-64,Middle Adult,3203,163.0,2.7167,522089,0
+2009-2010,2009,Male,Asthma,65+,Older Adult,1086,218.0,3.6333,236748,0
+2009-2010,2009,Male,Influenzal Pneumonia,0-19,Pediatric & Youth,2203,143.0,2.3833,315029,0
+2009-2010,2009,Male,Influenzal Pneumonia,20-44,Young Adult,877,141.0,2.35,123657,0
+2009-2010,2009,Male,Influenzal Pneumonia,45-64,Middle Adult,369,163.0,2.7167,60147,0
+2009-2010,2009,Male,Influenzal Pneumonia,65+,Older Adult,87,290.0,4.8333,25230,0
+2009-2010,2009,Male,Motor Vehicle Collisions,0-19,Pediatric & Youth,18599,131.0,2.1833,2436469,0
+2009-2010,2009,Male,Motor Vehicle Collisions,20-44,Young Adult,26528,152.0,2.5333,4032256,0
+2009-2010,2009,Male,Motor Vehicle Collisions,45-64,Middle Adult,13458,165.0,2.75,2220570,0
+2009-2010,2009,Male,Motor Vehicle Collisions,65+,Older Adult,4030,195.0,3.25,785850,0
+2009-2010,2009,Male,Pneumonia,0-19,Pediatric & Youth,13929,178.0,2.9667,2479362,0
+2009-2010,2009,Male,Pneumonia,20-44,Young Adult,6622,185.0,3.0833,1225070,0
+2009-2010,2009,Male,Pneumonia,45-64,Middle Adult,8323,237.0,3.95,1972551,0
+2009-2010,2009,Male,Pneumonia,65+,Older Adult,13141,395.0,6.5833,5190695,0
+2009-2010,2009,Male,Trauma,0-19,Pediatric & Youth,243463,116.0,1.9333,28241708,0
+2009-2010,2009,Male,Trauma,20-44,Young Adult,270278,125.0,2.0833,33784750,0
+2009-2010,2009,Male,Trauma,45-64,Middle Adult,144190,130.0,2.1667,18744700,0
+2009-2010,2009,Male,Trauma,65+,Older Adult,65423,172.0,2.8667,11252756,0
+2009-2010,2009,Male,Unintentional Falls,0-19,Pediatric & Youth,71691,120.0,2.0,8602920,0
+2009-2010,2009,Male,Unintentional Falls,20-44,Young Adult,42609,139.0,2.3167,5922651,0
+2009-2010,2009,Male,Unintentional Falls,45-64,Middle Adult,34791,158.0,2.6333,5496978,0
+2009-2010,2009,Male,Unintentional Falls,65+,Older Adult,33646,220.0,3.6667,7402120,0
+2008-2009,2008,Female,Acute Myocardial Infarction,0-19,Pediatric & Youth,0,208.0,3.4667,0,1
+2008-2009,2008,Female,Acute Myocardial Infarction,20-44,Young Adult,156,329.0,5.4833,51324,0
+2008-2009,2008,Female,Acute Myocardial Infarction,45-64,Middle Adult,1371,323.0,5.3833,442833,0
+2008-2009,2008,Female,Acute Myocardial Infarction,65+,Older Adult,4180,484.0,8.0667,2023120,0
+2008-2009,2008,Female,Asthma,0-19,Pediatric & Youth,11683,154.0,2.5667,1799182,0
+2008-2009,2008,Female,Asthma,20-44,Young Adult,11362,147.0,2.45,1670214,0
+2008-2009,2008,Female,Asthma,45-64,Middle Adult,6432,172.0,2.8667,1106304,0
+2008-2009,2008,Female,Asthma,65+,Older Adult,2772,244.0,4.0667,676368,0
+2008-2009,2008,Female,Influenzal Pneumonia,0-19,Pediatric & Youth,12,137.0,2.2833,1644,0
+2008-2009,2008,Female,Influenzal Pneumonia,20-44,Young Adult,13,136.0,2.2667,1768,0
+2008-2009,2008,Female,Influenzal Pneumonia,45-64,Middle Adult,9,140.0,2.3333,1260,0
+2008-2009,2008,Female,Influenzal Pneumonia,65+,Older Adult,7,146.0,2.4333,1022,0
+2008-2009,2008,Female,Motor Vehicle Collisions,0-19,Pediatric & Youth,12140,131.0,2.1833,1590340,0
+2008-2009,2008,Female,Motor Vehicle Collisions,20-44,Young Adult,21666,149.0,2.4833,3228234,0
+2008-2009,2008,Female,Motor Vehicle Collisions,45-64,Middle Adult,11446,163.0,2.7167,1865698,0
+2008-2009,2008,Female,Motor Vehicle Collisions,65+,Older Adult,4274,195.0,3.25,833430,0
+2008-2009,2008,Female,Pneumonia,0-19,Pediatric & Youth,9110,177.0,2.95,1612470,0
+2008-2009,2008,Female,Pneumonia,20-44,Young Adult,5812,180.0,3.0,1046160,0
+2008-2009,2008,Female,Pneumonia,45-64,Middle Adult,7271,218.0,3.6333,1585078,0
+2008-2009,2008,Female,Pneumonia,65+,Older Adult,13968,400.0,6.6667,5587200,0
+2008-2009,2008,Female,Trauma,0-19,Pediatric & Youth,165010,117.0,1.95,19306170,0
+2008-2009,2008,Female,Trauma,20-44,Young Adult,168522,127.0,2.1167,21402294,0
+2008-2009,2008,Female,Trauma,45-64,Middle Adult,122746,138.0,2.3,16938948,0
+2008-2009,2008,Female,Trauma,65+,Older Adult,98890,205.0,3.4167,20272450,0
+2008-2009,2008,Female,Unintentional Falls,0-19,Pediatric & Youth,55176,123.0,2.05,6786648,0
+2008-2009,2008,Female,Unintentional Falls,20-44,Young Adult,40190,139.0,2.3167,5586410,0
+2008-2009,2008,Female,Unintentional Falls,45-64,Middle Adult,46791,158.0,2.6333,7392978,0
+2008-2009,2008,Female,Unintentional Falls,65+,Older Adult,66254,240.0,4.0,15900960,0
+2008-2009,2008,Male,Acute Myocardial Infarction,0-19,Pediatric & Youth,7,494.0,8.2333,3458,0
+2008-2009,2008,Male,Acute Myocardial Infarction,20-44,Young Adult,718,256.0,4.2667,183808,0
+2008-2009,2008,Male,Acute Myocardial Infarction,45-64,Middle Adult,4542,252.0,4.2,1144584,0
+2008-2009,2008,Male,Acute Myocardial Infarction,65+,Older Adult,5144,390.0,6.5,2006160,0
+2008-2009,2008,Male,Asthma,0-19,Pediatric & Youth,18973,161.0,2.6833,3054653,0
+2008-2009,2008,Male,Asthma,20-44,Young Adult,7849,132.0,2.2,1036068,0
+2008-2009,2008,Male,Asthma,45-64,Middle Adult,3483,170.0,2.8333,592110,0
+2008-2009,2008,Male,Asthma,65+,Older Adult,1313,191.0,3.1833,250783,0
+2008-2009,2008,Male,Influenzal Pneumonia,0-19,Pediatric & Youth,18,168.0,2.8,3024,0
+2008-2009,2008,Male,Influenzal Pneumonia,20-44,Young Adult,12,208.0,3.4667,2496,0
+2008-2009,2008,Male,Influenzal Pneumonia,45-64,Middle Adult,13,208.0,3.4667,2704,0
+2008-2009,2008,Male,Influenzal Pneumonia,65+,Older Adult,6,198.0,3.3,1188,0
+2008-2009,2008,Male,Motor Vehicle Collisions,0-19,Pediatric & Youth,19200,132.0,2.2,2534400,0
+2008-2009,2008,Male,Motor Vehicle Collisions,20-44,Young Adult,27171,151.0,2.5167,4102821,0
+2008-2009,2008,Male,Motor Vehicle Collisions,45-64,Middle Adult,13298,165.0,2.75,2194170,0
+2008-2009,2008,Male,Motor Vehicle Collisions,65+,Older Adult,4006,195.0,3.25,781170,0
+2008-2009,2008,Male,Pneumonia,0-19,Pediatric & Youth,11437,172.0,2.8667,1967164,0
+2008-2009,2008,Male,Pneumonia,20-44,Young Adult,5995,182.0,3.0333,1091090,0
+2008-2009,2008,Male,Pneumonia,45-64,Middle Adult,7671,232.0,3.8667,1779672,0
+2008-2009,2008,Male,Pneumonia,65+,Older Adult,13472,397.0,6.6167,5348384,0
+2008-2009,2008,Male,Trauma,0-19,Pediatric & Youth,250603,118.0,1.9667,29571154,0
+2008-2009,2008,Male,Trauma,20-44,Young Adult,283688,126.0,2.1,35744688,0
+2008-2009,2008,Male,Trauma,45-64,Middle Adult,145526,132.0,2.2,19209432,0
+2008-2009,2008,Male,Trauma,65+,Older Adult,64774,174.0,2.9,11270676,0
+2008-2009,2008,Male,Unintentional Falls,0-19,Pediatric & Youth,72203,124.0,2.0667,8953172,0
+2008-2009,2008,Male,Unintentional Falls,20-44,Young Adult,45090,140.0,2.3333,6312600,0
+2008-2009,2008,Male,Unintentional Falls,45-64,Middle Adult,36117,159.0,2.65,5742603,0
+2008-2009,2008,Male,Unintentional Falls,65+,Older Adult,33646,220.0,3.6667,7402120,0
+2007-2008,2007,Female,Acute Myocardial Infarction,0-19,Pediatric & Youth,0,177.0,2.95,0,1
+2007-2008,2007,Female,Acute Myocardial Infarction,20-44,Young Adult,154,298.0,4.9667,45892,0
+2007-2008,2007,Female,Acute Myocardial Infarction,45-64,Middle Adult,1320,292.0,4.8667,385440,0
+2007-2008,2007,Female,Acute Myocardial Infarction,65+,Older Adult,3772,392.0,6.5333,1478624,0
+2007-2008,2007,Female,Asthma,0-19,Pediatric & Youth,11846,148.0,2.4667,1753208,0
+2007-2008,2007,Female,Asthma,20-44,Young Adult,11628,142.0,2.3667,1651176,0
+2007-2008,2007,Female,Asthma,45-64,Middle Adult,6459,163.0,2.7167,1052817,0
+2007-2008,2007,Female,Asthma,65+,Older Adult,2630,241.0,4.0167,633830,0
+2007-2008,2007,Female,Influenzal Pneumonia,0-19,Pediatric & Youth,12,147.0,2.45,1764,0
+2007-2008,2007,Female,Influenzal Pneumonia,20-44,Young Adult,21,154.0,2.5667,3234,0
+2007-2008,2007,Female,Influenzal Pneumonia,45-64,Middle Adult,17,204.0,3.4,3468,0
+2007-2008,2007,Female,Influenzal Pneumonia,65+,Older Adult,10,387.0,6.45,3870,0
+2007-2008,2007,Female,Motor Vehicle Collisions,0-19,Pediatric & Youth,12734,127.0,2.1167,1617218,0
+2007-2008,2007,Female,Motor Vehicle Collisions,20-44,Young Adult,22692,146.0,2.4333,3313032,0
+2007-2008,2007,Female,Motor Vehicle Collisions,45-64,Middle Adult,11785,160.0,2.6667,1885600,0
+2007-2008,2007,Female,Motor Vehicle Collisions,65+,Older Adult,4444,189.0,3.15,839916,0
+2007-2008,2007,Female,Pneumonia,0-19,Pediatric & Youth,7836,166.0,2.7667,1300776,0
+2007-2008,2007,Female,Pneumonia,20-44,Young Adult,4909,183.0,3.05,898347,0
+2007-2008,2007,Female,Pneumonia,45-64,Middle Adult,5849,217.0,3.6167,1269233,0
+2007-2008,2007,Female,Pneumonia,65+,Older Adult,12014,376.0,6.2667,4517264,0
+2007-2008,2007,Female,Trauma,0-19,Pediatric & Youth,162825,113.0,1.8833,18399225,0
+2007-2008,2007,Female,Trauma,20-44,Young Adult,171329,125.0,2.0833,21416125,0
+2007-2008,2007,Female,Trauma,45-64,Middle Adult,120353,135.0,2.25,16247655,0
+2007-2008,2007,Female,Trauma,65+,Older Adult,96089,199.0,3.3167,19121711,0
+2007-2008,2007,Female,Unintentional Falls,0-19,Pediatric & Youth,55549,120.0,2.0,6665880,0
+2007-2008,2007,Female,Unintentional Falls,20-44,Young Adult,42795,138.0,2.3,5905710,0
+2007-2008,2007,Female,Unintentional Falls,45-64,Middle Adult,47472,155.0,2.5833,7358160,0
+2007-2008,2007,Female,Unintentional Falls,65+,Older Adult,65276,230.0,3.8333,15013480,0
+2007-2008,2007,Male,Acute Myocardial Infarction,0-19,Pediatric & Youth,0,384.0,6.4,0,1
+2007-2008,2007,Male,Acute Myocardial Infarction,20-44,Young Adult,694,235.0,3.9167,163090,0
+2007-2008,2007,Male,Acute Myocardial Infarction,45-64,Middle Adult,4226,231.0,3.85,976206,0
+2007-2008,2007,Male,Acute Myocardial Infarction,65+,Older Adult,4528,339.0,5.65,1534992,0
+2007-2008,2007,Male,Asthma,0-19,Pediatric & Youth,19167,153.0,2.55,2932551,0
+2007-2008,2007,Male,Asthma,20-44,Young Adult,7898,127.0,2.1167,1003046,0
+2007-2008,2007,Male,Asthma,45-64,Middle Adult,3358,150.0,2.5,503700,0
+2007-2008,2007,Male,Asthma,65+,Older Adult,1310,202.0,3.3667,264620,0
+2007-2008,2007,Male,Influenzal Pneumonia,0-19,Pediatric & Youth,14,246.0,4.1,3444,0
+2007-2008,2007,Male,Influenzal Pneumonia,20-44,Young Adult,15,129.0,2.15,1935,0
+2007-2008,2007,Male,Influenzal Pneumonia,45-64,Middle Adult,11,257.0,4.2833,2827,0
+2007-2008,2007,Male,Influenzal Pneumonia,65+,Older Adult,0,1264.0,21.0667,0,1
+2007-2008,2007,Male,Motor Vehicle Collisions,0-19,Pediatric & Youth,21029,126.0,2.1,2649654,0
+2007-2008,2007,Male,Motor Vehicle Collisions,20-44,Young Adult,29022,149.0,2.4833,4324278,0
+2007-2008,2007,Male,Motor Vehicle Collisions,45-64,Middle Adult,13339,163.0,2.7167,2174257,0
+2007-2008,2007,Male,Motor Vehicle Collisions,65+,Older Adult,4076,188.0,3.1333,766288,0
+2007-2008,2007,Male,Pneumonia,0-19,Pediatric & Youth,10075,168.0,2.8,1692600,0
+2007-2008,2007,Male,Pneumonia,20-44,Young Adult,5420,183.0,3.05,991860,0
+2007-2008,2007,Male,Pneumonia,45-64,Middle Adult,6486,228.0,3.8,1478808,0
+2007-2008,2007,Male,Pneumonia,65+,Older Adult,11809,365.0,6.0833,4310285,0
+2007-2008,2007,Male,Trauma,0-19,Pediatric & Youth,252776,114.0,1.9,28816464,0
+2007-2008,2007,Male,Trauma,20-44,Young Adult,294547,123.0,2.05,36229281,0
+2007-2008,2007,Male,Trauma,45-64,Middle Adult,144393,130.0,2.1667,18771090,0
+2007-2008,2007,Male,Trauma,65+,Older Adult,62484,167.0,2.7833,10434828,0
+2007-2008,2007,Male,Unintentional Falls,0-19,Pediatric & Youth,72789,120.0,2.0,8734680,0
+2007-2008,2007,Male,Unintentional Falls,20-44,Young Adult,47656,139.0,2.3167,6624184,0
+2007-2008,2007,Male,Unintentional Falls,45-64,Middle Adult,37021,157.0,2.6167,5812297,0
+2007-2008,2007,Male,Unintentional Falls,65+,Older Adult,33097,208.0,3.4667,6884176,0
+2006-2007,2006,Female,Acute Myocardial Infarction,20-44,Young Adult,146,225.0,3.75,32850,0
+2006-2007,2006,Female,Acute Myocardial Infarction,45-64,Middle Adult,1150,190.0,3.1667,218500,0
+2006-2007,2006,Female,Acute Myocardial Infarction,65+,Older Adult,3661,245.0,4.0833,896945,0
+2006-2007,2006,Female,Asthma,0-19,Pediatric & Youth,13604,140.0,2.3333,1904560,0
+2006-2007,2006,Female,Asthma,20-44,Young Adult,13091,137.0,2.2833,1793467,0
+2006-2007,2006,Female,Asthma,45-64,Middle Adult,6719,161.0,2.6833,1081759,0
+2006-2007,2006,Female,Asthma,65+,Older Adult,2734,220.0,3.6667,601480,0
+2006-2007,2006,Female,Influenzal Pneumonia,0-19,Pediatric & Youth,18,109.0,1.8167,1962,0
+2006-2007,2006,Female,Influenzal Pneumonia,20-44,Young Adult,15,197.0,3.2833,2955,0
+2006-2007,2006,Female,Influenzal Pneumonia,45-64,Middle Adult,9,103.0,1.7167,927,0
+2006-2007,2006,Female,Influenzal Pneumonia,65+,Older Adult,18,562.0,9.3667,10116,0
+2006-2007,2006,Female,Motor Vehicle Collisions,0-19,Pediatric & Youth,13076,124.0,2.0667,1621424,0
+2006-2007,2006,Female,Motor Vehicle Collisions,20-44,Young Adult,23137,144.0,2.4,3331728,0
+2006-2007,2006,Female,Motor Vehicle Collisions,45-64,Middle Adult,11563,155.0,2.5833,1792265,0
+2006-2007,2006,Female,Motor Vehicle Collisions,65+,Older Adult,4490,179.0,2.9833,803710,0
+2006-2007,2006,Female,Pneumonia,0-19,Pediatric & Youth,8484,160.0,2.6667,1357440,0
+2006-2007,2006,Female,Pneumonia,20-44,Young Adult,5129,172.0,2.8667,882188,0
+2006-2007,2006,Female,Pneumonia,45-64,Middle Adult,5935,201.0,3.35,1192935,0
+2006-2007,2006,Female,Pneumonia,65+,Older Adult,12436,282.0,4.7,3506952,0
+2006-2007,2006,Female,Trauma,0-19,Pediatric & Youth,163175,109.0,1.8167,17786075,0
+2006-2007,2006,Female,Trauma,20-44,Young Adult,167789,121.0,2.0167,20302469,0
+2006-2007,2006,Female,Trauma,45-64,Middle Adult,111604,130.0,2.1667,14508520,0
+2006-2007,2006,Female,Trauma,65+,Older Adult,91895,185.0,3.0833,17000575,0
+2006-2007,2006,Female,Unintentional Falls,0-19,Pediatric & Youth,54886,115.0,1.9167,6311890,0
+2006-2007,2006,Female,Unintentional Falls,20-44,Young Adult,38228,134.0,2.2333,5122552,0
+2006-2007,2006,Female,Unintentional Falls,45-64,Middle Adult,41110,150.0,2.5,6166500,0
+2006-2007,2006,Female,Unintentional Falls,65+,Older Adult,61989,210.0,3.5,13017690,0
+2006-2007,2006,Male,Acute Myocardial Infarction,0-19,Pediatric & Youth,0,145.0,2.4167,0,1
+2006-2007,2006,Male,Acute Myocardial Infarction,20-44,Young Adult,690,160.0,2.6667,110400,0
+2006-2007,2006,Male,Acute Myocardial Infarction,45-64,Middle Adult,3996,162.0,2.7,647352,0
+2006-2007,2006,Male,Acute Myocardial Infarction,65+,Older Adult,4504,222.0,3.7,999888,0
+2006-2007,2006,Male,Asthma,0-19,Pediatric & Youth,22159,145.0,2.4167,3213055,0
+2006-2007,2006,Male,Asthma,20-44,Young Adult,9405,124.0,2.0667,1166220,0
+2006-2007,2006,Male,Asthma,45-64,Middle Adult,3798,147.0,2.45,558306,0
+2006-2007,2006,Male,Asthma,65+,Older Adult,1412,191.0,3.1833,269692,0
+2006-2007,2006,Male,Influenzal Pneumonia,0-19,Pediatric & Youth,33,144.0,2.4,4752,0
+2006-2007,2006,Male,Influenzal Pneumonia,20-44,Young Adult,21,116.0,1.9333,2436,0
+2006-2007,2006,Male,Influenzal Pneumonia,45-64,Middle Adult,12,202.0,3.3667,2424,0
+2006-2007,2006,Male,Influenzal Pneumonia,65+,Older Adult,9,204.0,3.4,1836,0
+2006-2007,2006,Male,Motor Vehicle Collisions,0-19,Pediatric & Youth,21283,123.0,2.05,2617809,0
+2006-2007,2006,Male,Motor Vehicle Collisions,20-44,Young Adult,29944,143.0,2.3833,4281992,0
+2006-2007,2006,Male,Motor Vehicle Collisions,45-64,Middle Adult,13127,157.0,2.6167,2060939,0
+2006-2007,2006,Male,Motor Vehicle Collisions,65+,Older Adult,3987,175.0,2.9167,697725,0
+2006-2007,2006,Male,Pneumonia,0-19,Pediatric & Youth,10405,164.0,2.7333,1706420,0
+2006-2007,2006,Male,Pneumonia,20-44,Young Adult,5480,174.0,2.9,953520,0
+2006-2007,2006,Male,Pneumonia,45-64,Middle Adult,6418,210.0,3.5,1347780,0
+2006-2007,2006,Male,Pneumonia,65+,Older Adult,12210,276.0,4.6,3369960,0
+2006-2007,2006,Male,Trauma,0-19,Pediatric & Youth,254565,110.0,1.8333,28002150,0
+2006-2007,2006,Male,Trauma,20-44,Young Adult,299455,120.0,2.0,35934600,0
+2006-2007,2006,Male,Trauma,45-64,Middle Adult,137590,125.0,2.0833,17198750,0
+2006-2007,2006,Male,Trauma,65+,Older Adult,59159,158.0,2.6333,9347122,0
+2006-2007,2006,Male,Unintentional Falls,0-19,Pediatric & Youth,72291,116.0,1.9333,8385756,0
+2006-2007,2006,Male,Unintentional Falls,20-44,Young Adult,44676,135.0,2.25,6031260,0
+2006-2007,2006,Male,Unintentional Falls,45-64,Middle Adult,32016,150.0,2.5,4802400,0
+2006-2007,2006,Male,Unintentional Falls,65+,Older Adult,30555,195.0,3.25,5958225,0
+2005-2006,2005,Female,Acute Myocardial Infarction,0-19,Pediatric & Youth,0,166.0,2.7667,0,1
+2005-2006,2005,Female,Acute Myocardial Infarction,20-44,Young Adult,152,190.0,3.1667,28880,0
+2005-2006,2005,Female,Acute Myocardial Infarction,45-64,Middle Adult,1072,203.0,3.3833,217616,0
+2005-2006,2005,Female,Acute Myocardial Infarction,65+,Older Adult,3777,250.0,4.1667,944250,0
+2005-2006,2005,Female,Asthma,0-19,Pediatric & Youth,15088,143.0,2.3833,2157584,0
+2005-2006,2005,Female,Asthma,20-44,Young Adult,13705,134.0,2.2333,1836470,0
+2005-2006,2005,Female,Asthma,45-64,Middle Adult,6683,153.0,2.55,1022499,0
+2005-2006,2005,Female,Asthma,65+,Older Adult,2939,206.0,3.4333,605434,0
+2005-2006,2005,Female,Influenzal Pneumonia,0-19,Pediatric & Youth,9,174.0,2.9,1566,0
+2005-2006,2005,Female,Influenzal Pneumonia,20-44,Young Adult,11,80.0,1.3333,880,0
+2005-2006,2005,Female,Influenzal Pneumonia,45-64,Middle Adult,0,135.0,2.25,0,1
+2005-2006,2005,Female,Influenzal Pneumonia,65+,Older Adult,8,171.0,2.85,1368,0
+2005-2006,2005,Female,Motor Vehicle Collisions,0-19,Pediatric & Youth,14054,123.0,2.05,1728642,0
+2005-2006,2005,Female,Motor Vehicle Collisions,20-44,Young Adult,23509,139.0,2.3167,3267751,0
+2005-2006,2005,Female,Motor Vehicle Collisions,45-64,Middle Adult,11213,150.0,2.5,1681950,0
+2005-2006,2005,Female,Motor Vehicle Collisions,65+,Older Adult,4468,173.0,2.8833,772964,0
+2005-2006,2005,Female,Pneumonia,0-19,Pediatric & Youth,7989,160.0,2.6667,1278240,0
+2005-2006,2005,Female,Pneumonia,20-44,Young Adult,4242,176.0,2.9333,746592,0
+2005-2006,2005,Female,Pneumonia,45-64,Middle Adult,5163,202.0,3.3667,1042926,0
+2005-2006,2005,Female,Pneumonia,65+,Older Adult,11644,277.0,4.6167,3225388,0
+2005-2006,2005,Female,Trauma,0-19,Pediatric & Youth,166819,107.0,1.7833,17849633,0
+2005-2006,2005,Female,Trauma,20-44,Young Adult,173539,119.0,1.9833,20651141,0
+2005-2006,2005,Female,Trauma,45-64,Middle Adult,109457,127.0,2.1167,13901039,0
+2005-2006,2005,Female,Trauma,65+,Older Adult,91094,180.0,3.0,16396920,0
+2005-2006,2005,Female,Unintentional Falls,0-19,Pediatric & Youth,55962,113.0,1.8833,6323706,0
+2005-2006,2005,Female,Unintentional Falls,20-44,Young Adult,39931,130.0,2.1667,5191030,0
+2005-2006,2005,Female,Unintentional Falls,45-64,Middle Adult,40259,147.0,2.45,5918073,0
+2005-2006,2005,Female,Unintentional Falls,65+,Older Adult,61608,205.0,3.4167,12629640,0
+2005-2006,2005,Male,Acute Myocardial Infarction,0-19,Pediatric & Youth,0,424.0,7.0667,0,1
+2005-2006,2005,Male,Acute Myocardial Infarction,20-44,Young Adult,675,159.0,2.65,107325,0
+2005-2006,2005,Male,Acute Myocardial Infarction,45-64,Middle Adult,3827,156.0,2.6,597012,0
+2005-2006,2005,Male,Acute Myocardial Infarction,65+,Older Adult,4235,212.0,3.5333,897820,0
+2005-2006,2005,Male,Asthma,0-19,Pediatric & Youth,24525,145.0,2.4167,3556125,0
+2005-2006,2005,Male,Asthma,20-44,Young Adult,9064,120.0,2.0,1087680,0
+2005-2006,2005,Male,Asthma,45-64,Middle Adult,3544,148.0,2.4667,524512,0
+2005-2006,2005,Male,Asthma,65+,Older Adult,1454,190.0,3.1667,276260,0
+2005-2006,2005,Male,Influenzal Pneumonia,0-19,Pediatric & Youth,10,97.0,1.6167,970,0
+2005-2006,2005,Male,Influenzal Pneumonia,20-44,Young Adult,0,98.0,1.6333,0,1
+2005-2006,2005,Male,Influenzal Pneumonia,45-64,Middle Adult,6,301.0,5.0167,1806,0
+2005-2006,2005,Male,Influenzal Pneumonia,65+,Older Adult,0,429.0,7.15,0,1
+2005-2006,2005,Male,Motor Vehicle Collisions,0-19,Pediatric & Youth,23151,122.0,2.0333,2824422,0
+2005-2006,2005,Male,Motor Vehicle Collisions,20-44,Young Adult,30771,140.0,2.3333,4307940,0
+2005-2006,2005,Male,Motor Vehicle Collisions,45-64,Middle Adult,12921,151.0,2.5167,1951071,0
+2005-2006,2005,Male,Motor Vehicle Collisions,65+,Older Adult,4079,168.0,2.8,685272,0
+2005-2006,2005,Male,Pneumonia,0-19,Pediatric & Youth,10013,160.0,2.6667,1602080,0
+2005-2006,2005,Male,Pneumonia,20-44,Young Adult,4807,178.0,2.9667,855646,0
+2005-2006,2005,Male,Pneumonia,45-64,Middle Adult,5714,212.0,3.5333,1211368,0
+2005-2006,2005,Male,Pneumonia,65+,Older Adult,11872,269.0,4.4833,3193568,0
+2005-2006,2005,Male,Trauma,0-19,Pediatric & Youth,263076,110.0,1.8333,28938360,0
+2005-2006,2005,Male,Trauma,20-44,Young Adult,314962,117.0,1.95,36850554,0
+2005-2006,2005,Male,Trauma,45-64,Middle Adult,138159,122.0,2.0333,16855398,0
+2005-2006,2005,Male,Trauma,65+,Older Adult,58415,153.0,2.55,8937495,0
+2005-2006,2005,Male,Unintentional Falls,0-19,Pediatric & Youth,75141,115.0,1.9167,8641215,0
+2005-2006,2005,Male,Unintentional Falls,20-44,Young Adult,46944,132.0,2.2,6196608,0
+2005-2006,2005,Male,Unintentional Falls,45-64,Middle Adult,32241,147.0,2.45,4739427,0
+2005-2006,2005,Male,Unintentional Falls,65+,Older Adult,29951,189.0,3.15,5660739,0
+2004-2005,2004,Female,Acute Myocardial Infarction,0-19,Pediatric & Youth,0,91.0,1.5167,0,1
+2004-2005,2004,Female,Acute Myocardial Infarction,20-44,Young Adult,123,148.0,2.4667,18204,0
+2004-2005,2004,Female,Acute Myocardial Infarction,45-64,Middle Adult,1003,178.0,2.9667,178534,0
+2004-2005,2004,Female,Acute Myocardial Infarction,65+,Older Adult,3841,235.0,3.9167,902635,0
+2004-2005,2004,Female,Asthma,0-19,Pediatric & Youth,14068,133.0,2.2167,1871044,0
+2004-2005,2004,Female,Asthma,20-44,Young Adult,14246,132.0,2.2,1880472,0
+2004-2005,2004,Female,Asthma,45-64,Middle Adult,7350,155.0,2.5833,1139250,0
+2004-2005,2004,Female,Asthma,65+,Older Adult,3172,208.0,3.4667,659776,0
+2004-2005,2004,Female,Influenzal Pneumonia,0-19,Pediatric & Youth,13,93.0,1.55,1209,0
+2004-2005,2004,Female,Influenzal Pneumonia,20-44,Young Adult,11,146.0,2.4333,1606,0
+2004-2005,2004,Female,Influenzal Pneumonia,45-64,Middle Adult,16,88.0,1.4667,1408,0
+2004-2005,2004,Female,Influenzal Pneumonia,65+,Older Adult,16,248.0,4.1333,3968,0
+2004-2005,2004,Female,Motor Vehicle Collisions,0-19,Pediatric & Youth,14084,119.0,1.9833,1675996,0
+2004-2005,2004,Female,Motor Vehicle Collisions,20-44,Young Adult,23168,135.0,2.25,3127680,0
+2004-2005,2004,Female,Motor Vehicle Collisions,45-64,Middle Adult,10988,149.0,2.4833,1637212,0
+2004-2005,2004,Female,Motor Vehicle Collisions,65+,Older Adult,4415,172.0,2.8667,759380,0
+2004-2005,2004,Female,Pneumonia,0-19,Pediatric & Youth,7968,157.0,2.6167,1250976,0
+2004-2005,2004,Female,Pneumonia,20-44,Young Adult,5041,168.0,2.8,846888,0
+2004-2005,2004,Female,Pneumonia,45-64,Middle Adult,5556,199.0,3.3167,1105644,0
+2004-2005,2004,Female,Pneumonia,65+,Older Adult,12792,274.0,4.5667,3505008,0
+2004-2005,2004,Female,Trauma,0-19,Pediatric & Youth,164426,105.0,1.75,17264730,0
+2004-2005,2004,Female,Trauma,20-44,Young Adult,171731,115.0,1.9167,19749065,0
+2004-2005,2004,Female,Trauma,45-64,Middle Adult,105572,124.0,2.0667,13090928,0
+2004-2005,2004,Female,Trauma,65+,Older Adult,88439,180.0,3.0,15919020,0
+2004-2005,2004,Female,Unintentional Falls,0-19,Pediatric & Youth,56147,111.0,1.85,6232317,0
+2004-2005,2004,Female,Unintentional Falls,20-44,Young Adult,40344,128.0,2.1333,5164032,0
+2004-2005,2004,Female,Unintentional Falls,45-64,Middle Adult,39578,145.0,2.4167,5738810,0
+2004-2005,2004,Female,Unintentional Falls,65+,Older Adult,59665,203.0,3.3833,12111995,0
+2004-2005,2004,Male,Acute Myocardial Infarction,0-19,Pediatric & Youth,8,378.0,6.3,3024,0
+2004-2005,2004,Male,Acute Myocardial Infarction,20-44,Young Adult,708,168.0,2.8,118944,0
+2004-2005,2004,Male,Acute Myocardial Infarction,45-64,Middle Adult,3805,151.0,2.5167,574555,0
+2004-2005,2004,Male,Acute Myocardial Infarction,65+,Older Adult,4437,215.0,3.5833,953955,0
+2004-2005,2004,Male,Asthma,0-19,Pediatric & Youth,22407,142.0,2.3667,3181794,0
+2004-2005,2004,Male,Asthma,20-44,Young Adult,9389,118.0,1.9667,1107902,0
+2004-2005,2004,Male,Asthma,45-64,Middle Adult,3720,144.0,2.4,535680,0
+2004-2005,2004,Male,Asthma,65+,Older Adult,1639,184.0,3.0667,301576,0
+2004-2005,2004,Male,Influenzal Pneumonia,0-19,Pediatric & Youth,10,72.0,1.2,720,0
+2004-2005,2004,Male,Influenzal Pneumonia,20-44,Young Adult,11,115.0,1.9167,1265,0
+2004-2005,2004,Male,Influenzal Pneumonia,45-64,Middle Adult,0,94.0,1.5667,0,1
+2004-2005,2004,Male,Influenzal Pneumonia,65+,Older Adult,12,259.0,4.3167,3108,0
+2004-2005,2004,Male,Motor Vehicle Collisions,0-19,Pediatric & Youth,22941,118.0,1.9667,2707038,0
+2004-2005,2004,Male,Motor Vehicle Collisions,20-44,Young Adult,30211,139.0,2.3167,4199329,0
+2004-2005,2004,Male,Motor Vehicle Collisions,45-64,Middle Adult,11893,150.0,2.5,1783950,0
+2004-2005,2004,Male,Motor Vehicle Collisions,65+,Older Adult,3830,172.0,2.8667,658760,0
+2004-2005,2004,Male,Pneumonia,0-19,Pediatric & Youth,10080,159.0,2.65,1602720,0
+2004-2005,2004,Male,Pneumonia,20-44,Young Adult,5518,170.0,2.8333,938060,0
+2004-2005,2004,Male,Pneumonia,45-64,Middle Adult,6111,202.0,3.3667,1234422,0
+2004-2005,2004,Male,Pneumonia,65+,Older Adult,12974,266.0,4.4333,3451084,0
+2004-2005,2004,Male,Trauma,0-19,Pediatric & Youth,261950,105.0,1.75,27504750,0
+2004-2005,2004,Male,Trauma,20-44,Young Adult,311583,113.0,1.8833,35208879,0
+2004-2005,2004,Male,Trauma,45-64,Middle Adult,131558,119.0,1.9833,15655402,0
+2004-2005,2004,Male,Trauma,65+,Older Adult,56327,152.0,2.5333,8561704,0
+2004-2005,2004,Male,Unintentional Falls,0-19,Pediatric & Youth,76933,112.0,1.8667,8616496,0
+2004-2005,2004,Male,Unintentional Falls,20-44,Young Adult,47309,130.0,2.1667,6150170,0
+2004-2005,2004,Male,Unintentional Falls,45-64,Middle Adult,31976,145.0,2.4167,4636520,0
+2004-2005,2004,Male,Unintentional Falls,65+,Older Adult,28932,190.0,3.1667,5497080,0
+2003-2004,2003,Female,Acute Myocardial Infarction,0-19,Pediatric & Youth,0,93.0,1.55,0,1
+2003-2004,2003,Female,Acute Myocardial Infarction,20-44,Young Adult,152,204.0,3.4,31008,0
+2003-2004,2003,Female,Acute Myocardial Infarction,45-64,Middle Adult,1161,203.0,3.3833,235683,0
+2003-2004,2003,Female,Acute Myocardial Infarction,65+,Older Adult,3783,252.0,4.2,953316,0
+2003-2004,2003,Female,Asthma,0-19,Pediatric & Youth,13769,130.0,2.1667,1789970,0
+2003-2004,2003,Female,Asthma,20-44,Young Adult,14510,128.0,2.1333,1857280,0
+2003-2004,2003,Female,Asthma,45-64,Middle Adult,6702,150.0,2.5,1005300,0
+2003-2004,2003,Female,Asthma,65+,Older Adult,2924,199.0,3.3167,581876,0
+2003-2004,2003,Female,Influenzal Pneumonia,0-19,Pediatric & Youth,14,163.0,2.7167,2282,0
+2003-2004,2003,Female,Influenzal Pneumonia,20-44,Young Adult,27,111.0,1.85,2997,0
+2003-2004,2003,Female,Influenzal Pneumonia,45-64,Middle Adult,11,141.0,2.35,1551,0
+2003-2004,2003,Female,Influenzal Pneumonia,65+,Older Adult,19,490.0,8.1667,9310,0
+2003-2004,2003,Female,Motor Vehicle Collisions,0-19,Pediatric & Youth,13812,115.0,1.9167,1588380,0
+2003-2004,2003,Female,Motor Vehicle Collisions,20-44,Young Adult,22644,130.0,2.1667,2943720,0
+2003-2004,2003,Female,Motor Vehicle Collisions,45-64,Middle Adult,10009,149.0,2.4833,1491341,0
+2003-2004,2003,Female,Motor Vehicle Collisions,65+,Older Adult,4050,166.0,2.7667,672300,0
+2003-2004,2003,Female,Pneumonia,0-19,Pediatric & Youth,8026,155.0,2.5833,1244030,0
+2003-2004,2003,Female,Pneumonia,20-44,Young Adult,4515,168.0,2.8,758520,0
+2003-2004,2003,Female,Pneumonia,45-64,Middle Adult,4950,200.0,3.3333,990000,0
+2003-2004,2003,Female,Pneumonia,65+,Older Adult,11923,279.0,4.65,3326517,0
+2003-2004,2003,Female,Trauma,0-19,Pediatric & Youth,156811,100.0,1.6667,15681100,0
+2003-2004,2003,Female,Trauma,20-44,Young Adult,163985,110.0,1.8333,18038350,0
+2003-2004,2003,Female,Trauma,45-64,Middle Adult,94280,120.0,2.0,11313600,0
+2003-2004,2003,Female,Trauma,65+,Older Adult,81413,176.0,2.9333,14328688,0
+2003-2004,2003,Female,Unintentional Falls,0-19,Pediatric & Youth,52777,105.0,1.75,5541585,0
+2003-2004,2003,Female,Unintentional Falls,20-44,Young Adult,37367,120.0,2.0,4484040,0
+2003-2004,2003,Female,Unintentional Falls,45-64,Middle Adult,34428,140.0,2.3333,4819920,0
+2003-2004,2003,Female,Unintentional Falls,65+,Older Adult,54970,200.0,3.3333,10994000,0
+2003-2004,2003,Male,Acute Myocardial Infarction,0-19,Pediatric & Youth,7,344.0,5.7333,2408,0
+2003-2004,2003,Male,Acute Myocardial Infarction,20-44,Young Adult,705,167.0,2.7833,117735,0
+2003-2004,2003,Male,Acute Myocardial Infarction,45-64,Middle Adult,4000,166.0,2.7667,664000,0
+2003-2004,2003,Male,Acute Myocardial Infarction,65+,Older Adult,4647,219.0,3.65,1017693,0
+2003-2004,2003,Male,Asthma,0-19,Pediatric & Youth,22029,135.0,2.25,2973915,0
+2003-2004,2003,Male,Asthma,20-44,Young Adult,9281,117.0,1.95,1085877,0
+2003-2004,2003,Male,Asthma,45-64,Middle Adult,3404,135.0,2.25,459540,0
+2003-2004,2003,Male,Asthma,65+,Older Adult,1459,166.0,2.7667,242194,0
+2003-2004,2003,Male,Influenzal Pneumonia,0-19,Pediatric & Youth,21,87.0,1.45,1827,0
+2003-2004,2003,Male,Influenzal Pneumonia,20-44,Young Adult,21,153.0,2.55,3213,0
+2003-2004,2003,Male,Influenzal Pneumonia,45-64,Middle Adult,15,112.0,1.8667,1680,0
+2003-2004,2003,Male,Influenzal Pneumonia,65+,Older Adult,21,184.0,3.0667,3864,0
+2003-2004,2003,Male,Motor Vehicle Collisions,0-19,Pediatric & Youth,22377,115.0,1.9167,2573355,0
+2003-2004,2003,Male,Motor Vehicle Collisions,20-44,Young Adult,28964,135.0,2.25,3910140,0
+2003-2004,2003,Male,Motor Vehicle Collisions,45-64,Middle Adult,10943,145.0,2.4167,1586735,0
+2003-2004,2003,Male,Motor Vehicle Collisions,65+,Older Adult,3640,160.0,2.6667,582400,0
+2003-2004,2003,Male,Pneumonia,0-19,Pediatric & Youth,10055,155.0,2.5833,1558525,0
+2003-2004,2003,Male,Pneumonia,20-44,Young Adult,5050,173.0,2.8833,873650,0
+2003-2004,2003,Male,Pneumonia,45-64,Middle Adult,5327,207.0,3.45,1102689,0
+2003-2004,2003,Male,Pneumonia,65+,Older Adult,12119,270.0,4.5,3272130,0
+2003-2004,2003,Male,Trauma,0-19,Pediatric & Youth,251651,100.0,1.6667,25165100,0
+2003-2004,2003,Male,Trauma,20-44,Young Adult,303230,109.0,1.8167,33052070,0
+2003-2004,2003,Male,Trauma,45-64,Middle Adult,121150,114.0,1.9,13811100,0
+2003-2004,2003,Male,Trauma,65+,Older Adult,51563,147.0,2.45,7579761,0
+2003-2004,2003,Male,Unintentional Falls,0-19,Pediatric & Youth,72683,107.0,1.7833,7777081,0
+2003-2004,2003,Male,Unintentional Falls,20-44,Young Adult,44930,123.0,2.05,5526390,0
+2003-2004,2003,Male,Unintentional Falls,45-64,Middle Adult,28700,140.0,2.3333,4018000,0
+2003-2004,2003,Male,Unintentional Falls,65+,Older Adult,26121,184.0,3.0667,4806264,0
