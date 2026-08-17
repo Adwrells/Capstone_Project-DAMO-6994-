@@ -1,6 +1,8 @@
 import math
 from typing import List, Tuple, Dict, Any
 
+from .weighted import chi2_sf
+
 def chi_square_test(observed_matrix: List[List[int]]) -> Tuple[float, int, float]:
     if not observed_matrix or not observed_matrix[0]: return 0.0, 0, 1.0
     n_rows, n_cols = len(observed_matrix), len(observed_matrix[0])
@@ -14,8 +16,10 @@ def chi_square_test(observed_matrix: List[List[int]]) -> Tuple[float, int, float
             exp = (row_sums[r] * col_sums[c]) / total
             if exp > 0: chi2 += ((observed_matrix[r][c] - exp) ** 2) / exp
     df = (n_rows - 1) * (n_cols - 1)
-    p_val = max(0.0001, min(1.0, 1.0 / (1.0 + chi2 / max(1, df))))
-    return round(chi2, 4), df, round(p_val, 6)
+    # Exact upper-tail probability. The previous 1 / (1 + chi2/df) expression was not a
+    # chi-square distribution at all and could not reach small p-values.
+    p_val = chi2_sf(chi2, df)
+    return round(chi2, 4), df, p_val
 
 def chi_square_summary(observed_matrix: List[List[int]], row_labels: List[str], col_labels: List[str]) -> Dict[str, Any]:
     chi2, df, p_val = chi_square_test(observed_matrix)

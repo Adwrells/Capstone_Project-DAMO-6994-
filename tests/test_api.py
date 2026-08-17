@@ -19,6 +19,7 @@ from backend.api.statistics import (
     get_hypothesis_h3,
     get_hypothesis_h4,
     get_hypothesis_h5,
+    get_statistical_methods,
     get_statistics_dashboard,
 )
 from backend.api.dashboard import get_dashboard_kpis, get_dashboard_summary
@@ -64,6 +65,48 @@ class TestAPIEndpoints(unittest.TestCase):
 
         dash_res = asyncio.run(get_statistics_dashboard())
         self.assertTrue(dash_res["success"])
+
+    def test_hypothesis_endpoints_report_weighted_tests(self):
+        """The API must advertise the weighting it actually performs."""
+        h1 = asyncio.run(get_hypothesis_h1())
+        h2 = asyncio.run(get_hypothesis_h2())
+        h4 = asyncio.run(get_hypothesis_h4())
+
+        for res in (h1, h2, h4):
+            self.assertIn("Weighted", res["test_name"])
+            self.assertIn("weighted_n", res)
+            self.assertGreater(res["weighted_n"], 0)
+
+        for res in (h1, h4):
+            self.assertIn("epsilon_squared", res)
+            self.assertIn("degrees_of_freedom", res)
+            self.assertLessEqual(res["tie_correction"], 1.0)
+
+        self.assertIn("rank_biserial", h2)
+
+    def test_statistics_dashboard_carries_effect_sizes(self):
+        dash = asyncio.run(get_statistics_dashboard())
+        summary = dash["summary_dashboard"]
+        self.assertEqual(dash["alpha"], 0.05)
+        for key, metric in (("H1_Triage_Difference", "epsilon_squared"),
+                            ("H2_Admission_Difference", "rank_biserial"),
+                            ("H4_Age_Group_Difference", "epsilon_squared")):
+            self.assertEqual(summary[key]["effect_size_metric"], metric)
+            self.assertIsNotNone(summary[key]["effect_size"])
+            self.assertGreater(summary[key]["weighted_n"], 0)
+
+    def test_methods_endpoint_matches_engine(self):
+        """/methods must be derived from the modules, not a hand-maintained list."""
+        from backend.analytics.hypothesis_testing import TEST_KRUSKAL, TEST_MANN_WHITNEY
+
+        res = asyncio.run(get_statistical_methods())
+        self.assertTrue(res["success"])
+        self.assertTrue(res["weighting"]["applied"])
+        self.assertEqual(res["weighting"]["weight_column"], "ed_visits")
+        self.assertEqual(res["methods"]["H1"]["test"], TEST_KRUSKAL)
+        self.assertEqual(res["methods"]["H4"]["test"], TEST_KRUSKAL)
+        self.assertEqual(res["methods"]["H2"]["test"], TEST_MANN_WHITNEY)
+        self.assertEqual(set(res["methods"]), {"H1", "H2", "H3", "H4", "H5"})
 
 
 if __name__ == "__main__":

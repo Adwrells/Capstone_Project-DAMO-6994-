@@ -34,3 +34,6 @@ htmlcov/
 # every dashboard, hypothesis test, and chart with no data.
 # See README.md → "Database & Data Provenance".
 !backend/database/healthcare.db
+
+# Local working notes on data/statistics defects — not for distribution.
+MEMORY.md
