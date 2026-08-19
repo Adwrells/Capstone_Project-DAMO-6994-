@@ -34,7 +34,7 @@ dashboard, all reading from a reproducible analytical database.
 | Node server | Express (`server.ts`), port **3000** — serves Vite in middleware mode, handles uploads, Excel parsing and Gemini insight calls |
 | Python backend | FastAPI (`backend/main.py`), port **8000** — 31 routes |
 | Database | SQLite, schema in `backend/database/schema.sql` |
-| Testing | pytest — 212 tests across 18 suites |
+| Testing | pytest — 291 tests across 20 suites |
 
 The platform runs as two services on two ports. The user interface remains functional
 without the Python backend, though model diagnostics and dataset persistence report as
@@ -126,8 +126,9 @@ The full specification, including layer contracts and conformance checks, is doc
 
 The analytics core enforces a strict separation:
 
-- `backend/analytics/statistics/` contains **pure computation only** — Kruskal-Wallis,
-  chi-square, OLS regression, ANOVA, assumption checks. No business logic, no I/O.
+- `backend/analytics/statistics/` contains **pure computation only** — the frequency-weighted
+  Kruskal-Wallis/Mann-Whitney/Dunn engine (`weighted.py`), chi-square, WLS regression, ANOVA,
+  assumption checks. No business logic, no I/O.
 - `backend/analytics/hypothesis/` holds the H1–H5 handlers, which compose the statistics
   layer and shape response payloads.
 - `backend/services/` owns data access and business rules. API routers remain transport
@@ -172,13 +173,30 @@ defaults to non-parametric methods rather than assuming normality.
 
 | ID | Research question | Method |
 | :-- | :--- | :--- |
-| **H1** | Does LOS differ across CTAS triage levels? | Kruskal-Wallis with Dunn post-hoc (Bonferroni) |
-| **H2** | Does LOS differ between admitted and discharged visits? | Mann-Whitney U |
-| **H3** | Does CTAS urgency score predict LOS? | OLS linear regression |
-| **H4** | Does LOS differ across patient age groups? | Kruskal-Wallis, four cohorts |
-| **H5** | Is patient sex associated with visit disposition? | Chi-square test of independence |
+| **H1** | Does LOS differ across CTAS triage levels? | Weighted Kruskal-Wallis with Dunn post-hoc (Bonferroni) |
+| **H2** | Does LOS differ between admitted and non-admitted visits? | Weighted Mann-Whitney U |
+| **H3** | Does CTAS urgency score predict LOS? | Weighted Least Squares regression |
+| **H4** | Does LOS differ across patient age groups? | Weighted Kruskal-Wallis with Dunn post-hoc |
+| **H5** | Is patient sex associated with visit disposition? | Chi-square test of independence, visit-weighted contingency table |
 
-Each hypothesis has a handler in `backend/analytics/hypothesis/` and a matching test suite.
+Each hypothesis has a handler in `backend/analytics/hypothesis/`, a matching test suite, and
+a companion notebook in `backend/hypothesis testing/` (`H1_testing.ipynb` … `H5_testing.ipynb`)
+that derives the result independently and checks it against the running API for agreement.
+
+### Every row is an aggregate, not an observation
+
+`ctas_triage`, `visit_disposition`, `age_sex`, `main_problems`, and `ed_visits` each store one
+row per reported combination — a median LOS plus the `ed_visits` count it summarises. Running
+H1/H2/H4 unweighted therefore tests "do the ~900 aggregate rows differ?" instead of "do the
+~174 million visits differ?" The platform runs every rank, tie correction, and p-value over
+the **visit-weighted** population instead. The single implementation lives in
+`backend/analytics/statistics/weighted.py`; `hypothesis_testing.py`, `hypothesis/H*.py`,
+`statistics/kruskal.py`, and the client-side mirror in
+`frontend/src/pages/StatisticalAnalysis/AnalyticsCore.tsx` all delegate to it — verified to
+agree with it bit-for-bit on the seeded H1 cohort (H = 126,319,368.2434, weighted N =
+174,207,395). p-values come from exact chi-square, normal, and Student-t survival functions
+(pure Python, checked against SciPy to ~1e-12), not the logistic tail approximations the
+platform previously used.
 
 ---
 
@@ -188,9 +206,35 @@ Each hypothesis has a handler in `backend/analytics/hypothesis/` and a matching 
 
 | Path | Contents |
 | :--- | :--- |
-| `data/Explorer Dataset/` | Cleaned CSVs and the notebooks that produced them |
+| `data/Explorer Dataset/` | Raw per-dataset CSV exports and the notebooks that produced them |
+| `data/Explorer Dataset/cleaned/` | Cleaned copies, same file names, written by `Explorer_Dataset_Cleaning.ipynb` |
 | `data/cleaned dataset/` | Master workbook containing all six datasets as sheets |
 | `backend/database/healthcare.db` | The seeded analytical database |
+
+### Explorer Dataset cleaning
+
+`data/Explorer Dataset/Explorer_Dataset_Cleaning.ipynb` audits and cleans the raw exports
+that back the dataset explorer, deliberately conservatively: it corrects what is wrong,
+flags what is incomplete, and deletes only what is actively misleading and recoverable.
+Measured values are never imputed or rewritten.
+
+| Action | What | Why |
+| :--- | :--- | :--- |
+| Removed | `visit_disposition == 'Total'` and `main_problem == 'Any'` roll-up rows | `ED_Visits.csv` mixes aggregate rows into the detail; the `Total` rows equal the detail sum exactly, so leaving them in doubles every unfiltered total. Recoverable by summing the detail rows. |
+| Corrected | `age_group` / `population_category` spelling | `CTAS_Triage.csv` writes an EN DASH (`00–19`); every other export uses an ASCII hyphen (`0-19`). A join on `age_group` across files silently matched nothing until this was normalised. |
+| Flagged, not deleted | `is_suppressed` column | CIHI reports small suppressed counts as `0`, not as missing. The row stays visible in the explorer; the hypothesis engines already filter `ed_visits > 0` in SQL. |
+| Corrected | `median_los_hours` | Recomputed from the authoritative `median_los_minutes` column rather than trusted as reported. |
+
+`backend/database/load_csv.py` prefers `data/Explorer Dataset/cleaned/` when present and
+falls back to the raw files, so table names, column names, and every downstream call site
+are unaffected — rebuild with `python -m backend.database.load_csv` after re-running the
+cleaning notebook.
+
+One data issue is intentionally left uncorrected: `ctas_urgency_score` maps CTAS III,
+`Less urgent`, `Non-urgent`, and `Unknown` all onto the value `3`, so H3's predictor cannot
+separate the three lowest acuity levels. The `H3_testing.ipynb` notebook surfaces this with
+a diagnostic before reporting the regression, since re-deriving the score changes H3's
+substantive result — an analyst decision, not a cleaning one.
 
 ### Database provenance
 
@@ -317,7 +361,7 @@ as the print destination.
 
 ## Testing
 
-The platform ships **212 tests across 18 suites**.
+The platform ships **291 tests across 20 suites**.
 
 ```bash
 python -m pytest tests
@@ -336,17 +380,19 @@ python -m pytest tests
 
 | Suite | Tests | Covers |
 | :--- | ---: | :--- |
+| `test_weighted_statistics.py` | 38 | The shared weighted engine: exact chi²/normal/Student-t tails, weighted Kruskal-Wallis, Mann-Whitney U, Dunn post-hoc |
 | `test_model_validation.py` | 33 | Splitting, polynomial fitting, metrics, curves, fit verdict |
 | `test_dashboard_services.py` | 29 | Dashboard, insights and dataset service layers |
 | `test_user_datasets.py` | 28 | Cleaned-dataset persistence and cohort isolation |
-| `test_user_dataset_isolation.py` | 12 | Session-scoped isolation between concurrent users |
+| `test_hypothesis_pipeline.py` | 26 | H1/H2/H4 against the seeded database, incl. a notebook-anchored parity check |
 | `test_model_diagnostics_service.py` | 23 | Underfitting, overfitting and good-fit verdicts end to end |
 | `test_data_loader.py` | 15 | Cleaned-dataset to schema column contract |
+| `test_h1.py`–`test_h5.py` | 49 | The five hypothesis handlers and their statistical routines |
 | `test_preprocessing.py` | 13 | Cleaning, feature engineering, validation |
-| `test_h1.py`–`test_h5.py` | 37 | The five hypotheses and their statistical routines |
+| `test_user_dataset_isolation.py` | 12 | Session-scoped isolation between concurrent users |
 | `test_dashboard.py` | 8 | KPI aggregation, ERBI, insight generation |
+| `test_api.py` | 6 | FastAPI endpoint handlers, incl. `/statistics/methods` |
 | `test_analytics.py` | 5 | Analytics and statistics engine |
-| `test_api.py` | 3 | FastAPI endpoint handlers |
 | `test_dependencies.py` | 3 | Every third-party import declared in `requirements.txt` |
 | `test_architecture_services.py` | 2 | Service orchestration |
 | `test_database.py` | 1 | SQLite connection lifecycle |
@@ -365,8 +411,11 @@ python -m pytest tests
 │   │   ├── dashboard/     KPI and ERBI computation
 │   │   └── forecasting/   Exponential smoothing
 │   ├── services/          Business logic and data access
-│   └── database/          Schema, connection manager, loader, seeded database
-├── data/                  Cleaned datasets and source workbooks
+│   ├── database/          Schema, connection manager, loader, seeded database
+│   └── hypothesis testing/  H1–H5 notebooks, each verified against the running API
+├── data/
+│   ├── Explorer Dataset/  Raw CSV exports, cleaning notebook, and cleaned/ output
+│   └── cleaned dataset/   Master workbook (all six datasets as sheets)
 ├── docs/                  Capstone documentation
 ├── tests/                 Automated test suites
 ├── server.ts              Express server

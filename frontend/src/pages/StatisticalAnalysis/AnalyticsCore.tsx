@@ -41,70 +41,177 @@ const lgamma = (z: number): number => {
   let ser = 1.000000000190015; c.forEach(v => { y += 1; ser += v / y; });
   return -tmp + Math.log(2.5066282746310005 * ser / z);
 };
-const incGamma = (a: number, x: number): number => {
+
+// Regularised lower incomplete gamma P(a,x) — series form, valid while x < a + 1.
+const gammaPSeries = (a: number, x: number): number => {
   if (x <= 0) return 0;
   let sum = 1 / a, term = 1 / a;
-  for (let n = 1; n <= 150; n++) { term *= x / (a + n); sum += term; if (Math.abs(term) < 1e-12) break; }
-  return Math.min(1, sum * Math.exp(-x + a * Math.log(x) - lgamma(a)));
+  for (let n = 1; n <= 1000; n++) { term *= x / (a + n); sum += term; if (Math.abs(term) < Math.abs(sum) * 1e-16) break; }
+  return sum * Math.exp(-x + a * Math.log(x) - lgamma(a));
 };
-const chiSqP = (h: number, df: number): number => Math.max(0, Math.min(1, 1 - incGamma(df / 2, h / 2)));
+
+// Regularised upper incomplete gamma Q(a,x) — Lentz continued fraction, for x >= a + 1.
+// The series alone diverges badly once x greatly exceeds a, which is exactly the regime
+// visit-weighted H statistics land in (H ~ 1e8), so the branch below is load-bearing.
+const gammaQContinued = (a: number, x: number): number => {
+  const tiny = 1e-300;
+  let b = x + 1 - a, c = 1 / tiny, d = b !== 0 ? 1 / b : 1 / tiny, h = d;
+  for (let i = 1; i <= 1000; i++) {
+    const an = -i * (i - a);
+    b += 2;
+    d = an * d + b; if (Math.abs(d) < tiny) d = tiny;
+    c = b + an / c; if (Math.abs(c) < tiny) c = tiny;
+    d = 1 / d;
+    const delta = d * c;
+    h *= delta;
+    if (Math.abs(delta - 1) < 1e-16) break;
+  }
+  return h * Math.exp(-x + a * Math.log(x) - lgamma(a));
+};
+
+const chiSqP = (h: number, df: number): number => {
+  if (df <= 0 || h <= 0) return 1;
+  if (!isFinite(h)) return 0;
+  const a = df / 2, x = h / 2;
+  const q = x < a + 1 ? 1 - gammaPSeries(a, x) : gammaQContinued(a, x);
+  return Math.max(0, Math.min(1, q));
+};
 const fmtP = (p: number): string => p < 0.0001 ? '< 0.0001' : p.toFixed(4);
 const fmtN = (n: number, d = 2): string => isFinite(n) ? n.toFixed(d) : 'N/A';
 const getV = (row: any, ...keys: string[]): any => { for (const k of keys) if (row[k] != null && row[k] !== '') return row[k]; return undefined; };
 
-const rankArr = (vals: number[]): number[] => {
-  const n = vals.length, sorted = vals.map((v, i) => ({ v, i })).sort((a, b) => a.v - b.v), ranks = new Array(n);
-  let i = 0;
-  while (i < n) { let j = i; while (j < n - 1 && sorted[j + 1].v === sorted[i].v) j++; const r = (i + j) / 2 + 1; for (let k = i; k <= j; k++)ranks[sorted[k].i] = r; i = j + 1; }
-  return ranks;
+// ─── FREQUENCY-WEIGHTED NON-PARAMETRIC TESTS ─────────────────────────────────
+// Mirrors backend/analytics/statistics/weighted.py. Each row is an AGGREGATE carrying
+// an ed_visits count, so visits are frequency weights: the tests must run over the
+// weight-expanded population (N in the hundreds of millions), not over the row count.
+//
+// The previous implementation approximated this by replicating each row into a
+// 500-slot array, which quantised every weight to ~0.2% and silently capped N at 500.
+// Weighted midranks give the exact same answer as full replication at no cost.
+
+export interface WGroup { v: number[]; w: number[] }
+
+const cleanPairs = (vals: number[], wts?: number[]): WGroup => {
+  const out: WGroup = { v: [], w: [] };
+  vals.forEach((value, i) => {
+    const weight = wts ? wts[i] : 1;
+    if (!isFinite(value) || !isFinite(weight) || weight <= 0) return;
+    out.v.push(value); out.w.push(weight);
+  });
+  return out;
 };
 
-const kruskalWallis = (groups: number[][]): { h: number; p: number; eps2: number; df: number; n: number } => {
-  const flat = groups.flat(), N = flat.length, k = groups.length;
-  if (N < 3 || k < 2) return { h: 0, p: 1, eps2: 0, df: k - 1, n: N };
-  const ranks = rankArr(flat); let hSum = 0, off = 0;
-  groups.forEach(g => { const ri = ranks.slice(off, off + g.length).reduce((a, b) => a + b, 0); hSum += (ri * ri) / g.length; off += g.length; });
-  const h = (12 / (N * (N + 1))) * hSum - 3 * (N + 1), p = chiSqP(h, k - 1), eps2 = Math.max(0, (h - k + 1) / (N - k));
-  return { h: +h.toFixed(3), p, eps2: +eps2.toFixed(4), df: k - 1, n: N };
+/** Midranks each distinct value across the weight-expanded population. */
+const weightedMidranks = (vals: number[], wts: number[]) => {
+  const weightByValue = new Map<number, number>();
+  vals.forEach((v, i) => weightByValue.set(v, (weightByValue.get(v) || 0) + wts[i]));
+  const rankByValue = new Map<number, number>();
+  const tieSizes: number[] = [];
+  let cumulative = 0;
+  [...weightByValue.keys()].sort((a, b) => a - b).forEach(value => {
+    const tie = weightByValue.get(value)!;
+    rankByValue.set(value, cumulative + (tie + 1) / 2);
+    tieSizes.push(tie);
+    cumulative += tie;
+  });
+  return { rankByValue, tieSizes, total: cumulative };
 };
 
-const dunnTest = (groups: number[][], names: string[]) => {
-  const flat = groups.flat(), N = flat.length, ranks = rankArr(flat);
-  let off = 0; const meanR: number[] = [];
-  groups.forEach(g => { const s = ranks.slice(off, off + g.length).reduce((a, b) => a + b, 0); meanR.push(s / g.length); off += g.length; });
-  const freq: Record<number, number> = {};
-  ranks.forEach(r => { freq[r] = (freq[r] || 0) + 1; });
-  const tieC = Object.values(freq).reduce((s, c) => s + (c > 1 ? c * c * c - c : 0), 0);
+// 1 - sum(t^3 - t) / (N^3 - N). Float64 carries t^3 up to ~1e308 without wraparound,
+// so unlike a fixed-width integer type it stays valid at NACRS scale.
+const tieCorrection = (tieSizes: number[], N: number): number => {
+  if (N < 2) return 1;
+  const denom = N ** 3 - N;
+  if (denom === 0) return 1;
+  const c = 1 - tieSizes.reduce((s, t) => s + (t ** 3 - t), 0) / denom;
+  return c > 0 ? c : 1;
+};
+
+const weightedKruskalWallis = (groups: WGroup[]): { h: number; p: number; eps2: number; df: number; n: number; tieC: number } => {
+  const clean = groups.map(g => cleanPairs(g.v, g.w)).filter(g => g.v.length > 0);
+  const k = clean.length;
+  const N = clean.reduce((s, g) => s + g.w.reduce((a, b) => a + b, 0), 0);
+  if (k < 2 || N < 3) return { h: 0, p: 1, eps2: 0, df: Math.max(0, k - 1), n: N, tieC: 1 };
+
+  const allV = clean.flatMap(g => g.v), allW = clean.flatMap(g => g.w);
+  const { rankByValue, tieSizes } = weightedMidranks(allV, allW);
+
+  let rankSumTerm = 0;
+  clean.forEach(g => {
+    const gw = g.w.reduce((a, b) => a + b, 0);
+    const rankSum = g.v.reduce((s, v, i) => s + rankByValue.get(v)! * g.w[i], 0);
+    rankSumTerm += (rankSum * rankSum) / gw;
+  });
+
+  const hRaw = (12 / (N * (N + 1))) * rankSumTerm - 3 * (N + 1);
+  const tieC = tieCorrection(tieSizes, N);
+  const h = hRaw / tieC;
+  const df = k - 1;
+  const eps2 = N - k > 0 ? Math.max(0, Math.min(1, (h - k + 1) / (N - k))) : 0;
+  return { h, p: chiSqP(h, df), eps2: +eps2.toFixed(4), df, n: N, tieC };
+};
+
+/** Dunn's post-hoc: pairwise mean-rank z-tests sharing the omnibus pooled variance. */
+const weightedDunn = (groups: WGroup[], names: string[]) => {
+  const clean = groups.map(g => cleanPairs(g.v, g.w));
+  const keep = clean.map((g, i) => ({ g, name: names[i] })).filter(x => x.g.v.length > 0);
+  if (keep.length < 2) return [];
+
+  const allV = keep.flatMap(x => x.g.v), allW = keep.flatMap(x => x.g.w);
+  const { rankByValue, tieSizes, total: N } = weightedMidranks(allV, allW);
+  if (N < 2) return [];
+
+  const meanR = keep.map(x => {
+    const gw = x.g.w.reduce((a, b) => a + b, 0);
+    return x.g.v.reduce((s, v, i) => s + rankByValue.get(v)! * x.g.w[i], 0) / gw;
+  });
+  const gw = keep.map(x => x.g.w.reduce((a, b) => a + b, 0));
+  const tieSum = tieSizes.reduce((s, t) => s + (t ** 3 - t), 0);
+  const pooled = (N * (N + 1) / 12) - tieSum / (12 * (N - 1));
+
   const pairs: { pair: string; z: number; p: number; pAdj: number; significant: boolean }[] = [];
-  for (let i = 0; i < groups.length - 1; i++) for (let j = i + 1; j < groups.length; j++) {
-    const se = Math.sqrt(((N * (N + 1) / 12) - tieC / (12 * (N - 1))) * (1 / groups[i].length + 1 / groups[j].length));
-    const z = Math.abs(meanR[i] - meanR[j]) / (se || 1), p = 2 * (1 - normalCDF(z));
-    pairs.push({ pair: `${names[i]} vs. ${names[j]}`, z: +z.toFixed(3), p, pAdj: 0, significant: false });
+  for (let i = 0; i < keep.length - 1; i++) for (let j = i + 1; j < keep.length; j++) {
+    const se = pooled > 0 ? Math.sqrt(pooled * (1 / gw[i] + 1 / gw[j])) : 0;
+    const z = se > 0 ? Math.abs(meanR[i] - meanR[j]) / se : 0;
+    pairs.push({ pair: `${keep[i].name} vs. ${keep[j].name}`, z: +z.toFixed(3), p: Math.min(1, 2 * (1 - normalCDF(z))), pAdj: 0, significant: false });
   }
   const m = pairs.length;
   pairs.forEach(r => { r.pAdj = Math.min(1, r.p * m); r.significant = r.pAdj < 0.05; });
   return pairs;
 };
 
-const expandW = (vals: number[], wts: number[], cap = 500): number[] => {
-  const total = wts.reduce((s, w) => s + w, 0) || 1, out: number[] = [];
-  vals.forEach((v, i) => { const cnt = Math.max(1, Math.round((wts[i] / total) * cap)); for (let j = 0; j < cnt; j++)out.push(v); });
-  return out;
+const weightedMedian = (vals: number[], wts: number[]): number => {
+  if (!vals.length) return 0;
+  const order = vals.map((v, i) => ({ v, w: wts[i] })).sort((a, b) => a.v - b.v);
+  const mid = order.reduce((s, o) => s + o.w, 0) / 2;
+  let cum = 0;
+  for (const o of order) { cum += o.w; if (cum >= mid) return o.v; }
+  return order[order.length - 1].v;
 };
 
-const mannWhitneyU = (a: number[], b: number[]) => {
-  const n1 = a.length, n2 = b.length;
-  if (!n1 || !n2) return { u: 0, p: 1, rb: 0, medDiff: 0 };
-  const comb = [...a.map(v => ({ v, g: 0 })), ...b.map(v => ({ v, g: 1 }))].sort((x, y) => x.v - y.v);
-  const N = n1 + n2, ranks = new Array(N); let i = 0;
-  while (i < N) { let j = i; while (j < N - 1 && comb[j + 1].v === comb[i].v) j++; const r = (i + j) / 2 + 1; for (let k = i; k <= j; k++)ranks[k] = r; i = j + 1; }
-  let r1 = 0; comb.forEach((it, idx) => { if (it.g === 0) r1 += ranks[idx]; });
-  const u1 = r1 - n1 * (n1 + 1) / 2, u = Math.min(u1, n1 * n2 - u1);
-  const mu = n1 * n2 / 2, sigma = Math.sqrt(n1 * n2 * (n1 + n2 + 1) / 12);
-  const p = 2 * (1 - normalCDF(Math.abs((u - mu) / (sigma || 1))));
-  const rb = +(1 - (2 * u) / (n1 * n2)).toFixed(4);
-  const sA = [...a].sort((x, y) => x - y), sB = [...b].sort((x, y) => x - y);
-  return { u: +u.toFixed(1), p, rb, medDiff: +(sA[Math.floor(n1 / 2)] - sB[Math.floor(n2 / 2)]).toFixed(3) };
+const weightedMannWhitneyU = (ga: WGroup, gb: WGroup) => {
+  const a = cleanPairs(ga.v, ga.w), b = cleanPairs(gb.v, gb.w);
+  const n1 = a.w.reduce((s, w) => s + w, 0), n2 = b.w.reduce((s, w) => s + w, 0);
+  if (!a.v.length || !b.v.length || !n1 || !n2) return { u: 0, p: 1, rb: 0, medDiff: 0, z: 0, n: 0 };
+
+  const { rankByValue, tieSizes, total: N } = weightedMidranks([...a.v, ...b.v], [...a.w, ...b.w]);
+  const r1 = a.v.reduce((s, v, i) => s + rankByValue.get(v)! * a.w[i], 0);
+  const u1 = r1 - n1 * (n1 + 1) / 2;
+  const u = Math.min(u1, n1 * n2 - u1);
+
+  const mu = n1 * n2 / 2;
+  const tieSum = tieSizes.reduce((s, t) => s + (t ** 3 - t), 0);
+  const variance = (n1 * n2 / 12) * ((N + 1) - tieSum / (N * (N - 1)));
+  const sigma = variance > 0 ? Math.sqrt(variance) : 0;
+  const z = sigma > 0 ? Math.max(0, (Math.abs(u - mu) - 0.5) / sigma) : 0;
+
+  return {
+    u, z: +z.toFixed(3),
+    p: sigma > 0 ? Math.min(1, 2 * (1 - normalCDF(z))) : 1,
+    rb: +(1 - (2 * u) / (n1 * n2)).toFixed(4),
+    medDiff: +(weightedMedian(a.v, a.w) - weightedMedian(b.v, b.w)).toFixed(3),
+    n: N,
+  };
 };
 
 const boxStats = (vals: number[]) => {
@@ -422,9 +529,9 @@ export default function AnalyticsCore({ fields, data, onNavigateNext }: Analytic
       if (gm[key]) { gm[key].los.push(los); gm[key].wts.push(wt); }
     });
     const present = ORDER.filter(k => gm[k]?.los.length > 0);
-    const expanded = present.map(k => expandW(gm[k].los, gm[k].wts));
-    const kw = kruskalWallis(expanded);
-    const dunn = present.length >= 2 ? dunnTest(expanded, present).filter(r => r.significant) : [];
+    const wgroups: WGroup[] = present.map(k => ({ v: gm[k].los, w: gm[k].wts }));
+    const kw = weightedKruskalWallis(wgroups);
+    const dunn = present.length >= 2 ? weightedDunn(wgroups, present).filter(r => r.significant) : [];
     const boxes: BoxGroup[] = present.map(k => ({ label: k === 'Resuscitation' ? 'Resus.' : k === 'Less Urgent' ? 'Less Urg.' : k, color: CTAS_PAL[k] || PAL[0], stats: boxStats(gm[k].los) }));
     return { kw, dunn, boxes, present, m: present.length * (present.length - 1) / 2 };
   }, [data, cols]);
@@ -440,8 +547,7 @@ export default function AnalyticsCore({ fields, data, onNavigateNext }: Analytic
       if (fy === '20202021') { pandemic.los.push(los); pandemic.wts.push(wt); }
       else if (['20192020', '20172018'].includes(fy)) { pre.los.push(los); pre.wts.push(wt); }
     });
-    const ea = expandW(pandemic.los, pandemic.wts), eb = expandW(pre.los, pre.wts);
-    const u = mannWhitneyU(ea, eb);
+    const u = weightedMannWhitneyU({ v: pandemic.los, w: pandemic.wts }, { v: pre.los, w: pre.wts });
     const boxes: BoxGroup[] = [{ label: 'Pre-Pandemic', color: '#3B82F6', stats: boxStats(pre.los) }, { label: 'FY 2020–21', color: '#EF4444', stats: boxStats(pandemic.los) }].filter(g => g.stats.n > 0);
     return { u, boxes };
   }, [data, cols]);
@@ -489,9 +595,9 @@ export default function AnalyticsCore({ fields, data, onNavigateNext }: Analytic
       gm[d].los.push(los); gm[d].wts.push(wt);
     });
     const present = Object.entries(gm).sort((a, b) => b[1].los.length - a[1].los.length).slice(0, 6).map(([k]) => k);
-    const expanded = present.map(k => expandW(gm[k].los, gm[k].wts));
-    const kw = kruskalWallis(expanded);
-    const dunn = present.length >= 2 ? dunnTest(expanded, present).filter(r => r.significant) : [];
+    const wgroups: WGroup[] = present.map(k => ({ v: gm[k].los, w: gm[k].wts }));
+    const kw = weightedKruskalWallis(wgroups);
+    const dunn = present.length >= 2 ? weightedDunn(wgroups, present).filter(r => r.significant) : [];
     const boxes: BoxGroup[] = present.map((k, i) => ({ label: k.length > 13 ? k.slice(0, 12) + '…' : k, color: PAL[i % PAL.length], stats: boxStats(gm[k].los) }));
     return { kw, dunn, boxes, present, m: present.length * (present.length - 1) / 2 };
   }, [data, cols]);

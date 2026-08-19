@@ -1,6 +1,8 @@
 import math
 from typing import List, Dict, Any
 
+from .weighted import student_t_sf
+
 def linear_regression(x: List[float], y: List[float]) -> Dict[str, float]:
     if len(x) != len(y) or len(x) < 2: return {"slope": 0.0, "intercept": 0.0, "r_squared": 0.0, "correlation": 0.0, "p_value": 1.0}
     n = len(x)
@@ -18,8 +20,10 @@ def linear_regression(x: List[float], y: List[float]) -> Dict[str, float]:
     r_squared = r ** 2
     df = max(1, n - 2)
     t_stat = r * math.sqrt(df) / math.sqrt(max(1e-10, 1 - r_squared))
-    p_val = max(0.0001, min(1.0, 2.0 * math.exp(-0.717 * abs(t_stat) - 0.416 * t_stat ** 2)))
-    return {"slope": round(slope, 4), "intercept": round(intercept, 4), "r_squared": round(r_squared, 4), "correlation": round(r, 4), "p_value": round(p_val, 6)}
+    # Two-sided exact Student-t tail on n-2 df, replacing a normal-tail approximation
+    # that ignored df and floored every p-value at 0.0001.
+    p_val = min(1.0, 2.0 * student_t_sf(abs(t_stat), df))
+    return {"slope": round(slope, 4), "intercept": round(intercept, 4), "r_squared": round(r_squared, 4), "correlation": round(r, 4), "p_value": p_val, "t_statistic": round(t_stat, 4), "degrees_of_freedom": df}
 
 def regression_summary(x: List[float], y: List[float], x_label: str = "X", y_label: str = "Y") -> Dict[str, Any]:
     res = linear_regression(x, y)

@@ -40,13 +40,19 @@ jobs:
         language: ['javascript-typescript', 'python']
 
     steps:
+      # checkout v4 runs on Node 20, which GitHub now forces onto Node 24 with a
+      # deprecation warning. v5 targets Node 24 natively.
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
-          language: ${{ matrix.language }}
+          # `languages`, plural. The singular form is not a valid input: the action
+          # ignores it and falls back to auto-detection, so the matrix value never
+          # reaches CodeQL. It fails as a warning rather than an error, which is easy
+          # to miss in a run that is already red for another reason.
+          languages: ${{ matrix.language }}
           # security-extended adds lower-severity and precision queries beyond the
           # default set. Worth it here: this is coursework, not a high-traffic service,
           # so a slower scan with more findings is the better trade.
@@ -56,6 +62,6 @@ jobs:
       # so CodeQL can analyse the sources directly.
 
       - name: Perform CodeQL analysis
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v4
         with:
           category: '/language:${{ matrix.language }}'
