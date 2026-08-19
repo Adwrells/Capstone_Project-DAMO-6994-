@@ -44,5 +44,36 @@ class TestH1Module(unittest.TestCase):
         for f in ["hypothesis", "research_question", "null_hypothesis", "alternative_hypothesis", "statistical_method", "results"]:
             self.assertIn(f, res)
 
+    def test_h1_reports_weighted_method(self):
+        self.assertIn("Weighted", H1.STATISTICAL_METHOD)
+
+    def test_h1_weights_change_the_statistic(self):
+        """Visit counts must actually drive the test, not merely decorate the output."""
+        groups, names = [[10.0, 90.0], [11.0, 91.0]], ["L1", "L5"]
+        unweighted = H1.run(groups, names)
+        weighted = H1.run(groups, names, [[5000, 1], [1, 5000]])
+        self.assertNotEqual(unweighted["results"]["h_statistic"],
+                            weighted["results"]["h_statistic"])
+        self.assertEqual(weighted["results"]["weighted_n"], 10002)
+
+    def test_h1_reports_effect_size_and_df(self):
+        res = H1.run([[10.0, 11.0, 10.5], [200.0, 210.0, 205.0]], ["L1", "L5"])
+        self.assertEqual(res["results"]["degrees_of_freedom"], 1)
+        self.assertGreaterEqual(res["results"]["epsilon_squared"], 0.0)
+        self.assertLessEqual(res["results"]["epsilon_squared"], 1.0)
+        self.assertLessEqual(res["results"]["tie_correction"], 1.0)
+
+    def test_h1_post_hoc_uses_pooled_dunn_ranks(self):
+        res = H1.run([[10, 11], [50, 55], [30, 32]], ["L1", "L2", "L3"])
+        for pair in res["post_hoc_comparisons"]:
+            self.assertIn("z_score", pair)
+            self.assertIn("mean_rank_a", pair)
+            self.assertLessEqual(pair["p_raw"], pair["p_adj_bonferroni"])
+
+    def test_h1_normality_is_reported_but_not_required(self):
+        """Kruskal-Wallis is distribution-free; normality must not gate the result."""
+        res = H1.run([[10, 11], [50, 55]], ["L1", "L2"])
+        self.assertFalse(res["assumption_checks"]["normality_required"])
+
 if __name__ == "__main__":
     unittest.main()

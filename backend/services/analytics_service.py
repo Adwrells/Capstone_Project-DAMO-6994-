@@ -58,7 +58,10 @@ class AnalyticsService:
                 },
                 "processing": {
                     "status": stage_status,
-                    "description": "Feature engineering, hypothesis testing (H1-H5), and forecasting.",
+                    "description": (
+                        "Feature engineering, visit-weighted hypothesis testing (H1-H5), "
+                        "and forecasting."
+                    ),
                 },
                 "visualization": {
                     "status": stage_status,

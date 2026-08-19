@@ -37,6 +37,10 @@ from .database_manager import DatabaseManager, db_manager
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 WORKBOOK = PROJECT_ROOT / "data" / "cleaned dataset" / "Explanatory_and_Predictive_ED_Analytics_Dataset.xlsx"
 CSV_DIR = PROJECT_ROOT / "data" / "Explorer Dataset"
+# Written by data/Explorer Dataset/Explorer_Dataset_Cleaning.ipynb. Same file names as
+# CSV_DIR, so preferring this directory changes the data quality without changing any
+# table name, column name, or downstream call site.
+CLEAN_CSV_DIR = CSV_DIR / "cleaned"
 SCHEMA_FILE = Path(__file__).parent / "schema.sql"
 
 # table -> (workbook sheet, fallback CSV stem)
@@ -75,6 +79,15 @@ def align_to_table(df: pd.DataFrame, columns: List[str]) -> pd.DataFrame:
     return df[[c for c in columns if c in df.columns]]
 
 
+def resolve_csv_source(csv_stem: str) -> Optional[Path]:
+    """Returns the CSV to read for a dataset: the cleaned copy if present, else raw."""
+    cleaned = CLEAN_CSV_DIR / f"{csv_stem}.csv"
+    if cleaned.exists():
+        return cleaned
+    raw = CSV_DIR / f"{csv_stem}.csv"
+    return raw if raw.exists() else None
+
+
 def read_sources(prefer_workbook: bool = True) -> Dict[str, pd.DataFrame]:
     """Loads every available dataset, workbook first, CSV directory as fallback."""
     frames: Dict[str, pd.DataFrame] = {}
@@ -91,12 +104,13 @@ def read_sources(prefer_workbook: bool = True) -> Dict[str, pd.DataFrame]:
             frames[table] = sheets[sheet_name]
             continue
 
-        csv_path = CSV_DIR / f"{csv_stem}.csv"
-        if csv_path.exists():
+        csv_path = resolve_csv_source(csv_stem)
+        if csv_path is not None:
             frames[table] = pd.read_csv(csv_path)
-            print(f"  {table}: workbook sheet missing, using {csv_path.name}")
+            origin = "cleaned" if csv_path.parent == CLEAN_CSV_DIR else "raw"
+            print(f"  {table}: workbook sheet missing, using {origin} {csv_path.name}")
         else:
-            print(f"  SKIP {table}: no sheet '{sheet_name}' and no {csv_path.name}")
+            print(f"  SKIP {table}: no sheet '{sheet_name}' and no {csv_stem}.csv")
 
     return frames
 
