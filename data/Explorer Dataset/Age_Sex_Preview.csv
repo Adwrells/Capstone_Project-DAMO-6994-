@@ -1,0 +1,191 @@
+fiscal_year,fiscal_year_start,sex,age_group,population_category,ed_visits,median_los_minutes,median_los_hours
+2003-2004,2003,Female,0–17,Pediatric Population,611154,101,1.68
+2003-2004,2003,Female,18–34,Young Adult Population,532768,127,2.12
+2003-2004,2003,Female,35–49,Adult Population,503478,129,2.15
+2003-2004,2003,Female,50–64,Pre-Senior Population,349504,141,2.35
+2003-2004,2003,Female,65–85+,Geriatric Population,478789,203,3.38
+2003-2004,2003,Male,0–17,Pediatric Population,702232,101,1.68
+2003-2004,2003,Male,18–34,Young Adult Population,471173,114,1.9
+2003-2004,2003,Male,35–49,Adult Population,509323,123,2.05
+2003-2004,2003,Male,50–64,Pre-Senior Population,351182,140,2.33
+2003-2004,2003,Male,65–85+,Geriatric Population,396791,188,3.13
+2004-2005,2004,Female,0–17,Pediatric Population,630204,107,1.78
+2004-2005,2004,Female,18–34,Young Adult Population,574624,132,2.2
+2004-2005,2004,Female,35–49,Adult Population,541592,134,2.23
+2004-2005,2004,Female,50–64,Pre-Senior Population,394967,146,2.43
+2004-2005,2004,Female,65–85+,Geriatric Population,528129,206,3.43
+2004-2005,2004,Male,0–17,Pediatric Population,718565,105,1.75
+2004-2005,2004,Male,18–34,Young Adult Population,495778,119,1.98
+2004-2005,2004,Male,35–49,Adult Population,540707,129,2.15
+2004-2005,2004,Male,50–64,Pre-Senior Population,389975,143,2.38
+2004-2005,2004,Male,65–85+,Geriatric Population,433264,190,3.17
+2005-2006,2005,Female,0–17,Pediatric Population,652811,111,1.85
+2005-2006,2005,Female,18–34,Young Adult Population,591788,136,2.27
+2005-2006,2005,Female,35–49,Adult Population,553166,140,2.33
+2005-2006,2005,Female,50–64,Pre-Senior Population,414007,149,2.48
+2005-2006,2005,Female,65–85+,Geriatric Population,541936,209,3.48
+2005-2006,2005,Male,0–17,Pediatric Population,743474,109,1.82
+2005-2006,2005,Male,18–34,Young Adult Population,509679,123,2.05
+2005-2006,2005,Male,35–49,Adult Population,552981,132,2.2
+2005-2006,2005,Male,50–64,Pre-Senior Population,411694,145,2.42
+2005-2006,2005,Male,65–85+,Geriatric Population,445578,193,3.22
+2006-2007,2006,Female,0–17,Pediatric Population,636662,113,1.88
+2006-2007,2006,Female,18–34,Young Adult Population,597976,141,2.35
+2006-2007,2006,Female,35–49,Adult Population,554532,144,2.4
+2006-2007,2006,Female,50–64,Pre-Senior Population,430292,152,2.53
+2006-2007,2006,Female,65–85+,Geriatric Population,558640,214,3.57
+2006-2007,2006,Male,0–17,Pediatric Population,720928,111,1.85
+2006-2007,2006,Male,18–34,Young Adult Population,501523,126,2.1
+2006-2007,2006,Male,35–49,Adult Population,545998,136,2.27
+2006-2007,2006,Male,50–64,Pre-Senior Population,424314,150,2.5
+2006-2007,2006,Male,65–85+,Geriatric Population,459002,199,3.32
+2007-2008,2007,Female,0–17,Pediatric Population,639773,118,1.97
+2007-2008,2007,Female,18–34,Young Adult Population,611398,146,2.43
+2007-2008,2007,Female,35–49,Adult Population,563437,150,2.5
+2007-2008,2007,Female,50–64,Pre-Senior Population,453678,161,2.68
+2007-2008,2007,Female,65–85+,Geriatric Population,572833,240,4.0
+2007-2008,2007,Male,0–17,Pediatric Population,717804,116,1.93
+2007-2008,2007,Male,18–34,Young Adult Population,504291,131,2.18
+2007-2008,2007,Male,35–49,Adult Population,545232,143,2.38
+2007-2008,2007,Male,50–64,Pre-Senior Population,446981,159,2.65
+2007-2008,2007,Male,65–85+,Geriatric Population,474901,223,3.72
+2008-2009,2008,Female,0–17,Pediatric Population,649434,124,2.07
+2008-2009,2008,Female,18–34,Young Adult Population,616555,150,2.5
+2008-2009,2008,Female,35–49,Adult Population,559016,156,2.6
+2008-2009,2008,Female,50–64,Pre-Senior Population,466284,167,2.78
+2008-2009,2008,Female,65–85+,Geriatric Population,584833,251,4.18
+2008-2009,2008,Male,0–17,Pediatric Population,715625,121,2.02
+2008-2009,2008,Male,18–34,Young Adult Population,495889,134,2.23
+2008-2009,2008,Male,35–49,Adult Population,530800,147,2.45
+2008-2009,2008,Male,50–64,Pre-Senior Population,455398,166,2.77
+2008-2009,2008,Male,65–85+,Geriatric Population,485360,235,3.92
+2009-2010,2009,Female,0–17,Pediatric Population,681603,127,2.12
+2009-2010,2009,Female,18–34,Young Adult Population,647989,151,2.52
+2009-2010,2009,Female,35–49,Adult Population,574842,158,2.63
+2009-2010,2009,Female,50–64,Pre-Senior Population,491648,169,2.82
+2009-2010,2009,Female,65–85+,Geriatric Population,608126,253,4.22
+2009-2010,2009,Male,0–17,Pediatric Population,747986,123,2.05
+2009-2010,2009,Male,18–34,Young Adult Population,510139,136,2.27
+2009-2010,2009,Male,35–49,Adult Population,527223,149,2.48
+2009-2010,2009,Male,50–64,Pre-Senior Population,474013,167,2.78
+2009-2010,2009,Male,65–85+,Geriatric Population,499772,236,3.93
+2010-2011,2010,Female,0–17,Pediatric Population,954584,119,1.98
+2010-2011,2010,Female,18–34,Young Adult Population,958938,143,2.38
+2010-2011,2010,Female,35–49,Adult Population,799513,150,2.5
+2010-2011,2010,Female,50–64,Pre-Senior Population,699702,159,2.65
+2010-2011,2010,Female,65–85+,Geriatric Population,827951,240,4.0
+2010-2011,2010,Male,0–17,Pediatric Population,1039804,115,1.92
+2010-2011,2010,Male,18–34,Young Adult Population,767357,129,2.15
+2010-2011,2010,Male,35–49,Adult Population,742377,141,2.35
+2010-2011,2010,Male,50–64,Pre-Senior Population,691754,157,2.62
+2010-2011,2010,Male,65–85+,Geriatric Population,689671,222,3.7
+2011-2012,2011,Female,0–17,Pediatric Population,1035283,118,1.97
+2011-2012,2011,Female,18–34,Young Adult Population,1073552,146,2.43
+2011-2012,2011,Female,35–49,Adult Population,875611,153,2.55
+2011-2012,2011,Female,50–64,Pre-Senior Population,790817,162,2.7
+2011-2012,2011,Female,65–85+,Geriatric Population,930681,242,4.03
+2011-2012,2011,Male,0–17,Pediatric Population,1118698,114,1.9
+2011-2012,2011,Male,18–34,Young Adult Population,867401,131,2.18
+2011-2012,2011,Male,35–49,Adult Population,811104,144,2.4
+2011-2012,2011,Male,50–64,Pre-Senior Population,780832,161,2.68
+2011-2012,2011,Male,65–85+,Geriatric Population,780606,226,3.77
+2012-2013,2012,Female,0–17,Pediatric Population,1122973,119,1.98
+2012-2013,2012,Female,18–34,Young Adult Population,1190503,146,2.43
+2012-2013,2012,Female,35–49,Adult Population,951614,154,2.57
+2012-2013,2012,Female,50–64,Pre-Senior Population,885403,164,2.73
+2012-2013,2012,Female,65–85+,Geriatric Population,1066532,242,4.03
+2012-2013,2012,Male,0–17,Pediatric Population,1209465,114,1.9
+2012-2013,2012,Male,18–34,Young Adult Population,954438,131,2.18
+2012-2013,2012,Male,35–49,Adult Population,880615,144,2.4
+2012-2013,2012,Male,50–64,Pre-Senior Population,880147,164,2.73
+2012-2013,2012,Male,65–85+,Geriatric Population,899826,227,3.78
+2013-2014,2013,Female,0–17,Pediatric Population,1133177,121,2.02
+2013-2014,2013,Female,18–34,Young Adult Population,1235676,148,2.47
+2013-2014,2013,Female,35–49,Adult Population,975824,158,2.63
+2013-2014,2013,Female,50–64,Pre-Senior Population,927669,169,2.82
+2013-2014,2013,Female,65–85+,Geriatric Population,1120021,248,4.13
+2013-2014,2013,Male,0–17,Pediatric Population,1209236,116,1.93
+2013-2014,2013,Male,18–34,Young Adult Population,986318,134,2.23
+2013-2014,2013,Male,35–49,Adult Population,892561,146,2.43
+2013-2014,2013,Male,50–64,Pre-Senior Population,926414,165,2.75
+2013-2014,2013,Male,65–85+,Geriatric Population,955229,231,3.85
+2014-2015,2014,Female,0–17,Pediatric Population,1195509,125,2.08
+2014-2015,2014,Female,18–34,Young Adult Population,1276617,152,2.53
+2014-2015,2014,Female,35–49,Adult Population,994800,164,2.73
+2014-2015,2014,Female,50–64,Pre-Senior Population,976996,171,2.85
+2014-2015,2014,Female,65–85+,Geriatric Population,1210712,253,4.22
+2014-2015,2014,Male,0–17,Pediatric Population,1268612,118,1.97
+2014-2015,2014,Male,18–34,Young Adult Population,1025276,138,2.3
+2014-2015,2014,Male,35–49,Adult Population,906519,150,2.5
+2014-2015,2014,Male,50–64,Pre-Senior Population,971600,171,2.85
+2014-2015,2014,Male,65–85+,Geriatric Population,1030397,237,3.95
+2015-2016,2015,Female,0–17,Pediatric Population,1201643,127,2.12
+2015-2016,2015,Female,18–34,Young Adult Population,1298839,156,2.6
+2015-2016,2015,Female,35–49,Adult Population,1013428,166,2.77
+2015-2016,2015,Female,50–64,Pre-Senior Population,1011475,175,2.92
+2015-2016,2015,Female,65–85+,Geriatric Population,1248304,250,4.17
+2015-2016,2015,Male,0–17,Pediatric Population,1272742,122,2.03
+2015-2016,2015,Male,18–34,Young Adult Population,1037990,140,2.33
+2015-2016,2015,Male,35–49,Adult Population,914861,154,2.57
+2015-2016,2015,Male,50–64,Pre-Senior Population,1006539,175,2.92
+2015-2016,2015,Male,65–85+,Geriatric Population,1076350,237,3.95
+2016-2017,2016,Female,0–17,Pediatric Population,1188411,129,2.15
+2016-2017,2016,Female,18–34,Young Adult Population,1286786,160,2.67
+2016-2017,2016,Female,35–49,Adult Population,1016731,170,2.83
+2016-2017,2016,Female,50–64,Pre-Senior Population,1027589,178,2.97
+2016-2017,2016,Female,65–85+,Geriatric Population,1291273,254,4.23
+2016-2017,2016,Male,0–17,Pediatric Population,1255041,123,2.05
+2016-2017,2016,Male,18–34,Young Adult Population,1041235,146,2.43
+2016-2017,2016,Male,35–49,Adult Population,917413,156,2.6
+2016-2017,2016,Male,50–64,Pre-Senior Population,1021526,178,2.97
+2016-2017,2016,Male,65–85+,Geriatric Population,1126319,243,4.05
+2017-2018,2017,Female,0–17,Pediatric Population,1213932,136,2.27
+2017-2018,2017,Female,18–34,Young Adult Population,1306830,164,2.73
+2017-2018,2017,Female,35–49,Adult Population,1041086,176,2.93
+2017-2018,2017,Female,50–64,Pre-Senior Population,1044058,184,3.07
+2017-2018,2017,Female,65–85+,Geriatric Population,1335220,257,4.28
+2017-2018,2017,Male,0–17,Pediatric Population,1292689,129,2.15
+2017-2018,2017,Male,18–34,Young Adult Population,1056582,152,2.53
+2017-2018,2017,Male,35–49,Adult Population,936630,162,2.7
+2017-2018,2017,Male,50–64,Pre-Senior Population,1046623,182,3.03
+2017-2018,2017,Male,65–85+,Geriatric Population,1165927,247,4.12
+2018-2019,2018,Female,0–17,Pediatric Population,1533658,152,2.53
+2018-2019,2018,Female,18–34,Young Adult Population,1687028,182,3.03
+2018-2019,2018,Female,35–49,Adult Population,1362217,196,3.27
+2018-2019,2018,Female,50–64,Pre-Senior Population,1392695,206,3.43
+2018-2019,2018,Female,65–85+,Geriatric Population,1873756,298,4.97
+2018-2019,2018,Male,0–17,Pediatric Population,1600980,142,2.37
+2018-2019,2018,Male,18–34,Young Adult Population,1355993,166,2.77
+2018-2019,2018,Male,35–49,Adult Population,1236210,180,3.0
+2018-2019,2018,Male,50–64,Pre-Senior Population,1404546,206,3.43
+2018-2019,2018,Male,65–85+,Geriatric Population,1633259,280,4.67
+2019-2020,2019,Female,0–17,Pediatric Population,1510151,154,2.57
+2019-2020,2019,Female,18–34,Young Adult Population,1684458,188,3.13
+2019-2020,2019,Female,35–49,Adult Population,1355418,196,3.27
+2019-2020,2019,Female,50–64,Pre-Senior Population,1366212,212,3.53
+2019-2020,2019,Female,65–85+,Geriatric Population,1877379,305,5.08
+2019-2020,2019,Male,0–17,Pediatric Population,1594400,147,2.45
+2019-2020,2019,Male,18–34,Young Adult Population,1354402,172,2.87
+2019-2020,2019,Male,35–49,Adult Population,1238252,186,3.1
+2019-2020,2019,Male,50–64,Pre-Senior Population,1384632,212,3.53
+2019-2020,2019,Male,65–85+,Geriatric Population,1657795,287,4.78
+2020-2021,2020,Female,0–17,Pediatric Population,875662,143,2.38
+2020-2021,2020,Female,18–34,Young Adult Population,1346939,174,2.9
+2020-2021,2020,Female,35–49,Adult Population,1115048,188,3.13
+2020-2021,2020,Female,50–64,Pre-Senior Population,1104615,200,3.33
+2020-2021,2020,Female,65–85+,Geriatric Population,1529646,300,5.0
+2020-2021,2020,Male,0–17,Pediatric Population,874511,131,2.18
+2020-2021,2020,Male,18–34,Young Adult Population,1123440,156,2.6
+2020-2021,2020,Male,35–49,Adult Population,1051460,174,2.9
+2020-2021,2020,Male,50–64,Pre-Senior Population,1181393,200,3.33
+2020-2021,2020,Male,65–85+,Geriatric Population,1419730,280,4.67
+2021-2022,2021,Female,0–17,Pediatric Population,1293819,172,2.87
+2021-2022,2021,Female,18–34,Young Adult Population,1590665,204,3.4
+2021-2022,2021,Female,35–49,Adult Population,1301435,216,3.6
+2021-2022,2021,Female,50–64,Pre-Senior Population,1260136,226,3.77
+2021-2022,2021,Female,65–85+,Geriatric Population,1784078,326,5.43
+2021-2022,2021,Male,0–17,Pediatric Population,1345417,160,2.67
+2021-2022,2021,Male,18–34,Young Adult Population,1299236,186,3.1
+2021-2022,2021,Male,35–49,Adult Population,1202684,204,3.4
+2021-2022,2021,Male,50–64,Pre-Senior Population,1299479,229,3.82
+2021-2022,2021,Male,65–85+,Geriatric Population,1615080,307,5.12

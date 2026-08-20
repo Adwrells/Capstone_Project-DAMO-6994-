@@ -15,14 +15,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2021-2022,2021,Male,Death,0,Not Admitted,20-44,Young Adult,1209,36,0.6,43524
 2021-2022,2021,Male,Death,0,Not Admitted,45-64,Middle Adult,2866,54,0.9,154764
 2021-2022,2021,Male,Death,0,Not Admitted,65+,Older Adult,7162,108,1.8,773496
-2021-2022,2021,Female,Discharged,0,Not Admitted,0-19,Pediatric & Youth,1111383,162,2.7,180044046
-2021-2022,2021,Female,Discharged,0,Not Admitted,20-44,Young Adult,2099271,198,3.3,415655658
-2021-2022,2021,Female,Discharged,0,Not Admitted,45-64,Middle Adult,1362105,204,3.4,277869420
-2021-2022,2021,Female,Discharged,0,Not Admitted,65+,Older Adult,1197410,246,4.1,294562860
-2021-2022,2021,Male,Discharged,0,Not Admitted,0-19,Pediatric & Youth,1164643,156,2.6,181684308
-2021-2022,2021,Male,Discharged,0,Not Admitted,20-44,Young Adult,1734357,180,3.0,312184260
-2021-2022,2021,Male,Discharged,0,Not Admitted,45-64,Middle Adult,1304242,198,3.3,258239916
-2021-2022,2021,Male,Discharged,0,Not Admitted,65+,Older Adult,1061589,228,3.8,242042292
+2021-2022,2021,Female,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,1111383,162,2.7,180044046
+2021-2022,2021,Female,Discharged Home,0,Not Admitted,20-44,Young Adult,2099271,198,3.3,415655658
+2021-2022,2021,Female,Discharged Home,0,Not Admitted,45-64,Middle Adult,1362105,204,3.4,277869420
+2021-2022,2021,Female,Discharged Home,0,Not Admitted,65+,Older Adult,1197410,246,4.1,294562860
+2021-2022,2021,Male,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,1164643,156,2.6,181684308
+2021-2022,2021,Male,Discharged Home,0,Not Admitted,20-44,Young Adult,1734357,180,3.0,312184260
+2021-2022,2021,Male,Discharged Home,0,Not Admitted,45-64,Middle Adult,1304242,198,3.3,258239916
+2021-2022,2021,Male,Discharged Home,0,Not Admitted,65+,Older Adult,1061589,228,3.8,242042292
 2021-2022,2021,Female,Intra-Facility Transfer,0,Not Admitted,0-19,Pediatric & Youth,3093,186,3.1,575298
 2021-2022,2021,Female,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,9761,210,3.5,2049810
 2021-2022,2021,Female,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,4464,228,3.8,1017792
@@ -31,14 +31,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2021-2022,2021,Male,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,6273,252,4.2,1580796
 2021-2022,2021,Male,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,4991,222,3.7,1108002
 2021-2022,2021,Male,Intra-Facility Transfer,0,Not Admitted,65+,Older Adult,4100,234,3.9,959400
-2021-2022,2021,Female,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,98886,150,2.5,14832900
-2021-2022,2021,Female,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,213981,180,3.0,38516580
-2021-2022,2021,Female,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,99494,180,3.0,17908920
-2021-2022,2021,Female,Left Without Being Seen,0,Not Admitted,65+,Older Adult,62794,180,3.0,11302920
-2021-2022,2021,Male,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,97707,144,2.4,14069808
-2021-2022,2021,Male,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,205103,174,2.9,35687922
-2021-2022,2021,Male,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,118919,180,3.0,21405420
-2021-2022,2021,Male,Left Without Being Seen,0,Not Admitted,65+,Older Adult,65270,174,2.9,11356980
+2021-2022,2021,Female,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,98886,150,2.5,14832900
+2021-2022,2021,Female,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,213981,180,3.0,38516580
+2021-2022,2021,Female,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,99494,180,3.0,17908920
+2021-2022,2021,Female,Not Seen Or Left,0,Not Admitted,65+,Older Adult,62794,180,3.0,11302920
+2021-2022,2021,Male,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,97707,144,2.4,14069808
+2021-2022,2021,Male,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,205103,174,2.9,35687922
+2021-2022,2021,Male,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,118919,180,3.0,21405420
+2021-2022,2021,Male,Not Seen Or Left,0,Not Admitted,65+,Older Adult,65270,174,2.9,11356980
 2021-2022,2021,Female,Transferred,0,Not Admitted,0-19,Pediatric & Youth,18833,288,4.8,5423904
 2021-2022,2021,Female,Transferred,0,Not Admitted,20-44,Young Adult,39251,330,5.5,12952830
 2021-2022,2021,Female,Transferred,0,Not Admitted,45-64,Middle Adult,31707,360,6.0,11414520
@@ -63,14 +63,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2020-2021,2020,Male,Death,0,Not Admitted,20-44,Young Adult,1222,36,0.6,43992
 2020-2021,2020,Male,Death,0,Not Admitted,45-64,Middle Adult,2907,48,0.8,139536
 2020-2021,2020,Male,Death,0,Not Admitted,65+,Older Adult,6711,96,1.6,644256
-2020-2021,2020,Female,Discharged,0,Not Admitted,0-19,Pediatric & Youth,772044,132,2.2,101909808
-2020-2021,2020,Female,Discharged,0,Not Admitted,20-44,Young Adult,1828993,168,2.8,307270824
-2020-2021,2020,Female,Discharged,0,Not Admitted,45-64,Middle Adult,1207456,180,3.0,217342080
-2020-2021,2020,Female,Discharged,0,Not Admitted,65+,Older Adult,1024550,222,3.7,227450100
-2020-2021,2020,Male,Discharged,0,Not Admitted,0-19,Pediatric & Youth,774918,126,2.1,97639668
-2020-2021,2020,Male,Discharged,0,Not Admitted,20-44,Young Adult,1537683,150,2.5,230652450
-2020-2021,2020,Male,Discharged,0,Not Admitted,45-64,Middle Adult,1201166,168,2.8,201795888
-2020-2021,2020,Male,Discharged,0,Not Admitted,65+,Older Adult,937745,204,3.4,191299980
+2020-2021,2020,Female,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,772044,132,2.2,101909808
+2020-2021,2020,Female,Discharged Home,0,Not Admitted,20-44,Young Adult,1828993,168,2.8,307270824
+2020-2021,2020,Female,Discharged Home,0,Not Admitted,45-64,Middle Adult,1207456,180,3.0,217342080
+2020-2021,2020,Female,Discharged Home,0,Not Admitted,65+,Older Adult,1024550,222,3.7,227450100
+2020-2021,2020,Male,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,774918,126,2.1,97639668
+2020-2021,2020,Male,Discharged Home,0,Not Admitted,20-44,Young Adult,1537683,150,2.5,230652450
+2020-2021,2020,Male,Discharged Home,0,Not Admitted,45-64,Middle Adult,1201166,168,2.8,201795888
+2020-2021,2020,Male,Discharged Home,0,Not Admitted,65+,Older Adult,937745,204,3.4,191299980
 2020-2021,2020,Female,Intra-Facility Transfer,0,Not Admitted,0-19,Pediatric & Youth,2522,162,2.7,408564
 2020-2021,2020,Female,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,9187,198,3.3,1819026
 2020-2021,2020,Female,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,4202,204,3.4,857208
@@ -79,14 +79,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2020-2021,2020,Male,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,6641,210,3.5,1394610
 2020-2021,2020,Male,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,4943,204,3.4,1008372
 2020-2021,2020,Male,Intra-Facility Transfer,0,Not Admitted,65+,Older Adult,3673,210,3.5,771330
-2020-2021,2020,Female,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,38354,120,2.0,4602480
-2020-2021,2020,Female,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,120738,144,2.4,17386272
-2020-2021,2020,Female,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,57032,144,2.4,8212608
-2020-2021,2020,Female,Left Without Being Seen,0,Not Admitted,65+,Older Adult,34137,150,2.5,5120550
-2020-2021,2020,Male,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,36034,114,1.9,4107876
-2020-2021,2020,Male,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,124550,138,2.3,17187900
-2020-2021,2020,Male,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,75767,144,2.4,10910448
-2020-2021,2020,Male,Left Without Being Seen,0,Not Admitted,65+,Older Adult,38440,144,2.4,5535360
+2020-2021,2020,Female,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,38354,120,2.0,4602480
+2020-2021,2020,Female,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,120738,144,2.4,17386272
+2020-2021,2020,Female,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,57032,144,2.4,8212608
+2020-2021,2020,Female,Not Seen Or Left,0,Not Admitted,65+,Older Adult,34137,150,2.5,5120550
+2020-2021,2020,Male,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,36034,114,1.9,4107876
+2020-2021,2020,Male,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,124550,138,2.3,17187900
+2020-2021,2020,Male,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,75767,144,2.4,10910448
+2020-2021,2020,Male,Not Seen Or Left,0,Not Admitted,65+,Older Adult,38440,144,2.4,5535360
 2020-2021,2020,Female,Transferred,0,Not Admitted,0-19,Pediatric & Youth,13778,258,4.3,3554724
 2020-2021,2020,Female,Transferred,0,Not Admitted,20-44,Young Adult,34661,306,5.1,10606266
 2020-2021,2020,Female,Transferred,0,Not Admitted,45-64,Middle Adult,28183,330,5.5,9300390
@@ -111,14 +111,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2019-2020,2019,Male,Death,0,Not Admitted,20-44,Young Adult,1057,36,0.6,38052
 2019-2020,2019,Male,Death,0,Not Admitted,45-64,Middle Adult,2694,48,0.8,129312
 2019-2020,2019,Male,Death,0,Not Admitted,65+,Older Adult,6321,84,1.4,530964
-2019-2020,2019,Female,Discharged,0,Not Admitted,0-19,Pediatric & Youth,1291223,150,2.5,193683450
-2019-2020,2019,Female,Discharged,0,Not Admitted,20-44,Young Adult,2191882,186,3.1,407690052
-2019-2020,2019,Female,Discharged,0,Not Admitted,45-64,Middle Adult,1461599,192,3.2,280627008
-2019-2020,2019,Female,Discharged,0,Not Admitted,65+,Older Adult,1260505,240,4.0,302521200
-2019-2020,2019,Male,Discharged,0,Not Admitted,0-19,Pediatric & Youth,1366492,144,2.4,196774848
-2019-2020,2019,Male,Discharged,0,Not Admitted,20-44,Young Adult,1782990,168,2.8,299542320
-2019-2020,2019,Male,Discharged,0,Not Admitted,45-64,Middle Adult,1390032,186,3.1,258545952
-2019-2020,2019,Male,Discharged,0,Not Admitted,65+,Older Adult,1095817,222,3.7,243271374
+2019-2020,2019,Female,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,1291223,150,2.5,193683450
+2019-2020,2019,Female,Discharged Home,0,Not Admitted,20-44,Young Adult,2191882,186,3.1,407690052
+2019-2020,2019,Female,Discharged Home,0,Not Admitted,45-64,Middle Adult,1461599,192,3.2,280627008
+2019-2020,2019,Female,Discharged Home,0,Not Admitted,65+,Older Adult,1260505,240,4.0,302521200
+2019-2020,2019,Male,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,1366492,144,2.4,196774848
+2019-2020,2019,Male,Discharged Home,0,Not Admitted,20-44,Young Adult,1782990,168,2.8,299542320
+2019-2020,2019,Male,Discharged Home,0,Not Admitted,45-64,Middle Adult,1390032,186,3.1,258545952
+2019-2020,2019,Male,Discharged Home,0,Not Admitted,65+,Older Adult,1095817,222,3.7,243271374
 2019-2020,2019,Female,Intra-Facility Transfer,0,Not Admitted,0-19,Pediatric & Youth,25544,36,0.6,919584
 2019-2020,2019,Female,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,50796,36,0.6,1828656
 2019-2020,2019,Female,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,27452,36,0.6,988272
@@ -127,14 +127,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2019-2020,2019,Male,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,41222,36,0.6,1483992
 2019-2020,2019,Male,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,27741,36,0.6,998676
 2019-2020,2019,Male,Intra-Facility Transfer,0,Not Admitted,65+,Older Adult,17030,48,0.8,817440
-2019-2020,2019,Female,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,109094,144,2.4,15709536
-2019-2020,2019,Female,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,209324,168,2.8,35166432
-2019-2020,2019,Female,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,100900,162,2.7,16345800
-2019-2020,2019,Female,Left Without Being Seen,0,Not Admitted,65+,Older Adult,65208,168,2.8,10954944
-2019-2020,2019,Male,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,111102,138,2.3,15332076
-2019-2020,2019,Male,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,197719,162,2.7,32030478
-2019-2020,2019,Male,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,119048,168,2.8,20000064
-2019-2020,2019,Male,Left Without Being Seen,0,Not Admitted,65+,Older Adult,64279,162,2.7,10413198
+2019-2020,2019,Female,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,109094,144,2.4,15709536
+2019-2020,2019,Female,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,209324,168,2.8,35166432
+2019-2020,2019,Female,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,100900,162,2.7,16345800
+2019-2020,2019,Female,Not Seen Or Left,0,Not Admitted,65+,Older Adult,65208,168,2.8,10954944
+2019-2020,2019,Male,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,111102,138,2.3,15332076
+2019-2020,2019,Male,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,197719,162,2.7,32030478
+2019-2020,2019,Male,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,119048,168,2.8,20000064
+2019-2020,2019,Male,Not Seen Or Left,0,Not Admitted,65+,Older Adult,64279,162,2.7,10413198
 2019-2020,2019,Female,Transferred,0,Not Admitted,0-19,Pediatric & Youth,18073,258,4.3,4662834
 2019-2020,2019,Female,Transferred,0,Not Admitted,20-44,Young Adult,37467,294,4.9,11015298
 2019-2020,2019,Female,Transferred,0,Not Admitted,45-64,Middle Adult,31341,318,5.3,9966438
@@ -159,14 +159,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2018-2019,2018,Male,Death,0,Not Admitted,20-44,Young Adult,1105,30,0.5,33150
 2018-2019,2018,Male,Death,0,Not Admitted,45-64,Middle Adult,2813,42,0.7,118146
 2018-2019,2018,Male,Death,0,Not Admitted,65+,Older Adult,6163,78,1.3,480714
-2018-2019,2018,Female,Discharged,0,Not Admitted,0-19,Pediatric & Youth,1322198,144,2.4,190396512
-2018-2019,2018,Female,Discharged,0,Not Admitted,20-44,Young Adult,2206226,180,3.0,397120680
-2018-2019,2018,Female,Discharged,0,Not Admitted,45-64,Middle Adult,1500252,186,3.1,279046872
-2018-2019,2018,Female,Discharged,0,Not Admitted,65+,Older Adult,1261817,234,3.9,295265178
-2018-2019,2018,Male,Discharged,0,Not Admitted,0-19,Pediatric & Youth,1382791,138,2.3,190825158
-2018-2019,2018,Male,Discharged,0,Not Admitted,20-44,Young Adult,1792331,162,2.7,290357622
-2018-2019,2018,Male,Discharged,0,Not Admitted,45-64,Middle Adult,1419611,180,3.0,255529980
-2018-2019,2018,Male,Discharged,0,Not Admitted,65+,Older Adult,1083472,216,3.6,234029952
+2018-2019,2018,Female,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,1322198,144,2.4,190396512
+2018-2019,2018,Female,Discharged Home,0,Not Admitted,20-44,Young Adult,2206226,180,3.0,397120680
+2018-2019,2018,Female,Discharged Home,0,Not Admitted,45-64,Middle Adult,1500252,186,3.1,279046872
+2018-2019,2018,Female,Discharged Home,0,Not Admitted,65+,Older Adult,1261817,234,3.9,295265178
+2018-2019,2018,Male,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,1382791,138,2.3,190825158
+2018-2019,2018,Male,Discharged Home,0,Not Admitted,20-44,Young Adult,1792331,162,2.7,290357622
+2018-2019,2018,Male,Discharged Home,0,Not Admitted,45-64,Middle Adult,1419611,180,3.0,255529980
+2018-2019,2018,Male,Discharged Home,0,Not Admitted,65+,Older Adult,1083472,216,3.6,234029952
 2018-2019,2018,Female,Intra-Facility Transfer,0,Not Admitted,0-19,Pediatric & Youth,22149,42,0.7,930258
 2018-2019,2018,Female,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,45499,42,0.7,1910958
 2018-2019,2018,Female,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,25067,42,0.7,1052814
@@ -175,14 +175,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2018-2019,2018,Male,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,36688,36,0.6,1320768
 2018-2019,2018,Male,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,24906,42,0.7,1046052
 2018-2019,2018,Male,Intra-Facility Transfer,0,Not Admitted,65+,Older Adult,15414,54,0.9,832356
-2018-2019,2018,Female,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,102876,138,2.3,14196888
-2018-2019,2018,Female,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,197698,162,2.7,32027076
-2018-2019,2018,Female,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,97703,162,2.7,15827886
-2018-2019,2018,Female,Left Without Being Seen,0,Not Admitted,65+,Older Adult,61198,162,2.7,9914076
-2018-2019,2018,Male,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,103760,132,2.2,13696320
-2018-2019,2018,Male,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,184207,156,2.6,28736292
-2018-2019,2018,Male,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,115550,156,2.6,18025800
-2018-2019,2018,Male,Left Without Being Seen,0,Not Admitted,65+,Older Adult,59839,150,2.5,8975850
+2018-2019,2018,Female,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,102876,138,2.3,14196888
+2018-2019,2018,Female,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,197698,162,2.7,32027076
+2018-2019,2018,Female,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,97703,162,2.7,15827886
+2018-2019,2018,Female,Not Seen Or Left,0,Not Admitted,65+,Older Adult,61198,162,2.7,9914076
+2018-2019,2018,Male,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,103760,132,2.2,13696320
+2018-2019,2018,Male,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,184207,156,2.6,28736292
+2018-2019,2018,Male,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,115550,156,2.6,18025800
+2018-2019,2018,Male,Not Seen Or Left,0,Not Admitted,65+,Older Adult,59839,150,2.5,8975850
 2018-2019,2018,Female,Transferred,0,Not Admitted,0-19,Pediatric & Youth,18307,252,4.2,4613364
 2018-2019,2018,Female,Transferred,0,Not Admitted,20-44,Young Adult,37306,288,4.8,10744128
 2018-2019,2018,Female,Transferred,0,Not Admitted,45-64,Middle Adult,30923,318,5.3,9833514
@@ -207,14 +207,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2017-2018,2017,Male,Death,0,Not Admitted,20-44,Young Adult,661,30,0.5,19830
 2017-2018,2017,Male,Death,0,Not Admitted,45-64,Middle Adult,1504,30,0.5,45120
 2017-2018,2017,Male,Death,0,Not Admitted,65+,Older Adult,3345,84,1.4,280980
-2017-2018,2017,Female,Discharged,0,Not Admitted,0-19,Pediatric & Youth,1090851,132,2.2,143992332
-2017-2018,2017,Female,Discharged,0,Not Admitted,20-44,Young Adult,1765199,162,2.7,285962238
-2017-2018,2017,Female,Discharged,0,Not Admitted,45-64,Middle Adult,1181522,168,2.8,198495696
-2017-2018,2017,Female,Discharged,0,Not Admitted,65+,Older Adult,980491,204,3.4,200020164
-2017-2018,2017,Male,Discharged,0,Not Admitted,0-19,Pediatric & Youth,1164345,126,2.1,146707470
-2017-2018,2017,Male,Discharged,0,Not Admitted,20-44,Young Adult,1440025,144,2.4,207363600
-2017-2018,2017,Male,Discharged,0,Not Admitted,45-64,Middle Adult,1119438,162,2.7,181348956
-2017-2018,2017,Male,Discharged,0,Not Admitted,65+,Older Adult,831153,192,3.2,159581376
+2017-2018,2017,Female,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,1090851,132,2.2,143992332
+2017-2018,2017,Female,Discharged Home,0,Not Admitted,20-44,Young Adult,1765199,162,2.7,285962238
+2017-2018,2017,Female,Discharged Home,0,Not Admitted,45-64,Middle Adult,1181522,168,2.8,198495696
+2017-2018,2017,Female,Discharged Home,0,Not Admitted,65+,Older Adult,980491,204,3.4,200020164
+2017-2018,2017,Male,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,1164345,126,2.1,146707470
+2017-2018,2017,Male,Discharged Home,0,Not Admitted,20-44,Young Adult,1440025,144,2.4,207363600
+2017-2018,2017,Male,Discharged Home,0,Not Admitted,45-64,Middle Adult,1119438,162,2.7,181348956
+2017-2018,2017,Male,Discharged Home,0,Not Admitted,65+,Older Adult,831153,192,3.2,159581376
 2017-2018,2017,Female,Intra-Facility Transfer,0,Not Admitted,0-19,Pediatric & Youth,3784,180,3.0,681120
 2017-2018,2017,Female,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,9449,198,3.3,1870902
 2017-2018,2017,Female,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,4405,216,3.6,951480
@@ -223,14 +223,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2017-2018,2017,Male,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,6328,228,3.8,1442784
 2017-2018,2017,Male,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,4847,210,3.5,1017870
 2017-2018,2017,Male,Intra-Facility Transfer,0,Not Admitted,65+,Older Adult,3596,222,3.7,798312
-2017-2018,2017,Female,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,57219,120,2.0,6866280
-2017-2018,2017,Female,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,119158,138,2.3,16443804
-2017-2018,2017,Female,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,53871,138,2.3,7434198
-2017-2018,2017,Female,Left Without Being Seen,0,Not Admitted,65+,Older Adult,28175,144,2.4,4057200
-2017-2018,2017,Male,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,57657,114,1.9,6572898
-2017-2018,2017,Male,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,113812,132,2.2,15023184
-2017-2018,2017,Male,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,66890,138,2.3,9230820
-2017-2018,2017,Male,Left Without Being Seen,0,Not Admitted,65+,Older Adult,28173,138,2.3,3887874
+2017-2018,2017,Female,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,57219,120,2.0,6866280
+2017-2018,2017,Female,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,119158,138,2.3,16443804
+2017-2018,2017,Female,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,53871,138,2.3,7434198
+2017-2018,2017,Female,Not Seen Or Left,0,Not Admitted,65+,Older Adult,28175,144,2.4,4057200
+2017-2018,2017,Male,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,57657,114,1.9,6572898
+2017-2018,2017,Male,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,113812,132,2.2,15023184
+2017-2018,2017,Male,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,66890,138,2.3,9230820
+2017-2018,2017,Male,Not Seen Or Left,0,Not Admitted,65+,Older Adult,28173,138,2.3,3887874
 2017-2018,2017,Female,Transferred,0,Not Admitted,0-19,Pediatric & Youth,11773,240,4.0,2825520
 2017-2018,2017,Female,Transferred,0,Not Admitted,20-44,Young Adult,19435,252,4.2,4897620
 2017-2018,2017,Female,Transferred,0,Not Admitted,45-64,Middle Adult,15769,276,4.6,4352244
@@ -255,14 +255,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2016-2017,2016,Male,Death,0,Not Admitted,20-44,Young Adult,599,30,0.5,17970
 2016-2017,2016,Male,Death,0,Not Admitted,45-64,Middle Adult,1446,30,0.5,43380
 2016-2017,2016,Male,Death,0,Not Admitted,65+,Older Adult,3104,78,1.3,242112
-2016-2017,2016,Female,Discharged,0,Not Admitted,0-19,Pediatric & Youth,1072555,126,2.1,135141930
-2016-2017,2016,Female,Discharged,0,Not Admitted,20-44,Young Adult,1740393,156,2.6,271501308
-2016-2017,2016,Female,Discharged,0,Not Admitted,45-64,Middle Adult,1165812,162,2.7,188861544
-2016-2017,2016,Female,Discharged,0,Not Admitted,65+,Older Adult,947804,198,3.3,187665192
-2016-2017,2016,Male,Discharged,0,Not Admitted,0-19,Pediatric & Youth,1135199,120,2.0,136223880
-2016-2017,2016,Male,Discharged,0,Not Admitted,20-44,Young Adult,1425017,138,2.3,196652346
-2016-2017,2016,Male,Discharged,0,Not Admitted,45-64,Middle Adult,1102297,156,2.6,171958332
-2016-2017,2016,Male,Discharged,0,Not Admitted,65+,Older Adult,804186,186,3.1,149578596
+2016-2017,2016,Female,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,1072555,126,2.1,135141930
+2016-2017,2016,Female,Discharged Home,0,Not Admitted,20-44,Young Adult,1740393,156,2.6,271501308
+2016-2017,2016,Female,Discharged Home,0,Not Admitted,45-64,Middle Adult,1165812,162,2.7,188861544
+2016-2017,2016,Female,Discharged Home,0,Not Admitted,65+,Older Adult,947804,198,3.3,187665192
+2016-2017,2016,Male,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,1135199,120,2.0,136223880
+2016-2017,2016,Male,Discharged Home,0,Not Admitted,20-44,Young Adult,1425017,138,2.3,196652346
+2016-2017,2016,Male,Discharged Home,0,Not Admitted,45-64,Middle Adult,1102297,156,2.6,171958332
+2016-2017,2016,Male,Discharged Home,0,Not Admitted,65+,Older Adult,804186,186,3.1,149578596
 2016-2017,2016,Female,Intra-Facility Transfer,0,Not Admitted,0-19,Pediatric & Youth,3517,186,3.1,654162
 2016-2017,2016,Female,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,9093,204,3.4,1854972
 2016-2017,2016,Female,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,4132,210,3.5,867720
@@ -271,14 +271,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2016-2017,2016,Male,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,5807,228,3.8,1323996
 2016-2017,2016,Male,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,4907,210,3.5,1030470
 2016-2017,2016,Male,Intra-Facility Transfer,0,Not Admitted,65+,Older Adult,3612,228,3.8,823536
-2016-2017,2016,Female,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,51567,120,2.0,6188040
-2016-2017,2016,Female,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,108420,132,2.2,14311440
-2016-2017,2016,Female,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,49599,138,2.3,6844662
-2016-2017,2016,Female,Left Without Being Seen,0,Not Admitted,65+,Older Adult,24956,138,2.3,3443928
-2016-2017,2016,Male,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,51456,108,1.8,5557248
-2016-2017,2016,Male,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,102113,132,2.2,13478916
-2016-2017,2016,Male,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,60006,138,2.3,8280828
-2016-2017,2016,Male,Left Without Being Seen,0,Not Admitted,65+,Older Adult,25378,138,2.3,3502164
+2016-2017,2016,Female,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,51567,120,2.0,6188040
+2016-2017,2016,Female,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,108420,132,2.2,14311440
+2016-2017,2016,Female,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,49599,138,2.3,6844662
+2016-2017,2016,Female,Not Seen Or Left,0,Not Admitted,65+,Older Adult,24956,138,2.3,3443928
+2016-2017,2016,Male,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,51456,108,1.8,5557248
+2016-2017,2016,Male,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,102113,132,2.2,13478916
+2016-2017,2016,Male,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,60006,138,2.3,8280828
+2016-2017,2016,Male,Not Seen Or Left,0,Not Admitted,65+,Older Adult,25378,138,2.3,3502164
 2016-2017,2016,Female,Transferred,0,Not Admitted,0-19,Pediatric & Youth,11232,234,3.9,2628288
 2016-2017,2016,Female,Transferred,0,Not Admitted,20-44,Young Adult,18503,246,4.1,4551738
 2016-2017,2016,Female,Transferred,0,Not Admitted,45-64,Middle Adult,15506,264,4.4,4093584
@@ -303,14 +303,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2015-2016,2015,Male,Death,0,Not Admitted,20-44,Young Adult,548,30,0.5,16440
 2015-2016,2015,Male,Death,0,Not Admitted,45-64,Middle Adult,1505,36,0.6,54180
 2015-2016,2015,Male,Death,0,Not Admitted,65+,Older Adult,2928,78,1.3,228384
-2015-2016,2015,Female,Discharged,0,Not Admitted,0-19,Pediatric & Youth,1086176,120,2.0,130341120
-2015-2016,2015,Female,Discharged,0,Not Admitted,20-44,Young Adult,1752606,150,2.5,262890900
-2015-2016,2015,Female,Discharged,0,Not Admitted,45-64,Middle Adult,1152791,156,2.6,179835396
-2015-2016,2015,Female,Discharged,0,Not Admitted,65+,Older Adult,912836,198,3.3,180741528
-2015-2016,2015,Male,Discharged,0,Not Admitted,0-19,Pediatric & Youth,1152185,114,1.9,131349090
-2015-2016,2015,Male,Discharged,0,Not Admitted,20-44,Young Adult,1427341,138,2.3,196973058
-2015-2016,2015,Male,Discharged,0,Not Admitted,45-64,Middle Adult,1091368,150,2.5,163705200
-2015-2016,2015,Male,Discharged,0,Not Admitted,65+,Older Adult,767813,180,3.0,138206340
+2015-2016,2015,Female,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,1086176,120,2.0,130341120
+2015-2016,2015,Female,Discharged Home,0,Not Admitted,20-44,Young Adult,1752606,150,2.5,262890900
+2015-2016,2015,Female,Discharged Home,0,Not Admitted,45-64,Middle Adult,1152791,156,2.6,179835396
+2015-2016,2015,Female,Discharged Home,0,Not Admitted,65+,Older Adult,912836,198,3.3,180741528
+2015-2016,2015,Male,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,1152185,114,1.9,131349090
+2015-2016,2015,Male,Discharged Home,0,Not Admitted,20-44,Young Adult,1427341,138,2.3,196973058
+2015-2016,2015,Male,Discharged Home,0,Not Admitted,45-64,Middle Adult,1091368,150,2.5,163705200
+2015-2016,2015,Male,Discharged Home,0,Not Admitted,65+,Older Adult,767813,180,3.0,138206340
 2015-2016,2015,Female,Intra-Facility Transfer,0,Not Admitted,0-19,Pediatric & Youth,3561,192,3.2,683712
 2015-2016,2015,Female,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,9128,204,3.4,1862112
 2015-2016,2015,Female,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,4219,204,3.4,860676
@@ -319,14 +319,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2015-2016,2015,Male,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,5757,228,3.8,1312596
 2015-2016,2015,Male,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,4641,204,3.4,946764
 2015-2016,2015,Male,Intra-Facility Transfer,0,Not Admitted,65+,Older Adult,3421,222,3.7,759462
-2015-2016,2015,Female,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,52161,114,1.9,5946354
-2015-2016,2015,Female,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,103396,132,2.2,13648272
-2015-2016,2015,Female,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,47482,132,2.2,6267624
-2015-2016,2015,Female,Left Without Being Seen,0,Not Admitted,65+,Older Adult,23283,138,2.3,3213054
-2015-2016,2015,Male,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,52511,108,1.8,5671188
-2015-2016,2015,Male,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,95629,126,2.1,12049254
-2015-2016,2015,Male,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,55523,132,2.2,7329036
-2015-2016,2015,Male,Left Without Being Seen,0,Not Admitted,65+,Older Adult,22859,138,2.3,3154542
+2015-2016,2015,Female,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,52161,114,1.9,5946354
+2015-2016,2015,Female,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,103396,132,2.2,13648272
+2015-2016,2015,Female,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,47482,132,2.2,6267624
+2015-2016,2015,Female,Not Seen Or Left,0,Not Admitted,65+,Older Adult,23283,138,2.3,3213054
+2015-2016,2015,Male,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,52511,108,1.8,5671188
+2015-2016,2015,Male,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,95629,126,2.1,12049254
+2015-2016,2015,Male,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,55523,132,2.2,7329036
+2015-2016,2015,Male,Not Seen Or Left,0,Not Admitted,65+,Older Adult,22859,138,2.3,3154542
 2015-2016,2015,Female,Transferred,0,Not Admitted,0-19,Pediatric & Youth,10935,222,3.7,2427570
 2015-2016,2015,Female,Transferred,0,Not Admitted,20-44,Young Adult,18043,246,4.1,4438578
 2015-2016,2015,Female,Transferred,0,Not Admitted,45-64,Middle Adult,14914,264,4.4,3937296
@@ -351,14 +351,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2014-2015,2014,Male,Death,0,Not Admitted,20-44,Young Adult,497,30,0.5,14910
 2014-2015,2014,Male,Death,0,Not Admitted,45-64,Middle Adult,1417,36,0.6,51012
 2014-2015,2014,Male,Death,0,Not Admitted,65+,Older Adult,3002,66,1.1,198132
-2014-2015,2014,Female,Discharged,0,Not Admitted,0-19,Pediatric & Youth,1079692,120,2.0,129563040
-2014-2015,2014,Female,Discharged,0,Not Admitted,20-44,Young Adult,1722811,150,2.5,258421650
-2014-2015,2014,Female,Discharged,0,Not Admitted,45-64,Middle Adult,1118157,156,2.6,174432492
-2014-2015,2014,Female,Discharged,0,Not Admitted,65+,Older Adult,878511,198,3.3,173945178
-2014-2015,2014,Male,Discharged,0,Not Admitted,0-19,Pediatric & Youth,1147766,114,1.9,130845324
-2014-2015,2014,Male,Discharged,0,Not Admitted,20-44,Young Adult,1414193,132,2.2,186673476
-2014-2015,2014,Male,Discharged,0,Not Admitted,45-64,Middle Adult,1063300,150,2.5,159495000
-2014-2015,2014,Male,Discharged,0,Not Admitted,65+,Older Adult,729245,180,3.0,131264100
+2014-2015,2014,Female,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,1079692,120,2.0,129563040
+2014-2015,2014,Female,Discharged Home,0,Not Admitted,20-44,Young Adult,1722811,150,2.5,258421650
+2014-2015,2014,Female,Discharged Home,0,Not Admitted,45-64,Middle Adult,1118157,156,2.6,174432492
+2014-2015,2014,Female,Discharged Home,0,Not Admitted,65+,Older Adult,878511,198,3.3,173945178
+2014-2015,2014,Male,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,1147766,114,1.9,130845324
+2014-2015,2014,Male,Discharged Home,0,Not Admitted,20-44,Young Adult,1414193,132,2.2,186673476
+2014-2015,2014,Male,Discharged Home,0,Not Admitted,45-64,Middle Adult,1063300,150,2.5,159495000
+2014-2015,2014,Male,Discharged Home,0,Not Admitted,65+,Older Adult,729245,180,3.0,131264100
 2014-2015,2014,Female,Intra-Facility Transfer,0,Not Admitted,0-19,Pediatric & Youth,3448,192,3.2,662016
 2014-2015,2014,Female,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,8296,204,3.4,1692384
 2014-2015,2014,Female,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,3819,210,3.5,801990
@@ -367,14 +367,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2014-2015,2014,Male,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,5234,222,3.7,1161948
 2014-2015,2014,Male,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,4278,210,3.5,898380
 2014-2015,2014,Male,Intra-Facility Transfer,0,Not Admitted,65+,Older Adult,3152,216,3.6,680832
-2014-2015,2014,Female,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,53093,114,1.9,6052602
-2014-2015,2014,Female,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,102917,132,2.2,13585044
-2014-2015,2014,Female,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,46203,138,2.3,6376014
-2014-2015,2014,Female,Left Without Being Seen,0,Not Admitted,65+,Older Adult,22614,138,2.3,3120732
-2014-2015,2014,Male,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,52943,108,1.8,5717844
-2014-2015,2014,Male,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,93765,126,2.1,11814390
-2014-2015,2014,Male,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,53532,138,2.3,7387416
-2014-2015,2014,Male,Left Without Being Seen,0,Not Admitted,65+,Older Adult,21933,138,2.3,3026754
+2014-2015,2014,Female,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,53093,114,1.9,6052602
+2014-2015,2014,Female,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,102917,132,2.2,13585044
+2014-2015,2014,Female,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,46203,138,2.3,6376014
+2014-2015,2014,Female,Not Seen Or Left,0,Not Admitted,65+,Older Adult,22614,138,2.3,3120732
+2014-2015,2014,Male,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,52943,108,1.8,5717844
+2014-2015,2014,Male,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,93765,126,2.1,11814390
+2014-2015,2014,Male,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,53532,138,2.3,7387416
+2014-2015,2014,Male,Not Seen Or Left,0,Not Admitted,65+,Older Adult,21933,138,2.3,3026754
 2014-2015,2014,Female,Transferred,0,Not Admitted,0-19,Pediatric & Youth,10609,228,3.8,2418852
 2014-2015,2014,Female,Transferred,0,Not Admitted,20-44,Young Adult,16707,246,4.1,4109922
 2014-2015,2014,Female,Transferred,0,Not Admitted,45-64,Middle Adult,14066,264,4.4,3713424
@@ -399,14 +399,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2013-2014,2013,Male,Death,0,Not Admitted,20-44,Young Adult,513,30,0.5,15390
 2013-2014,2013,Male,Death,0,Not Admitted,45-64,Middle Adult,1390,36,0.6,50040
 2013-2014,2013,Male,Death,0,Not Admitted,65+,Older Adult,2775,72,1.2,199800
-2013-2014,2013,Female,Discharged,0,Not Admitted,0-19,Pediatric & Youth,1027729,114,1.9,117161106
-2013-2014,2013,Female,Discharged,0,Not Admitted,20-44,Young Adult,1673977,144,2.4,241052688
-2013-2014,2013,Female,Discharged,0,Not Admitted,45-64,Middle Adult,1075895,150,2.5,161384250
-2013-2014,2013,Female,Discharged,0,Not Admitted,65+,Older Adult,810016,186,3.1,150662976
-2013-2014,2013,Male,Discharged,0,Not Admitted,0-19,Pediatric & Youth,1098880,108,1.8,118679040
-2013-2014,2013,Male,Discharged,0,Not Admitted,20-44,Young Adult,1372351,126,2.1,172916226
-2013-2014,2013,Male,Discharged,0,Not Admitted,45-64,Middle Adult,1027695,144,2.4,147988080
-2013-2014,2013,Male,Discharged,0,Not Admitted,65+,Older Adult,673703,174,2.9,117224322
+2013-2014,2013,Female,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,1027729,114,1.9,117161106
+2013-2014,2013,Female,Discharged Home,0,Not Admitted,20-44,Young Adult,1673977,144,2.4,241052688
+2013-2014,2013,Female,Discharged Home,0,Not Admitted,45-64,Middle Adult,1075895,150,2.5,161384250
+2013-2014,2013,Female,Discharged Home,0,Not Admitted,65+,Older Adult,810016,186,3.1,150662976
+2013-2014,2013,Male,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,1098880,108,1.8,118679040
+2013-2014,2013,Male,Discharged Home,0,Not Admitted,20-44,Young Adult,1372351,126,2.1,172916226
+2013-2014,2013,Male,Discharged Home,0,Not Admitted,45-64,Middle Adult,1027695,144,2.4,147988080
+2013-2014,2013,Male,Discharged Home,0,Not Admitted,65+,Older Adult,673703,174,2.9,117224322
 2013-2014,2013,Female,Intra-Facility Transfer,0,Not Admitted,0-19,Pediatric & Youth,3370,186,3.1,626820
 2013-2014,2013,Female,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,7944,216,3.6,1715904
 2013-2014,2013,Female,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,3825,216,3.6,826200
@@ -415,14 +415,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2013-2014,2013,Male,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,5238,210,3.5,1099980
 2013-2014,2013,Male,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,4383,204,3.4,894132
 2013-2014,2013,Male,Intra-Facility Transfer,0,Not Admitted,65+,Older Adult,2898,222,3.7,643356
-2013-2014,2013,Female,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,45601,114,1.9,5198514
-2013-2014,2013,Female,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,92476,132,2.2,12206832
-2013-2014,2013,Female,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,41569,138,2.3,5736522
-2013-2014,2013,Female,Left Without Being Seen,0,Not Admitted,65+,Older Adult,19932,144,2.4,2870208
-2013-2014,2013,Male,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,45476,108,1.8,4911408
-2013-2014,2013,Male,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,83854,126,2.1,10565604
-2013-2014,2013,Male,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,48819,138,2.3,6737022
-2013-2014,2013,Male,Left Without Being Seen,0,Not Admitted,65+,Older Adult,19250,138,2.3,2656500
+2013-2014,2013,Female,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,45601,114,1.9,5198514
+2013-2014,2013,Female,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,92476,132,2.2,12206832
+2013-2014,2013,Female,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,41569,138,2.3,5736522
+2013-2014,2013,Female,Not Seen Or Left,0,Not Admitted,65+,Older Adult,19932,144,2.4,2870208
+2013-2014,2013,Male,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,45476,108,1.8,4911408
+2013-2014,2013,Male,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,83854,126,2.1,10565604
+2013-2014,2013,Male,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,48819,138,2.3,6737022
+2013-2014,2013,Male,Not Seen Or Left,0,Not Admitted,65+,Older Adult,19250,138,2.3,2656500
 2013-2014,2013,Female,Transferred,0,Not Admitted,0-19,Pediatric & Youth,9790,222,3.7,2173380
 2013-2014,2013,Female,Transferred,0,Not Admitted,20-44,Young Adult,16080,234,3.9,3762720
 2013-2014,2013,Female,Transferred,0,Not Admitted,45-64,Middle Adult,13656,264,4.4,3605184
@@ -447,14 +447,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2012-2013,2012,Male,Death,0,Not Admitted,20-44,Young Adult,520,31,0.52,16120
 2012-2013,2012,Male,Death,0,Not Admitted,45-64,Middle Adult,1472,35,0.58,51520
 2012-2013,2012,Male,Death,0,Not Admitted,65+,Older Adult,2743,70,1.17,192010
-2012-2013,2012,Female,Discharged,0,Not Admitted,0-19,Pediatric & Youth,1015603,113,1.88,114763139
-2012-2013,2012,Female,Discharged,0,Not Admitted,20-44,Young Adult,1607298,142,2.37,228236316
-2012-2013,2012,Female,Discharged,0,Not Admitted,45-64,Middle Adult,1039977,148,2.47,153916596
-2012-2013,2012,Female,Discharged,0,Not Admitted,65+,Older Adult,772413,188,3.13,145213644
-2012-2013,2012,Male,Discharged,0,Not Admitted,0-19,Pediatric & Youth,1095123,109,1.82,119368407
-2012-2013,2012,Male,Discharged,0,Not Admitted,20-44,Young Adult,1330615,127,2.12,168988105
-2012-2013,2012,Male,Discharged,0,Not Admitted,45-64,Middle Adult,992669,142,2.37,140958998
-2012-2013,2012,Male,Discharged,0,Not Admitted,65+,Older Adult,636089,171,2.85,108771219
+2012-2013,2012,Female,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,1015603,113,1.88,114763139
+2012-2013,2012,Female,Discharged Home,0,Not Admitted,20-44,Young Adult,1607298,142,2.37,228236316
+2012-2013,2012,Female,Discharged Home,0,Not Admitted,45-64,Middle Adult,1039977,148,2.47,153916596
+2012-2013,2012,Female,Discharged Home,0,Not Admitted,65+,Older Adult,772413,188,3.13,145213644
+2012-2013,2012,Male,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,1095123,109,1.82,119368407
+2012-2013,2012,Male,Discharged Home,0,Not Admitted,20-44,Young Adult,1330615,127,2.12,168988105
+2012-2013,2012,Male,Discharged Home,0,Not Admitted,45-64,Middle Adult,992669,142,2.37,140958998
+2012-2013,2012,Male,Discharged Home,0,Not Admitted,65+,Older Adult,636089,171,2.85,108771219
 2012-2013,2012,Female,Intra-Facility Transfer,0,Not Admitted,0-19,Pediatric & Youth,2878,177,2.95,509406
 2012-2013,2012,Female,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,7258,230,3.83,1669340
 2012-2013,2012,Female,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,3522,204,3.4,718488
@@ -463,14 +463,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2012-2013,2012,Male,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,4292,208,3.47,892736
 2012-2013,2012,Male,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,3831,212,3.53,812172
 2012-2013,2012,Male,Intra-Facility Transfer,0,Not Admitted,65+,Older Adult,2451,215,3.58,526965
-2012-2013,2012,Female,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,49116,112,1.87,5500992
-2012-2013,2012,Female,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,94306,130,2.17,12259780
-2012-2013,2012,Female,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,43559,132,2.2,5749788
-2012-2013,2012,Female,Left Without Being Seen,0,Not Admitted,65+,Older Adult,21173,145,2.42,3070085
-2012-2013,2012,Male,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,49130,106,1.77,5207780
-2012-2013,2012,Male,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,85435,123,2.05,10508505
-2012-2013,2012,Male,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,49605,132,2.2,6547860
-2012-2013,2012,Male,Left Without Being Seen,0,Not Admitted,65+,Older Adult,19644,137,2.28,2691228
+2012-2013,2012,Female,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,49116,112,1.87,5500992
+2012-2013,2012,Female,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,94306,130,2.17,12259780
+2012-2013,2012,Female,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,43559,132,2.2,5749788
+2012-2013,2012,Female,Not Seen Or Left,0,Not Admitted,65+,Older Adult,21173,145,2.42,3070085
+2012-2013,2012,Male,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,49130,106,1.77,5207780
+2012-2013,2012,Male,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,85435,123,2.05,10508505
+2012-2013,2012,Male,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,49605,132,2.2,6547860
+2012-2013,2012,Male,Not Seen Or Left,0,Not Admitted,65+,Older Adult,19644,137,2.28,2691228
 2012-2013,2012,Female,Transferred,0,Not Admitted,0-19,Pediatric & Youth,9606,210,3.5,2017260
 2012-2013,2012,Female,Transferred,0,Not Admitted,20-44,Young Adult,15766,230,3.83,3626180
 2012-2013,2012,Female,Transferred,0,Not Admitted,45-64,Middle Adult,13244,262,4.37,3469928
@@ -495,14 +495,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2011-2012,2011,Male,Death,0,Not Admitted,20-44,Young Adult,538,30,0.5,16140
 2011-2012,2011,Male,Death,0,Not Admitted,45-64,Middle Adult,1430,29,0.48,41470
 2011-2012,2011,Male,Death,0,Not Admitted,65+,Older Adult,2686,66,1.1,177276
-2011-2012,2011,Female,Discharged,0,Not Admitted,0-19,Pediatric & Youth,937358,113,1.88,105921454
-2011-2012,2011,Female,Discharged,0,Not Admitted,20-44,Young Adult,1452102,141,2.35,204746382
-2011-2012,2011,Female,Discharged,0,Not Admitted,45-64,Middle Adult,944093,145,2.42,136893485
-2011-2012,2011,Female,Discharged,0,Not Admitted,65+,Older Adult,678307,187,3.12,126843409
-2011-2012,2011,Male,Discharged,0,Not Admitted,0-19,Pediatric & Youth,1011912,110,1.83,111310320
-2011-2012,2011,Male,Discharged,0,Not Admitted,20-44,Young Adult,1212342,127,2.12,153967434
-2011-2012,2011,Male,Discharged,0,Not Admitted,45-64,Middle Adult,895262,140,2.33,125336680
-2011-2012,2011,Male,Discharged,0,Not Admitted,65+,Older Adult,555752,168,2.8,93366336
+2011-2012,2011,Female,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,937358,113,1.88,105921454
+2011-2012,2011,Female,Discharged Home,0,Not Admitted,20-44,Young Adult,1452102,141,2.35,204746382
+2011-2012,2011,Female,Discharged Home,0,Not Admitted,45-64,Middle Adult,944093,145,2.42,136893485
+2011-2012,2011,Female,Discharged Home,0,Not Admitted,65+,Older Adult,678307,187,3.12,126843409
+2011-2012,2011,Male,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,1011912,110,1.83,111310320
+2011-2012,2011,Male,Discharged Home,0,Not Admitted,20-44,Young Adult,1212342,127,2.12,153967434
+2011-2012,2011,Male,Discharged Home,0,Not Admitted,45-64,Middle Adult,895262,140,2.33,125336680
+2011-2012,2011,Male,Discharged Home,0,Not Admitted,65+,Older Adult,555752,168,2.8,93366336
 2011-2012,2011,Female,Intra-Facility Transfer,0,Not Admitted,0-19,Pediatric & Youth,2263,173,2.88,391499
 2011-2012,2011,Female,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,6340,235,3.92,1489900
 2011-2012,2011,Female,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,2983,215,3.58,641345
@@ -511,14 +511,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2011-2012,2011,Male,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,3579,205,3.42,733695
 2011-2012,2011,Male,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,3246,206,3.43,668676
 2011-2012,2011,Male,Intra-Facility Transfer,0,Not Admitted,65+,Older Adult,2272,236,3.93,536192
-2011-2012,2011,Female,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,48260,115,1.92,5549900
-2011-2012,2011,Female,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,88896,131,2.18,11645376
-2011-2012,2011,Female,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,40638,134,2.23,5445492
-2011-2012,2011,Female,Left Without Being Seen,0,Not Admitted,65+,Older Adult,18438,144,2.4,2655072
-2011-2012,2011,Male,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,48577,110,1.83,5343470
-2011-2012,2011,Male,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,79599,126,2.1,10029474
-2011-2012,2011,Male,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,46342,135,2.25,6256170
-2011-2012,2011,Male,Left Without Being Seen,0,Not Admitted,65+,Older Adult,17263,139,2.32,2399557
+2011-2012,2011,Female,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,48260,115,1.92,5549900
+2011-2012,2011,Female,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,88896,131,2.18,11645376
+2011-2012,2011,Female,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,40638,134,2.23,5445492
+2011-2012,2011,Female,Not Seen Or Left,0,Not Admitted,65+,Older Adult,18438,144,2.4,2655072
+2011-2012,2011,Male,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,48577,110,1.83,5343470
+2011-2012,2011,Male,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,79599,126,2.1,10029474
+2011-2012,2011,Male,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,46342,135,2.25,6256170
+2011-2012,2011,Male,Not Seen Or Left,0,Not Admitted,65+,Older Adult,17263,139,2.32,2399557
 2011-2012,2011,Female,Transferred,0,Not Admitted,0-19,Pediatric & Youth,9020,209,3.48,1885180
 2011-2012,2011,Female,Transferred,0,Not Admitted,20-44,Young Adult,15371,233,3.88,3581443
 2011-2012,2011,Female,Transferred,0,Not Admitted,45-64,Middle Adult,12995,265,4.42,3443675
@@ -543,14 +543,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2010-2011,2010,Male,Death,0,Not Admitted,20-44,Young Adult,528,26,0.43,13728
 2010-2011,2010,Male,Death,0,Not Admitted,45-64,Middle Adult,1570,30,0.5,47100
 2010-2011,2010,Male,Death,0,Not Admitted,65+,Older Adult,2687,72,1.2,193464
-2010-2011,2010,Female,Discharged,0,Not Admitted,0-19,Pediatric & Youth,862885,114,1.9,98368890
-2010-2011,2010,Female,Discharged,0,Not Admitted,20-44,Young Adult,1304409,139,2.32,181312851
-2010-2011,2010,Female,Discharged,0,Not Admitted,45-64,Middle Adult,848847,142,2.37,120536274
-2010-2011,2010,Female,Discharged,0,Not Admitted,65+,Older Adult,606404,184,3.07,111578336
-2010-2011,2010,Male,Discharged,0,Not Admitted,0-19,Pediatric & Youth,938799,110,1.83,103267890
-2010-2011,2010,Male,Discharged,0,Not Admitted,20-44,Young Adult,1087268,125,2.08,135908500
-2010-2011,2010,Male,Discharged,0,Not Admitted,45-64,Middle Adult,806286,136,2.27,109654896
-2010-2011,2010,Male,Discharged,0,Not Admitted,65+,Older Adult,494462,165,2.75,81586230
+2010-2011,2010,Female,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,862885,114,1.9,98368890
+2010-2011,2010,Female,Discharged Home,0,Not Admitted,20-44,Young Adult,1304409,139,2.32,181312851
+2010-2011,2010,Female,Discharged Home,0,Not Admitted,45-64,Middle Adult,848847,142,2.37,120536274
+2010-2011,2010,Female,Discharged Home,0,Not Admitted,65+,Older Adult,606404,184,3.07,111578336
+2010-2011,2010,Male,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,938799,110,1.83,103267890
+2010-2011,2010,Male,Discharged Home,0,Not Admitted,20-44,Young Adult,1087268,125,2.08,135908500
+2010-2011,2010,Male,Discharged Home,0,Not Admitted,45-64,Middle Adult,806286,136,2.27,109654896
+2010-2011,2010,Male,Discharged Home,0,Not Admitted,65+,Older Adult,494462,165,2.75,81586230
 2010-2011,2010,Female,Intra-Facility Transfer,0,Not Admitted,0-19,Pediatric & Youth,1629,156,2.6,254124
 2010-2011,2010,Female,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,5655,237,3.95,1340235
 2010-2011,2010,Female,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,1991,198,3.3,394218
@@ -559,14 +559,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2010-2011,2010,Male,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,2573,195,3.25,501735
 2010-2011,2010,Male,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,2494,200,3.33,498800
 2010-2011,2010,Male,Intra-Facility Transfer,0,Not Admitted,65+,Older Adult,1698,223,3.72,378654
-2010-2011,2010,Female,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,46256,115,1.92,5319440
-2010-2011,2010,Female,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,80805,131,2.18,10585455
-2010-2011,2010,Female,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,36439,135,2.25,4919265
-2010-2011,2010,Female,Left Without Being Seen,0,Not Admitted,65+,Older Adult,16963,142,2.37,2408746
-2010-2011,2010,Male,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,46671,112,1.87,5227152
-2010-2011,2010,Male,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,71833,127,2.12,9122791
-2010-2011,2010,Male,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,40731,135,2.25,5498685
-2010-2011,2010,Male,Left Without Being Seen,0,Not Admitted,65+,Older Adult,15385,138,2.3,2123130
+2010-2011,2010,Female,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,46256,115,1.92,5319440
+2010-2011,2010,Female,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,80805,131,2.18,10585455
+2010-2011,2010,Female,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,36439,135,2.25,4919265
+2010-2011,2010,Female,Not Seen Or Left,0,Not Admitted,65+,Older Adult,16963,142,2.37,2408746
+2010-2011,2010,Male,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,46671,112,1.87,5227152
+2010-2011,2010,Male,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,71833,127,2.12,9122791
+2010-2011,2010,Male,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,40731,135,2.25,5498685
+2010-2011,2010,Male,Not Seen Or Left,0,Not Admitted,65+,Older Adult,15385,138,2.3,2123130
 2010-2011,2010,Female,Transferred,0,Not Admitted,0-19,Pediatric & Youth,8191,199,3.32,1630009
 2010-2011,2010,Female,Transferred,0,Not Admitted,20-44,Young Adult,13689,228,3.8,3121092
 2010-2011,2010,Female,Transferred,0,Not Admitted,45-64,Middle Adult,10876,260,4.33,2827760
@@ -591,14 +591,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2009-2010,2009,Male,Death,0,Not Admitted,20-44,Young Adult,355,23,0.38,8165
 2009-2010,2009,Male,Death,0,Not Admitted,45-64,Middle Adult,1151,27,0.45,31077
 2009-2010,2009,Male,Death,0,Not Admitted,65+,Older Adult,2123,45,0.75,95535
-2009-2010,2009,Female,Discharged,0,Not Admitted,0-19,Pediatric & Youth,610570,120,2.0,73268400
-2009-2010,2009,Female,Discharged,0,Not Admitted,20-44,Young Adult,896368,147,2.45,131766096
-2009-2010,2009,Female,Discharged,0,Not Admitted,45-64,Middle Adult,598153,151,2.52,90321103
-2009-2010,2009,Female,Discharged,0,Not Admitted,65+,Older Adult,440779,195,3.25,85951905
-2009-2010,2009,Male,Discharged,0,Not Admitted,0-19,Pediatric & Youth,668590,118,1.97,78893620
-2009-2010,2009,Male,Discharged,0,Not Admitted,20-44,Young Adult,737150,133,2.22,98040950
-2009-2010,2009,Male,Discharged,0,Not Admitted,45-64,Middle Adult,555557,145,2.42,80555765
-2009-2010,2009,Male,Discharged,0,Not Admitted,65+,Older Adult,353215,177,2.95,62519055
+2009-2010,2009,Female,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,610570,120,2.0,73268400
+2009-2010,2009,Female,Discharged Home,0,Not Admitted,20-44,Young Adult,896368,147,2.45,131766096
+2009-2010,2009,Female,Discharged Home,0,Not Admitted,45-64,Middle Adult,598153,151,2.52,90321103
+2009-2010,2009,Female,Discharged Home,0,Not Admitted,65+,Older Adult,440779,195,3.25,85951905
+2009-2010,2009,Male,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,668590,118,1.97,78893620
+2009-2010,2009,Male,Discharged Home,0,Not Admitted,20-44,Young Adult,737150,133,2.22,98040950
+2009-2010,2009,Male,Discharged Home,0,Not Admitted,45-64,Middle Adult,555557,145,2.42,80555765
+2009-2010,2009,Male,Discharged Home,0,Not Admitted,65+,Older Adult,353215,177,2.95,62519055
 2009-2010,2009,Female,Intra-Facility Transfer,0,Not Admitted,0-19,Pediatric & Youth,1371,149,2.48,204279
 2009-2010,2009,Female,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,4931,218,3.63,1074958
 2009-2010,2009,Female,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,1717,201,3.35,345117
@@ -607,14 +607,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2009-2010,2009,Male,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,2106,173,2.88,364338
 2009-2010,2009,Male,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,2005,182,3.03,364910
 2009-2010,2009,Male,Intra-Facility Transfer,0,Not Admitted,65+,Older Adult,1405,212,3.53,297860
-2009-2010,2009,Female,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,38079,125,2.08,4759875
-2009-2010,2009,Female,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,60227,139,2.32,8371553
-2009-2010,2009,Female,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,28239,142,2.37,4009938
-2009-2010,2009,Female,Left Without Being Seen,0,Not Admitted,65+,Older Adult,13451,153,2.55,2058003
-2009-2010,2009,Male,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,39571,121,2.02,4788091
-2009-2010,2009,Male,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,52409,134,2.23,7022806
-2009-2010,2009,Male,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,30001,140,2.33,4200140
-2009-2010,2009,Male,Left Without Being Seen,0,Not Admitted,65+,Older Adult,12288,143,2.38,1757184
+2009-2010,2009,Female,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,38079,125,2.08,4759875
+2009-2010,2009,Female,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,60227,139,2.32,8371553
+2009-2010,2009,Female,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,28239,142,2.37,4009938
+2009-2010,2009,Female,Not Seen Or Left,0,Not Admitted,65+,Older Adult,13451,153,2.55,2058003
+2009-2010,2009,Male,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,39571,121,2.02,4788091
+2009-2010,2009,Male,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,52409,134,2.23,7022806
+2009-2010,2009,Male,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,30001,140,2.33,4200140
+2009-2010,2009,Male,Not Seen Or Left,0,Not Admitted,65+,Older Adult,12288,143,2.38,1757184
 2009-2010,2009,Female,Transferred,0,Not Admitted,0-19,Pediatric & Youth,5657,213,3.55,1204941
 2009-2010,2009,Female,Transferred,0,Not Admitted,20-44,Young Adult,8192,246,4.1,2015232
 2009-2010,2009,Female,Transferred,0,Not Admitted,45-64,Middle Adult,7218,266,4.43,1919988
@@ -639,14 +639,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2008-2009,2008,Male,Death,0,Not Admitted,20-44,Young Adult,358,21,0.35,7518
 2008-2009,2008,Male,Death,0,Not Admitted,45-64,Middle Adult,1201,22,0.37,26422
 2008-2009,2008,Male,Death,0,Not Admitted,65+,Older Adult,2168,40,0.67,86720
-2008-2009,2008,Female,Discharged,0,Not Admitted,0-19,Pediatric & Youth,575901,120,2.0,69108120
-2008-2009,2008,Female,Discharged,0,Not Admitted,20-44,Young Adult,852756,146,2.43,124502376
-2008-2009,2008,Female,Discharged,0,Not Admitted,45-64,Middle Adult,561928,150,2.5,84289200
-2008-2009,2008,Female,Discharged,0,Not Admitted,65+,Older Adult,417365,195,3.25,81386175
-2008-2009,2008,Male,Discharged,0,Not Admitted,0-19,Pediatric & Youth,634136,117,1.95,74193912
-2008-2009,2008,Male,Discharged,0,Not Admitted,20-44,Young Adult,725730,132,2.2,95796360
-2008-2009,2008,Male,Discharged,0,Not Admitted,45-64,Middle Adult,531224,144,2.4,76496256
-2008-2009,2008,Male,Discharged,0,Not Admitted,65+,Older Adult,337002,178,2.97,59986356
+2008-2009,2008,Female,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,575901,120,2.0,69108120
+2008-2009,2008,Female,Discharged Home,0,Not Admitted,20-44,Young Adult,852756,146,2.43,124502376
+2008-2009,2008,Female,Discharged Home,0,Not Admitted,45-64,Middle Adult,561928,150,2.5,84289200
+2008-2009,2008,Female,Discharged Home,0,Not Admitted,65+,Older Adult,417365,195,3.25,81386175
+2008-2009,2008,Male,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,634136,117,1.95,74193912
+2008-2009,2008,Male,Discharged Home,0,Not Admitted,20-44,Young Adult,725730,132,2.2,95796360
+2008-2009,2008,Male,Discharged Home,0,Not Admitted,45-64,Middle Adult,531224,144,2.4,76496256
+2008-2009,2008,Male,Discharged Home,0,Not Admitted,65+,Older Adult,337002,178,2.97,59986356
 2008-2009,2008,Female,Intra-Facility Transfer,0,Not Admitted,0-19,Pediatric & Youth,1421,147,2.45,208887
 2008-2009,2008,Female,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,4953,227,3.78,1124331
 2008-2009,2008,Female,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,1668,220,3.67,366960
@@ -655,14 +655,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2008-2009,2008,Male,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,1823,184,3.07,335432
 2008-2009,2008,Male,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,1859,188,3.13,349492
 2008-2009,2008,Male,Intra-Facility Transfer,0,Not Admitted,65+,Older Adult,1386,216,3.6,299376
-2008-2009,2008,Female,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,36147,122,2.03,4409934
-2008-2009,2008,Female,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,58581,138,2.3,8084178
-2008-2009,2008,Female,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,27029,140,2.33,3784060
-2008-2009,2008,Female,Left Without Being Seen,0,Not Admitted,65+,Older Adult,12939,150,2.5,1940850
-2008-2009,2008,Male,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,37098,119,1.98,4414662
-2008-2009,2008,Male,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,51406,135,2.25,6939810
-2008-2009,2008,Male,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,29236,140,2.33,4093040
-2008-2009,2008,Male,Left Without Being Seen,0,Not Admitted,65+,Older Adult,11935,143,2.38,1706705
+2008-2009,2008,Female,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,36147,122,2.03,4409934
+2008-2009,2008,Female,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,58581,138,2.3,8084178
+2008-2009,2008,Female,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,27029,140,2.33,3784060
+2008-2009,2008,Female,Not Seen Or Left,0,Not Admitted,65+,Older Adult,12939,150,2.5,1940850
+2008-2009,2008,Male,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,37098,119,1.98,4414662
+2008-2009,2008,Male,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,51406,135,2.25,6939810
+2008-2009,2008,Male,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,29236,140,2.33,4093040
+2008-2009,2008,Male,Not Seen Or Left,0,Not Admitted,65+,Older Adult,11935,143,2.38,1706705
 2008-2009,2008,Female,Transferred,0,Not Admitted,0-19,Pediatric & Youth,5096,212,3.53,1080352
 2008-2009,2008,Female,Transferred,0,Not Admitted,20-44,Young Adult,7804,239,3.98,1865156
 2008-2009,2008,Female,Transferred,0,Not Admitted,45-64,Middle Adult,6444,265,4.42,1707660
@@ -695,14 +695,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2007-2008,2007,Male,Death,0,Not Admitted,20-44,Young Adult,416,22,0.37,9152
 2007-2008,2007,Male,Death,0,Not Admitted,45-64,Middle Adult,1195,20,0.33,23900
 2007-2008,2007,Male,Death,0,Not Admitted,65+,Older Adult,2193,40,0.67,87720
-2007-2008,2007,Female,Discharged,0,Not Admitted,0-19,Pediatric & Youth,575633,113,1.88,65046529
-2007-2008,2007,Female,Discharged,0,Not Admitted,20-44,Young Adult,862802,140,2.33,120792280
-2007-2008,2007,Female,Discharged,0,Not Admitted,45-64,Middle Adult,554034,144,2.4,79780896
-2007-2008,2007,Female,Discharged,0,Not Admitted,65+,Older Adult,411930,188,3.13,77442840
-2007-2008,2007,Male,Discharged,0,Not Admitted,0-19,Pediatric & Youth,645427,110,1.83,70996970
-2007-2008,2007,Male,Discharged,0,Not Admitted,20-44,Young Adult,753102,127,2.12,95643954
-2007-2008,2007,Male,Discharged,0,Not Admitted,45-64,Middle Adult,530040,139,2.32,73675560
-2007-2008,2007,Male,Discharged,0,Not Admitted,65+,Older Adult,333929,170,2.83,56767930
+2007-2008,2007,Female,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,575633,113,1.88,65046529
+2007-2008,2007,Female,Discharged Home,0,Not Admitted,20-44,Young Adult,862802,140,2.33,120792280
+2007-2008,2007,Female,Discharged Home,0,Not Admitted,45-64,Middle Adult,554034,144,2.4,79780896
+2007-2008,2007,Female,Discharged Home,0,Not Admitted,65+,Older Adult,411930,188,3.13,77442840
+2007-2008,2007,Male,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,645427,110,1.83,70996970
+2007-2008,2007,Male,Discharged Home,0,Not Admitted,20-44,Young Adult,753102,127,2.12,95643954
+2007-2008,2007,Male,Discharged Home,0,Not Admitted,45-64,Middle Adult,530040,139,2.32,73675560
+2007-2008,2007,Male,Discharged Home,0,Not Admitted,65+,Older Adult,333929,170,2.83,56767930
 2007-2008,2007,Female,Intra-Facility Transfer,0,Not Admitted,0-19,Pediatric & Youth,1340,155,2.58,207700
 2007-2008,2007,Female,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,5402,220,3.67,1188440
 2007-2008,2007,Female,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,1677,199,3.32,333723
@@ -711,14 +711,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2007-2008,2007,Male,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,2148,191,3.18,410268
 2007-2008,2007,Male,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,1948,196,3.27,381808
 2007-2008,2007,Male,Intra-Facility Transfer,0,Not Admitted,65+,Older Adult,1415,207,3.45,292905
-2007-2008,2007,Female,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,33342,117,1.95,3901014
-2007-2008,2007,Female,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,57387,135,2.25,7747245
-2007-2008,2007,Female,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,25540,139,2.32,3550060
-2007-2008,2007,Female,Left Without Being Seen,0,Not Admitted,65+,Older Adult,12127,150,2.5,1819050
-2007-2008,2007,Male,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,34267,113,1.88,3872171
-2007-2008,2007,Male,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,51414,132,2.2,6786648
-2007-2008,2007,Male,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,27640,137,2.28,3786680
-2007-2008,2007,Male,Left Without Being Seen,0,Not Admitted,65+,Older Adult,11251,140,2.33,1575140
+2007-2008,2007,Female,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,33342,117,1.95,3901014
+2007-2008,2007,Female,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,57387,135,2.25,7747245
+2007-2008,2007,Female,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,25540,139,2.32,3550060
+2007-2008,2007,Female,Not Seen Or Left,0,Not Admitted,65+,Older Adult,12127,150,2.5,1819050
+2007-2008,2007,Male,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,34267,113,1.88,3872171
+2007-2008,2007,Male,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,51414,132,2.2,6786648
+2007-2008,2007,Male,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,27640,137,2.28,3786680
+2007-2008,2007,Male,Not Seen Or Left,0,Not Admitted,65+,Older Adult,11251,140,2.33,1575140
 2007-2008,2007,Female,Transferred,0,Not Admitted,0-19,Pediatric & Youth,4884,205,3.42,1001220
 2007-2008,2007,Female,Transferred,0,Not Admitted,20-44,Young Adult,7840,236,3.93,1850240
 2007-2008,2007,Female,Transferred,0,Not Admitted,45-64,Middle Adult,6272,258,4.3,1618176
@@ -743,14 +743,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2006-2007,2006,Male,Death,0,Not Admitted,20-44,Young Adult,464,21,0.35,9744
 2006-2007,2006,Male,Death,0,Not Admitted,45-64,Middle Adult,1285,29,0.48,37265
 2006-2007,2006,Male,Death,0,Not Admitted,65+,Older Adult,2266,53,0.88,120098
-2006-2007,2006,Female,Discharged,0,Not Admitted,0-19,Pediatric & Youth,572389,108,1.8,61818012
-2006-2007,2006,Female,Discharged,0,Not Admitted,20-44,Young Adult,848023,136,2.27,115331128
-2006-2007,2006,Female,Discharged,0,Not Admitted,45-64,Middle Adult,527180,139,2.32,73278020
-2006-2007,2006,Female,Discharged,0,Not Admitted,65+,Older Adult,398258,183,3.05,72881214
-2006-2007,2006,Male,Discharged,0,Not Admitted,0-19,Pediatric & Youth,647797,106,1.77,68666482
-2006-2007,2006,Male,Discharged,0,Not Admitted,20-44,Young Adult,757323,124,2.07,93908052
-2006-2007,2006,Male,Discharged,0,Not Admitted,45-64,Middle Adult,504756,135,2.25,68142060
-2006-2007,2006,Male,Discharged,0,Not Admitted,65+,Older Adult,319394,166,2.77,53019404
+2006-2007,2006,Female,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,572389,108,1.8,61818012
+2006-2007,2006,Female,Discharged Home,0,Not Admitted,20-44,Young Adult,848023,136,2.27,115331128
+2006-2007,2006,Female,Discharged Home,0,Not Admitted,45-64,Middle Adult,527180,139,2.32,73278020
+2006-2007,2006,Female,Discharged Home,0,Not Admitted,65+,Older Adult,398258,183,3.05,72881214
+2006-2007,2006,Male,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,647797,106,1.77,68666482
+2006-2007,2006,Male,Discharged Home,0,Not Admitted,20-44,Young Adult,757323,124,2.07,93908052
+2006-2007,2006,Male,Discharged Home,0,Not Admitted,45-64,Middle Adult,504756,135,2.25,68142060
+2006-2007,2006,Male,Discharged Home,0,Not Admitted,65+,Older Adult,319394,166,2.77,53019404
 2006-2007,2006,Female,Intra-Facility Transfer,0,Not Admitted,0-19,Pediatric & Youth,1405,140,2.33,196700
 2006-2007,2006,Female,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,5730,227,3.78,1300710
 2006-2007,2006,Female,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,1660,192,3.2,318720
@@ -759,14 +759,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2006-2007,2006,Male,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,2275,172,2.87,391300
 2006-2007,2006,Male,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,2005,181,3.02,362905
 2006-2007,2006,Male,Intra-Facility Transfer,0,Not Admitted,65+,Older Adult,1402,200,3.33,280400
-2006-2007,2006,Female,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,32770,115,1.92,3768550
-2006-2007,2006,Female,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,56705,134,2.23,7598470
-2006-2007,2006,Female,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,24062,136,2.27,3272432
-2006-2007,2006,Female,Left Without Being Seen,0,Not Admitted,65+,Older Adult,11763,148,2.47,1740924
-2006-2007,2006,Male,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,34372,111,1.85,3815292
-2006-2007,2006,Male,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,52019,131,2.18,6814489
-2006-2007,2006,Male,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,26299,136,2.27,3576664
-2006-2007,2006,Male,Left Without Being Seen,0,Not Admitted,65+,Older Adult,10266,140,2.33,1437240
+2006-2007,2006,Female,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,32770,115,1.92,3768550
+2006-2007,2006,Female,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,56705,134,2.23,7598470
+2006-2007,2006,Female,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,24062,136,2.27,3272432
+2006-2007,2006,Female,Not Seen Or Left,0,Not Admitted,65+,Older Adult,11763,148,2.47,1740924
+2006-2007,2006,Male,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,34372,111,1.85,3815292
+2006-2007,2006,Male,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,52019,131,2.18,6814489
+2006-2007,2006,Male,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,26299,136,2.27,3576664
+2006-2007,2006,Male,Not Seen Or Left,0,Not Admitted,65+,Older Adult,10266,140,2.33,1437240
 2006-2007,2006,Female,Transferred,0,Not Admitted,0-19,Pediatric & Youth,4944,190,3.17,939360
 2006-2007,2006,Female,Transferred,0,Not Admitted,20-44,Young Adult,7769,212,3.53,1647028
 2006-2007,2006,Female,Transferred,0,Not Admitted,45-64,Middle Adult,5875,238,3.97,1398250
@@ -791,14 +791,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2005-2006,2005,Male,Death,0,Not Admitted,20-44,Young Adult,498,32,0.53,15936
 2005-2006,2005,Male,Death,0,Not Admitted,45-64,Middle Adult,1329,29,0.48,38541
 2005-2006,2005,Male,Death,0,Not Admitted,65+,Older Adult,2372,47,0.78,111484
-2005-2006,2005,Female,Discharged,0,Not Admitted,0-19,Pediatric & Youth,587687,105,1.75,61707135
-2005-2006,2005,Female,Discharged,0,Not Admitted,20-44,Young Adult,847352,131,2.18,111003112
-2005-2006,2005,Female,Discharged,0,Not Admitted,45-64,Middle Adult,506404,135,2.25,68364540
-2005-2006,2005,Female,Discharged,0,Not Admitted,65+,Older Adult,383363,176,2.93,67471888
-2005-2006,2005,Male,Discharged,0,Not Admitted,0-19,Pediatric & Youth,667873,105,1.75,70126665
-2005-2006,2005,Male,Discharged,0,Not Admitted,20-44,Young Adult,775240,120,2.0,93028800
-2005-2006,2005,Male,Discharged,0,Not Admitted,45-64,Middle Adult,491610,130,2.17,63909300
-2005-2006,2005,Male,Discharged,0,Not Admitted,65+,Older Adult,308342,160,2.67,49334720
+2005-2006,2005,Female,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,587687,105,1.75,61707135
+2005-2006,2005,Female,Discharged Home,0,Not Admitted,20-44,Young Adult,847352,131,2.18,111003112
+2005-2006,2005,Female,Discharged Home,0,Not Admitted,45-64,Middle Adult,506404,135,2.25,68364540
+2005-2006,2005,Female,Discharged Home,0,Not Admitted,65+,Older Adult,383363,176,2.93,67471888
+2005-2006,2005,Male,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,667873,105,1.75,70126665
+2005-2006,2005,Male,Discharged Home,0,Not Admitted,20-44,Young Adult,775240,120,2.0,93028800
+2005-2006,2005,Male,Discharged Home,0,Not Admitted,45-64,Middle Adult,491610,130,2.17,63909300
+2005-2006,2005,Male,Discharged Home,0,Not Admitted,65+,Older Adult,308342,160,2.67,49334720
 2005-2006,2005,Female,Intra-Facility Transfer,0,Not Admitted,0-19,Pediatric & Youth,1881,149,2.48,280269
 2005-2006,2005,Female,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,6143,216,3.6,1326888
 2005-2006,2005,Female,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,1784,169,2.82,301496
@@ -807,14 +807,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2005-2006,2005,Male,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,2626,172,2.87,451672
 2005-2006,2005,Male,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,2111,172,2.87,363092
 2005-2006,2005,Male,Intra-Facility Transfer,0,Not Admitted,65+,Older Adult,1607,188,3.13,302116
-2005-2006,2005,Female,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,31176,110,1.83,3429360
-2005-2006,2005,Female,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,51444,126,2.1,6481944
-2005-2006,2005,Female,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,20753,129,2.15,2677137
-2005-2006,2005,Female,Left Without Being Seen,0,Not Admitted,65+,Older Adult,9587,137,2.28,1313419
-2005-2006,2005,Male,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,33077,108,1.8,3572316
-2005-2006,2005,Male,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,47446,125,2.08,5930750
-2005-2006,2005,Male,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,23224,128,2.13,2972672
-2005-2006,2005,Male,Left Without Being Seen,0,Not Admitted,65+,Older Adult,8927,132,2.2,1178364
+2005-2006,2005,Female,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,31176,110,1.83,3429360
+2005-2006,2005,Female,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,51444,126,2.1,6481944
+2005-2006,2005,Female,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,20753,129,2.15,2677137
+2005-2006,2005,Female,Not Seen Or Left,0,Not Admitted,65+,Older Adult,9587,137,2.28,1313419
+2005-2006,2005,Male,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,33077,108,1.8,3572316
+2005-2006,2005,Male,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,47446,125,2.08,5930750
+2005-2006,2005,Male,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,23224,128,2.13,2972672
+2005-2006,2005,Male,Not Seen Or Left,0,Not Admitted,65+,Older Adult,8927,132,2.2,1178364
 2005-2006,2005,Female,Transferred,0,Not Admitted,0-19,Pediatric & Youth,4597,187,3.12,859639
 2005-2006,2005,Female,Transferred,0,Not Admitted,20-44,Young Adult,6430,218,3.63,1401740
 2005-2006,2005,Female,Transferred,0,Not Admitted,45-64,Middle Adult,5082,238,3.97,1209516
@@ -839,14 +839,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2004-2005,2004,Male,Death,0,Not Admitted,20-44,Young Adult,518,30,0.5,15540
 2004-2005,2004,Male,Death,0,Not Admitted,45-64,Middle Adult,1321,24,0.4,31704
 2004-2005,2004,Male,Death,0,Not Admitted,65+,Older Adult,2355,47,0.78,110685
-2004-2005,2004,Female,Discharged,0,Not Admitted,0-19,Pediatric & Youth,561255,103,1.72,57809265
-2004-2005,2004,Female,Discharged,0,Not Admitted,20-44,Young Adult,822137,127,2.12,104411399
-2004-2005,2004,Female,Discharged,0,Not Admitted,45-64,Middle Adult,477445,131,2.18,62545295
-2004-2005,2004,Female,Discharged,0,Not Admitted,65+,Older Adult,365790,174,2.9,63647460
-2004-2005,2004,Male,Discharged,0,Not Admitted,0-19,Pediatric & Youth,640845,101,1.68,64725345
-2004-2005,2004,Male,Discharged,0,Not Admitted,20-44,Young Adult,753274,117,1.95,88133058
-2004-2005,2004,Male,Discharged,0,Not Admitted,45-64,Middle Adult,460622,127,2.12,58498994
-2004-2005,2004,Male,Discharged,0,Not Admitted,65+,Older Adult,293286,155,2.58,45459330
+2004-2005,2004,Female,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,561255,103,1.72,57809265
+2004-2005,2004,Female,Discharged Home,0,Not Admitted,20-44,Young Adult,822137,127,2.12,104411399
+2004-2005,2004,Female,Discharged Home,0,Not Admitted,45-64,Middle Adult,477445,131,2.18,62545295
+2004-2005,2004,Female,Discharged Home,0,Not Admitted,65+,Older Adult,365790,174,2.9,63647460
+2004-2005,2004,Male,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,640845,101,1.68,64725345
+2004-2005,2004,Male,Discharged Home,0,Not Admitted,20-44,Young Adult,753274,117,1.95,88133058
+2004-2005,2004,Male,Discharged Home,0,Not Admitted,45-64,Middle Adult,460622,127,2.12,58498994
+2004-2005,2004,Male,Discharged Home,0,Not Admitted,65+,Older Adult,293286,155,2.58,45459330
 2004-2005,2004,Female,Intra-Facility Transfer,0,Not Admitted,0-19,Pediatric & Youth,1894,137,2.28,259478
 2004-2005,2004,Female,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,6555,215,3.58,1409325
 2004-2005,2004,Female,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,2123,168,2.8,356664
@@ -855,14 +855,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2004-2005,2004,Male,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,3010,156,2.6,469560
 2004-2005,2004,Male,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,2355,160,2.67,376800
 2004-2005,2004,Male,Intra-Facility Transfer,0,Not Admitted,65+,Older Adult,1630,189,3.15,308070
-2004-2005,2004,Female,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,28321,110,1.83,3115310
-2004-2005,2004,Female,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,47643,125,2.08,5955375
-2004-2005,2004,Female,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,18629,126,2.1,2347254
-2004-2005,2004,Female,Left Without Being Seen,0,Not Admitted,65+,Older Adult,8676,134,2.23,1162584
-2004-2005,2004,Male,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,29349,105,1.75,3081645
-2004-2005,2004,Male,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,44038,122,2.03,5372636
-2004-2005,2004,Male,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,20498,130,2.17,2664740
-2004-2005,2004,Male,Left Without Being Seen,0,Not Admitted,65+,Older Adult,7919,128,2.13,1013632
+2004-2005,2004,Female,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,28321,110,1.83,3115310
+2004-2005,2004,Female,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,47643,125,2.08,5955375
+2004-2005,2004,Female,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,18629,126,2.1,2347254
+2004-2005,2004,Female,Not Seen Or Left,0,Not Admitted,65+,Older Adult,8676,134,2.23,1162584
+2004-2005,2004,Male,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,29349,105,1.75,3081645
+2004-2005,2004,Male,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,44038,122,2.03,5372636
+2004-2005,2004,Male,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,20498,130,2.17,2664740
+2004-2005,2004,Male,Not Seen Or Left,0,Not Admitted,65+,Older Adult,7919,128,2.13,1013632
 2004-2005,2004,Female,Transferred,0,Not Admitted,0-19,Pediatric & Youth,4172,180,3.0,750960
 2004-2005,2004,Female,Transferred,0,Not Admitted,20-44,Young Adult,6191,213,3.55,1318683
 2004-2005,2004,Female,Transferred,0,Not Admitted,45-64,Middle Adult,4557,244,4.07,1111908
@@ -895,14 +895,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2003-2004,2003,Male,Death,0,Not Admitted,20-44,Young Adult,496,26,0.43,12896
 2003-2004,2003,Male,Death,0,Not Admitted,45-64,Middle Adult,1349,30,0.5,40470
 2003-2004,2003,Male,Death,0,Not Admitted,65+,Older Adult,2516,43,0.72,108188
-2003-2004,2003,Female,Discharged,0,Not Admitted,0-19,Pediatric & Youth,545764,98,1.63,53484872
-2003-2004,2003,Female,Discharged,0,Not Admitted,20-44,Young Adult,767996,121,2.02,92927516
-2003-2004,2003,Female,Discharged,0,Not Admitted,45-64,Middle Adult,421939,126,2.1,53164314
-2003-2004,2003,Female,Discharged,0,Not Admitted,65+,Older Adult,326007,169,2.82,55095183
-2003-2004,2003,Male,Discharged,0,Not Admitted,0-19,Pediatric & Youth,627670,96,1.6,60256320
-2003-2004,2003,Male,Discharged,0,Not Admitted,20-44,Young Adult,720856,111,1.85,80015016
-2003-2004,2003,Male,Discharged,0,Not Admitted,45-64,Middle Adult,412073,121,2.02,49860833
-2003-2004,2003,Male,Discharged,0,Not Admitted,65+,Older Adult,263877,150,2.5,39581550
+2003-2004,2003,Female,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,545764,98,1.63,53484872
+2003-2004,2003,Female,Discharged Home,0,Not Admitted,20-44,Young Adult,767996,121,2.02,92927516
+2003-2004,2003,Female,Discharged Home,0,Not Admitted,45-64,Middle Adult,421939,126,2.1,53164314
+2003-2004,2003,Female,Discharged Home,0,Not Admitted,65+,Older Adult,326007,169,2.82,55095183
+2003-2004,2003,Male,Discharged Home,0,Not Admitted,0-19,Pediatric & Youth,627670,96,1.6,60256320
+2003-2004,2003,Male,Discharged Home,0,Not Admitted,20-44,Young Adult,720856,111,1.85,80015016
+2003-2004,2003,Male,Discharged Home,0,Not Admitted,45-64,Middle Adult,412073,121,2.02,49860833
+2003-2004,2003,Male,Discharged Home,0,Not Admitted,65+,Older Adult,263877,150,2.5,39581550
 2003-2004,2003,Female,Intra-Facility Transfer,0,Not Admitted,0-19,Pediatric & Youth,1941,140,2.33,271740
 2003-2004,2003,Female,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,6949,212,3.53,1473188
 2003-2004,2003,Female,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,2214,188,3.13,416232
@@ -911,14 +911,14 @@ fiscal_year,fiscal_year_start,sex,visit_disposition,admission_flag,admission_sta
 2003-2004,2003,Male,Intra-Facility Transfer,0,Not Admitted,20-44,Young Adult,3620,161,2.68,582820
 2003-2004,2003,Male,Intra-Facility Transfer,0,Not Admitted,45-64,Middle Adult,2507,180,3.0,451260
 2003-2004,2003,Male,Intra-Facility Transfer,0,Not Admitted,65+,Older Adult,1692,203,3.38,343476
-2003-2004,2003,Female,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,25699,100,1.67,2569900
-2003-2004,2003,Female,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,42487,115,1.92,4886005
-2003-2004,2003,Female,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,16212,115,1.92,1864380
-2003-2004,2003,Female,Left Without Being Seen,0,Not Admitted,65+,Older Adult,7776,119,1.98,925344
-2003-2004,2003,Male,Left Without Being Seen,0,Not Admitted,0-19,Pediatric & Youth,27409,98,1.63,2686082
-2003-2004,2003,Male,Left Without Being Seen,0,Not Admitted,20-44,Young Adult,40011,115,1.92,4601265
-2003-2004,2003,Male,Left Without Being Seen,0,Not Admitted,45-64,Middle Adult,17968,116,1.93,2084288
-2003-2004,2003,Male,Left Without Being Seen,0,Not Admitted,65+,Older Adult,7185,114,1.9,819090
+2003-2004,2003,Female,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,25699,100,1.67,2569900
+2003-2004,2003,Female,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,42487,115,1.92,4886005
+2003-2004,2003,Female,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,16212,115,1.92,1864380
+2003-2004,2003,Female,Not Seen Or Left,0,Not Admitted,65+,Older Adult,7776,119,1.98,925344
+2003-2004,2003,Male,Not Seen Or Left,0,Not Admitted,0-19,Pediatric & Youth,27409,98,1.63,2686082
+2003-2004,2003,Male,Not Seen Or Left,0,Not Admitted,20-44,Young Adult,40011,115,1.92,4601265
+2003-2004,2003,Male,Not Seen Or Left,0,Not Admitted,45-64,Middle Adult,17968,116,1.93,2084288
+2003-2004,2003,Male,Not Seen Or Left,0,Not Admitted,65+,Older Adult,7185,114,1.9,819090
 2003-2004,2003,Female,Transferred,0,Not Admitted,0-19,Pediatric & Youth,4082,171,2.85,698022
 2003-2004,2003,Female,Transferred,0,Not Admitted,20-44,Young Adult,5756,210,3.5,1208760
 2003-2004,2003,Female,Transferred,0,Not Admitted,45-64,Middle Adult,3916,246,4.1,963336
