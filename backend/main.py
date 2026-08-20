@@ -1,33 +1,50 @@
-"""
-Healthcare Analytics Platform - Main FastAPI Enterprise Server
-"""
+import os
+import sys
+from pathlib import Path
 
-try:
-    from fastapi import FastAPI
-    from fastapi.middleware.cors import CORSMiddleware
-except ImportError:
-    class FastAPI:
-        def __init__(self, *args, **kwargs): pass
-        def add_middleware(self, *args, **kwargs): pass
-        def include_router(self, *args, **kwargs): pass
-        def get(self, *args, **kwargs): return lambda f: f
-    class CORSMiddleware: pass
+# Ensure project root is in sys.path so backend modules always resolve
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
-try:
-    from backend.api import upload, datasets, statistics, dashboard, insights, reports, dataset_explorer_api, model_diagnostics, architecture, user_datasets
-except ImportError:
-    from api import upload, datasets, statistics, dashboard, insights, reports, dataset_explorer_api, model_diagnostics, architecture, user_datasets
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from backend.api import (
+    architecture,
+    dashboard,
+    dataset_explorer_api,
+    datasets,
+    insights,
+    model_diagnostics,
+    reports,
+    statistics,
+    upload,
+    user_datasets,
+)
 
 app = FastAPI(
     title="Healthcare Analytics Platform API",
     description="Enterprise Analytics & Machine Learning Engine for Emergency Department Data",
-    version="1.0.0"
+    version="1.0.0",
 )
 
 # Enable Cross-Origin Resource Sharing (CORS)
+# Support development frontends (Node/Vite) and configurable origins via CORS_ORIGINS env var
+cors_origins_env = os.getenv("CORS_ORIGINS", "")
+allowed_origins = [
+    origin.strip() for origin in cors_origins_env.split(",") if origin.strip()
+] if cors_origins_env else [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
+    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -45,25 +62,25 @@ app.include_router(model_diagnostics.router)
 app.include_router(architecture.router)
 app.include_router(user_datasets.router)
 
+
 @app.get("/")
 async def root():
     return {
         "status": "healthy",
         "service": "Healthcare Analytics Platform API",
-        "version": "1.0.0"
+        "version": "1.0.0",
     }
+
 
 @app.get("/api/health")
 async def health_check():
     return {"status": "ok"}
 
+
 if __name__ == "__main__":
-    import os
     import uvicorn
 
-    # Bind loopback by default. The previous 0.0.0.0 exposed this API — which serves the
-    # full clinical dataset with CORS wide open — to every device on the local network.
-    # Set API_HOST=0.0.0.0 explicitly when running in a container or serving other hosts.
+    # Bind loopback by default. Set API_HOST=0.0.0.0 explicitly when running in a container.
     host = os.getenv("API_HOST", "127.0.0.1")
     port = int(os.getenv("API_PORT", "8000"))
 

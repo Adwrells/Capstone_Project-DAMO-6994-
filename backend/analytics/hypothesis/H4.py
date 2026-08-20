@@ -7,11 +7,10 @@ from backend.analytics.statistics.weighted import weighted_mean, weighted_median
 STATISTICAL_METHOD = "Weighted Kruskal-Wallis H-Test with Dunn Post-Hoc"
  
 AGE_CATEGORY_ORDER = [
-    "Pediatric Population",
-    "Young Adult Population",
-    "Adult Population",
-    "Pre-Senior Population",
-    "Geriatric Population",
+    "Pediatric & Youth",
+    "Young Adult",
+    "Middle Adult",
+    "Older Adult",
 ]
  
  
