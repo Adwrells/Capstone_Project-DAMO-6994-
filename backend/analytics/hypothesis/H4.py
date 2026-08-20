@@ -1,5 +1,6 @@
 from typing import Any, Dict, List, Optional, Sequence
  
+from backend.analytics.hypothesis_testing import is_rollup_or_excluded
 from backend.analytics.statistics.assumptions import check_normality, check_sample_size
 from backend.analytics.statistics.kruskal import dunn_post_hoc, kruskal_wallis_full
 from backend.analytics.statistics.weighted import weighted_mean, weighted_median
@@ -24,6 +25,11 @@ def run(
     ``weights`` are ED visit counts. Supplying them runs the test over the
     weight-expanded population, which is what the aggregate NACRS data requires.
     """
+    valid_idx = [i for i, name in enumerate(group_names) if not is_rollup_or_excluded(name)]
+    groups = [groups[i] for i in valid_idx]
+    group_names = [group_names[i] for i in valid_idx]
+    if weights is not None:
+        weights = [weights[i] for i in valid_idx]
     normality = [check_normality(g, name) for g, name in zip(groups, group_names)]
     size_check = check_sample_size(groups, group_names)
  
