@@ -243,6 +243,10 @@ def run_h4_test() -> Dict[str, Any]:
 
     # Life-stage order, so post-hoc pairs read youngest -> oldest rather than alphabetically.
     age_order = [
+        "Pediatric & Youth",
+        "Young Adult",
+        "Middle Adult",
+        "Older Adult",
         "Pediatric Population",
         "Young Adult Population",
         "Adult Population",
