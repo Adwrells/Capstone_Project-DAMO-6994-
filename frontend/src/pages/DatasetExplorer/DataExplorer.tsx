@@ -60,6 +60,75 @@ const fmt = (v: number | null | undefined, decimals = 2): string => {
   return Number(v).toLocaleString('en-CA', { maximumFractionDigits: decimals });
 };
 
+/**
+ * Format numeric values using compact notation:
+ * - >= 1,000 as K, >= 1,000,000 as M, >= 1,000,000,000 as B
+ * - Maximum of 2 decimal places with unnecessary trailing zeros removed
+ * - Preserves fiscal years in full format (e.g. 2003, not 2.00K)
+ * - Does not abbreviate Length of Stay (LOS) / duration values
+ */
+export const formatCompact = (
+  v: number | null | undefined,
+  colName: string = '',
+  statType: string = '',
+  maxDecimals = 2
+): string => {
+  if (v == null || isNaN(v)) return '—';
+
+  const lowerCol = colName.toLowerCase().trim();
+
+  // Rule 1: Fiscal years - keep in full format (e.g. 2003, not 2.00K)
+  const isYearCol = (
+    lowerCol.includes('year') ||
+    lowerCol.includes('fiscal') ||
+    lowerCol === 'fy' ||
+    lowerCol.includes('yr')
+  );
+  if (isYearCol && statType !== 'count') {
+    if (Math.abs(v % 1) < 0.001) {
+      return Math.round(v).toString();
+    }
+    return Number(v).toFixed(maxDecimals).replace(/\.?0+$/, '');
+  }
+
+  // Rule 2: Length of Stay (LOS) / Duration - do not abbreviate
+  const isLosCol = (
+    lowerCol.includes('los') ||
+    lowerCol.includes('length_of_stay') ||
+    lowerCol.includes('stay') ||
+    lowerCol.includes('wait_time') ||
+    lowerCol.includes('hours')
+  );
+  if (isLosCol && statType !== 'count') {
+    return Number(v).toLocaleString('en-CA', { maximumFractionDigits: maxDecimals });
+  }
+
+  // Rule 3: Compact notation for values >= 1,000 (K), >= 1,000,000 (M), >= 1,000,000,000 (B)
+  const absVal = Math.abs(v);
+  const sign = v < 0 ? '-' : '';
+
+  const formatUnit = (num: number, unit: string): string => {
+    const formatted = num.toFixed(maxDecimals).replace(/\.?0+$/, '');
+    return `${sign}${formatted}${unit}`;
+  };
+
+  if (absVal >= 1_000_000_000) {
+    return formatUnit(absVal / 1_000_000_000, 'B');
+  }
+  if (absVal >= 1_000_000) {
+    return formatUnit(absVal / 1_000_000, 'M');
+  }
+  if (absVal >= 1_000) {
+    return formatUnit(absVal / 1_000, 'K');
+  }
+
+  // Values < 1000
+  if (Number.isInteger(v)) {
+    return `${sign}${Math.abs(v).toLocaleString('en-CA')}`;
+  }
+  return Number(v).toLocaleString('en-CA', { maximumFractionDigits: maxDecimals });
+};
+
 /* ─── Sub-components ──────────────────────────────────────────────────────── */
 
 /** Section card wrapper */
@@ -174,7 +243,7 @@ interface DataExplorerProps {
   onNavigateNext?: () => void;
 }
 
-type Tab = 'summary' | 'distribution' | 'correlation' | 'outliers' | 'features' | 'dictionary' | 'table';
+type Tab = 'summary' | 'features' | 'dictionary' | 'table';
 
 export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
   /* sheet state */
@@ -425,10 +494,7 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
 
   /* ── Tabs config ── */
   const TABS: { key: Tab; label: string; icon: React.ElementType }[] = [
-    { key: 'summary',      label: 'Summary',      icon: Activity },
-    { key: 'distribution', label: 'Distribution',  icon: BarChart2 },
-    { key: 'correlation',  label: 'Correlation',   icon: TrendingUp },
-    { key: 'outliers',     label: 'Outliers',      icon: AlertTriangle },
+    { key: 'summary',      label: 'Summary',       icon: Activity },
     { key: 'features',     label: 'Feature Eng.',  icon: Zap },
     { key: 'dictionary',   label: 'Data Dict.',    icon: BookOpen },
     { key: 'table',        label: 'Data Table',    icon: Grid },
@@ -603,174 +669,17 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
                         return (
                           <tr key={col} className={`border-b border-[#F3F4F6] transition-colors hover:bg-[#F9FAFB] ${i % 2 === 0 ? '' : 'bg-[#FAFAFA]'}`}>
                             <td className="px-3 py-2.5 font-medium text-[#111827] max-w-[160px] truncate">{col}</td>
-                            <td className="px-3 py-2.5 text-[#374151]">{s.count.toLocaleString()}</td>
+                            <td className="px-3 py-2.5 text-[#374151] font-mono">{formatCompact(s.count, col, 'count')}</td>
                             <td className="px-3 py-2.5">
                               <span className={`font-medium ${s.missing > 0 ? 'text-[#EF4444]' : 'text-[#10B981]'}`}>{s.missing}</span>
                             </td>
-                            <td className="px-3 py-2.5 text-[#374151]">{fmt(s.min)}</td>
-                            <td className="px-3 py-2.5 text-[#374151]">{fmt(s.max)}</td>
-                            <td className="px-3 py-2.5 font-medium text-[#2563EB]">{fmt(s.mean)}</td>
-                            <td className="px-3 py-2.5 text-[#374151]">{fmt(s.median)}</td>
-                            <td className="px-3 py-2.5 text-[#374151]">{fmt(s.std_dev)}</td>
-                            <td className="px-3 py-2.5 text-[#374151]">{fmt(s.q1)}</td>
-                            <td className="px-3 py-2.5 text-[#374151]">{fmt(s.q3)}</td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </Section>
-          )}
-
-          {/* DISTRIBUTION */}
-          {activeTab === 'distribution' && (
-            <div className="space-y-6">
-              {/* Column selectors */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {sheetStats.numeric_columns.length > 0 && (
-                  <Section title="Numeric Distribution (Histogram)" icon={BarChart2}>
-                    <div className="mb-4">
-                      <label className="text-xs font-medium text-[#6B7280] mb-1.5 block">Select Column</label>
-                      <select
-                        value={selectedNumCol}
-                        onChange={e => setSelectedNumCol(e.target.value)}
-                        className="w-full text-sm"
-                        aria-label="Select numeric column for histogram"
-                      >
-                        {sheetStats.numeric_columns.map(c => <option key={c} value={c}>{c}</option>)}
-                      </select>
-                    </div>
-                    {selectedNumCol && <DistributionChart data={sheetData.data} col={selectedNumCol} />}
-                  </Section>
-                )}
-
-                {sheetStats.categorical_columns.length > 0 && (
-                  <Section title="Categorical Frequency" icon={BarChart2} accent="#0EA5A4">
-                    <div className="mb-4">
-                      <label className="text-xs font-medium text-[#6B7280] mb-1.5 block">Select Column</label>
-                      <select
-                        value={selectedCatCol}
-                        onChange={e => setSelectedCatCol(e.target.value)}
-                        className="w-full text-sm"
-                        aria-label="Select categorical column for frequency chart"
-                      >
-                        {sheetStats.categorical_columns.map(c => <option key={c} value={c}>{c}</option>)}
-                      </select>
-                    </div>
-                    {selectedCatCol && <FrequencyChart data={sheetData.data} col={selectedCatCol} />}
-                  </Section>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* CORRELATION */}
-          {activeTab === 'correlation' && (
-            <Section title="Pearson Correlation Matrix" icon={TrendingUp} accent="#8B5CF6">
-              {correlationMatrix.length === 0 ? (
-                <div className="text-center py-8">
-                  <TrendingUp size={32} className="text-[#D1D5DB] mx-auto mb-2" />
-                  <p className="text-sm text-[#9CA3AF]">Need at least 2 numeric columns to compute correlations.</p>
-                </div>
-              ) : (
-                <>
-                  <p className="text-xs text-[#6B7280] mb-4">
-                    Pearson r measures linear association (–1 = perfect negative, 0 = none, +1 = perfect positive).
-                    Computed on available non-null pairs.
-                  </p>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm" role="grid">
-                      <thead>
-                        <tr className="border-b border-[#E5E7EB]">
-                          <th className="text-left px-3 py-2 text-[10px] font-semibold text-[#6B7280] uppercase tracking-wider">Variable A</th>
-                          <th className="text-left px-3 py-2 text-[10px] font-semibold text-[#6B7280] uppercase tracking-wider">Variable B</th>
-                          <th className="text-left px-3 py-2 text-[10px] font-semibold text-[#6B7280] uppercase tracking-wider">Pearson r</th>
-                          <th className="text-left px-3 py-2 text-[10px] font-semibold text-[#6B7280] uppercase tracking-wider">Strength</th>
-                          <th className="text-left px-3 py-2 text-[10px] font-semibold text-[#6B7280] uppercase tracking-wider">Visual</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {correlationMatrix.map(({ colA, colB, r }, i) => {
-                          const abs = Math.abs(r);
-                          const strength = abs >= 0.7 ? 'Strong' : abs >= 0.4 ? 'Moderate' : abs >= 0.2 ? 'Weak' : 'Negligible';
-                          const colour = r > 0 ? '#2563EB' : '#EF4444';
-                          const strengthColour = abs >= 0.7 ? '#10B981' : abs >= 0.4 ? '#F59E0B' : '#9CA3AF';
-                          return (
-                            <tr key={i} className={`border-b border-[#F3F4F6] hover:bg-[#F9FAFB] transition-colors ${i % 2 === 0 ? '' : 'bg-[#FAFAFA]'}`}>
-                              <td className="px-3 py-2.5 font-medium text-[#111827] max-w-[160px] truncate">{colA}</td>
-                              <td className="px-3 py-2.5 text-[#374151] max-w-[160px] truncate">{colB}</td>
-                              <td className="px-3 py-2.5 font-bold" style={{ color: colour }}>{r.toFixed(3)}</td>
-                              <td className="px-3 py-2.5">
-                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold"
-                                  style={{ backgroundColor: `${strengthColour}18`, color: strengthColour }}>
-                                  {strength}
-                                </span>
-                              </td>
-                              <td className="px-3 py-2.5">
-                                <div className="relative h-2 bg-[#F3F4F6] rounded-full w-24 overflow-hidden">
-                                  <div
-                                    className="absolute top-0 h-full rounded-full transition-all"
-                                    style={{
-                                      width: `${Math.abs(r) * 100}%`,
-                                      left: r < 0 ? `${(1 - Math.abs(r)) * 50}%` : '50%',
-                                      backgroundColor: colour,
-                                    }}
-                                  />
-                                  <div className="absolute top-0 left-1/2 w-px h-full bg-[#D1D5DB]" />
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                </>
-              )}
-            </Section>
-          )}
-
-          {/* OUTLIERS */}
-          {activeTab === 'outliers' && (
-            <Section title="Outlier Detection — IQR Method (1.5×IQR Fence)" icon={AlertTriangle} accent="#EF4444">
-              <p className="text-xs text-[#6B7280] mb-4">
-                Tukey's fence: values below Q1 − 1.5·IQR or above Q3 + 1.5·IQR are flagged as outliers.
-              </p>
-              {outlierReport.length === 0 ? (
-                <p className="text-sm text-[#9CA3AF]">No numeric columns for outlier analysis.</p>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm" role="grid">
-                    <thead>
-                      <tr className="border-b border-[#E5E7EB]">
-                        {['Column','Q1','Q3','IQR','Lower Fence','Upper Fence','Outlier Count','% of Data','Severity'].map(h => (
-                          <th key={h} className="text-left px-3 py-2 text-[10px] font-semibold text-[#6B7280] uppercase tracking-wider whitespace-nowrap">{h}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {outlierReport.map((r, i) => {
-                        const sevColour = r.severity === 'High' ? '#EF4444' : r.severity === 'Low' ? '#F59E0B' : '#10B981';
-                        return (
-                          <tr key={r.col} className={`border-b border-[#F3F4F6] hover:bg-[#F9FAFB] transition-colors ${i % 2 === 0 ? '' : 'bg-[#FAFAFA]'}`}>
-                            <td className="px-3 py-2.5 font-medium text-[#111827] max-w-[160px] truncate">{r.col}</td>
-                            <td className="px-3 py-2.5 text-[#374151]">{fmt(r.q1)}</td>
-                            <td className="px-3 py-2.5 text-[#374151]">{fmt(r.q3)}</td>
-                            <td className="px-3 py-2.5 text-[#374151]">{fmt(r.iqr)}</td>
-                            <td className="px-3 py-2.5 text-[#EF4444]">{fmt(r.lowerFence)}</td>
-                            <td className="px-3 py-2.5 text-[#EF4444]">{fmt(r.upperFence)}</td>
-                            <td className="px-3 py-2.5 font-bold" style={{ color: r.outlierCount > 0 ? '#EF4444' : '#10B981' }}>
-                              {r.outlierCount.toLocaleString()}
-                            </td>
-                            <td className="px-3 py-2.5 text-[#374151]">{r.pct}%</td>
-                            <td className="px-3 py-2.5">
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold"
-                                style={{ backgroundColor: `${sevColour}18`, color: sevColour }}>
-                                {r.severity}
-                              </span>
-                            </td>
+                            <td className="px-3 py-2.5 text-[#374151] font-mono">{formatCompact(s.min, col, 'min')}</td>
+                            <td className="px-3 py-2.5 text-[#374151] font-mono">{formatCompact(s.max, col, 'max')}</td>
+                            <td className="px-3 py-2.5 font-medium text-[#2563EB] font-mono">{formatCompact(s.mean, col, 'mean')}</td>
+                            <td className="px-3 py-2.5 text-[#374151] font-mono">{formatCompact(s.median, col, 'median')}</td>
+                            <td className="px-3 py-2.5 text-[#374151] font-mono">{formatCompact(s.std_dev, col, 'std_dev')}</td>
+                            <td className="px-3 py-2.5 text-[#374151] font-mono">{formatCompact(s.q1, col, 'q1')}</td>
+                            <td className="px-3 py-2.5 text-[#374151] font-mono">{formatCompact(s.q3, col, 'q3')}</td>
                           </tr>
                         );
                       })}
