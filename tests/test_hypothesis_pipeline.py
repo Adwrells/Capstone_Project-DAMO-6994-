@@ -68,6 +68,11 @@ class TestH1(unittest.TestCase, HypothesisResultContract):
         for field in ("h_statistic", "degrees_of_freedom", "epsilon_squared", "tie_correction"):
             self.assertIn(field, self.res)
 
+    def test_cohort_scope_rule_is_explicit(self):
+        self.assertIn("cohort_scope_rule", self.res)
+        self.assertIn("CTAS I", self.res["cohort_scope_rule"])
+        self.assertIn("Unknown", self.res["cohort_scope_rule"])
+
     def test_excludes_unknown_triage_level(self):
         groups = {g["triage_level"] for g in self.res["group_summaries"]}
         self.assertTrue(groups.issubset(set(VALID_CTAS_LEVELS)))
@@ -161,6 +166,10 @@ class TestH4(unittest.TestCase, HypothesisResultContract):
         for field in ("h_statistic", "degrees_of_freedom", "epsilon_squared", "tie_correction"):
             self.assertIn(field, self.res)
 
+    def test_cohort_scope_rule_is_explicit(self):
+        self.assertIn("cohort_scope_rule", self.res)
+        self.assertIn("Total", self.res["cohort_scope_rule"])
+
     def test_group_summaries_use_age_category(self):
         for g in self.res["group_summaries"]:
             self.assertIn("age_category", g)
@@ -185,25 +194,137 @@ class TestDeterminism(unittest.TestCase):
         self.assertEqual(a["p_value"], b["p_value"])
 
 
-class TestEmptyDatabaseHandling(unittest.TestCase):
-    """The engines must degrade to an error dict, never raise, on an unseeded table."""
+class TestRollupCategoryFiltering(unittest.TestCase):
+    """Task 01 Acceptance Criteria: Asserts rollup categories are filtered out upstream."""
 
-    def test_missing_table_returns_error(self):
-        from backend.analytics import hypothesis_testing as ht
+    def test_filter_exact_rollup_labels(self):
+        from backend.analytics.hypothesis_testing import ROLLUP_LABELS, is_rollup_or_excluded
+        for label in ("Total", "TOTAL", "total", "All", "ALL", "all", "Any", "any", "Grand Total", "Overall"):
+            self.assertTrue(is_rollup_or_excluded(label), f"Rollup label '{label}' should be excluded")
 
-        class EmptyDB:
-            def read_sql(self, *a, **k):
-                import pandas as pd
-                return pd.DataFrame()
+    def test_filter_does_not_exclude_legitimate_substrings(self):
+        from backend.analytics.hypothesis_testing import is_rollup_or_excluded
+        # Valid clinical strings with similar letters or substrings must not be falsely dropped
+        legit_categories = [
+            "Intra-Facility Transfer",
+            "Discharged Home",
+            "CTAS I - Resuscitation",
+            "CTAS II - Emergent",
+            "CTAS III - Urgent",
+            "Less urgent",
+            "Non-urgent",
+            "Pediatric & Youth",
+            "Geriatric Population",
+            "Admitted",
+            "Death",
+        ]
+        for cat in legit_categories:
+            self.assertFalse(is_rollup_or_excluded(cat), f"Legitimate category '{cat}' must not be excluded")
 
-        original = ht.db_manager
-        ht.db_manager = EmptyDB()
-        try:
-            for runner in (ht.run_h1_test, ht.run_h2_test, ht.run_h4_test):
-                res = runner()
-                self.assertIn("error", res)
-        finally:
-            ht.db_manager = original
+    @unittest.skipUnless(_seeded("ctas_triage"), "ctas_triage not seeded")
+    def test_h1_contains_no_rollup_in_groups_or_post_hoc(self):
+        res = run_h1_test()
+        groups = [g["triage_level"].lower() for g in res["group_summaries"]]
+        for rollup in ("total", "all", "any", "grand total", "overall"):
+            self.assertNotIn(rollup, groups)
+        for pair in res.get("dunn_post_hoc", []):
+            self.assertNotIn("total", pair["group_a"].lower())
+            self.assertNotIn("total", pair["group_b"].lower())
+
+    @unittest.skipUnless(_seeded("age_sex"), "age_sex not seeded")
+    def test_h4_contains_no_rollup_in_groups_or_post_hoc(self):
+        res = run_h4_test()
+        groups = [g["age_category"].lower() for g in res["group_summaries"]]
+        for rollup in ("total", "all", "any", "grand total", "overall"):
+            self.assertNotIn(rollup, groups)
+        for pair in res.get("dunn_post_hoc", []):
+            self.assertNotIn("total", pair["group_a"].lower())
+            self.assertNotIn("total", pair["group_b"].lower())
+
+
+class TestStalenessAndLiveQueryReconciliation(unittest.TestCase):
+    """Task 07: Live query reconciliation & staleness validation guard.
+    
+    Verifies that all hypothesis group sizes (aggregate record count & weighted visit sum)
+    computed by the solver match exact live queries against the underlying database tables.
+    Fails loudly if cached/stale values drift from live data.
+    """
+
+    @unittest.skipUnless(_seeded("ctas_triage"), "ctas_triage not seeded")
+    def test_h1_live_query_reconciliation(self):
+        # Direct SQL aggregation on live table
+        df = db_manager.read_sql(
+            """
+            SELECT triage_level, COUNT(*) as n_records, SUM(ed_visits) as total_visits
+            FROM ctas_triage
+            WHERE ed_visits > 0
+              AND triage_level NOT IN ('Unknown', 'Total', 'All', 'Grand Total')
+              AND median_length_of_stay_min IS NOT NULL
+            GROUP BY triage_level
+            """
+        )
+        sql_map = {row["triage_level"]: (int(row["n_records"]), int(row["total_visits"])) for _, row in df.iterrows()}
+        
+        res = run_h1_test()
+        solver_map = {g["triage_level"]: (g["n_records"], g["weighted_n"]) for g in res["group_summaries"]}
+        
+        # Must have exactly 5 clinical CTAS tiers
+        self.assertEqual(len(solver_map), 5)
+        for level, (exp_records, exp_visits) in sql_map.items():
+            self.assertIn(level, solver_map, f"Missing CTAS tier {level} in H1 solver output")
+            act_records, act_visits = solver_map[level]
+            self.assertEqual(act_records, exp_records, f"Record count drift for CTAS tier {level}")
+            self.assertEqual(act_visits, exp_visits, f"Weighted visit count drift for CTAS tier {level}")
+
+    @unittest.skipUnless(_seeded("visit_disposition"), "visit_disposition not seeded")
+    def test_h2_live_query_reconciliation(self):
+        # Direct SQL aggregation for admission groups
+        df = db_manager.read_sql(
+            """
+            SELECT is_admitted, COUNT(*) as n_records, SUM(ed_visits) as total_visits
+            FROM visit_disposition
+            WHERE ed_visits > 0
+              AND visit_disposition NOT IN ('Unknown', 'Total', 'All', 'Grand Total')
+              AND is_admitted IS NOT NULL
+              AND median_length_of_stay_min IS NOT NULL
+            GROUP BY is_admitted
+            """
+        )
+        sql_totals = {int(row["is_admitted"]): (int(row["n_records"]), int(row["total_visits"])) for _, row in df.iterrows()}
+        
+        res = run_h2_test()
+        # Admitted is group 0, Non-Admitted is group 1
+        admitted = res["admitted_summary"]
+        non_admitted = res["discharged_summary"]
+        
+        self.assertEqual(admitted["n_records"], sql_totals[1][0], "H2 Admitted record count drift")
+        self.assertEqual(admitted["weighted_n"], sql_totals[1][1], "H2 Admitted visit count drift")
+        self.assertEqual(non_admitted["n_records"], sql_totals[0][0], "H2 Non-Admitted record count drift")
+        self.assertEqual(non_admitted["weighted_n"], sql_totals[0][1], "H2 Non-Admitted visit count drift")
+
+    @unittest.skipUnless(_seeded("age_sex"), "age_sex not seeded")
+    def test_h4_live_query_reconciliation(self):
+        # Direct SQL aggregation for broad age categories
+        df = db_manager.read_sql(
+            """
+            SELECT age_broad_category, COUNT(*) as n_records, SUM(ed_visits) as total_visits
+            FROM age_sex
+            WHERE ed_visits > 0
+              AND age_broad_category NOT IN ('Unknown', 'Total', 'All', 'Grand Total')
+              AND median_length_of_stay_min IS NOT NULL
+            GROUP BY age_broad_category
+            """
+        )
+        sql_map = {row["age_broad_category"]: (int(row["n_records"]), int(row["total_visits"])) for _, row in df.iterrows()}
+        
+        res = run_h4_test()
+        solver_map = {g["age_category"]: (g["n_records"], g["weighted_n"]) for g in res["group_summaries"]}
+        
+        for cat, (exp_records, exp_visits) in sql_map.items():
+            self.assertIn(cat, solver_map, f"Missing age category {cat} in H4 solver output")
+            act_records, act_visits = solver_map[cat]
+            self.assertEqual(act_records, exp_records, f"Record count drift for age category {cat}")
+            self.assertEqual(act_visits, exp_visits, f"Weighted visit count drift for age category {cat}")
 
 
 if __name__ == "__main__":

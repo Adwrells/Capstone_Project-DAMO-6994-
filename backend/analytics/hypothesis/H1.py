@@ -1,30 +1,36 @@
 from typing import Any, Dict, List, Optional, Sequence
-
+ 
+from backend.analytics.hypothesis_testing import is_rollup_or_excluded
 from backend.analytics.statistics.assumptions import check_normality, check_sample_size
 from backend.analytics.statistics.kruskal import dunn_post_hoc, kruskal_wallis_full
 from backend.analytics.statistics.weighted import weighted_mean, weighted_median
-
+ 
 STATISTICAL_METHOD = "Weighted Kruskal-Wallis H-Test with Dunn Post-Hoc"
-
-
+ 
+ 
 def run(
     groups: List[List[float]],
     group_names: List[str],
     weights: Optional[Sequence[Sequence[float]]] = None,
 ) -> Dict[str, Any]:
     """H1: does reported median ED LOS differ across CTAS triage levels?
-
+ 
     ``weights`` are ED visit counts. Supplying them runs the test over the
     weight-expanded population, which is what the aggregate NACRS data requires;
     omitting them falls back to an unweighted test over the aggregate rows.
     """
+    valid_idx = [i for i, name in enumerate(group_names) if not is_rollup_or_excluded(name)]
+    groups = [groups[i] for i in valid_idx]
+    group_names = [group_names[i] for i in valid_idx]
+    if weights is not None:
+        weights = [weights[i] for i in valid_idx]
     normality = [check_normality(g, name) for g, name in zip(groups, group_names)]
     size_check = check_sample_size(groups, group_names)
-
+ 
     kw = kruskal_wallis_full(groups, group_names, weights)
     post_hoc = dunn_post_hoc(groups, group_names, weights)
     reject = kw["reject_null"]
-
+ 
     wts = weights if weights is not None else [[1.0] * len(g) for g in groups]
     group_stats = [
         {
@@ -38,7 +44,7 @@ def run(
         }
         for name, g, w in zip(group_names, groups, wts) if g
     ]
-
+ 
     return {
         "hypothesis": "H1",
         "research_question": "Does LOS differ significantly across CTAS Triage Levels?",
@@ -68,3 +74,4 @@ def run(
         "group_summaries": group_stats,
         "post_hoc_comparisons": post_hoc,
     }
+ 

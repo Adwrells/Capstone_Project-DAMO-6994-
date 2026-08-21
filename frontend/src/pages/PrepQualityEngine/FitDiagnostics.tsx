@@ -377,30 +377,6 @@ export default function FitDiagnostics({ cleanedData, isDarkMode = false }: FitD
             </div>
           )}
 
-          {/* ── PDF EXPORT ──────────────────────────────────────────────────── */}
-          <div className={`p-6 rounded-2xl border shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 print-hide ${
-            isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-slate-200 bg-white'
-          }`}>
-            <div className="text-center sm:text-left">
-              <h4 className="font-bold text-sm text-slate-900 dark:text-white">Export Diagnostics Report</h4>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 max-w-xl">
-                Generates a print-ready PDF of the verdict, metrics, and all four charts —
-                suitable for the capstone appendix. Choose <strong>Save as PDF</strong> as
-                the destination in the dialog. Charts export as vector graphics, so they
-                stay sharp at any zoom.
-              </p>
-            </div>
-
-            <button
-              onClick={exportPdf}
-              className="h-11 px-6 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer select-none shrink-0"
-              id="export-fit-diagnostics-pdf-btn"
-            >
-              <FileDown size={18} />
-              <span>Export as PDF</span>
-            </button>
-          </div>
-
           {/* Printed footer — screen-hidden */}
           <div className="print-only" style={{ marginTop: '1rem', borderTop: '1px solid #cbd5e1', paddingTop: '0.4rem', fontSize: '8pt' }}>
             Verdict: <strong>{result.diagnosis.verdict}</strong> · Training R²{' '}
