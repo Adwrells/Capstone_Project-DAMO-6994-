@@ -93,3 +93,13 @@ CREATE TABLE metadata (
     column_count INTEGER NOT NULL,
     last_updated TEXT NOT NULL
 );
+
+-- Query Performance Indexes
+CREATE INDEX IF NOT EXISTS idx_ed_visits_fiscal_year ON ed_visits (fiscal_year);
+CREATE INDEX IF NOT EXISTS idx_ed_visits_triage ON ed_visits (triage_level);
+CREATE INDEX IF NOT EXISTS idx_ctas_triage_lookup ON ctas_triage (fiscal_year, age_group, sex);
+CREATE INDEX IF NOT EXISTS idx_visit_disp_lookup ON visit_disposition (fiscal_year, age_group, sex);
+CREATE INDEX IF NOT EXISTS idx_age_sex_lookup ON age_sex (fiscal_year, age_group, sex);
+CREATE INDEX IF NOT EXISTS idx_main_problems_lookup ON main_problems (fiscal_year, age_group, sex);
+CREATE INDEX IF NOT EXISTS idx_demographics_lookup ON demographics (age_group, sex);
+

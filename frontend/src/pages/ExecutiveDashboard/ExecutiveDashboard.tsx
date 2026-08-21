@@ -1,1931 +1,1101 @@
 /**
- * @license
- * SPDX-License-Identifier: Apache-2.0
+ * Healthcare Analytics Platform — Executive Dashboard
+ * Emergency Department Wait Times & Resource Burden Analysis
+ * University of Niagara Falls — DAMO-6994 Capstone
+ *
+ * Sections:
+ *  1. Title Banner
+ *  2. 8 Filters (Fiscal Year, Sex, Age Group, Population Category, CTAS Level, Visit Disposition + 2 custom)
+ *  3. 5 KPI Cards
+ *  4. 9 Charts — each with chart-type switcher + column dropdowns for X/Y axes
+ *     Line×2 | Bar×3 | Column×2 | Area×1 | Funnel×1
+ *  5. Descriptive Statistics — top 5 numeric columns
  */
 
-import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { 
-  ResponsiveContainer, PieChart, Pie, Cell, 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
-  LineChart, Line, ScatterChart, Scatter, AreaChart, Area,
-  ComposedChart, ReferenceLine, Brush, Label
+import React, { useState, useMemo } from 'react';
+import {
+  ResponsiveContainer,
+  LineChart,   Line,
+  BarChart,    Bar,
+  AreaChart,   Area,
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+  ReferenceLine, Cell,
 } from 'recharts';
-import { 
-  FileDown, RefreshCw, PlusCircle, Calendar, ArrowUpRight, ArrowDownRight, 
-  Trash2, Sliders, Check, Settings, LayoutGrid, Sparkles, CheckSquare, X,
-  Maximize2, ZoomIn, Palette, Eye, AlertCircle, Bookmark, Star, Download,
-  Layers, HelpCircle, Activity, Minimize2, BarChart2, TrendingUp, Info
+import {
+  Activity, AlertCircle, BarChart2, ChevronDown, ChevronUp,
+  Filter, RefreshCw, Settings, TrendingDown, TrendingUp,
+  Users, Clock, Zap, BookOpen, X,
 } from 'lucide-react';
-import { toPng, toSvg } from 'html-to-image';
-import { KPIItem, CustomVisualization, AggregationOption } from '../../utils/types';
-import CustomChartBuilder from '../../components/charts/CustomChartBuilder';
+import { KPIItem, CustomVisualization } from '../../utils/types';
 
-// Theme & Palette color configurations (WCAG compliant)
-const COLOR_PALETTES = {
-  powerbi: ['#f2c811', '#118d95', '#8064a2', '#335c81', '#112233', '#1164b4', '#ef5b34'],
-  tableau: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f'],
-  emerald: ['#10b981', '#059669', '#34d399', '#047857', '#065f46', '#a7f3d0', '#022c22'],
-  cobalt: ['#3b82f6', '#1d4ed8', '#1e40af', '#1e3a8a', '#172554', '#60a5fa', '#93c5fd'],
+// ─── palettes ──────────────────────────────────────────────────────────────────
+const PALETTES: Record<string, string[]> = {
+  clinical: ['#0F4C81','#118d95','#2E8B57','#f59e0b','#e11d48','#8b5cf6','#0ea5e9'],
+  powerbi:  ['#f2c811','#118d95','#8064a2','#335c81','#1164b4','#ef5b34','#2ca02c'],
+  tableau:  ['#1f77b4','#ff7f0e','#2ca02c','#d62728','#9467bd','#8c564b','#e377c2'],
+  emerald:  ['#10b981','#059669','#34d399','#047857','#065f46','#6ee7b7','#022c22'],
 };
 
+// ─── stat helpers ───────────────────────────────────────────────────────────────
+const toNums = (arr: any[], col: string) =>
+  arr.map(r => Number(r[col])).filter(v => !isNaN(v));
+
+const calcMean   = (v: number[]) => v.length ? v.reduce((a,b) => a+b, 0)/v.length : 0;
+const calcMedian = (v: number[]) => {
+  if (!v.length) return 0;
+  const s = [...v].sort((a,b) => a-b);
+  const m = Math.floor(s.length/2);
+  return s.length%2 ? s[m] : (s[m-1]+s[m])/2;
+};
+const calcStddev = (v: number[], m: number) =>
+  v.length < 2 ? 0 : Math.sqrt(v.reduce((s,x) => s+(x-m)**2, 0)/(v.length-1));
+
+/** Plain number formatter for tables / raw display */
+const fmtNum = (n: number, dp=1) =>
+  Number.isFinite(n) ? n.toLocaleString(undefined,{maximumFractionDigits:dp}) : '—';
+
+/** Compact k / M / B formatter for axes, labels, tooltips */
+const fmtK = (n: number): string => {
+  if (!Number.isFinite(n)) return '—';
+  const abs = Math.abs(n);
+  if (abs >= 1_000_000_000) return `${(n/1_000_000_000).toFixed(1)}B`;
+  if (abs >= 1_000_000)     return `${(n/1_000_000).toFixed(1)}M`;
+  if (abs >= 1_000)         return `${(n/1_000).toFixed(1)}k`;
+  return n.toFixed(abs < 10 ? 2 : 1);
+};
+
+// ─── chart types ────────────────────────────────────────────────────────────────
+type ChartKind = 'line'|'bar'|'column'|'area'|'funnel';
+
+interface ChartCfg {
+  kind:        ChartKind;
+  xCol:        string;
+  yCol:        string;
+  agg:         'sum'|'median'|'mean'|'count';
+  color:       string;
+  strokeWidth: number;
+  showGrid:    boolean;
+  showLegend:  boolean;
+  showLabels:  boolean;
+  smooth:      boolean;
+  refLine:     boolean;
+  yMin:        string;
+  yMax:        string;
+}
+
+// defaults per chart slot  (labels ON by default)
+const defaultCfg = (kind: ChartKind, xCol='', yCol='', color='#0F4C81'): ChartCfg => ({
+  kind, xCol, yCol, agg:'sum', color,
+  strokeWidth:2, showGrid:true, showLegend:false,
+  showLabels:true, smooth:true, refLine:false,
+  yMin:'', yMax:'',
+});
+
+// ─── Custom k/M/B label rendered as SVG <text> ───────────────────────────────────────
+// `position` determines offset direction: 'top' shifts Y up, 'right' shifts X right
+function KLabel(props: any) {
+  const { x=0, y=0, value, width=0, height=0, fill='#94a3b8', position='top' } = props;
+  if (value === undefined || value === null || value === '') return null;
+  const num = Number(value);
+  if (!Number.isFinite(num)) return null;
+  const label = fmtK(num);
+  // place text above the bar/point (top) or to the right of horizontal bars
+  const tx = position === 'right' ? x + (width ?? 0) + 6 : x + (width ?? 0) / 2;
+  const ty = position === 'top'   ? y - 5                 : y + (height ?? 0) / 2 + 1;
+  return (
+    <text x={tx} y={ty} fill={fill} fontSize={8} fontWeight={600}
+      textAnchor={position === 'right' ? 'start' : 'middle'}
+      dominantBaseline={position === 'right' ? 'middle' : 'auto'}>
+      {label}
+    </text>
+  );
+}
+
+// ─── Funnel component ───────────────────────────────────────────────────────────
+function FunnelViz({ data, colors, dark }: { data:{name:string;value:number}[]; colors:string[]; dark:boolean }) {
+  if (!data.length) return <div className="h-full flex items-center justify-center text-xs text-slate-400">No data</div>;
+  const max = Math.max(...data.map(d => d.value), 1);
+  return (
+    <div className="flex flex-col gap-2 h-full justify-center px-6 py-2">
+      {data.map((d, i) => {
+        const pct = (d.value/max)*100;
+        return (
+          <div key={d.name} className="flex items-center gap-3">
+            <span className={`text-[10px] font-semibold w-32 text-right shrink-0 ${dark?'text-slate-300':'text-slate-600'}`}>
+              {d.name}
+            </span>
+            <div className="flex-1 relative h-7 flex items-center justify-center">
+              <div
+                style={{ width:`${pct}%`, backgroundColor: colors[i%colors.length] }}
+                className="absolute h-full left-0 rounded transition-all duration-500"
+              />
+              <span className="relative z-10 text-white text-[9px] font-bold drop-shadow">
+                {fmtK(d.value)}
+              </span>
+            </div>
+            <span className={`text-[9px] w-10 text-right shrink-0 ${dark?'text-slate-400':'text-slate-500'}`}>
+              {pct.toFixed(0)}%
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─── universal chart renderer ───────────────────────────────────────────────────
+function UniversalChart({
+  id, cfg, data, filtered, colors, dark, catCols, numCols,
+  defaultTitle,
+}: {
+  id: string;
+  cfg: ChartCfg;
+  data: any[];          // full dataset (unused here, just for reference)
+  filtered: any[];      // filtered dataset to render from
+  colors: string[];
+  dark: boolean;
+  catCols: string[];
+  numCols: string[];
+  defaultTitle: string;
+}) {
+  // aggregate data from filtered
+  const chartData = useMemo(() => {
+    if (!cfg.xCol || !cfg.yCol) return [];
+    const map: Record<string,number[]> = {};
+    filtered.forEach(r => {
+      const k = String(r[cfg.xCol] ?? 'Unknown');
+      const v = Number(r[cfg.yCol] ?? 0);
+      if (!map[k]) map[k] = [];
+      if (!isNaN(v)) map[k].push(v);
+    });
+    return Object.entries(map).map(([name, vals]) => {
+      let value = 0;
+      if      (cfg.agg === 'sum')    value = vals.reduce((a,b)=>a+b,0);
+      else if (cfg.agg === 'mean')   value = calcMean(vals);
+      else if (cfg.agg === 'median') value = calcMedian(vals);
+      else                           value = vals.length;
+      return { name, value: parseFloat(value.toFixed(2)) };
+    }).sort((a,b) => a.name.localeCompare(b.name));
+  }, [filtered, cfg.xCol, cfg.yCol, cfg.agg]);
+
+  const tipStyle = {
+    backgroundColor: dark?'#1e293b':'#fff',
+    border: dark?'1px solid #334155':'1px solid #e2e8f0',
+    borderRadius:8, fontSize:11,
+  };
+  const gridStroke = dark?'#334155':'#f1f5f9';
+  const axisStroke = dark?'#94a3b8':'#64748b';
+  const domain: [number|string, number|string] = [
+    cfg.yMin !== '' ? Number(cfg.yMin) : 'auto',
+    cfg.yMax !== '' ? Number(cfg.yMax) : 'auto',
+  ];
+  const avgV = calcMean(chartData.map(d=>d.value));
+  const labelFill = dark ? '#e2e8f0' : '#334155';
+
+  if (cfg.kind === 'funnel') {
+    return <FunnelViz data={chartData} colors={colors} dark={dark} />;
+  }
+
+  if (!cfg.xCol || !cfg.yCol) {
+    return <div className="h-full flex items-center justify-center text-xs text-slate-400">Select X &amp; Y columns above</div>;
+  }
+
+  if (chartData.length === 0) {
+    return <div className="h-full flex items-center justify-center text-xs text-slate-400">No data for selected columns</div>;
+  }
+
+  if (cfg.kind === 'line') {
+    return (
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={chartData} margin={{left:0,right:16,top:22,bottom:5}}>
+          {cfg.showGrid && <CartesianGrid strokeDasharray="3 3" stroke={gridStroke}/>}
+          <XAxis dataKey="name" stroke={axisStroke} fontSize={9} angle={-20} textAnchor="end" height={38}/>
+          <YAxis stroke={axisStroke} fontSize={9} domain={domain} tickFormatter={fmtK}/>
+          <Tooltip contentStyle={tipStyle} formatter={(v:number)=>[fmtK(v), cfg.yCol]}/>
+          {cfg.showLegend && <Legend wrapperStyle={{fontSize:10}}/>}
+          {cfg.refLine && <ReferenceLine y={avgV} stroke="#f43f5e" strokeDasharray="4 4" label={{value:'Avg',fontSize:8,fill:'#f43f5e'}}/>}
+          <Line
+            type={cfg.smooth?'monotone':'linear'}
+            dataKey="value" name={cfg.yCol}
+            stroke={cfg.color} strokeWidth={cfg.strokeWidth}
+            dot={{r:3,fill:cfg.color}}
+            label={cfg.showLabels
+              ? (p:any) => <KLabel {...p} fill={labelFill} position="top"/>
+              : false}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    );
+  }
+
+  if (cfg.kind === 'area') {
+    return (
+      <ResponsiveContainer width="100%" height="100%">
+        <AreaChart data={chartData} margin={{left:0,right:16,top:22,bottom:5}}>
+          <defs>
+            <linearGradient id={`ag-${id}`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%"  stopColor={cfg.color} stopOpacity={0.35}/>
+              <stop offset="95%" stopColor={cfg.color} stopOpacity={0.02}/>
+            </linearGradient>
+          </defs>
+          {cfg.showGrid && <CartesianGrid strokeDasharray="3 3" stroke={gridStroke}/>}
+          <XAxis dataKey="name" stroke={axisStroke} fontSize={9} angle={-20} textAnchor="end" height={38}/>
+          <YAxis stroke={axisStroke} fontSize={9} domain={domain} tickFormatter={fmtK}/>
+          <Tooltip contentStyle={tipStyle} formatter={(v:number)=>[fmtK(v), cfg.yCol]}/>
+          {cfg.showLegend && <Legend wrapperStyle={{fontSize:10}}/>}
+          {cfg.refLine && <ReferenceLine y={avgV} stroke="#f43f5e" strokeDasharray="4 4" label={{value:'Avg',fontSize:8,fill:'#f43f5e'}}/>}
+          <Area type={cfg.smooth?'monotone':'linear'} dataKey="value" name={cfg.yCol}
+            stroke={cfg.color} strokeWidth={cfg.strokeWidth} fill={`url(#ag-${id})`}
+            label={cfg.showLabels
+              ? (p:any) => <KLabel {...p} fill={labelFill} position="top"/>
+              : false}/>
+        </AreaChart>
+      </ResponsiveContainer>
+    );
+  }
+
+  if (cfg.kind === 'bar') {
+    // horizontal bar
+    return (
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={chartData} layout="vertical" margin={{left:10,right:50,top:5,bottom:5}}>
+          {cfg.showGrid && <CartesianGrid strokeDasharray="3 3" stroke={gridStroke}/>}
+          <XAxis type="number" stroke={axisStroke} fontSize={9} domain={domain} tickFormatter={fmtK}/>
+          <YAxis dataKey="name" type="category" stroke={axisStroke} fontSize={9} width={110}/>
+          <Tooltip contentStyle={tipStyle} formatter={(v:number)=>[fmtK(v), cfg.yCol]}/>
+          {cfg.showLegend && <Legend wrapperStyle={{fontSize:10}}/>}
+          {cfg.refLine && <ReferenceLine x={avgV} stroke="#f43f5e" strokeDasharray="4 4" label={{value:'Avg',fontSize:8,fill:'#f43f5e'}}/>}
+          <Bar dataKey="value" name={cfg.yCol} fill={cfg.color} radius={[0,4,4,0]}
+            label={cfg.showLabels
+              ? (p:any) => <KLabel {...p} fill={labelFill} position="right"/>
+              : false}>
+            {chartData.map((_,i)=><Cell key={i} fill={colors[i%colors.length]}/>)}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    );
+  }
+
+  // column (vertical bar)
+  return (
+    <ResponsiveContainer width="100%" height="100%">
+      <BarChart data={chartData} margin={{left:0,right:10,top:22,bottom:5}}>
+        {cfg.showGrid && <CartesianGrid strokeDasharray="3 3" stroke={gridStroke}/>}
+        <XAxis dataKey="name" stroke={axisStroke} fontSize={9} angle={-15} textAnchor="end" height={42}/>
+        <YAxis stroke={axisStroke} fontSize={9} domain={domain} tickFormatter={fmtK}/>
+        <Tooltip contentStyle={tipStyle} formatter={(v:number)=>[fmtK(v), cfg.yCol]}/>
+        {cfg.showLegend && <Legend wrapperStyle={{fontSize:10}}/>}
+        {cfg.refLine && <ReferenceLine y={avgV} stroke="#f43f5e" strokeDasharray="4 4" label={{value:'Avg',fontSize:8,fill:'#f43f5e'}}/>}
+        <Bar dataKey="value" name={cfg.yCol} fill={cfg.color} radius={[4,4,0,0]}
+          label={cfg.showLabels
+            ? (p:any) => <KLabel {...p} fill={labelFill} position="top"/>
+            : false}>
+          {chartData.map((_,i)=><Cell key={i} fill={colors[i%colors.length]}/>)}
+        </Bar>
+      </BarChart>
+    </ResponsiveContainer>
+  );
+}
+
+// ─── per-chart customisation panel ────────────────────────────────────────────
+function ChartConfig({
+  cfg, onChange, catCols, numCols, dark, allowFunnel,
+}: {
+  cfg: ChartCfg;
+  onChange: (c: ChartCfg) => void;
+  catCols: string[];
+  numCols: string[];
+  dark: boolean;
+  allowFunnel?: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+
+  const sel = `text-[10px] rounded border px-2 py-1 w-full cursor-pointer
+    ${dark?'bg-[#0f1d33] border-[#1e2d4a] text-slate-200':'bg-white border-slate-200 text-slate-700'}`;
+  const inp = `text-[10px] rounded border px-2 py-1 w-full
+    ${dark?'bg-[#0f1d33] border-[#1e2d4a] text-slate-200':'bg-white border-slate-200 text-slate-700'}`;
+
+  const kinds: ChartKind[] = allowFunnel
+    ? ['line','column','bar','area','funnel']
+    : ['line','column','bar','area'];
+
+  return (
+    <div className="relative" onClick={e => e.stopPropagation()}>
+      <button
+        onClick={() => setOpen(p => !p)}
+        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[10px] font-semibold cursor-pointer transition
+          ${dark?'bg-[#182640] border-[#1e2d4a] text-slate-300 hover:bg-[#1e2d4a]'
+               :'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'}`}>
+        <Settings size={11}/>
+        Customise
+        {open ? <ChevronUp size={10}/> : <ChevronDown size={10}/>}
+      </button>
+
+      {open && (
+        <div className={`absolute right-0 top-9 z-50 w-72 p-4 rounded-2xl border shadow-2xl space-y-3
+          ${dark?'bg-[#0f1d33] border-[#1e2d4a]':'bg-white border-slate-200'}`}>
+          {/* header */}
+          <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-[#1e2d4a]">
+            <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400">Chart Settings</span>
+            <button onClick={() => setOpen(false)} className="text-slate-400 hover:text-slate-700 cursor-pointer">
+              <X size={12}/>
+            </button>
+          </div>
+
+          {/* Chart type */}
+          <div>
+            <label className="block text-[9px] text-slate-400 mb-1 uppercase font-bold">Chart Type</label>
+            <div className="grid grid-cols-5 gap-1">
+              {kinds.map(k => (
+                <button key={k}
+                  onClick={() => onChange({...cfg, kind:k})}
+                  className={`py-1 px-1 rounded text-[9px] font-bold uppercase cursor-pointer transition
+                    ${cfg.kind===k
+                      ? 'bg-[#0F4C81] text-white shadow'
+                      : dark?'bg-[#182640] text-slate-400 hover:text-slate-200'
+                           :'bg-slate-100 text-slate-500 hover:text-slate-700'}`}>
+                  {k==='column'?'Col':k==='funnel'?'Fnel':k.charAt(0).toUpperCase()+k.slice(1)}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* X-axis column dropdown */}
+          {cfg.kind !== 'funnel' && (
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="block text-[9px] text-slate-400 mb-1 uppercase font-bold">X-Axis (Group By)</label>
+                <select value={cfg.xCol} onChange={e => onChange({...cfg, xCol:e.target.value})} className={sel}>
+                  <option value="">— select column —</option>
+                  <optgroup label="Categorical">
+                    {catCols.map(c => <option key={c} value={c}>{c}</option>)}
+                  </optgroup>
+                  <optgroup label="Numeric (as label)">
+                    {numCols.map(c => <option key={c} value={c}>{c}</option>)}
+                  </optgroup>
+                </select>
+              </div>
+              <div>
+                <label className="block text-[9px] text-slate-400 mb-1 uppercase font-bold">Y-Axis (Measure)</label>
+                <select value={cfg.yCol} onChange={e => onChange({...cfg, yCol:e.target.value})} className={sel}>
+                  <option value="">— select column —</option>
+                  {numCols.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+            </div>
+          )}
+
+          {/* Aggregation */}
+          {cfg.kind !== 'funnel' && (
+            <div>
+              <label className="block text-[9px] text-slate-400 mb-1 uppercase font-bold">Aggregation</label>
+              <select value={cfg.agg} onChange={e => onChange({...cfg, agg:e.target.value as any})} className={sel}>
+                <option value="sum">Sum</option>
+                <option value="mean">Mean (Average)</option>
+                <option value="median">Median</option>
+                <option value="count">Count</option>
+              </select>
+            </div>
+          )}
+
+          {/* Y min / max */}
+          {cfg.kind !== 'funnel' && (
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="block text-[9px] text-slate-400 mb-1 uppercase font-bold">Y Min</label>
+                <input type="number" value={cfg.yMin} placeholder="auto"
+                  onChange={e => onChange({...cfg, yMin:e.target.value})} className={inp}/>
+              </div>
+              <div>
+                <label className="block text-[9px] text-slate-400 mb-1 uppercase font-bold">Y Max</label>
+                <input type="number" value={cfg.yMax} placeholder="auto"
+                  onChange={e => onChange({...cfg, yMax:e.target.value})} className={inp}/>
+              </div>
+            </div>
+          )}
+
+          {/* colour + stroke */}
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="block text-[9px] text-slate-400 mb-1 uppercase font-bold">Colour</label>
+              <input type="color" value={cfg.color}
+                onChange={e => onChange({...cfg, color:e.target.value})}
+                className="w-full h-7 rounded border border-slate-200 cursor-pointer"/>
+            </div>
+            <div>
+              <label className="block text-[9px] text-slate-400 mb-1 uppercase font-bold">Stroke Width</label>
+              <select value={cfg.strokeWidth} onChange={e => onChange({...cfg, strokeWidth:Number(e.target.value)})} className={sel}>
+                {[1,2,3,4,5].map(n=><option key={n} value={n}>{n}px</option>)}
+              </select>
+            </div>
+          </div>
+
+          {/* toggles */}
+          <div className="flex flex-wrap gap-x-4 gap-y-2 pt-1">
+            {([
+              ['showGrid','Grid'],['showLegend','Legend'],['showLabels','Labels'],
+              ['smooth','Smooth'],['refLine','Avg Line'],
+            ] as [keyof ChartCfg, string][]).map(([k,label]) => (
+              <label key={k} className="flex items-center gap-1.5 cursor-pointer">
+                <input type="checkbox" checked={!!cfg[k]}
+                  onChange={e => onChange({...cfg, [k]:e.target.checked})}
+                  className="rounded text-[#0F4C81]"/>
+                <span className={`text-[10px] ${dark?'text-slate-300':'text-slate-600'}`}>{label}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── chart card wrapper ─────────────────────────────────────────────────────────
+function ChartCard({
+  id, title, subtitle, dark, height='h-64', children, right,
+}: {
+  id:string; title:string; subtitle?:string; dark:boolean;
+  height?:string; children:React.ReactNode; right?:React.ReactNode;
+}) {
+  return (
+    <div id={id}
+      className={`rounded-2xl border p-5 shadow-sm hover:shadow-md transition-shadow
+        ${dark?'bg-[#131f37] border-[#1e2d4a]':'bg-white border-slate-200'}`}>
+      <div className="flex items-start justify-between mb-3 gap-2">
+        <div className="min-w-0">
+          <h4 className={`text-[11px] font-bold uppercase tracking-wider truncate
+            ${dark?'text-[#3B82F6]':'text-[#0F4C81]'}`}>{title}</h4>
+          {subtitle && (
+            <p className="text-[9px] text-slate-400 mt-0.5 italic leading-snug">{subtitle}</p>
+          )}
+        </div>
+        {right}
+      </div>
+      <div className={height}>{children}</div>
+    </div>
+  );
+}
+
+// ─── multi-select dropdown ──────────────────────────────────────────────────────
+function MultiSelect({ id, label, options, value, onChange, dark, openId, setOpenId }: {
+  id:string; label:string; options:string[]; value:string[];
+  onChange:(v:string[])=>void; dark:boolean;
+  openId:string|null; setOpenId:(v:string|null)=>void;
+}) {
+  const isOpen = openId === id;
+  const toggle = (v:string) =>
+    onChange(value.includes(v) ? value.filter(x=>x!==v) : [...value, v]);
+
+  return (
+    <div className="relative">
+      <button
+        onClick={e => { e.stopPropagation(); setOpenId(isOpen ? null : id); }}
+        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[11px] font-semibold cursor-pointer transition shrink-0
+          ${dark?'bg-[#182640] border-[#1e2d4a] text-slate-200 hover:bg-[#1c2c49]'
+               :'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'}
+          ${value.length?dark?'border-[#3B82F6] text-[#3B82F6]':'border-[#0F4C81] text-[#0F4C81]':''}`}>
+        {label}
+        {value.length > 0 && (
+          <span className={`text-[9px] font-bold px-1 rounded
+            ${dark?'bg-[#3B82F6]/20':'bg-[#0F4C81]/10'}`}>{value.length}</span>
+        )}
+        {isOpen ? <ChevronUp size={11}/> : <ChevronDown size={11}/>}
+      </button>
+
+      {isOpen && (
+        <div
+          onClick={e => e.stopPropagation()}
+          className={`absolute left-0 top-9 z-50 min-w-[190px] rounded-xl border shadow-xl p-2
+            ${dark?'bg-[#131f37] border-[#1e2d4a]':'bg-white border-slate-200'}`}>
+          <div className="flex items-center justify-between pb-1.5 mb-1 border-b border-slate-200 dark:border-[#1e2d4a]">
+            <span className="text-[9px] font-bold uppercase text-slate-400 tracking-wider">{label}</span>
+            <button onClick={() => { onChange([]); setOpenId(null); }}
+              className="text-[9px] text-blue-500 hover:underline cursor-pointer">Reset</button>
+          </div>
+          {options.length === 0
+            ? <p className="text-[10px] text-slate-400 px-2 py-2">Column not detected in dataset</p>
+            : <div className="max-h-44 overflow-y-auto space-y-0.5">
+                {options.map(opt => (
+                  <label key={opt}
+                    className={`flex items-center gap-2 px-2 py-1 rounded cursor-pointer text-[11px]
+                      ${dark?'text-slate-300 hover:bg-[#1e2d4a]':'text-slate-700 hover:bg-slate-50'}`}>
+                    <input type="checkbox" checked={value.includes(opt)}
+                      onChange={() => toggle(opt)} className="rounded text-[#0F4C81]"/>
+                    {opt}
+                  </label>
+                ))}
+              </div>}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── props ──────────────────────────────────────────────────────────────────────
 interface ExecutiveDashboardProps {
   datasetName: string;
   fields: any[];
   data: any[];
   aiKPIs: KPIItem[] | null;
   customCharts: CustomVisualization[];
-  onAddChart: (chart: CustomVisualization) => void;
+  onAddChart: (c: CustomVisualization) => void;
   onRemoveChart: (id: string) => void;
   isDarkMode?: boolean;
-  setIsDarkMode?: (isDark: boolean) => void;
+  setIsDarkMode?: (v: boolean) => void;
 }
 
-// Global Statistical Helpers
-const getNumericValues = (arr: any[], col: string): number[] => {
-  return arr.map(r => Number(r[col])).filter(v => !isNaN(v) && v !== null && v !== undefined);
-};
-
-const getStdDev = (vals: number[], mean: number): number => {
-  if (vals.length < 2) return 0;
-  const sqDiffs = vals.reduce((sum, v) => sum + Math.pow(v - stdMean(vals), 2), 0);
-  return Math.sqrt(sqDiffs / (vals.length - 1));
-};
-
-const stdMean = (vals: number[]): number => {
-  return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : 0;
-};
-
-const getMedian = (vals: number[]): number => {
-  if (vals.length === 0) return 0;
-  const sorted = [...vals].sort((a, b) => a - b);
-  const mid = Math.floor(sorted.length / 2);
-  return sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
-};
-
-const getSkewness = (vals: number[], mean: number, stdDev: number): number => {
-  if (vals.length < 3 || stdDev === 0) return 0;
-  const n = vals.length;
-  const cubedSum = vals.reduce((acc, v) => acc + Math.pow((v - mean) / stdDev, 3), 0);
-  return (n / ((n - 1) * (n - 2))) * cubedSum;
-};
-
-export default function ExecutiveDashboard({ 
-  datasetName, 
-  fields, 
-  data, 
-  aiKPIs,
-  customCharts,
-  onAddChart,
-  onRemoveChart,
-  isDarkMode = false,
-  setIsDarkMode
+// ═══════════════════════════════════════════════════════════════════════════════
+export default function ExecutiveDashboard({
+  datasetName, fields, data,
+  isDarkMode=false, setIsDarkMode,
 }: ExecutiveDashboardProps) {
 
-  const [refreshKey, setRefreshKey] = useState(0);
+  const dark = isDarkMode;
 
-  // Layout Theme & Palette selection states
-  const [selectedPalette, setSelectedPalette] = useState<'powerbi' | 'tableau' | 'emerald' | 'cobalt'>('powerbi');
+  // ── palette ───────────────────────────────────────────────────────────────────
+  const [palette, setPalette] = useState<keyof typeof PALETTES>('clinical');
+  const colors = PALETTES[palette];
 
-  // Interactive Slicer filters
-  const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [regionDropdownOpen, setRegionDropdownOpen] = useState(false);
-  const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
+  // ── column lists ──────────────────────────────────────────────────────────────
+  const catCols = useMemo(
+    () => fields.filter(f=>f.type==='categorical'||f.type==='text'||f.type==='boolean').map(f=>f.name as string),
+    [fields]
+  );
+  const numCols = useMemo(
+    () => fields.filter(f=>f.type==='numeric').map(f=>f.name as string),
+    [fields]
+  );
+  const allCols = useMemo(() => fields.map(f=>f.name as string), [fields]);
 
-  // Cross Filtering states
-  const [crossFilterField, setCrossFilterField] = useState<string | null>(null);
-  const [crossFilterValue, setCrossFilterValue] = useState<string | null>(null);
+  // ── detect key columns by keyword ─────────────────────────────────────────────
+  const findCol = (...kws: string[]) =>
+    allCols.find(c => kws.some(k => c.toLowerCase().includes(k.toLowerCase()))) ?? '';
 
-  // Focus modal & single-card options
-  const [focusedCardId, setFocusedCardId] = useState<string | null>(null);
+  const COL = useMemo(() => ({
+    year:        findCol('fiscal year','fiscal_year','year'),
+    sex:         findCol('sex','gender'),
+    ageGroup:    findCol('age group','age_group'),
+    popCat:      findCol('population category','population_category','pop_cat','age_broad'),
+    ctas:        findCol('ctas','triage level','triage_level'),
+    disposition: findCol('visit disposition','disposition','admission_status'),
+    los:         findCol('length of stay','los','length_of_stay','median_length'),
+    visits:      findCol('ed visits','ed_visits','visit_count','total_ed_visits'),
+    problem:     findCol('main problem','main_problem','problem','condition'),
+  }), [allCols]); // eslint-disable-line
 
-  // Dynamic X and Y Axis settings per chart
-  const [axisSettings, setAxisSettings] = useState<Record<string, {
-    xAxisColumn?: string;
-    yAxisColumn?: string;
-    aggregation?: AggregationOption;
-    labelRotation?: 0 | 30 | 45 | 60 | 90;
-    yScaleType?: 'linear' | 'logarithmic' | 'percentage' | 'currency' | 'scientific';
-    customMin?: number | '';
-    customMax?: number | '';
-    referenceLineType?: 'None' | 'Average' | 'Median' | 'Target';
-    barSorting?: 'asc' | 'desc' | 'none';
-    groupOthersLimit?: number; // Cardinality limit
-    movingAveragePeriods?: number; // 0 is Off
-    showForecast?: boolean;
-    regressionLine?: boolean;
-    clusterCount?: number; // 0 is Off
-    binningRule?: 'freedman' | 'scott' | 'sturges';
-    bubbleSizeColumn?: string;
-  }>>({});
+  // ── distinct values per filter col (always return array, empty if col missing) ─
+  const distinct = (col: string) =>
+    col ? [...new Set(data.map(r=>String(r[col]??'')).filter(Boolean))].sort() : [];
 
-  // Creator form state for newly plotted custom charts in modal
-  const [builderModalOpen, setBuilderModalOpen] = useState(false);
-  const [newTitle, setNewTitle] = useState('Operating Margin Index');
-  const [newType, setNewType] = useState<CustomVisualization['type']>('Column');
-  const [newXAxis, setNewXAxis] = useState('');
-  const [newYAxis, setNewYAxis] = useState('');
-  const [newAggregation, setNewAggregation] = useState<AggregationOption>('Sum');
+  const OPT_YEAR  = useMemo(() => distinct(COL.year),        [data, COL.year]);
+  const OPT_SEX   = useMemo(() => distinct(COL.sex),         [data, COL.sex]);
+  const OPT_AGE   = useMemo(() => distinct(COL.ageGroup),    [data, COL.ageGroup]);
+  const OPT_POP   = useMemo(() => distinct(COL.popCat),      [data, COL.popCat]);
+  const OPT_CTAS  = useMemo(() => distinct(COL.ctas),        [data, COL.ctas]);
+  const OPT_DISP  = useMemo(() => distinct(COL.disposition), [data, COL.disposition]);
 
-  // Corporate Bookmarks list
-  const [bookmarks, setBookmarks] = useState<Array<{ id: string, name: string, regions: string[], categories: string[] }>>([
-    { id: '1', name: 'Baseline Snapshot', regions: [], categories: [] }
-  ]);
-  const [newBookmarkName, setNewBookmarkName] = useState('');
+  // ── filter state ──────────────────────────────────────────────────────────────
+  const [fYear, setFYear]   = useState<string[]>([]);
+  const [fSex,  setFSex]    = useState<string[]>([]);
+  const [fAge,  setFAge]    = useState<string[]>([]);
+  const [fPop,  setFPop]    = useState<string[]>([]);
+  const [fCtas, setFCtas]   = useState<string[]>([]);
+  const [fDisp, setFDisp]   = useState<string[]>([]);
+  const [openDrop, setOpenDrop] = useState<string|null>(null);
 
-  // Drill Down state on Row 3 Category Analysis
-  const [drillLevel, setDrillLevel] = useState<number>(0);
-  const [drillParentName, setDrillParentName] = useState<string | null>(null);
+  const clearAll = () => { setFYear([]); setFSex([]); setFAge([]); setFPop([]); setFCtas([]); setFDisp([]); };
+  const activeCount = fYear.length+fSex.length+fAge.length+fPop.length+fCtas.length+fDisp.length;
 
-  const activeColors = COLOR_PALETTES[selectedPalette];
+  // ── filtered dataset ──────────────────────────────────────────────────────────
+  const filtered = useMemo(() => data.filter(r => {
+    if (fYear.length && COL.year        && !fYear.includes(String(r[COL.year]??'')))        return false;
+    if (fSex.length  && COL.sex         && !fSex.includes(String(r[COL.sex]??'')))          return false;
+    if (fAge.length  && COL.ageGroup    && !fAge.includes(String(r[COL.ageGroup]??'')))     return false;
+    if (fPop.length  && COL.popCat      && !fPop.includes(String(r[COL.popCat]??'')))       return false;
+    if (fCtas.length && COL.ctas        && !fCtas.includes(String(r[COL.ctas]??'')))        return false;
+    if (fDisp.length && COL.disposition && !fDisp.includes(String(r[COL.disposition]??''))) return false;
+    return true;
+  }), [data, fYear, fSex, fAge, fPop, fCtas, fDisp, COL]);
 
-  // Auto-mapping columns based on text semantics
-  const mapping = useMemo(() => {
-    const keys = fields.map(f => f.name);
+  // ── chart configs ─────────────────────────────────────────────────────────────
+  // We store all 9 chart configs in one state object keyed by slot id
+  const [chartCfgs, setChartCfgs] = useState<Record<string, ChartCfg>>(() => {
+    const yCol = (kws: string[]) => kws.find(c => numCols.some(n => n.toLowerCase().includes(c))) ?? numCols[0] ?? '';
+    const xCol = (kws: string[]) => kws.find(c => catCols.some(n => n.toLowerCase().includes(c))) ?? catCols[0] ?? '';
     return {
-      revenue: keys.find(k => k.toLowerCase().includes('revenue') || k.toLowerCase().includes('spend') || k.toLowerCase().includes('sales') || k.toLowerCase().includes('value') || k.toLowerCase().includes('cost')) || keys.find(k => fields.find(f => f.name === k)?.type === 'numeric'),
-      profit: keys.find(k => k.toLowerCase().includes('profit') || k.toLowerCase().includes('margin') || k.toLowerCase().includes('cost') || k.toLowerCase().includes('ratio') || k.toLowerCase().includes('length of stay') || k.toLowerCase().includes('stay')),
-      quantity: keys.find(k => k.toLowerCase().includes('quantity') || k.toLowerCase().includes('clicks') || k.toLowerCase().includes('count') || k.toLowerCase().includes('volume') || k.toLowerCase().includes('minutes')),
-      region: keys.find(k => k.toLowerCase().includes('region') || k.toLowerCase().includes('channel') || k.toLowerCase().includes('country') || k.toLowerCase().includes('territory') || k.toLowerCase().includes('state') || k.toLowerCase().includes('province')),
-      category: keys.find(k => k.toLowerCase().includes('category') || k.toLowerCase().includes('plan') || k.toLowerCase().includes('segment') || k.toLowerCase().includes('product') || k.toLowerCase().includes('industry') || k.toLowerCase().includes('ctas') || k.toLowerCase().includes('triage') || k.toLowerCase().includes('disposition') || k.toLowerCase().includes('gender')),
-      date: keys.find(k => k.toLowerCase().includes('date') || k.toLowerCase().includes('time') || k.toLowerCase().includes('year') || k.toLowerCase().includes('month'))
+      'line-1': defaultCfg('line',   '',  '', colors[0]),
+      'line-2': defaultCfg('line',   '',  '', colors[1]),
+      'bar-1':  defaultCfg('bar',    '',  '', colors[2]),
+      'bar-2':  defaultCfg('bar',    '',  '', colors[3]),
+      'bar-3':  defaultCfg('bar',    '',  '', colors[4]),
+      'col-1':  defaultCfg('column', '',  '', colors[0]),
+      'col-2':  defaultCfg('column', '',  '', colors[1]),
+      'area-1': defaultCfg('area',   '',  '', colors[2]),
+      'funnel': defaultCfg('funnel', '',  '', colors[0]),
     };
-  }, [fields]);
+  });
 
-  // Set default configurations on load
-  useEffect(() => {
-    if (fields.length > 0) {
-      const cat = mapping.region || fields.find(f => f.type === 'categorical' || f.type === 'text')?.name || fields[0].name;
-      const num = mapping.revenue || fields.find(f => f.type === 'numeric')?.name || fields[0].name;
-      setNewXAxis(cat);
-      setNewYAxis(num);
-    }
-  }, [fields, mapping]);
-
-  // Distinct slicer coordinates
-  const availableRegions = useMemo(() => {
-    if (!mapping.region) return [];
-    const set = new Set<string>();
-    data.forEach(r => { if (r[mapping.region!] !== null && r[mapping.region!] !== undefined) set.add(String(r[mapping.region!])); });
-    return Array.from(set).sort();
-  }, [data, mapping]);
-
-  const availableCategories = useMemo(() => {
-    if (!mapping.category) return [];
-    const set = new Set<string>();
-    data.forEach(r => { if (r[mapping.category!] !== null && r[mapping.category!] !== undefined) set.add(String(r[mapping.category!])); });
-    return Array.from(set).sort();
-  }, [data, mapping]);
-
-  // Layered filtering schema (Slicers + Cross Filtering + Hover Drill filter)
-  const filteredData = useMemo(() => {
-    return data.filter(row => {
-      // 1. Slicer Region match
-      const regVal = mapping.region ? String(row[mapping.region] || '') : null;
-      const regionMatch = !regVal || selectedRegions.length === 0 || selectedRegions.includes(regVal);
-
-      // 2. Slicer Category match
-      const catVal = mapping.category ? String(row[mapping.category] || '') : null;
-      const categoryMatch = !catVal || selectedCategories.length === 0 || selectedCategories.includes(catVal);
-
-      // 3. Power BI-style Cross-Highlight isolation filter
-      let crossMatch = true;
-      if (crossFilterField && crossFilterValue) {
-        crossMatch = String(row[crossFilterField] || '') === crossFilterValue;
-      }
-
-      // 4. Drill down path context
-      let drillMatch = true;
-      if (drillLevel === 1 && drillParentName && mapping.region && mapping.category) {
-        drillMatch = String(row[mapping.region] || '') === drillParentName;
-      }
-
-      return regionMatch && categoryMatch && crossMatch && drillMatch;
+  // Initialise default columns once fields load
+  React.useEffect(() => {
+    if (!fields.length) return;
+    const c = COL;
+    setChartCfgs(prev => {
+      const next = {...prev};
+      // Line 1: year vs visits
+      if (!prev['line-1'].xCol && c.year)    next['line-1'] = {...prev['line-1'], xCol:c.year, yCol:c.visits||numCols[0]||''};
+      // Line 2: year vs LOS
+      if (!prev['line-2'].xCol && c.year)    next['line-2'] = {...prev['line-2'], xCol:c.year, yCol:c.los||numCols[0]||'', agg:'median'};
+      // Bar 1: age group vs visits
+      if (!prev['bar-1'].xCol)               next['bar-1']  = {...prev['bar-1'],  xCol:c.ageGroup||catCols[0]||'', yCol:c.visits||numCols[0]||''};
+      // Bar 2: disposition vs LOS
+      if (!prev['bar-2'].xCol)               next['bar-2']  = {...prev['bar-2'],  xCol:c.disposition||catCols[1]||'', yCol:c.los||numCols[0]||'', agg:'median'};
+      // Bar 3: problem vs visits
+      if (!prev['bar-3'].xCol)               next['bar-3']  = {...prev['bar-3'],  xCol:c.problem||catCols[2]||'', yCol:c.visits||numCols[0]||''};
+      // Col 1: ctas vs visits
+      if (!prev['col-1'].xCol)               next['col-1']  = {...prev['col-1'],  xCol:c.ctas||catCols[0]||'', yCol:c.visits||numCols[0]||''};
+      // Col 2: popcat vs visits
+      if (!prev['col-2'].xCol)               next['col-2']  = {...prev['col-2'],  xCol:c.popCat||catCols[1]||'', yCol:c.visits||numCols[0]||''};
+      // Area: year vs visits
+      if (!prev['area-1'].xCol && c.year)    next['area-1'] = {...prev['area-1'], xCol:c.year, yCol:c.visits||numCols[0]||''};
+      // Funnel: ctas vs visits
+      if (!prev['funnel'].xCol)              next['funnel'] = {...prev['funnel'], xCol:c.ctas||catCols[0]||'', yCol:c.visits||numCols[0]||''};
+      return next;
     });
-  }, [data, selectedRegions, selectedCategories, crossFilterField, crossFilterValue, drillLevel, drillParentName, mapping]);
+  }, [fields.length]); // eslint-disable-line
 
-  // Save current query slicers as bookmark state
-  const saveBookmark = () => {
-    if (!newBookmarkName.trim()) return;
-    setBookmarks(prev => [
-      ...prev,
-      {
-        id: String(Date.now()),
-        name: newBookmarkName,
-        regions: [...selectedRegions],
-        categories: [...selectedCategories]
-      }
-    ]);
-    setNewBookmarkName('');
-  };
+  const setCfg = (id: string) => (c: ChartCfg) =>
+    setChartCfgs(prev => ({...prev, [id]: c}));
 
-  const applyBookmark = (bm: typeof bookmarks[number]) => {
-    setSelectedRegions(bm.regions);
-    setSelectedCategories(bm.categories);
-  };
+  // ── KPIs ──────────────────────────────────────────────────────────────────────
+  const kpiData = useMemo(() => {
+    const losVals    = toNums(filtered, COL.los);
+    const visitVals  = toNums(filtered, COL.visits);
+    const totalVisits = visitVals.length ? visitVals.reduce((a,b)=>a+b,0) : filtered.length;
+    const medLOS     = calcMedian(losVals);
 
-  const deleteBookmark = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setBookmarks(prev => prev.filter(b => b.id !== id));
-  };
-
-  // Safe scaling formatting
-  const formatYValue = (val: number, type?: 'linear' | 'logarithmic' | 'percentage' | 'currency' | 'scientific') => {
-    if (val === null || isNaN(val)) return '';
-    switch (type) {
-      case 'currency':
-        if (Math.abs(val) >= 1e6) return `$${(val / 1e6).toFixed(1)}M`;
-        if (Math.abs(val) >= 1e3) return `$${(val / 1e3).toFixed(0)}K`;
-        return `$${val.toFixed(0)}`;
-      case 'percentage':
-        return `${val.toFixed(1)}%`;
-      case 'scientific':
-        return val.toExponential(2);
-      default:
-        if (Math.abs(val) >= 1e6) return `${(val / 1e6).toFixed(1)}M`;
-        if (Math.abs(val) >= 1e3) return `${(val / 1e3).toFixed(1)}K`;
-        return val.toLocaleString(undefined, { maximumFractionDigits: 1 });
+    // Highest LOS group
+    const groupCol = COL.ctas || COL.ageGroup || COL.popCat;
+    let highestLOSGroup = '—';
+    if (groupCol) {
+      const gm: Record<string,number[]> = {};
+      filtered.forEach(r => {
+        const g = String(r[groupCol]??'Unknown');
+        const v = Number(r[COL.los]??0);
+        if (!gm[g]) gm[g] = [];
+        if (!isNaN(v) && v>0) gm[g].push(v);
+      });
+      const best = Object.entries(gm).sort((a,b)=>calcMedian(b[1])-calcMedian(a[1]))[0];
+      if (best) highestLOSGroup = best[0];
     }
-  };
 
-  // Unified Y Axis options generator
-  const renderYAxisProps = (chartId: string) => {
-    const s = axisSettings[chartId] || {};
-    const scaleType = s.yScaleType || 'linear';
-    
-    // Nice numbers bounds calculations
-    const domain = s.customMin !== undefined && s.customMin !== '' && s.customMax !== undefined && s.customMax !== ''
-      ? [Number(s.customMin), Number(s.customMax)]
-      : ['auto', 'auto'];
-
-    return {
-      scale: scaleType === 'logarithmic' ? 'log' : 'auto',
-      domain: (scaleType === 'logarithmic' ? [1, 'auto'] : domain) as any,
-      tickFormatter: (v: any) => formatYValue(v, scaleType),
-      stroke: isDarkMode ? '#94a3b8' : '#475569',
-      fontSize: 9
-    } as any;
-  };
-
-  // Unified X Axis rendering options helper
-  const renderXAxisProps = (chartId: string, dataKey: string) => {
-    const s = axisSettings[chartId] || {};
-    const rot = s.labelRotation !== undefined ? s.labelRotation : 0;
-    return {
-      dataKey,
-      stroke: isDarkMode ? '#94a3b8' : '#475569',
-      fontSize: 8,
-      angle: rot,
-      textAnchor: (rot !== 0 ? 'start' : 'middle') as 'start' | 'middle',
-      height: rot !== 0 ? 50 : 30,
-      tickLine: true,
-      axisLine: true,
-    };
-  };
-
-  // Unified Aggregate calculator for series charts
-  const aggregateMetric = (values: number[], method: AggregationOption = 'Sum'): number => {
-    if (values.length === 0) return 0;
-    switch (method) {
-      case 'Average':
-        return stdMean(values);
-      case 'Median':
-        return getMedian(values);
-      case 'Count':
-        return values.length;
-      case 'Min':
-        return Math.min(...values);
-      case 'Max':
-        return Math.max(...values);
-      default: // Sum
-        return values.reduce((sum, curr) => sum + curr, 0);
-    }
-  };
-
-  // ==========================================
-  // ROW 1: EXECUTIVE KPI METRICS CALCULATIONS
-  // ==========================================
-  const kpisData = useMemo(() => {
-    const list: Array<{ 
-      title: string; 
-      value: string; 
-      growth: number; 
-      target: string; 
-      forecast: string; 
-      benchmark: string;
-      status: 'Excellent' | 'Good' | 'On Track' | 'Warning';
-      sparkData: Array<{ val: number }> 
-    }> = [];
-
-    const isClinical = filteredData.some(r => r["Length of Stay (Hours)"] !== undefined);
-
-    if (isClinical) {
-      // Clinical KPIs for Capstone Portfolio
-      const totalVisits = filteredData.length;
-      const sparkVisits = Array.from({ length: 6 }).map((_, i) => ({
-        val: filteredData.slice(i * Math.max(1, Math.floor(totalVisits / 6)), (i + 1) * Math.max(1, Math.floor(totalVisits / 6))).length
-      }));
-      list.push({
-        title: "TOTAL ED VISITS",
-        value: totalVisits.toLocaleString(),
-        growth: 4.8,
-        target: `${data.length} visits`,
-        forecast: Math.round(totalVisits * 1.05).toString(),
-        benchmark: `${Math.round(data.length * 0.95)}`,
-        status: totalVisits >= 12 ? 'Excellent' : 'Warning',
-        sparkData: sparkVisits
-      });
-
-      const losVals = getNumericValues(filteredData, "Length of Stay (Hours)");
-      const avgLOS = stdMean(losVals);
-      const sparkLOS = Array.from({ length: 6 }).map((_, i) => ({
-        val: stdMean(losVals.slice(i * Math.max(1, Math.floor(losVals.length / 6)), (i + 1) * Math.max(1, Math.floor(losVals.length / 6))))
-      }));
-      list.push({
-        title: "AVERAGE LENGTH OF STAY",
-        value: `${avgLOS.toFixed(1)} Hours`,
-        growth: avgLOS <= 6.0 ? -3.2 : 2.1,
-        target: "5.5 Hours",
-        forecast: `${(avgLOS * 0.95).toFixed(1)} Hours`,
-        benchmark: "6.2 Hours",
-        status: avgLOS <= 6.5 ? 'Excellent' : 'Warning',
-        sparkData: sparkLOS
-      });
-
-      const medianLOS = getMedian(losVals);
-      const sparkMedian = Array.from({ length: 6 }).map((_, i) => ({
-        val: getMedian(losVals.slice(i * Math.max(1, Math.floor(losVals.length / 6)), (i + 1) * Math.max(1, Math.floor(losVals.length / 6))))
-      }));
-      list.push({
-        title: "MEDIAN LENGTH OF STAY",
-        value: `${medianLOS.toFixed(1)} Hours`,
-        growth: medianLOS <= 5.0 ? -2.5 : 1.4,
-        target: "5.0 Hours",
-        forecast: `${(medianLOS * 0.96).toFixed(1)} Hours`,
-        benchmark: "5.5 Hours",
-        status: 'On Track',
-        sparkData: sparkMedian
-      });
-
-      const temVals = getNumericValues(filteredData, "Total ED Minutes");
-      const totalTEM = temVals.reduce((a, b) => a + b, 0);
-      const sparkTEM = Array.from({ length: 6 }).map((_, i) => ({
-        val: temVals.slice(i * Math.max(1, Math.floor(temVals.length / 6)), (i + 1) * Math.max(1, Math.floor(temVals.length / 6))).reduce((a, b) => a + b, 0)
-      }));
-      list.push({
-        title: "TOTAL ED MINUTES",
-        value: `${totalTEM.toLocaleString()} Min`,
-        growth: 1.8,
-        target: `${(data.length * 300).toLocaleString()} Min`,
-        forecast: `${Math.round(totalTEM * 1.03).toLocaleString()} Min`,
-        benchmark: `${Math.round(data.length * 330).toLocaleString()} Min`,
-        status: 'Good',
-        sparkData: sparkTEM
-      });
-
-      const ruiVals = getNumericValues(filteredData, "Resource Utilization Index");
-      const avgRUI = stdMean(ruiVals);
-      const sparkRUI = Array.from({ length: 6 }).map((_, i) => ({
-        val: stdMean(ruiVals.slice(i * Math.max(1, Math.floor(ruiVals.length / 6)), (i + 1) * Math.max(1, Math.floor(ruiVals.length / 6))))
-      }));
-      list.push({
-        title: "RESOURCE UTILIZATION INDEX",
-        value: avgRUI.toFixed(2),
-        growth: -1.8,
-        target: "1.80",
-        forecast: (avgRUI * 0.98).toFixed(2),
-        benchmark: "1.95",
-        status: avgRUI <= 2.0 ? 'Excellent' : 'Warning',
-        sparkData: sparkRUI
-      });
-
-    } else {
-      // Fallback mapping for other raw sources
-      const revCol = mapping.revenue || fields.find(f => f.type === 'numeric')?.name;
-      const profCol = mapping.profit;
-      const volCol = mapping.quantity || fields.find(f => f.type === 'numeric' && f.name !== revCol)?.name;
-
-      if (revCol) {
-        const v = getNumericValues(filteredData, revCol);
-        const totalSum = v.reduce((a, b) => a + b, 0);
-        const targetVal = totalSum * 0.88;
-        const pctGrowth = 14.2;
-        const step = Math.max(1, Math.floor(v.length / 6));
-        const sparkData = Array.from({ length: 6 }).map((_, i) => ({
-          val: v.slice(i * step, (i + 1) * step).reduce((sum, curr) => sum + curr, 0)
-        }));
-
-        list.push({
-          title: `GROSS SALES (${revCol})`,
-          value: formatYValue(totalSum, 'currency'),
-          growth: pctGrowth,
-          target: formatYValue(targetVal, 'currency'),
-          forecast: formatYValue(totalSum * 1.08, 'currency'),
-          benchmark: formatYValue(totalSum * 0.95, 'currency'),
-          status: totalSum >= targetVal ? 'Excellent' : 'Warning',
-          sparkData
-        });
-      }
-
-      if (profCol) {
-        const pVals = getNumericValues(filteredData, profCol);
-        const avgProfit = stdMean(pVals);
-        const targetVal = 18.5;
-        const step = Math.max(1, Math.floor(pVals.length / 6));
-        const sparkData = Array.from({ length: 6 }).map((_, i) => ({
-          val: stdMean(pVals.slice(i * step, (i + 1) * step))
-        }));
-
-        list.push({
-          title: `OPERATING METRIC (${profCol})`,
-          value: avgProfit > 100 ? `$${avgProfit.toFixed(0)}` : `${avgProfit.toFixed(1)}%`,
-          growth: avgProfit > targetVal ? 5.8 : -2.3,
-          target: `${targetVal}%`,
-          forecast: avgProfit > 50 ? `$${(avgProfit * 1.05).toFixed(0)}` : `${(avgProfit * 1.04).toFixed(1)}%`,
-          benchmark: '15.0%',
-          status: avgProfit >= targetVal ? 'On Track' : 'Warning',
-          sparkData
-        });
-      }
-
-      const v = getNumericValues(filteredData, volCol || '');
-      const countsVal = filteredData.length;
-      const sparkData = Array.from({ length: 6 }).map((_, i) => ({
-        val: filteredData.slice(i * Math.max(1, Math.floor(countsVal / 6)), (i + 1) * Math.max(1, Math.floor(countsVal / 6))).length
-      }));
-
-      list.push({
-        title: 'PIPELINE RECORD VOLUME',
-        value: countsVal.toLocaleString(),
-        growth: parseFloat(((filteredData.length / Math.max(1, data.length)) * 100).toFixed(1)),
-        target: data.length.toLocaleString(),
-        forecast: (countsVal * 1.1).toFixed(0),
-        benchmark: (data.length * 0.9).toFixed(0),
-        status: countsVal > data.length * 0.5 ? 'Good' : 'Warning',
-        sparkData
+    // Highest resource burden (ERBI)
+    const urgMap: Record<string,number> = {'1':5,'2':4,'3':3,'4':2,'5':1};
+    const bMap: Record<string,number> = {};
+    if (COL.ctas) {
+      filtered.forEach(r => {
+        const lvl = String(r[COL.ctas]??'').replace(/[^0-9]/g,'') || '3';
+        const urg = urgMap[lvl]??3;
+        const lo  = Number(r[COL.los]??0);
+        const v   = Number(r[COL.visits]??1);
+        const key = String(r[COL.ctas]??'');
+        bMap[key] = (bMap[key]??0) + urg*lo*v;
       });
     }
+    const bestBurden = Object.entries(bMap).sort((a,b)=>b[1]-a[1])[0];
+    const maxBurdenGroup = bestBurden ? bestBurden[0] : '—';
 
-    return list;
-  }, [filteredData, data, fields, mapping]);
+    const keyFinding = medLOS > 6
+      ? `Median LOS ${medLOS.toFixed(1)}h exceeds 6h CIHI benchmark`
+      : medLOS > 0
+        ? `Median LOS ${medLOS.toFixed(1)}h is within the CIHI 6h target`
+        : 'Load a clinical dataset to view insights';
 
-  // ==========================================
-  // ROW 2: TREND ANALYSIS (LINE / FORECAST / MA)
-  // ==========================================
-  const trendChartData = useMemo(() => {
-    const dateCol = mapping.date || fields.find(f => f.type === 'date')?.name;
-    const revCol = mapping.revenue || fields.find(f => f.type === 'numeric')?.name;
-    if (!revCol) return [];
+    return { totalVisits, medLOS, highestLOSGroup, maxBurdenGroup, keyFinding };
+  }, [filtered, COL]);
 
-    const timelineMap: Record<string, number[]> = {};
-    filteredData.forEach(row => {
-      let tVal = dateCol ? String(row[dateCol] || '') : 'Q1-2026';
-      if (tVal.includes('T')) {
-        tVal = tVal.split('T')[0]; // clean datetime stamps
-      }
-      if (!timelineMap[tVal]) timelineMap[tVal] = [];
-      timelineMap[tVal].push(Number(row[revCol]) || 0);
-    });
+  // ── descriptive stats ─────────────────────────────────────────────────────────
+  const descStats = useMemo(() =>
+    numCols.slice(0,5).map(col => {
+      const v = toNums(filtered, col).sort((a,b)=>a-b);
+      const m = calcMean(v);
+      const med = calcMedian(v);
+      const sd  = calcStddev(v, m);
+      const q1  = v[Math.floor(v.length*0.25)]??0;
+      const q3  = v[Math.floor(v.length*0.75)]??0;
+      return { col, n:v.length, mean:m, median:med, stddev:sd,
+               min:v[0]??0, max:v[v.length-1]??0, q1, q3,
+               iqr:q3-q1, skew: sd>0 ? ((m-med)/sd)*3 : 0 };
+    }), [filtered, numCols]);
 
-    // Group sums chronologically
-    const sortedTimeline = Object.entries(timelineMap).map(([date, arr]) => {
-      const sumValue = arr.reduce((a, b) => a + b, 0);
-      return {
-        date,
-        value: parseFloat(sumValue.toFixed(1))
-      };
-    }).sort((a, b) => a.date.localeCompare(b.date));
+  // ── common chart props ────────────────────────────────────────────────────────
+  const chartCommon = { filtered, data, colors, dark, catCols, numCols };
 
-    // Calculate moving averages and anomalies
-    const s = axisSettings['trend-analysis-card'] || {};
-    const maWindow = s.movingAveragePeriods || 0;
-    const meanVal = stdMean(sortedTimeline.map(d => d.value));
-    const stdDevVal = getStdDev(sortedTimeline.map(d => d.value), meanVal);
-
-    let plotted = sortedTimeline.map((item, idx) => {
-      let ma: number | null = null;
-      if (maWindow > 0 && idx >= maWindow - 1) {
-        const windowValues = sortedTimeline.slice(idx - maWindow + 1, idx + 1).map(d => d.value);
-        ma = parseFloat(stdMean(windowValues).toFixed(1));
-      }
-
-      // Outlier is >1.5 StdDevs from historic mean
-      const isAnomaly = stdDevVal > 0 && Math.abs(item.value - meanVal) > 1.5 * stdDevVal;
-
-      return {
-        ...item,
-        movingAverage: ma,
-        isAnomaly,
-        anomalyValue: isAnomaly ? item.value : null
-      };
-    });
-
-    // Simple forecasting overlay (extrapolate 3 steps ahead)
-    if (s.showForecast && plotted.length > 2) {
-      const n = plotted.length;
-      const lastX = n - 1;
-      const lastItem = plotted[lastX];
-      const slope = (lastItem.value - plotted[0].value) / n; // dynamic direction
-
-      const forecastPoints = Array.from({ length: 3 }).map((_, fIdx) => {
-        const projDate = `Proj Month +${fIdx + 1}`;
-        const projVal = Math.max(0, lastItem.value + slope * (fIdx + 1));
-        return {
-          date: projDate,
-          value: null,
-          forecast: parseFloat(projVal.toFixed(1)),
-          movingAverage: null,
-          isAnomaly: false,
-          anomalyValue: null
-        };
-      });
-
-      // Stitch matching end point
-      plotted[n - 1] = {
-        ...plotted[n - 1],
-        forecast: plotted[n - 1].value
-      } as any;
-
-      plotted = [...plotted, ...forecastPoints] as any;
-    }
-
-    return plotted;
-  }, [filteredData, fields, mapping, axisSettings]);
-
-  // ==========================================
-  // ROW 3: CATEGORICAL ANALYSIS (BAR & DONUT DRILL DOWN)
-  // ==========================================
-  const categoricalData = useMemo(() => {
-    const catCol = drillLevel === 0 ? (mapping.region || fields[0]?.name) : (mapping.category || fields[1]?.name);
-    const measureCol = mapping.revenue || fields.find(f => f.type === 'numeric')?.name;
-    if (!catCol || !measureCol) return { barPlotted: [], donutPlotted: [], cardinality: 0 };
-
-    const map: Record<string, number[]> = {};
-    filteredData.forEach(row => {
-      const key = String(row[catCol] !== null && row[catCol] !== undefined ? row[catCol] : 'Other');
-      if (!map[key]) map[key] = [];
-      map[key].push(Number(row[measureCol]) || 0);
-    });
-
-    // Compile aggregates
-    let aggregates = Object.entries(map).map(([name, list]) => {
-      const sum = list.reduce((a, b) => a + b, 0);
-      return {
-        name,
-        value: parseFloat(sum.toFixed(1)),
-        count: list.length
-      };
-    });
-
-    const s = axisSettings['category-analysis-card'] || {};
-    const limit = s.groupOthersLimit || 6;
-
-    // Auto sort descending
-    aggregates.sort((a, b) => b.value - a.value);
-
-    // Group small items into "Others" to maintain legibility
-    let barPlotted = [...aggregates];
-    if (aggregates.length > limit) {
-      const topSlice = aggregates.slice(0, limit - 1);
-      const minorSlice = aggregates.slice(limit - 1);
-      const minorSum = minorSlice.reduce((sum, item) => sum + item.value, 0);
-      const minorCount = minorSlice.reduce((sum, item) => sum + item.count, 0);
-      
-      barPlotted = [
-        ...topSlice,
-        {
-          name: 'Other (Grouped)',
-          value: parseFloat(minorSum.toFixed(1)),
-          count: minorCount
-        }
-      ];
-    }
-
-    const grandTotal = aggregates.reduce((a, b) => a + b.value, 0);
-
-    return {
-      barPlotted,
-      donutPlotted: barPlotted.map(item => ({
-        ...item,
-        percentage: grandTotal > 0 ? parseFloat(((item.value / grandTotal) * 100).toFixed(1)) : 0
-      })),
-      cardinality: aggregates.length,
-      grandTotal
-    };
-
-  }, [filteredData, fields, mapping, drillLevel, axisSettings]);
-
-  // ==========================================
-  // ROW 4: DISTRIBUTION ANALYSIS (HISTOGRAM)
-  // ==========================================
-  const distributionData = useMemo(() => {
-    const revCol = mapping.revenue || fields.find(f => f.type === 'numeric')?.name;
-    if (!revCol) return { bins: [], skewness: 0, stdDev: 0, mean: 0 };
-
-    const vals = getNumericValues(filteredData, revCol);
-    if (vals.length < 3) return { bins: [], skewness: 0, stdDev: 0, mean: 0 };
-
-    const n = vals.length;
-    const sorted = [...vals].sort((a, b) => a - b);
-    const min = sorted[0];
-    const max = sorted[sorted.length - 1];
-    const range = max - min;
-
-    const mean = stdMean(vals);
-    const stdDev = getStdDev(vals, mean);
-    const skewness = getSkewness(vals, mean, stdDev);
-
-    const s = axisSettings['distribution-analysis-card'] || {};
-    const rule = s.binningRule || 'sturges';
-    
-    let k = 5; // default bins count
-    if (rule === 'sturges') {
-      k = Math.ceil(Math.log2(n) + 1);
-    } else if (rule === 'scott') {
-      const hVal = (3.49 * stdDev) / Math.pow(n, 1/3);
-      k = hVal > 0 ? Math.ceil(range / hVal) : 5;
-    } else if (rule === 'freedman') {
-      const iqr = getIQR(sorted);
-      const hVal = (2 * iqr) / Math.pow(n, 1/3);
-      k = hVal > 0 ? Math.ceil(range / hVal) : 5;
-    }
-
-    k = Math.max(3, Math.min(k, 15)); // constrain steps between 3 and 15
-    const binWidth = range / k;
-    const bins: any[] = [];
-
-    for (let b = 0; b < k; b++) {
-      const binMin = min + b * binWidth;
-      const binMax = binMin + binWidth;
-      const count = vals.filter(v => v >= binMin && (b === k - 1 ? v <= binMax : v < binMax)).length;
-      
-      // Calculate normal curve overlay density for the mid point
-      const midPoint = binMin + binWidth / 2;
-      let normalDensity = 0;
-      if (stdDev > 0) {
-        normalDensity = (1 / (stdDev * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * Math.pow((midPoint - mean) / stdDev, 2));
-        // Scaling factor to fit frequency domain visually
-        normalDensity = normalDensity * n * binWidth;
-      }
-
-      bins.push({
-        range: `${formatYValue(binMin, 'currency')}-${formatYValue(binMax, 'currency')}`,
-        frequency: count,
-        density: parseFloat(normalDensity.toFixed(1))
-      });
-    }
-
-    return {
-      bins,
-      skewness,
-      stdDev,
-      mean
-    };
-
-  }, [filteredData, fields, mapping, axisSettings]);
-
-  function getIQR(values: number[]): number {
-    if (values.length < 4) return 0;
-    const sorted = [...values].sort((a, b) => a - b);
-    const q1 = sorted[Math.floor(sorted.length * 0.25)];
-    const q3 = sorted[Math.floor(sorted.length * 0.75)];
-    return q3 - q1;
-  }
-
-  // ==========================================
-  // ROW 5: CORRELATION INTERACTIVE SCATTER PLOT
-  // ==========================================
-  const correlationData = useMemo(() => {
-    const xCol = mapping.revenue || fields.find(f => f.type === 'numeric')?.name;
-    const yCol = mapping.profit || fields.find(f => f.type === 'numeric' && f.name !== xCol)?.name || fields[0]?.name;
-    const sizeCol = mapping.quantity || fields.find(f => f.type === 'numeric' && f.name !== xCol && f.name !== yCol)?.name;
-
-    if (!xCol || !yCol) return { scatter: [], r2: 0, equation: '', correlation: 0 };
-
-    const scatterPoints = filteredData.map(row => {
-      const xVal = Number(row[xCol]) || 0;
-      const yVal = Number(row[yCol]) || 0;
-      const zVal = sizeCol ? Number(row[sizeCol]) || 5 : 5;
-      const category = mapping.region ? String(row[mapping.region] || 'General') : 'General';
-
-      return {
-        x: xVal,
-        y: yVal,
-        z: zVal,
-        category,
-        label: mapping.category ? String(row[mapping.category] || '') : ''
-      };
-    }).filter(p => p.x > 0 && p.y > 0).slice(0, 45); // top 45 nodes performance boundary
-
-    // Perform linear regression calculations
-    const regression = calculateRegressionLine(scatterPoints);
-
-    // Calculate Pearson Correlation
-    const xs = scatterPoints.map(p => p.x);
-    const ys = scatterPoints.map(p => p.y);
-    const meanX = stdMean(xs);
-    const meanY = stdMean(ys);
-    const num = scatterPoints.reduce((sum, s) => sum + (s.x - meanX) * (s.y - meanY), 0);
-    const den = Math.sqrt(
-      scatterPoints.reduce((sum, s) => sum + Math.pow(s.x - meanX, 2), 0) *
-      scatterPoints.reduce((sum, s) => sum + Math.pow(s.y - meanY, 2), 0)
-    );
-    const pearson = den === 0 ? 0 : num / den;
-
-    return {
-      scatter: scatterPoints,
-      r2: regression.r2,
-      equation: `Y = ${regression.slope.toFixed(2)}x + ${regression.intercept.toFixed(1)}`,
-      correlation: pearson,
-      regPoints: regression.points,
-      xLabel: xCol,
-      yLabel: yCol,
-      zLabel: sizeCol || ''
-    };
-
-  }, [filteredData, fields, mapping]);
-
-  function calculateRegressionLine(points: Array<{ x: number, y: number }>) {
-    const n = points.length;
-    if (n < 2) return { points: [], r2: 0, slope: 0, intercept: 0 };
-    const sumX = points.reduce((acc, p) => acc + p.x, 0);
-    const sumY = points.reduce((acc, p) => acc + p.y, 0);
-    const sumXY = points.reduce((acc, p) => acc + (p.x * p.y), 0);
-    const sumX2 = points.reduce((acc, p) => acc + (p.x * p.x), 0);
-
-    const meanX = sumX / n;
-    const meanY = sumY / n;
-
-    const slopeNumerator = n * sumXY - sumX * sumY;
-    const slopeDenominator = n * sumX2 - sumX * sumX;
-    if (slopeDenominator === 0) return { points: [], r2: 0, slope: 0, intercept: 0 };
-
-    const slope = slopeNumerator / slopeDenominator;
-    const intercept = meanY - slope * meanX;
-
-    const resSumSq = points.reduce((acc, p) => acc + Math.pow(p.y - (slope * p.x + intercept), 2), 0);
-    const totalSumSq = points.reduce((acc, p) => acc + Math.pow(p.y - meanY, 2), 0);
-    const r2 = totalSumSq === 0 ? 0 : 1 - (resSumSq / totalSumSq);
-
-    const xs = points.map(p => p.x);
-    const minX = Math.min(...xs);
-    const maxX = Math.max(...xs);
-
-    return {
-      points: [
-        { x: minX, y: parseFloat((slope * minX + intercept).toFixed(1)) },
-        { x: maxX, y: parseFloat((slope * maxX + intercept).toFixed(1)) }
-      ],
-      r2,
-      slope,
-      intercept
-    };
-  }
-
-  // Matrix Heatmap calculations
-  const heatmapData = useMemo(() => {
-    const xKey = mapping.region || fields[0]?.name;
-    const yKey = mapping.category || fields[1]?.name;
-    const valKey = mapping.revenue || fields.find(f => f.type === 'numeric')?.name;
-
-    if (!xKey || !yKey || !valKey) return { cells: [], xLabels: [], yLabels: [] };
-
-    const xSet = new Set<string>();
-    const ySet = new Set<string>();
-    const mappingStore: Record<string, Record<string, number[]>> = {};
-
-    filteredData.slice(0, 100).forEach(row => {
-      const xVal = String(row[xKey] || 'Other');
-      const yVal = String(row[yKey] || 'Standard');
-      xSet.add(xVal);
-      ySet.add(yVal);
-
-      if (!mappingStore[xVal]) mappingStore[xVal] = {};
-      if (!mappingStore[xVal][yVal]) mappingStore[xVal][yVal] = [];
-      mappingStore[xVal][yVal].push(Number(row[valKey]) || 0);
-    });
-
-    const xLabels = Array.from(xSet).slice(0, 5); // limit columns
-    const yLabels = Array.from(ySet).slice(0, 5); // limit rows
-    const cells: any[] = [];
-
-    let maxVal = 0;
-    xLabels.forEach(x => {
-      yLabels.forEach(y => {
-        const arr = mappingStore[x]?.[y] || [];
-        const sum = arr.reduce((a, b) => a + b, 0);
-        if (sum > maxVal) maxVal = sum;
-        cells.push({ x, y, value: sum });
-      });
-    });
-
-    return {
-      cells: cells.map(c => ({
-        ...c,
-        intensity: maxVal > 0 ? c.value / maxVal : 0
-      })),
-      xLabels,
-      yLabels
-    };
-  }, [filteredData, fields, mapping]);
-
-  // ==========================================
-  // ROW 6: AI VISUAL AESTHETIC QUALITY CHECKER
-  // ==========================================
-  const visualQualityReport = useMemo(() => {
-    let score = 96;
-    const appliedFixes: string[] = [];
-
-    // 1. Core checks
-    if (categoricalData.cardinality > 6) {
-      score -= 5;
-      appliedFixes.push("Pie segments count (cardinality > 6) binned dynamically to 'Other' to prevent clutter");
-    }
-    if (trendChartData.length > 20) {
-      appliedFixes.push("Enabled responsive brush slider below trend series to manage viewport density");
-    } else {
-      appliedFixes.push("Calibrated responsive ticks on sequential date domains to prevent label collisions");
-    }
-
-    return {
-      score,
-      integrity: score >= 90 ? 'Excellent (AAA Grade)' : 'Optimal (A Grade)',
-      appliedFixes
-    };
-  }, [categoricalData, trendChartData]);
-
-  // Handle addition of Custom Visualizations
-  const handleAddNewDashboardChart = () => {
-    if (!newTitle.trim() || !newXAxis || !newYAxis) return;
-    onAddChart({
-      id: `custom-viz-${Date.now()}`,
-      title: newTitle,
-      type: newType,
-      xAxisColumn: newXAxis,
-      yAxisColumn: newYAxis,
-      aggregation: newAggregation
-    });
-
-    setBuilderModalOpen(false);
-    setNewTitle('Operating Margin Index');
+  // ── slot title helper ─────────────────────────────────────────────────────────
+  const slotTitle = (cfg: ChartCfg, fallback: string) => {
+    if (cfg.xCol && cfg.yCol)
+      return `${cfg.yCol} by ${cfg.xCol}`;
+    return fallback;
   };
 
-  const calculateCustomChartData = (chart: CustomVisualization) => {
-    const s = axisSettings[chart.id] || {};
-    const xAxisCol = s.xAxisColumn || chart.xAxisColumn;
-    const yAxisCol = s.yAxisColumn || chart.yAxisColumn;
-    const aggType = s.aggregation || chart.aggregation;
-
-    const grouped: Record<string, number[]> = {};
-    filteredData.forEach(row => {
-      const xKey = String(row[xAxisCol] !== null && row[xAxisCol] !== undefined ? row[xAxisCol] : 'Missing');
-      const yVal = Number(row[yAxisCol]) || 0;
-      if (!grouped[xKey]) grouped[xKey] = [];
-      grouped[xKey].push(yVal);
-    });
-
-    return Object.entries(grouped).map(([name, list]) => {
-      return { 
-        name, 
-        value: parseFloat(aggregateMetric(list, aggType).toFixed(1)) 
-      };
-    }).sort((a,b) => b.value - a.value).slice(0, 8);
-  };
-
-  // High Resolution ZIP Downloader of all widgets
-  const handleExportDashboardZIP = async () => {
-    const zip = new (await import('jszip')).default();
-    const componentsList = [
-      { id: 'trend-analysis-card', name: 'trend_analysis_timeline.png' },
-      { id: 'category-analysis-card', name: 'categorical_bar_donut_split.png' },
-      { id: 'distribution-analysis-card', name: 'histogram_density_profile.png' },
-      { id: 'correlation-analysis-card', name: 'pearson_scatter_grid.png' }
-    ];
-
-    const toast = document.createElement('div');
-    toast.className = 'fixed bottom-5 right-5 bg-indigo-700 text-white px-5 py-3 rounded-lg text-xs font-bold font-mono shadow-lg z-50 animate-bounce flex items-center gap-2 select-none border border-indigo-500';
-    toast.innerHTML = '⏳ Building report ZIP architecture. Encapsulating visuals...';
-    document.body.appendChild(toast);
-
-    try {
-      for (const item of componentsList) {
-        const el = document.getElementById(item.id);
-        if (el) {
-          await new Promise(r => setTimeout(r, 120));
-          const urlString = await toPng(el, { backgroundColor: isDarkMode ? '#0f172a' : '#ffffff', quality: 0.98 });
-          zip.file(item.name, urlString.split(',')[1], { base64: true });
-        }
-      }
-      const dataBlob = await zip.generateAsync({ type: 'blob' });
-      const downloadLink = document.createElement('a');
-      downloadLink.href = URL.createObjectURL(dataBlob);
-      downloadLink.download = `DataPilot_Executive_Pack_${Date.now()}.zip`;
-      downloadLink.click();
-    } catch (err) {
-      toast.className = 'fixed bottom-5 right-5 bg-rose-700 text-white px-5 py-3 rounded-lg text-xs font-bold font-mono shadow-lg z-50 flex items-center gap-2 select-none border border-rose-500';
-      toast.innerHTML = "❌ ZIP assembly failed: " + (err as Error).message;
-      await new Promise(r => setTimeout(r, 4000));
-    } finally {
-      if (toast.parentNode) {
-        document.body.removeChild(toast);
-      }
-    }
-  };
-
-  const clearFilters = () => {
-    setSelectedRegions([]);
-    setSelectedCategories([]);
-    setCrossFilterField(null);
-    setCrossFilterValue(null);
-    setDrillLevel(0);
-    setDrillParentName(null);
-  };
-
+  // ═══════════════════════════════════════════════════════════════════════════
   return (
-    <div className={`space-y-8 select-none ${isDarkMode ? 'bg-[#0C1524] text-slate-100 p-8 rounded-3xl border border-[#1e2d4a] shadow-2xl' : 'text-slate-800'}`} key={refreshKey} id="executive-dashboard-workspace">
-      
-      {/* HEADER SECTION CONTROLS */}
-      <div className={`border rounded-2xl p-6 flex flex-col xl:flex-row items-start xl:items-center justify-between gap-6 shadow-xs transition-colors ${isDarkMode ? 'border-[#1e2d4a] bg-[#131f37]' : 'border-[#E5E7EB] bg-white'}`} id="dashboard-header-block">
-        <div className="text-left">
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded bg-[#0F4C81]/10 border border-[#0F4C81]/20 text-[9px] text-[#0F4C81] dark:text-[#3B82F6] font-bold font-mono tracking-wide uppercase">
-              BI CORE 4.0 ACTIVE
+    <div
+      className={`space-y-6 p-6 rounded-3xl select-none
+        ${dark?'bg-[#0C1524] text-slate-100':'bg-slate-50 text-slate-800'}`}
+      id="executive-dashboard-root"
+      onClick={() => setOpenDrop(null)}>
+
+      {/* ══ 1. TITLE BANNER ══════════════════════════════════════════════════ */}
+      <div className={`rounded-2xl border shadow-sm overflow-hidden
+        ${dark?'bg-[#131f37] border-[#1e2d4a]':'bg-white border-slate-200'}`}>
+        {/* gradient accent bar */}
+        <div className="h-1 w-full bg-gradient-to-r from-[#0F4C81] via-[#118d95] to-[#2E8B57]"/>
+        <div className="p-6 text-center">
+          {/* badges row */}
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <span className={`text-[9px] font-bold font-mono uppercase tracking-widest px-2.5 py-1 rounded border
+              ${dark?'bg-[#0F4C81]/20 border-[#0F4C81]/40 text-[#3B82F6]'
+                    :'bg-[#0F4C81]/10 border-[#0F4C81]/20 text-[#0F4C81]'}`}>
+              DAMO-6994 ▸ CAPSTONE
             </span>
-            <span className="text-xs text-slate-400 font-mono tracking-tight truncate max-w-[200px]">{datasetName}</span>
+            <span className="text-[9px] font-mono text-slate-400 truncate max-w-[240px]">{datasetName}</span>
+            <div className={`flex items-center gap-1 text-[10px] font-mono ${dark?'text-emerald-400':'text-emerald-600'}`}>
+              <Activity size={11} className="animate-pulse"/><span>Live</span>
+            </div>
           </div>
-          <h2 className={`text-2xl font-bold tracking-tight mt-1.5 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
-            Power BI Enterprise Dashboard
-          </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 font-light mt-0.5">
-            Institutional quality executive visualization matrix packed with advanced linear stats, dynamic slicer bounds, and cross-filtration.
+          {/* main title */}
+          <h1 className={`text-2xl font-extrabold tracking-tight ${dark?'text-white':'text-slate-900'}`}>
+            Emergency Department Analytics
+          </h1>
+          <p className={`text-sm mt-1 font-light ${dark?'text-slate-400':'text-slate-500'}`}>
+            Operational &amp; Clinical Modelling of ED Wait Times — University of Niagara Falls
           </p>
-        </div>
-
-        {/* CONTROLS ROW */}
-        <div className="flex items-center flex-wrap gap-3 w-full xl:w-auto">
-          
-          {/* Theme Selector */}
-          <button
-            onClick={() => setIsDarkMode && setIsDarkMode(!isDarkMode)}
-            className={`flex items-center gap-1.5 px-3 py-2 border rounded-lg text-xs font-semibold cursor-pointer shadow-xs transition-all ${isDarkMode ? 'border-[#1e2d4a] bg-[#182640] text-slate-200 hover:bg-slate-700' : 'border-[#E5E7EB] bg-white text-slate-800 hover:bg-slate-50'}`}
-          >
-            {isDarkMode ? <span className="text-amber-400">☀️ Light Mode</span> : <span className="text-[#0F4C81] font-bold">🌙 Dark Mode</span>}
-          </button>
-
-          {/* Palette Selector */}
-          <div className="flex items-center gap-1.5 border border-[#E5E7EB] dark:border-[#1e2d4a] p-1 rounded-lg bg-[#F7F9FC] dark:bg-[#182640]">
-            <Palette size={13} className="text-slate-400 ml-1" />
-            {(['powerbi', 'tableau', 'emerald', 'cobalt'] as const).map(p => (
-              <button
-                key={p}
-                onClick={() => setSelectedPalette(p)}
-                className={`px-2 py-1 rounded text-[10px] font-bold uppercase transition cursor-pointer ${selectedPalette === p ? 'bg-[#0F4C81] text-white shadow-xs' : 'text-slate-400 hover:text-slate-700 bg-transparent'}`}
-              >
-                {p}
-              </button>
+          {/* stats + controls row */}
+          <div className="flex items-center justify-center flex-wrap gap-3 mt-4">
+            {[
+              ['Filtered', fmtNum(filtered.length,0)],
+              ['Total',    fmtNum(data.length,0)],
+              ['Columns',  String(fields.length)],
+            ].map(([lbl,val]) => (
+              <span key={lbl} className={`text-[10px] px-2.5 py-1 rounded-lg border font-semibold
+                ${dark?'bg-[#182640] border-[#1e2d4a] text-slate-300':'bg-slate-50 border-slate-200 text-slate-600'}`}>
+                {lbl}: <strong>{val}</strong>
+              </span>
             ))}
-          </div>
-
-          {/* Multi-Select Region Slicer dropdown */}
-          {mapping.region && availableRegions.length > 0 && (
-            <div className="relative select-none" id="region-multi-filter">
-              <button
-                onClick={() => { setRegionDropdownOpen(prev => !prev); setCategoryDropdownOpen(false); }}
-                className={`flex items-center gap-1.5 px-3 py-2 border rounded-lg text-xs font-semibold cursor-pointer shadow-xs ${isDarkMode ? 'bg-[#182640] border-[#1e2d4a] text-slate-200 hover:bg-[#1c2c49]' : 'bg-white border-[#E5E7EB] text-slate-700 hover:bg-slate-50'}`}
-              >
-                <span>Territory ({selectedRegions.length === 0 ? 'All' : `${selectedRegions.length} items`}) ▾</span>
-              </button>
-              {regionDropdownOpen && (
-                <div className={`absolute left-0 mt-1.5 w-56 p-3 rounded-lg border shadow-lg z-50 text-xs flex flex-col gap-2 ${isDarkMode ? 'bg-[#131f37] border-[#1e2d4a] text-slate-100' : 'bg-white border-[#E5E7EB]'}`}>
-                  <div className="flex items-center justify-between border-b border-[#E5E7EB] dark:border-[#1e2d4a] pb-1">
-                    <span className="font-bold text-[9px] font-mono tracking-wider text-slate-400 uppercase">SLICER: TERRITORY</span>
-                    <button onClick={() => setSelectedRegions([])} className="text-[9px] text-[#0F4C81] dark:text-[#3B82F6] font-bold hover:underline">RESET</button>
-                  </div>
-                  <div className="max-h-40 overflow-y-auto space-y-1">
-                    {availableRegions.map(reg => {
-                      const active = selectedRegions.includes(reg);
-                      return (
-                        <label key={reg} className="flex items-center gap-2 cursor-pointer py-1 hover:bg-[#0F4C81]/10 rounded px-1 text-slate-700 dark:text-slate-300">
-                          <input 
-                            type="checkbox" 
-                            checked={active}
-                            onChange={() => setSelectedRegions(p => active ? p.filter(x => x !== reg) : [...p, reg])}
-                            className="rounded border-[#E5E7EB] text-[#0F4C81] w-3.5 h-3.5"
-                          />
-                          <span className="font-semibold text-[11px]">{reg}</span>
-                        </label>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Multi-Select Category Slicer dropdown */}
-          {mapping.category && availableCategories.length > 0 && (
-            <div className="relative select-none" id="category-multi-filter">
-              <button
-                onClick={() => { setCategoryDropdownOpen(prev => !prev); setRegionDropdownOpen(false); }}
-                className={`flex items-center gap-1.5 px-3 py-2 border rounded-lg text-xs font-semibold cursor-pointer shadow-xs ${isDarkMode ? 'bg-[#182640] border-[#1e2d4a] text-slate-200 hover:bg-[#1c2c49]' : 'bg-white border-[#E5E7EB] text-slate-700 hover:bg-slate-50'}`}
-              >
-                <span>Category ({selectedCategories.length === 0 ? 'All' : `${selectedCategories.length} items`}) ▾</span>
-              </button>
-              {categoryDropdownOpen && (
-                <div className={`absolute left-0 mt-1.5 w-56 p-3 rounded-lg border shadow-lg z-50 text-xs flex flex-col gap-2 ${isDarkMode ? 'bg-[#131f37] border-[#1e2d4a] text-slate-100' : 'bg-white border-[#E5E7EB]'}`}>
-                  <div className="flex items-center justify-between border-b border-[#E5E7EB] dark:border-[#1e2d4a] pb-1">
-                    <span className="font-bold text-[9px] font-mono tracking-wider text-slate-400 uppercase">SLICER: SEGMENT</span>
-                    <button onClick={() => setSelectedCategories([])} className="text-[9px] text-[#0F4C81] dark:text-[#3B82F6] font-bold hover:underline">RESET</button>
-                  </div>
-                  <div className="max-h-40 overflow-y-auto space-y-1">
-                    {availableCategories.map(cat => {
-                      const active = selectedCategories.includes(cat);
-                      return (
-                        <label key={cat} className="flex items-center gap-2 cursor-pointer py-1 hover:bg-[#0F4C81]/10 rounded px-1 text-slate-700 dark:text-slate-300">
-                          <input 
-                            type="checkbox" 
-                            checked={active}
-                            onChange={() => setSelectedCategories(p => active ? p.filter(x => x !== cat) : [...p, cat])}
-                            className="rounded border-[#E5E7EB] text-[#0F4C81] w-3.5 h-3.5"
-                          />
-                          <span className="font-semibold text-[11px]">{cat}</span>
-                        </label>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Preset Custom Bookmark Manager */}
-          <div className="relative select-none group flex items-center gap-1.5">
-            <Bookmark size={14} className="text-[#0F4C81] dark:text-[#3B82F6] ml-1" />
-            <select
-              onChange={(e) => {
-                const bm = bookmarks.find(b => b.id === e.target.value);
-                if (bm) applyBookmark(bm);
-              }}
-              className={`p-2 rounded-lg text-xs font-semibold border cursor-pointer select-none ${isDarkMode ? 'bg-[#182640] text-slate-100 border-[#1e2d4a]' : 'bg-white border-[#E5E7EB] text-slate-600'}`}
-            >
-              <option value="">-- Apply Bookmarks --</option>
-              {bookmarks.map(bm => <option key={bm.id} value={bm.id}>{bm.name}</option>)}
-            </select>
-          </div>
-
-          <button
-            onClick={() => setBuilderModalOpen(true)}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-[#0F4C81] hover:bg-[#0c3e6b] text-white rounded-lg text-xs font-bold cursor-pointer transition shadow-xs hover:shadow-md"
-          >
-            <PlusCircle size={14} /> Emit Visual
-          </button>
-
-          {(selectedRegions.length > 0 || selectedCategories.length > 0 || crossFilterField || drillLevel > 0) && (
-            <button
-              onClick={clearFilters}
-              className="px-3 py-2 text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 rounded-lg cursor-pointer hover:bg-rose-100 transition"
-            >
-              Clear Live Filters
+            <button onClick={() => setIsDarkMode&&setIsDarkMode(!dark)}
+              className={`px-3 py-1 rounded-lg border text-[11px] font-semibold cursor-pointer transition
+                ${dark?'bg-[#182640] border-[#1e2d4a] text-amber-300 hover:bg-[#1c2c49]'
+                     :'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'}`}>
+              {dark?'☀ Light':'🌙 Dark'}
             </button>
-          )}
-
-          <button
-            onClick={handleExportDashboardZIP}
-            id="export-trigger-btn"
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg font-bold text-xs text-[#0F4C81] bg-[#0F4C81]/10 hover:bg-[#0F4C81]/20 cursor-pointer shadow-xs transition-all border border-[#0F4C81]/20 dark:border-[#3B82F6]/20 dark:text-[#3B82F6]"
-          >
-            <FileDown size={14} /> Export Pack
-          </button>
+          </div>
         </div>
       </div>
 
-      {/* Dynamic Slicers Activity Bar */}
-      {crossFilterValue && (
-        <div className="bg-amber-50 text-amber-800 border border-amber-200 p-2 text-xs rounded-xl flex items-center justify-between font-mono font-bold uppercase tracking-wide">
-          <span>⚠️ Isolating records where dashboard element '{crossFilterField}' matches limit '{crossFilterValue}'</span>
-          <button onClick={() => { setCrossFilterField(null); setCrossFilterValue(null); }} className="hover:underline text-rose-700 cursor-pointer text-xs">Remove Isolation [X]</button>
+
+      {/* ══ 2. FILTER BAR ════════════════════════════════════════════════════ */}
+      <div
+        className={`rounded-2xl border px-4 py-3 shadow-sm
+          ${dark?'bg-[#131f37] border-[#1e2d4a]':'bg-white border-slate-200'}`}
+        onClick={e => e.stopPropagation()}>
+
+        <div className="flex items-center gap-3 flex-wrap">
+          {/* label */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            <Filter size={12} className={dark?'text-[#3B82F6]':'text-[#0F4C81]'}/>
+            <span className={`text-[10px] font-bold uppercase tracking-widest
+              ${dark?'text-slate-300':'text-slate-500'}`}>Filters</span>
+            {activeCount > 0 && (
+              <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full
+                ${dark?'bg-[#3B82F6]/20 text-[#3B82F6]':'bg-[#0F4C81]/10 text-[#0F4C81]'}`}>
+                {activeCount}
+              </span>
+            )}
+          </div>
+          {/* 6 filter pills — grow equally */}
+          <div className="flex flex-1 flex-wrap gap-2 min-w-0">
+            <MultiSelect id="fy"   label="Fiscal Year"         options={OPT_YEAR}  value={fYear} onChange={setFYear} dark={dark} openId={openDrop} setOpenId={setOpenDrop}/>
+            <MultiSelect id="sex"  label="Sex"                 options={OPT_SEX}   value={fSex}  onChange={setFSex}  dark={dark} openId={openDrop} setOpenId={setOpenDrop}/>
+            <MultiSelect id="age"  label="Age Group"           options={OPT_AGE}   value={fAge}  onChange={setFAge}  dark={dark} openId={openDrop} setOpenId={setOpenDrop}/>
+            <MultiSelect id="pop"  label="Population Category" options={OPT_POP}   value={fPop}  onChange={setFPop}  dark={dark} openId={openDrop} setOpenId={setOpenDrop}/>
+            <MultiSelect id="ctas" label="CTAS Level"          options={OPT_CTAS}  value={fCtas} onChange={setFCtas} dark={dark} openId={openDrop} setOpenId={setOpenDrop}/>
+            <MultiSelect id="disp" label="Visit Disposition"   options={OPT_DISP}  value={fDisp} onChange={setFDisp} dark={dark} openId={openDrop} setOpenId={setOpenDrop}/>
+          </div>
+          {/* clear */}
+          {activeCount > 0 && (
+            <button onClick={clearAll}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-[10px] font-bold text-rose-500 border-rose-200 bg-rose-50 cursor-pointer hover:bg-rose-100 transition shrink-0">
+              <RefreshCw size={10}/> Clear
+            </button>
+          )}
         </div>
-      )}
 
-      {/* ROW 1: EXECUTIVE KPI CARDS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4" id="dashboard-kpi-grid">
-        {kpisData.map((kpi, idx) => (
-          <div 
-            key={idx} 
-            className={`border rounded-xl p-5 relative overflow-hidden text-left shadow-xs hover:shadow-md transition-shadow ${isDarkMode ? 'border-[#1e2d4a] bg-[#131f37]' : 'border-[#E5E7EB] bg-white'}`}
-          >
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold tracking-wider text-slate-400 uppercase">{kpi.title}</span>
-              <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${
-                kpi.status === 'Excellent' || kpi.status === 'Good' || kpi.status === 'On Track' ? 'bg-[#2E8B57]/10 text-[#2E8B57]' : 'bg-amber-50 text-amber-700'
-              }`}>{kpi.status}</span>
-            </div>
+        {/* active pills */}
+        {activeCount > 0 && (
+          <div className="flex flex-wrap gap-1.5 mt-2.5 pt-2.5 border-t border-slate-200 dark:border-[#1e2d4a]">
+            {([ [fYear,setFYear,'FY'],[fSex,setFSex,'Sex'],[fAge,setFAge,'Age'],
+                [fPop,setFPop,'Pop'],[fCtas,setFCtas,'CTAS'],[fDisp,setFDisp,'Disp'],
+              ] as [string[], React.Dispatch<React.SetStateAction<string[]>>, string][])
+              .flatMap(([vals,setter,pfx]) =>
+                (vals as string[]).map(v => (
+                  <span key={`${pfx}-${v}`}
+                    className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold
+                      ${dark?'bg-[#0F4C81]/30 text-[#3B82F6] border border-[#3B82F6]/30'
+                            :'bg-[#0F4C81]/10 text-[#0F4C81] border border-[#0F4C81]/20'}`}>
+                    <span className="opacity-60">{pfx}:</span> {v}
+                    <button onClick={() => setter(p => p.filter(x=>x!==v))}
+                      className="ml-0.5 hover:text-rose-500 cursor-pointer"><X size={8}/></button>
+                  </span>
+                ))
+              )}
+          </div>
+        )}
+      </div>
 
-            <div className="my-2.5 flex items-baseline gap-2 justify-between">
-              <div>
-                <span className={`text-3xl font-extrabold tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>{kpi.value}</span>
-                <span className={`text-xs font-bold ml-2 ${kpi.growth >= 0 ? 'text-[#2E8B57]' : 'text-rose-500'}`}>
-                  {kpi.growth >= 0 ? `▲ +${kpi.growth}%` : `▼ ${kpi.growth}%`}
-                </span>
-              </div>
-              
-              {/* TUCKED MINI SPARKLINE */}
-              <div className="w-24 h-10 overflow-hidden opacity-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={kpi.sparkData} margin={{ top: 5, bottom: 5, left: 1, right: 1 }}>
-                    <defs>
-                      <linearGradient id={`gradSpark-${idx}`} x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor={activeColors[0]} stopOpacity={0.4}/>
-                        <stop offset="95%" stopColor={activeColors[0]} stopOpacity={0.0}/>
-                      </linearGradient>
-                    </defs>
-                    <Area type="monotone" dataKey="val" stroke={activeColors[0]} strokeWidth={1.5} fill={`url(#gradSpark-${idx})`} dot={false} />
-                  </AreaChart>
-                </ResponsiveContainer>
+      {/* ══ 3. KPI CARDS ════════════════════════════════════════════════════ */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        {([
+          {
+            icon:<Users size={20} className="text-white"/>,
+            iconGrad:'from-[#0F4C81] to-[#118d95]',
+            badge:'LIVE', badgeStyle:'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+            label:'Total ED Visits',
+            value:fmtK(kpiData.totalVisits),
+            sub:`of ${fmtK(data.length)} total records`,
+            foot:<span className="flex items-center justify-center gap-1 text-emerald-400"><TrendingUp size={10}/> Active filter scope</span>,
+          },{
+            icon:<Clock size={20} className="text-white"/>,
+            iconGrad:'from-amber-500 to-orange-500',
+            badge:kpiData.medLOS>6?'ABOVE':'TARGET',
+            badgeStyle:kpiData.medLOS>6?'bg-rose-500/20 text-rose-400 border-rose-500/30':'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+            label:'Median LOS',
+            value:kpiData.medLOS>0?`${kpiData.medLOS.toFixed(1)}h`:'—',
+            sub:'CIHI Target: ≤ 6h',
+            foot:<span className={`flex items-center justify-center gap-1 ${kpiData.medLOS>6?'text-rose-400':'text-emerald-400'}`}>
+              {kpiData.medLOS>6?<TrendingUp size={10}/>:<TrendingDown size={10}/>}
+              {kpiData.medLOS>6?`+${(kpiData.medLOS-6).toFixed(1)}h over`:'Within benchmark'}
+            </span>,
+          },{
+            icon:<BarChart2 size={20} className="text-white"/>,
+            iconGrad:'from-purple-600 to-violet-500',
+            badge:'GROUP', badgeStyle:'bg-purple-500/20 text-purple-400 border-purple-500/30',
+            label:'Highest LOS Group',
+            value:kpiData.highestLOSGroup,
+            sub:'Longest median stay',
+            foot:<span className="flex justify-center text-purple-400">Triage / Age stratified</span>,
+          },{
+            icon:<Zap size={20} className="text-white"/>,
+            iconGrad:'from-rose-600 to-pink-500',
+            badge:'ERBI', badgeStyle:'bg-rose-500/20 text-rose-400 border-rose-500/30',
+            label:'Highest Resource Burden',
+            value:kpiData.maxBurdenGroup,
+            sub:'Urgency × LOS × Visits',
+            foot:<span className="flex items-center justify-center gap-1 text-rose-400"><AlertCircle size={10}/> Acuity-weighted</span>,
+          },{
+            icon:<BookOpen size={20} className="text-white"/>,
+            iconGrad:'from-teal-600 to-cyan-500',
+            badge:'INSIGHT', badgeStyle:'bg-teal-500/20 text-teal-400 border-teal-500/30',
+            label:'Key Finding',
+            value:null,
+            valueText:kpiData.keyFinding,
+            sub:'Statistical analysis',
+            foot:<span className="flex justify-center text-teal-400">Auto-generated</span>,
+          },
+        ]).map((kpi, i) => (
+          <div key={i} className={`rounded-2xl border overflow-hidden shadow-sm hover:shadow-lg hover:scale-[1.01] transition-all
+            ${dark?'bg-[#0f1a2e] border-[#1e2d4a]':'bg-white border-slate-200'}`}>
+            {/* icon header with gradient */}
+            <div className={`bg-gradient-to-br ${kpi.iconGrad} px-4 pt-5 pb-4 flex flex-col items-center gap-2`}>
+              <div className="p-2.5 rounded-xl bg-white/15 backdrop-blur">{kpi.icon}</div>
+              <span className={`text-[8px] font-bold uppercase tracking-widest px-2 py-0.5 rounded border ${kpi.badgeStyle}`}>
+                {kpi.badge}
+              </span>
+            </div>
+            {/* body — center aligned */}
+            <div className="px-4 py-4 text-center">
+              <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-2">{kpi.label}</p>
+              {kpi.value !== null && kpi.value !== undefined
+                ? <p className={`text-3xl font-extrabold tracking-tight leading-none ${dark?'text-white':'text-slate-900'}`}>{kpi.value}</p>
+                : <p className={`text-xs font-semibold leading-snug ${dark?'text-slate-100':'text-slate-800'}`}>{(kpi as any).valueText}</p>}
+              <p className="text-[9px] text-slate-500 mt-1.5">{kpi.sub}</p>
+              <div className={`mt-3 pt-3 border-t text-[9px] font-semibold ${dark?'border-[#1e2d4a]':'border-slate-100'}`}>
+                {kpi.foot}
               </div>
             </div>
-
-            <div className="grid grid-cols-3 gap-1 pt-2.5 border-t border-[#E5E7EB] dark:border-[#1e2d4a] text-[9px] text-slate-400">
-              <div>
-                <span className="block text-slate-400">Target</span>
-                <span className="font-bold text-slate-600 dark:text-slate-200">{kpi.target}</span>
-              </div>
-              <div>
-                <span className="block text-slate-400">Forecast</span>
-                <span className="font-bold text-slate-600 dark:text-slate-200">{kpi.forecast}</span>
-              </div>
-              <div>
-                <span className="block text-slate-400">Benchmark</span>
-                <span className="font-bold text-slate-600 dark:text-slate-200">{kpi.benchmark}</span>
-              </div>
-            </div>
-            
-            <div className="absolute bottom-0 left-0 h-1 w-full bg-[#0F4C81]/10" />
           </div>
         ))}
       </div>
 
-      {/* DASHBOARD GRID ROWS 2-5 */}
-      <div className="grid grid-cols-1 gap-8 text-left">
-        
-        {/* ROW 2: TREND ANALYSIS */}
-        <div 
-          className={`border rounded-xl p-5 shadow-xs relative group overflow-hidden ${isDarkMode ? 'border-[#1e2d4a] bg-[#131f37]' : 'border-[#E5E7EB] bg-white'}`}
-          id="trend-analysis-card"
-        >
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-5 border-b pb-3 border-[#E5E7EB] dark:border-[#1e2d4a]">
-            <div>
-              <h4 className={`text-sm font-bold uppercase tracking-wider ${isDarkMode ? 'text-[#3B82F6]' : 'text-[#0F4C81]'}`}>
-                ROW 2: Dynamic Trend & Forecasting Analysis
-              </h4>
-              <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-sans italic mt-0.5">Chronologically mapped sales bounds layered with continuous moving average</span>
-            </div>
-            
-            {/* INLINE WIDGET CONFIG SWITCHES */}
-            <div className="flex items-center gap-3 flex-wrap text-xs">
-              <label className="flex items-center gap-1">
-                <span className="text-[10px] text-slate-400">SMA Window:</span>
-                <select 
-                  onChange={(e) => setAxisSettings(p => ({
-                    ...p,
-                    'trend-analysis-card': { ...p['trend-analysis-card'], movingAveragePeriods: Number(e.target.value) }
-                  }))}
-                  className="p-1 rounded bg-white dark:bg-[#131f37] border border-[#E5E7EB] dark:border-[#1e2d4a] text-[11px] text-[#111827] dark:text-white"
-                  defaultValue="3"
-                >
-                  <option value="0">Off</option>
-                  <option value="3">3-Period</option>
-                  <option value="5">5-Period</option>
-                </select>
-              </label>
+      {/* ══ 4. CHARTS ════════════════════════════════════════════════════════ */}
 
-              <label className="flex items-center gap-1 cursor-pointer text-slate-600 dark:text-slate-400">
-                <input 
-                  type="checkbox"
-                  onChange={(e) => setAxisSettings(p => ({
-                    ...p,
-                    'trend-analysis-card': { ...p['trend-analysis-card'], showForecast: e.target.checked }
-                  }))}
-                  className="rounded text-[#0F4C81] border-[#E5E7EB]"
-                  defaultChecked={true}
-                />
-                <span className="text-[10px]">Forecast Projections</span>
-              </label>
+      {/* Row A — 2 Line Charts (full-width, stacked) */}
+      <div className="flex flex-col gap-6">
+        {/* LINE 1 */}
+        <ChartCard id="chart-line-1" dark={dark} height="h-72"
+          title={slotTitle(chartCfgs['line-1'], 'Line Chart 1 — ED Visit Trend')}
+          subtitle="Longitudinal trend — configure X/Y columns via Customise"
+          right={<ChartConfig cfg={chartCfgs['line-1']} onChange={setCfg('line-1')} catCols={catCols} numCols={numCols} dark={dark}/>}>
+          <UniversalChart id="line-1" cfg={chartCfgs['line-1']} defaultTitle="Line 1" {...chartCommon}/>
+        </ChartCard>
 
-              <label className="flex items-center gap-1 cursor-pointer text-slate-600 dark:text-slate-400">
-                <input 
-                  type="checkbox"
-                  onChange={(e) => setAxisSettings(p => ({
-                    ...p,
-                    'trend-analysis-card': { ...p['trend-analysis-card'], referenceLineType: e.target.checked ? 'Average' : 'None' }
-                  }))}
-                  className="rounded text-[#0F4C81] border-[#E5E7EB]"
-                />
-                <span className="text-[10px]">Benchmark Line</span>
-              </label>
+        {/* LINE 2 */}
+        <ChartCard id="chart-line-2" dark={dark} height="h-72"
+          title={slotTitle(chartCfgs['line-2'], 'Line Chart 2 — Median LOS Trend')}
+          subtitle="Year-over-year median LOS — CIHI 6h reference visible when LOS is Y-axis"
+          right={<ChartConfig cfg={chartCfgs['line-2']} onChange={setCfg('line-2')} catCols={catCols} numCols={numCols} dark={dark}/>}>
+          <UniversalChart id="line-2" cfg={chartCfgs['line-2']} defaultTitle="Line 2" {...chartCommon}/>
+        </ChartCard>
+      </div>
 
-              <button 
-                onClick={() => setFocusedCardId(focusedCardId === 'trend-analysis-card' ? null : 'trend-analysis-card')}
-                className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded"
-              >
-                <Maximize2 size={13} className="text-slate-400 hover:text-slate-800" />
-              </button>
-            </div>
-          </div>
+      {/* Row B — Bar 1 full-width, Bar 2 + Bar 3 side by side below */}
+      <div className="flex flex-col gap-6">
 
-          <div className="h-[280px] w-full">
-            {trendChartData.length === 0 ? (
-              <div className="h-full flex items-center justify-center text-slate-400 text-xs font-mono">Awaiting chronological data bounds.</div>
-            ) : (
-              <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart data={trendChartData} margin={{ left: -10, right: 10, top: 10 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#334155' : '#f1f5f9'} />
-                  <XAxis {...renderXAxisProps('trend-analysis-card','date')} />
-                  <YAxis {...renderYAxisProps('trend-analysis-card')} />
-                  <Tooltip 
-                    contentStyle={{ backgroundColor: isDarkMode ? '#1e293b' : '#ffffff', border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0', borderRadius: '8px' }}
-                    labelStyle={{ color: '#94a3b8', fontSize: '11px', fontFamily: 'monospace' }}
-                  />
-                  <Legend wrapperStyle={{ fontSize: '10px' }} />
-                  
-                  {/* Revenue Curve */}
-                  <Area type="monotone" name="Sequential Volume Value" dataKey="value" stroke={activeColors[0]} fill={activeColors[0]} fillOpacity={0.05} strokeWidth={2.5} />
-                  
-                  {/* Rolling Moving average */}
-                  {(axisSettings['trend-analysis-card']?.movingAveragePeriods !== 0) && (
-                    <Line type="monotone" name="SMA Trend Line" dataKey="movingAverage" stroke="#06b6d4" strokeWidth={2} dot={false} strokeDasharray="5 5" />
-                  )}
+        {/* BAR 1 — full width */}
+        <ChartCard id="chart-bar-1" dark={dark} height="h-72"
+          title={slotTitle(chartCfgs['bar-1'], 'Bar Chart 1 — ED Visits by Fiscal Year')}
+          subtitle="Full-width horizontal bar — configure X/Y columns via Customise"
+          right={<ChartConfig cfg={chartCfgs['bar-1']} onChange={setCfg('bar-1')} catCols={catCols} numCols={numCols} dark={dark}/>}>
+          <UniversalChart id="bar-1" cfg={chartCfgs['bar-1']} defaultTitle="Bar 1" {...chartCommon}/>
+        </ChartCard>
 
-                  {/* Future linear forecast */}
-                  {axisSettings['trend-analysis-card']?.showForecast && (
-                    <Line type="basis" name="Projected Extrapolated Forecast" dataKey="forecast" stroke="#f59e0b" strokeWidth={2} dot={{ r: 3, fill: '#ffb020' }} strokeDasharray="3 3" />
-                  )}
+        {/* BAR 2 + BAR 3 — side by side */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+          {/* BAR 2 */}
+          <ChartCard id="chart-bar-2" dark={dark}
+            title={slotTitle(chartCfgs['bar-2'], 'Bar Chart 2 — Disposition LOS')}
+            subtitle="Median LOS by visit disposition outcome"
+            right={<ChartConfig cfg={chartCfgs['bar-2']} onChange={setCfg('bar-2')} catCols={catCols} numCols={numCols} dark={dark}/>}>
+            <UniversalChart id="bar-2" cfg={chartCfgs['bar-2']} defaultTitle="Bar 2" {...chartCommon}/>
+          </ChartCard>
 
-                  {/* High outlier risk indicator */}
-                  <Scatter name="Anomalous Bounds" dataKey="anomalyValue" fill="#ef4444" />
-
-                  {/* Horizontal average line */}
-                  {axisSettings['trend-analysis-card']?.referenceLineType === 'Average' && (
-                    <ReferenceLine y={stdMean(trendChartData.map(d => d.value || 0))} stroke="#f43f5e" strokeDasharray="4 4" label={{ value: 'AVERAGE', position: 'insideTopLeft', fill: '#f43f5e', fontSize: 8 }} />
-                  )}
-
-                  {/* Zoom/Pan range brush controller */}
-                  <Brush dataKey="date" height={15} stroke={isDarkMode ? '#334155' : '#cbd5e1'} />
-                </ComposedChart>
-              </ResponsiveContainer>
-            )}
-          </div>
-          
-          <div className="mt-3.5 bg-[#F7F9FC] dark:bg-[#182640] p-3 rounded-lg border border-[#E5E7EB] dark:border-[#1e2d4a] text-[10px] flex items-center justify-between text-slate-500 dark:text-slate-400">
-            <span className="flex items-center gap-1.5 font-sans">
-              <Info size={11} className="text-[#3B82F6] animate-pulse" />
-              <span>Anomaly Detection: Evaluating deviation parameters. Real-time correlation tracks baseline growth perfectly.</span>
-            </span>
-            <span className="text-[#0F4C81] dark:text-[#3B82F6] font-bold">R² Confidence index is 94/100</span>
-          </div>
+          {/* BAR 3 */}
+          <ChartCard id="chart-bar-3" dark={dark}
+            title={slotTitle(chartCfgs['bar-3'], 'Bar Chart 3 — Top Problems')}
+            subtitle="Highest-volume diagnostic main problems"
+            right={<ChartConfig cfg={chartCfgs['bar-3']} onChange={setCfg('bar-3')} catCols={catCols} numCols={numCols} dark={dark}/>}>
+            <UniversalChart id="bar-3" cfg={chartCfgs['bar-3']} defaultTitle="Bar 3" {...chartCommon}/>
+          </ChartCard>
         </div>
-
-        {/* CONTROLS ROW 3: CATEGORICAL ANALYSIS */}
-        <div 
-          className={`border rounded-xl p-5 shadow-xs relative group ${isDarkMode ? 'border-[#1e2d4a] bg-[#131f37]' : 'border-[#E5E7EB] bg-white'}`}
-          id="category-analysis-card"
-        >
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-5 border-b pb-3 border-[#E5E7EB] dark:border-[#1e2d4a]">
-            <div>
-              <h4 className={`text-sm font-bold uppercase tracking-wider ${isDarkMode ? 'text-[#3B82F6]' : 'text-[#0F4C81]'}`}>
-                ROW 3: Categorical Breakdown (Drill-Down Supported)
-              </h4>
-              <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-sans italic mt-0.5">
-                {drillLevel === 0 ? 'Click column bar elements to audit child level categories' : `Viewing Drill-down division path under: "${drillParentName}"`}
-              </span>
-            </div>
-
-            {/* Drill controller breadcrumbs */}
-            <div className="flex items-center gap-2 text-xs">
-              {drillLevel === 1 && (
-                <button
-                  onClick={() => { setDrillLevel(0); setDrillParentName(null); }}
-                  className="px-2.5 py-1.5 text-[10px] font-bold text-[#0F4C81] bg-[#0F4C81]/10 hover:bg-[#0F4C81]/20 rounded border border-[#0F4C81]/20 cursor-pointer transition-all"
-                >
-                  ⏮ Drill Up
-                </button>
-              )}
-
-              <span className="text-[10px] text-slate-400">Max items threshold:</span>
-              <select 
-                onChange={(e) => setAxisSettings(p => ({
-                  ...p,
-                  'category-analysis-card': { ...p['category-analysis-card'], groupOthersLimit: Number(e.target.value) }
-                }))}
-                className="p-1.5 rounded bg-white dark:bg-[#131f37] border border-[#E5E7EB] dark:border-[#1e2d4a] text-[10px] text-[#111827] dark:text-white"
-                defaultValue="6"
-              >
-                <option value="4">4 Top (bin surplus to Others)</option>
-                <option value="6">6 Top (bin surplus to Others)</option>
-                <option value="12">12 All</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            
-            {/* Visual Part Left: Dynamic Horizontal/Vertical Bar Chart */}
-            <div className="lg:col-span-7 h-[280px]">
-              {categoricalData.barPlotted.length === 0 ? (
-                <div className="h-full flex items-center justify-center text-slate-400 text-xs font-mono">No matching records filtered for categorization.</div>
-              ) : (
-                <ResponsiveContainer width="100%" height="100%">
-                  {/* Automatically switches to Horizontal Bar chart if cardinality > 6 category columns (human perception requirement) */}
-                  {categoricalData.cardinality > 6 ? (
-                    <BarChart 
-                      data={categoricalData.barPlotted} 
-                      layout="vertical" 
-                      margin={{ left: 10, right: 30, top: 10 }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#334155' : '#f1f5f9'} />
-                      <XAxis type="number" stroke={isDarkMode ? '#94a3b8' : '#475569'} fontSize={9} />
-                      <YAxis dataKey="name" type="category" stroke={isDarkMode ? '#94a3b8' : '#475569'} fontSize={8} width={75} />
-                      <Tooltip contentStyle={{ backgroundColor: isDarkMode ? '#1e293b' : '#ffffff' }} />
-                      <Bar 
-                        dataKey="value" 
-                        fill={activeColors[1]} 
-                        radius={[0, 4, 4, 0]} 
-                        cursor="pointer"
-                        onClick={(v) => {
-                          if (drillLevel === 0 && v && v.name && v.name !== 'Other (Grouped)') {
-                            setDrillParentName(v.name);
-                            setDrillLevel(1);
-                          }
-                        }}
-                        label={{ position: 'right', fontSize: 8, fill: isDarkMode ? '#cbd5e1' : '#475569' }}
-                      />
-                    </BarChart>
-                  ) : (
-                    <BarChart 
-                      data={categoricalData.barPlotted} 
-                      margin={{ left: -10, right: 10, top: 10 }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#334155' : '#f1f5f9'} />
-                      <XAxis {...renderXAxisProps('category-analysis-card','name')} />
-                      <YAxis {...renderYAxisProps('category-analysis-card')} />
-                      <Tooltip contentStyle={{ backgroundColor: isDarkMode ? '#1e293b' : '#ffffff' }} />
-                      
-                      <Bar 
-                        dataKey="value" 
-                        fill={activeColors[0]} 
-                        radius={[4, 4, 0, 0]} 
-                        cursor="pointer"
-                        onClick={(v: any) => {
-                          if (drillLevel === 0 && v && v.name && v.name !== 'Other (Grouped)') {
-                            setDrillParentName(v.name);
-                            setDrillLevel(1);
-                          }
-                        }}
-                        label={{ position: 'top', fontSize: 8, fill: isDarkMode ? '#cbd5e1' : '#475569' }}
-                      />
-                    </BarChart>
-                  )}
-                </ResponsiveContainer>
-              )}
-            </div>
-
-            {/* Visual Part Right: Elegant Center-Totaled Donut Chart */}
-            <div className="lg:col-span-5 h-[280px] relative flex flex-col justify-center items-center">
-              
-              <div className="absolute top-[41%] left-[50%] -translate-x-[50%] -translate-y-[50%] text-center pointer-events-none">
-                <span className="text-[9px] text-slate-400 font-mono tracking-widest block uppercase leading-none mb-1">AGGREGATE SUM</span>
-                <span className={`text-sm sm:text-base font-extrabold block leading-none ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
-                  {formatYValue(categoricalData.grandTotal, 'currency')}
-                </span>
-                <span className="text-[8px] font-bold text-slate-400 font-mono leading-none mt-1 uppercase block max-w-[120px] truncate">
-                  {categoricalData.cardinality} node types
-                </span>
-              </div>
-
-              <div className="w-full h-[220px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={categoricalData.donutPlotted}
-                      cx="50%"
-                      cy="43%"
-                      innerRadius={68}
-                      outerRadius={84}
-                      paddingAngle={3}
-                      dataKey="value"
-                    >
-                      {categoricalData.donutPlotted.map((entry, index) => (
-                        <Cell 
-                          key={`cell-${index}`} 
-                          fill={activeColors[index % activeColors.length]} 
-                          className="cursor-pointer outline-none hover:opacity-85"
-                          onClick={() => {
-                            if (crossFilterValue === entry.name) {
-                              setCrossFilterField(null);
-                              setCrossFilterValue(null);
-                            } else {
-                              setCrossFilterField(drillLevel === 0 ? (mapping.region || fields[0]?.name) : (mapping.category || fields[1]?.name));
-                              setCrossFilterValue(entry.name);
-                            }
-                          }}
-                        />
-                      ))}
-                    </Pie>
-                    <Tooltip formatter={(val: number) => formatYValue(val, 'currency')} />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-
-              {/* Dynamic Legend Blocks */}
-              <div className="flex flex-wrap gap-2 justify-center max-h-16 overflow-y-auto">
-                {categoricalData.donutPlotted.map((item, idx) => (
-                  <span 
-                    key={item.name} 
-                    onClick={() => {
-                      setCrossFilterField(drillLevel === 0 ? (mapping.region || fields[0]?.name) : (mapping.category || fields[1]?.name));
-                      setCrossFilterValue(item.name);
-                    }}
-                    className={`px-1.5 py-0.5 rounded text-[10px] font-bold flex items-center gap-1.5 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 border transition-all ${
-                      crossFilterValue === item.name ? 'border-[#0F4C81] bg-[#0F4C81]/10 shadow-xs' : 'border-transparent'
-                    }`}
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ backgroundColor: activeColors[idx % activeColors.length] }} />
-                    <span className="text-slate-500 dark:text-slate-400">{item.name} ({item.percentage}%)</span>
-                  </span>
-                ))}
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-        {/* CONTROLS ROW 4: DISTRIBUTION ANALYSIS */}
-        <div 
-          className={`border rounded-xl p-5 shadow-xs relative group overflow-hidden ${isDarkMode ? 'border-[#1e2d4a] bg-[#131f37]' : 'border-[#E5E7EB] bg-white'}`}
-          id="distribution-analysis-card"
-        >
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-5 border-b pb-3 border-[#E5E7EB] dark:border-[#1e2d4a]">
-            <div>
-              <h4 className={`text-sm font-bold uppercase tracking-wider ${isDarkMode ? 'text-[#3B82F6]' : 'text-[#0F4C81]'}`}>
-                ROW 4: Distribution Profiling & Density Bounds
-              </h4>
-              <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-sans italic mt-0.5">Statistical frequency interval layout mapped with Freedman-Diaconis boundaries</span>
-            </div>
-
-            {/* Custom statistical binning choices block */}
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] text-slate-400">Binning Heuristic:</span>
-              <div className="grid grid-cols-3 gap-1 p-0.5 rounded border border-[#E5E7EB] dark:border-[#1e2d4a] bg-[#F7F9FC] dark:bg-[#182640]">
-                {[
-                  { key: 'freedman', label: 'Freedman' },
-                  { key: 'scott', label: 'Scott' },
-                  { key: 'sturges', label: 'Sturges' }
-                ].map(opt => (
-                  <button
-                    key={opt.key}
-                    type="button"
-                    onClick={() => setAxisSettings(p => ({
-                      ...p,
-                      'distribution-analysis-card': { ...p['distribution-analysis-card'], binningRule: opt.key as any }
-                    }))}
-                    className={`py-0.5 px-2 rounded text-[9px] font-bold transition-colors uppercase cursor-pointer ${
-                      (axisSettings['distribution-analysis-card']?.binningRule || 'sturges') === opt.key
-                        ? 'bg-[#0F4C81] text-white shadow-xs'
-                        : 'text-slate-500 hover:text-[#0F4C81] bg-transparent'
-                    }`}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            
-            {/* Visual Histogram */}
-            <div className="lg:col-span-8 h-[250px]">
-              {distributionData.bins.length === 0 ? (
-                <div className="h-full flex items-center justify-center text-slate-400 text-xs font-mono">VARIANCE METRICS UNAVAILABLE</div>
-              ) : (
-                <ResponsiveContainer width="100%" height="100%">
-                  <ComposedChart data={distributionData.bins} margin={{ left: -10, right: 10, top: 10 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#334155' : '#f1f5f9'} />
-                    <XAxis dataKey="range" stroke={isDarkMode ? '#94a3b8' : '#475569'} fontSize={7} interval={0} />
-                    <YAxis name="Frequency count" stroke={isDarkMode ? '#94a3b8' : '#475569'} fontSize={9} />
-                    <Tooltip contentStyle={{ backgroundColor: isDarkMode ? '#1e293b' : '#ffffff' }} />
-                    
-                    {/* Raw Bins bar frequency */}
-                    <Bar dataKey="frequency" fill={activeColors[2 % activeColors.length]} radius={[3, 3, 0, 0]} name="Ocurrences Count" />
-                    
-                    {/* Computed continuous bell normal curve */}
-                    <Line type="basis" dataKey="density" stroke="#ef4444" strokeWidth={2} dot={false} name="Bell Normal Curve" />
-                  </ComposedChart>
-                </ResponsiveContainer>
-              )}
-            </div>
-
-            {/* Strategic Distribution report panel */}
-            <div className="lg:col-span-4 space-y-4">
-              <h5 className="text-[10px] font-mono tracking-widest uppercase font-bold text-slate-400">DISTRIBUTION SYNOPSIS</h5>
-              
-              <div className="space-y-3.5 font-sans">
-                <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg border dark:border-slate-800 space-y-1">
-                  <span className="text-[9px] text-slate-400 font-mono uppercase block">SKEWNESS COEFFICIENT</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl font-extrabold">{distributionData.skewness.toFixed(3)}</span>
-                    <span className={`px-1 rounded text-[8px] font-bold uppercase ${
-                      distributionData.skewness > 0.5 ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'
-                    }`}>
-                      {distributionData.skewness > 0.5 ? 'Right Tail Skev' : 'Normally Dispersed'}
-                    </span>
-                  </div>
-                  <p className="text-[9px] text-slate-400 pt-1 leading-normal font-mono">
-                    *Skewness verifies baseline tail volume characteristics. Balanced metrics signify executive baseline budget predictability.
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 text-[10px] font-mono text-slate-600 dark:text-slate-400">
-                  <div className="p-2.5 border dark:border-slate-800 rounded bg-slate-50/20">
-                    <span className="text-[8px] block uppercase text-slate-400 mb-0.5">DEVIATION (σ)</span>
-                    <span className="font-extrabold text-xs text-slate-700 dark:text-slate-100">{formatYValue(distributionData.stdDev, 'currency')}</span>
-                  </div>
-                  <div className="p-2.5 border dark:border-slate-800 rounded bg-slate-50/20">
-                    <span className="text-[8px] block uppercase text-slate-400 mb-0.5">HIST HIST MEAN</span>
-                    <span className="font-extrabold text-xs text-slate-700 dark:text-slate-100">{formatYValue(distributionData.mean, 'currency')}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-        {/* CONTROLS ROW 5: CORRELATION & COVARIANCE */}
-        <div 
-          className={`border rounded-xl p-5 shadow-xs relative group overflow-hidden ${isDarkMode ? 'border-[#1e2d4a] bg-[#131f37]' : 'border-[#E5E7EB] bg-white'}`}
-          id="correlation-analysis-card"
-        >
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-5 border-b pb-3 border-[#E5E7EB] dark:border-[#1e2d4a]">
-            <div>
-              <h4 className={`text-sm font-bold uppercase tracking-wider ${isDarkMode ? 'text-[#3B82F6]' : 'text-[#0F4C81]'}`}>
-                ROW 5: Multivariable Correlation & Regression Analysis
-              </h4>
-              <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-sans italic mt-0.5">
-                Bivariate coordinate analysis paired with active linear correlation matrixes
-              </span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            
-            {/* Visual Scatter Grid representing scatter details */}
-            <div className="lg:col-span-8 h-[290px] relative">
-              {correlationData.scatter.length === 0 ? (
-                <div className="h-full flex items-center justify-center text-slate-400 text-xs font-mono">BIVARIATE SPREAD COORDINATES ABSENT</div>
-              ) : (
-                <ResponsiveContainer width="100%" height="100%">
-                  <ComposedChart margin={{ left: -10, right: 20, top: 10 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#334155' : '#f1f5f9'} />
-                    <XAxis type="number" dataKey="x" name={correlationData.xLabel} stroke={isDarkMode ? '#94a3b8' : '#475569'} fontSize={8} tickFormatter={(v) => formatYValue(v, 'currency')}>
-                      <Label value={correlationData.xLabel} offset={0} position="insideBottom" fill="#94a3b8" fontSize={8} />
-                    </XAxis>
-                    <YAxis type="number" dataKey="y" name={correlationData.yLabel} stroke={isDarkMode ? '#94a3b8' : '#475569'} fontSize={9} tickFormatter={(v) => formatYValue(v, 'currency')}>
-                      <Label value={correlationData.yLabel} angle={-90} position="insideLeft" fill="#94a3b8" fontSize={8} />
-                    </YAxis>
-                    <Tooltip cursor={{ strokeDasharray: '3 3' }} contentStyle={{ backgroundColor: isDarkMode ? '#1e293b' : '#ffffff' }} />
-                    
-                    {/* Color binned scatter coordinate bubbles */}
-                    <Scatter 
-                      name="Spends Coordinates" 
-                      data={correlationData.scatter} 
-                      fill={activeColors[0]} 
-                      opacity={0.8}
-                    />
-                    
-                    {/* Regression Plotting */}
-                    <Line 
-                      name="Regression Slope Line" 
-                      data={correlationData.regPoints} 
-                      dataKey="y" 
-                      stroke="#ef4444" 
-                      strokeWidth={2} 
-                      dot={false} 
-                      strokeDasharray="4 4" 
-                    />
-                  </ComposedChart>
-                </ResponsiveContainer>
-              )}
-            </div>
-
-            {/* Pearson correlation matrix coefficient panel */}
-            <div className="lg:col-span-4 space-y-4 text-left">
-              <h5 className="text-[10px] font-bold tracking-wider uppercase text-slate-400">CORRELATION SIGNATURE</h5>
-              
-              <div className="p-4 rounded-xl border border-[#E5E7EB] dark:border-[#1e2d4a] bg-[#F7F9FC] dark:bg-[#182640] space-y-3">
-                <div className="flex items-center justify-between border-b border-[#E5E7EB] dark:border-[#1e2d4a] pb-2">
-                  <span className="text-[9px] text-slate-400 uppercase leading-none">PEARSON INDEX (r)</span>
-                  <span className="text-[10px] font-bold text-[#0F4C81] dark:text-[#3B82F6] animate-pulse">ACTIVE ANALYSIS</span>
-                </div>
-                
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-extrabold tracking-tight">{correlationData.correlation.toFixed(3)}</span>
-                  <span className={`text-[9px] font-bold uppercase rounded px-1.5 py-0.5 ${
-                    Math.abs(correlationData.correlation) >= 0.7 ? 'bg-emerald-50 text-[#2E8B57]' : 'bg-slate-100 text-slate-700'
-                  }`}>
-                    {Math.abs(correlationData.correlation) >= 0.7 ? 'Highly Correlated' : 'Weak Correlation'}
-                  </span>
-                </div>
-
-                <div className="space-y-1.5 text-[9px] text-slate-400 pt-1 leading-normal border-t border-[#E5E7EB] dark:border-[#1e2d4a]">
-                  <div className="flex justify-between">
-                    <span>Regression:</span>
-                    <span className="font-semibold text-slate-700 dark:text-slate-200">{correlationData.equation}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Coefficient of (R²):</span>
-                    <span className="font-semibold text-slate-700 dark:text-slate-200">{correlationData.r2.toFixed(3)}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Dynamic Matrix Heatmap Block */}
-              {heatmapData.cells.length > 0 && (
-                <div className="space-y-1.5 pt-1.5 border-t border-[#E5E7EB] dark:border-[#1e2d4a]">
-                  <span className="text-[9px] uppercase text-slate-400 tracking-wider font-semibold">Strategic Performance Matrix Heatmap</span>
-                  <div className="grid grid-cols-4 gap-1 p-1 bg-slate-50/20 dark:bg-slate-900/40 rounded-lg border border-[#E5E7EB] dark:border-[#1e2d4a]">
-                    {heatmapData.cells.slice(0, 8).map((cell, cIdx) => (
-                      <div 
-                        key={cIdx} 
-                        style={{ backgroundColor: `${activeColors[0]}${Math.floor(cell.intensity * 255).toString(16).padStart(2,'0')}` }}
-                        className="py-2.5 rounded text-center cursor-pointer relative group/cell hover:scale-105 transition-all text-white border border-transparent hover:border-slate-300 shadow-xs"
-                        title={`${cell.x} x ${cell.y}: ${formatYValue(cell.value, 'currency')}`}
-                      >
-                        <span className="text-[8px] font-bold block overflow-hidden max-w-full font-mono select-none pointer-events-none uppercase text-slate-700">
-                          {cell.value > 1000 ? `${(cell.value/1000).toFixed(0)}K` : cell.value.toFixed(0)}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-          </div>
-        </div>
-
-        {/* ROW 6: AI VISUAL SUITABILITY & QUALITY ENGINE */}
-        <div className={`border rounded-xl p-5 shadow-xs flex flex-col md:flex-row gap-6 justify-between items-center ${isDarkMode ? 'border-[#1e2d4a] bg-[#131f37]' : 'border-[#0F4C81]/20 bg-[#0F4C81]/5'}`}>
-          <div className="flex items-start gap-4">
-            <div className="p-3.5 bg-[#0F4C81]/10 dark:bg-slate-800 rounded-xl border border-[#0F4C81]/20 flex items-center justify-center text-[#0F4C81] dark:text-[#3B82F6] shrink-0">
-              <Sparkles size={18} className="animate-pulse" />
-            </div>
-            <div className="text-left space-y-1">
-              <span className="text-[9px] font-bold tracking-widest uppercase text-slate-400 block">ROW 6: AI COGNITIVE VISUAL INTEGRITY CHECKER</span>
-              <h5 className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-[#0F4C81] font-bold font-sans'}`}>
-                Visual Layout Readability Audit Passed
-              </h5>
-              <p className="text-[11px] text-slate-400 font-light leading-normal font-sans">
-                Visual attributes automatically audited. Resolved category count threshold levels, axes intervals, scale domains, and prevented truncated boundary labels perfectly.
-              </p>
-              
-              {/* Quality checks log checklist */}
-              <div className="flex flex-wrap gap-2.5 pt-2">
-                {visualQualityReport.appliedFixes.map((f, fIdx) => (
-                  <span key={fIdx} className="px-2 py-0.5 rounded bg-emerald-50 text-[#2E8B57] border border-[#2E8B57]/20 text-[9px] font-bold">
-                    ✓ {f}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="shrink-0 text-center md:text-right border-l border-[#E5E7EB] dark:border-[#1e2d4a] pl-6 space-y-2">
-            <span className="text-[9px] text-slate-400 uppercase tracking-widest block font-bold">LAYOUT COEFFICIENT</span>
-            <div className="text-3xl font-extrabold text-[#0F4C81] dark:text-[#3B82F6] animate-pulse font-mono">
-              {visualQualityReport.score}%
-            </div>
-            <span className="text-[10px] font-bold text-emerald-500 uppercase block tracking-tight font-sans">
-              {visualQualityReport.integrity}
-            </span>
-          </div>
-        </div>
-
-        {/* ROW 7: RECOMMENDATIONS AND DRILL INDEX FINDINGS */}
-        <div className={`border rounded-xl p-5 shadow-xs flex flex-col gap-5 ${isDarkMode ? 'border-[#1e2d4a] bg-[#131f37]' : 'border-[#E5E7EB] bg-white'}`}>
-          <div className="border-b pb-3 flex items-center justify-between border-[#E5E7EB] dark:border-[#1e2d4a]">
-            <div>
-              <h4 className="text-xs font-bold tracking-wider uppercase text-[#0F4C81] dark:text-[#3B82F6]">ROW 7: STRATEGIC INSIGHTS & QUANTITATIVE RECOMMENDATIONS</h4>
-              <p className="text-[10px] text-slate-500 dark:text-slate-400 italic block mt-0.5 font-sans">Scanned spatial parameters verify high correlation sectors</p>
-            </div>
-            <span className="px-2.5 py-1 rounded bg-[#2E8B57]/10 border border-[#2E8B57]/20 text-[9px] text-[#2E8B57] font-bold font-mono">DECISION INTEGRATED</span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 leading-normal text-xs text-left">
-            <div className="p-4 bg-[#F7F9FC] dark:bg-[#182640] rounded-lg border border-[#E5E7EB] dark:border-[#1e2d4a] space-y-2">
-              <span className="text-[9px] uppercase text-[#0F4C81] dark:text-[#3B82F6] block font-bold">KEY QUANTITATIVE DISCOVERY</span>
-              <h5 className="font-bold text-slate-800 dark:text-slate-100 text-sm">Bivariate Linear Growth Verified</h5>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-sans">
-                A strong positive linear correlation (r = {correlationData.correlation.toFixed(3)}) exists between spend segments. Every unit change historically drives downstream ARR metrics linearly. Outliers have been successfully mitigated using winsorize boundaries.
-              </p>
-            </div>
-
-            <div className="p-4 bg-[#0F4C81]/5 dark:bg-[#182640]/50 rounded-lg border border-[#E5E7EB] dark:border-[#1e2d4a] space-y-2">
-              <span className="text-[9px] uppercase text-[#0F4C81] dark:text-[#3B82F6] block font-bold">STRATEGIC RECOMMENDATION</span>
-              <h5 className="font-bold text-slate-800 dark:text-slate-100 text-sm">Shift Budget Targetings Towards Top Territories</h5>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-sans font-light">
-                Shift 15% budget allocations from low performing categories to the top performers. Doing so minimizes customer acquisition costs (CAC) while scaling spatial yield indexes by an estimated +12.4% next quarter.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* DISPLAY OF USER CUSTOM VISUALIZATIONS ROWS */}
-        {customCharts.length > 0 && (
-          <div className="space-y-6 pt-6 border-t border-slate-200 text-left font-sans" id="user-custom-charts-row">
-            <div>
-              <h3 className="text-sm font-extrabold text-slate-800 uppercase tracking-widest font-mono">ROW 8: Saved Custom Visualization Studio Columns</h3>
-              <p className="text-xs text-slate-500 font-light mt-0.5">
-                Newly compiled aggregates appended dynamically inside dashboard appendices. Slicer updates trigger recalculations.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {customCharts.map(chart => {
-                const rawChartData = calculateCustomChartData(chart);
-                // Apply Top N limit if specified
-                const chartData = (chart.topN && chart.topN > 0) 
-                  ? rawChartData.sort((a,b) => b.value - a.value).slice(0, chart.topN)
-                  : rawChartData;
-                
-                const s = axisSettings[chart.id] || {};
-                const widgetType = s.xAxisColumn ? 'Column' : chart.type;
-
-                // Compute overlays & helpers
-                const formatter = (value: number) => {
-                  const fmt = chart.unitFormat || 'auto';
-                  if (fmt === 'raw') return value.toString();
-                  if (fmt === 'currency') return `$${value.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
-                  if (fmt === 'percentage') return `${value}%`;
-                  if (fmt === 'thousands') return `${(value / 1000).toFixed(1)}k`;
-                  if (fmt === 'millions') return `${(value / 1000000).toFixed(2)}M`;
-                  return value.toLocaleString(undefined, { maximumFractionDigits: 1 });
-                };
-
-                const mergedPoints = chartData.map((d, idx) => {
-                  const pt = { ...d } as any;
-                  if (chart.enableTrendLine && chartData.length >= 2) {
-                    const n = chartData.length;
-                    let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
-                    chartData.forEach((item, i) => {
-                      sumX += i;
-                      sumY += item.value;
-                      sumXY += i * item.value;
-                      sumXX += i * i;
-                    });
-                    const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
-                    const intercept = (sumY - slope * sumX) / n;
-                    pt.trendValue = parseFloat((slope * idx + intercept).toFixed(2));
-                  }
-                  if (chart.enableMovingAverage && chartData.length > 0) {
-                    const windowSize = 3;
-                    const start = Math.max(0, idx - windowSize + 1);
-                    const slice = chartData.slice(start, idx + 1);
-                    pt.maValue = parseFloat((slice.reduce((sum, item) => sum + item.value, 0) / slice.length).toFixed(2));
-                  }
-                  return pt;
-                });
-
-                const primaryColor = chart.chartColor || activeColors[0];
-                const gridColor = isDarkMode ? '#334155' : '#f1f5f9';
-                const labelColor = isDarkMode ? '#94a3b8' : '#475569';
-                const fFamilyClass = chart.fontFamily === 'mono' ? 'font-mono' : chart.fontFamily === 'serif' ? 'font-serif' : 'font-sans';
-                const fSize = chart.fontSize || 9;
-
-                return (
-                  <div 
-                    key={chart.id} 
-                    className={`border rounded-xl p-5 relative group shadow-sm hover:shadow-md transition-shadow ${isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-slate-200 bg-white'}`} 
-                    id={`saved-custom-chart-${chart.id}`}
-                  >
-                    
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="text-left">
-                        <h4 className="text-[11px] font-black font-sans uppercase tracking-tight text-slate-800 dark:text-white leading-tight">{chart.title}</h4>
-                        {chart.subtitle && (
-                          <p className="text-[9px] text-slate-500 dark:text-slate-400 mt-0.5 leading-tight font-light">{chart.subtitle}</p>
-                        )}
-                        <span className="text-[8px] text-slate-400 font-mono tracking-tight uppercase block leading-none mt-1">
-                          {chart.aggregation} of {chart.yAxisColumn} by {chart.xAxisColumn}
-                        </span>
-                      </div>
-
-                      <button
-                        onClick={() => onRemoveChart(chart.id)}
-                        className="p-1 text-slate-400 hover:text-red-500 hover:bg-rose-50 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer border border-transparent hover:border-rose-100"
-                        title="Delete custom visual"
-                      >
-                        <Trash2 size={12} fill="currentColor" />
-                      </button>
-                    </div>
-
-                    <div className="h-[200px] w-full text-xs font-mono mt-3">
-                      {chartData.length === 0 ? (
-                        <div className="h-full flex items-center justify-center text-slate-400">No data points available.</div>
-                      ) : (
-                        <ResponsiveContainer width="100%" height="100%">
-                          {widgetType === 'Column' ? (
-                            <ComposedChart data={mergedPoints} margin={{ left: -15, right: 5, top: 5 }}>
-                              {chart.showGridlines !== false && <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />}
-                              <XAxis dataKey="name" stroke={labelColor} fontSize={fSize} angle={chart.xAxisLabelRotation} textAnchor={chart.xAxisLabelRotation ? 'start' : 'middle'} height={chart.xAxisLabelRotation ? 35 : 20} className={fFamilyClass} />
-                              <YAxis stroke={labelColor} fontSize={fSize} tickFormatter={formatter} className={fFamilyClass} />
-                              <Tooltip formatter={(val) => [formatter(Number(val)), chart.yAxisColumn]} contentStyle={{ backgroundColor: isDarkMode ? '#1e293b' : '#ffffff' }} />
-                              {chart.showLegend && <Legend verticalAlign="bottom" height={24} />}
-                              <Bar dataKey="value" fill={primaryColor} radius={[2, 2, 0, 0]} />
-                              {chart.enableTrendLine && <Line type="monotone" dataKey="trendValue" stroke="#f43f5e" strokeWidth={1.5} dot={false} strokeDasharray="3 3" name="Trend" />}
-                              {chart.enableMovingAverage && <Line type="monotone" dataKey="maValue" stroke="#3b82f6" strokeWidth={1.5} dot={false} name="Avg" />}
-                            </ComposedChart>
-                          ) : widgetType === 'Bar' ? (
-                            <ComposedChart data={mergedPoints} layout="vertical" margin={{ left: -10, right: 5, top: 5 }}>
-                              {chart.showGridlines !== false && <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />}
-                              <XAxis type="number" stroke={labelColor} fontSize={fSize} tickFormatter={formatter} className={fFamilyClass} />
-                              <YAxis dataKey="name" type="category" stroke={labelColor} fontSize={fSize} className={fFamilyClass} />
-                              <Tooltip formatter={(val) => [formatter(Number(val)), chart.yAxisColumn]} contentStyle={{ backgroundColor: isDarkMode ? '#1e293b' : '#ffffff' }} />
-                              {chart.showLegend && <Legend verticalAlign="bottom" height={24} />}
-                              <Bar dataKey="value" fill={primaryColor} radius={[0, 2, 2, 0]} />
-                              {chart.enableTrendLine && <Line type="monotone" dataKey="trendValue" stroke="#f43f5e" strokeWidth={1.5} dot={false} strokeDasharray="3 3" name="Trend" />}
-                              {chart.enableMovingAverage && <Line type="monotone" dataKey="maValue" stroke="#3b82f6" strokeWidth={1.5} dot={false} name="Avg" />}
-                            </ComposedChart>
-                          ) : widgetType === 'Line' ? (
-                            <ComposedChart data={mergedPoints} margin={{ left: -15, right: 5, top: 5 }}>
-                              {chart.showGridlines !== false && <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />}
-                              <XAxis dataKey="name" stroke={labelColor} fontSize={fSize} angle={chart.xAxisLabelRotation} textAnchor={chart.xAxisLabelRotation ? 'start' : 'middle'} height={chart.xAxisLabelRotation ? 35 : 20} className={fFamilyClass} />
-                              <YAxis stroke={labelColor} fontSize={fSize} tickFormatter={formatter} className={fFamilyClass} />
-                              <Tooltip formatter={(val) => [formatter(Number(val)), chart.yAxisColumn]} contentStyle={{ backgroundColor: isDarkMode ? '#1e293b' : '#ffffff' }} />
-                              {chart.showLegend && <Legend verticalAlign="bottom" height={24} />}
-                              <Line type="monotone" dataKey="value" stroke={primaryColor} strokeWidth={2} dot={{ r: 2 }} />
-                              {chart.enableTrendLine && <Line type="monotone" dataKey="trendValue" stroke="#f43f5e" strokeWidth={1.5} dot={false} strokeDasharray="3 3" name="Trend" />}
-                              {chart.enableMovingAverage && <Line type="monotone" dataKey="maValue" stroke="#3b82f6" strokeWidth={1.5} dot={false} name="Avg" />}
-                            </ComposedChart>
-                          ) : (
-                            <PieChart>
-                              <Pie data={chartData} dataKey="value" cx="50%" cy="50%" outerRadius={55}>
-                                {chartData.map((entry, index) => (
-                                  <Cell key={`cell-${index}`} fill={activeColors[index % activeColors.length]} />
-                                ))}
-                              </Pie>
-                              <Tooltip formatter={(v) => formatter(Number(v))} />
-                              {chart.showLegend && <Legend verticalAlign="bottom" height={24} />}
-                            </PieChart>
-                          )}
-                        </ResponsiveContainer>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
 
       </div>
 
-      {/* 7. CUSTOM VISUALIZER CONFIGURATION MODAL */}
-      {builderModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-55 scroll-none">
-          <div className={`${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'} border rounded-3xl max-w-5xl w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto`}>
-            
-            <div className="flex justify-between items-center pb-4 border-b border-slate-200 dark:border-slate-800 mb-6">
-              <div>
-                <span className="px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900 text-[9px] text-indigo-700 dark:text-indigo-400 font-mono tracking-wider uppercase font-semibold">Intelligence Studio</span>
-                <h3 className="text-lg font-black text-slate-800 dark:text-white mt-1 flex items-center gap-1.5 font-sans">
-                  <Sparkles size={18} className="text-amber-500 animate-pulse" />
-                  AI Visualization Intelligence Workbench
-                </h3>
-              </div>
-              
-              <button
-                onClick={() => setBuilderModalOpen(false)}
-                className="p-1.5 text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-800 cursor-pointer"
-              >
-                <X size={16} />
-              </button>
-            </div>
 
-            <CustomChartBuilder 
-              fields={fields}
-              data={data}
-              customCharts={customCharts}
-              onAddChart={(chart) => {
-                onAddChart(chart);
-                setBuilderModalOpen(false);
-              }}
-              onRemoveChart={onRemoveChart}
-              isDarkMode={isDarkMode}
-            />
+      {/* Row C — 2 Column Charts */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        {/* COL 1 */}
+        <ChartCard id="chart-col-1" dark={dark}
+          title={slotTitle(chartCfgs['col-1'], 'Column Chart 1 — CTAS Level')}
+          subtitle="ED visits by triage acuity level (1=Resuscitation → 5=Non-Urgent)"
+          right={<ChartConfig cfg={chartCfgs['col-1']} onChange={setCfg('col-1')} catCols={catCols} numCols={numCols} dark={dark}/>}>
+          <UniversalChart id="col-1" cfg={chartCfgs['col-1']} defaultTitle="Col 1" {...chartCommon}/>
+        </ChartCard>
+
+        {/* COL 2 */}
+        <ChartCard id="chart-col-2" dark={dark}
+          title={slotTitle(chartCfgs['col-2'], 'Column Chart 2 — Population Category')}
+          subtitle="Standardised age brackets — Pediatric, Young Adult, Middle Adult, Older Adult"
+          right={<ChartConfig cfg={chartCfgs['col-2']} onChange={setCfg('col-2')} catCols={catCols} numCols={numCols} dark={dark}/>}>
+          <UniversalChart id="col-2" cfg={chartCfgs['col-2']} defaultTitle="Col 2" {...chartCommon}/>
+        </ChartCard>
+      </div>
+
+      {/* Row D — Area + Funnel */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        {/* AREA */}
+        <ChartCard id="chart-area-1" dark={dark}
+          title={slotTitle(chartCfgs['area-1'], 'Area Chart — Cumulative Growth')}
+          subtitle="Volume area with gradient fill — switch type via Customise"
+          right={<ChartConfig cfg={chartCfgs['area-1']} onChange={setCfg('area-1')} catCols={catCols} numCols={numCols} dark={dark}/>}>
+          <UniversalChart id="area-1" cfg={chartCfgs['area-1']} defaultTitle="Area" {...chartCommon}/>
+        </ChartCard>
+
+        {/* FUNNEL */}
+        <ChartCard id="chart-funnel" dark={dark}
+          title={slotTitle(chartCfgs['funnel'], 'Funnel Chart — Patient Flow by CTAS')}
+          subtitle="Volume tapering from most urgent (L1) to least urgent (L5)"
+          right={<ChartConfig cfg={chartCfgs['funnel']} onChange={setCfg('funnel')} catCols={catCols} numCols={numCols} dark={dark} allowFunnel/>}>
+          <UniversalChart id="funnel" cfg={chartCfgs['funnel']} defaultTitle="Funnel" {...chartCommon}/>
+        </ChartCard>
+      </div>
+
+      {/* ══ 5. DESCRIPTIVE STATISTICS ═════════════════════════════════════════ */}
+      <div className={`rounded-2xl border p-6 shadow-sm
+        ${dark?'bg-[#131f37] border-[#1e2d4a]':'bg-white border-slate-200'}`}>
+        <div className="flex items-center justify-between mb-5">
+          <div>
+            <h4 className={`text-xs font-bold uppercase tracking-wider
+              ${dark?'text-[#3B82F6]':'text-[#0F4C81]'}`}>
+              Descriptive Statistics — Top 5 Numeric Variables
+            </h4>
+            <p className="text-[10px] text-slate-400 mt-0.5 italic">
+              Mean, Median, Std Dev, Min, Max, Q1, Q3, IQR and Pearson skewness for active filter scope
+            </p>
           </div>
+          <span className={`text-[9px] font-bold px-2.5 py-1 rounded border font-mono
+            ${dark?'bg-[#182640] border-[#1e2d4a] text-slate-300':'bg-slate-50 border-slate-200 text-slate-600'}`}>
+            n = {fmtNum(filtered.length,0)} records
+          </span>
         </div>
-      )}
+
+        {descStats.length === 0
+          ? <p className="text-center py-10 text-xs text-slate-400">No numeric columns detected in the active dataset.</p>
+          : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-[11px] border-collapse">
+                <thead>
+                  <tr className={dark?'bg-[#182640]':'bg-slate-50'}>
+                    {['Column','N','Mean','Median','Std Dev','Min','Max','Q1','Q3','IQR','Skewness'].map(h=>(
+                      <th key={h} className={`px-3 py-2 text-left text-[9px] font-bold uppercase tracking-wider border-b
+                        ${dark?'border-[#1e2d4a] text-slate-400':'border-slate-200 text-slate-500'}`}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {descStats.map((row,i) => (
+                    <tr key={row.col}
+                      className={`transition hover:opacity-80
+                        ${i%2===0
+                          ? dark?'bg-[#0f1d33]':'bg-white'
+                          : dark?'bg-[#131f37]':'bg-slate-50/50'}`}>
+                      <td className={`px-3 py-2.5 font-semibold border-b max-w-[140px] truncate
+                        ${dark?'border-[#1e2d4a] text-slate-200':'border-slate-100 text-slate-800'}`}>
+                        {row.col}
+                      </td>
+                      {[fmtNum(row.n,0),fmtNum(row.mean,2),fmtNum(row.median,2),
+                        fmtNum(row.stddev,2),fmtNum(row.min,2),fmtNum(row.max,2),
+                        fmtNum(row.q1,2),fmtNum(row.q3,2),fmtNum(row.iqr,2)].map((v,j) => (
+                        <td key={j} className={`px-3 py-2.5 font-mono border-b
+                          ${dark?'border-[#1e2d4a] text-slate-300':'border-slate-100 text-slate-700'}`}>{v}</td>
+                      ))}
+                      <td className={`px-3 py-2.5 font-mono border-b font-bold
+                        ${dark?'border-[#1e2d4a]':'border-slate-100'}
+                        ${Math.abs(row.skew)>1?'text-amber-500':dark?'text-slate-300':'text-slate-700'}`}>
+                        {fmtNum(row.skew,3)}
+                        {Math.abs(row.skew)>1 && (
+                          <span className="ml-1 text-[8px]">{row.skew>0?'▲ Right':'▼ Left'}</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+        <div className={`mt-4 p-3 rounded-xl border text-[10px] leading-relaxed
+          ${dark?'bg-[#182640] border-[#1e2d4a] text-slate-400':'bg-amber-50 border-amber-100 text-amber-700'}`}>
+          <strong>Clinical Note:</strong> LOS distributions are right-skewed (skewness &gt; 0.5).
+          Non-parametric methods (Kruskal-Wallis, Mann-Whitney U, Dunn's post-hoc) are used throughout
+          hypothesis testing to respect this property. Values with |skewness| &gt; 1 are highlighted in amber.
+        </div>
+      </div>
+
+      {/* footer */}
+      <p className={`text-center text-[10px] font-mono py-1
+        ${dark?'text-slate-700':'text-slate-400'}`}>
+        Emergency Department Analytics · DAMO-6994 · University of Niagara Falls
+        · {fmtNum(filtered.length,0)} / {fmtNum(data.length,0)} records
+      </p>
 
     </div>
   );

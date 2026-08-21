@@ -1,0 +1,16 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: healthcare_analytics_platform
+    ports:
+      - "3000:3000"
+      - "8000:8000"
+    environment:
+      - PORT=3000
+      - API_PORT=8000
+      - API_HOST=0.0.0.0
+      - HOST=0.0.0.0
+      - DEBUG=false
+    restart: unless-stopped
