@@ -8,11 +8,10 @@ from backend.database.database_manager import db_manager
 # the real vocabulary keeps them honest: the previous fixture used labels
 # ("Middle Adult", "Older Adult") that appear nowhere in the schema.
 AGE_CATEGORIES = [
-    "Pediatric Population",
-    "Young Adult Population",
-    "Adult Population",
-    "Pre-Senior Population",
-    "Geriatric Population",
+    "Pediatric & Youth",
+    "Young Adult",
+    "Middle Adult",
+    "Older Adult",
 ]
 
 

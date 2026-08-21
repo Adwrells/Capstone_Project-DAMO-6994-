@@ -1,7 +1,7 @@
 from typing import Dict, Any, List
 from backend.analytics.statistics.linear_regression import regression_summary
 from backend.analytics.statistics.assumptions import check_normality
-
+ 
 def run(ctas_scores: List[float], los_values: List[float]) -> Dict[str, Any]:
     if len(ctas_scores) < 5 or len(los_values) < 5:
         return {"error": "H3 requires at least 5 data points."}
@@ -19,3 +19,4 @@ def run(ctas_scores: List[float], los_values: List[float]) -> Dict[str, Any]:
         "operational_recommendation": "Incorporate CTAS score into capacity planning." if reject else "Investigate other predictors.",
         "n": reg["n"],
     }
+ 

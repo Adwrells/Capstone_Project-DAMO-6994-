@@ -40,22 +40,58 @@ VALID_CTAS_LEVELS: List[str] = [
     "Non-urgent",
 ]
 
-# Categories excluded platform-wide: they denote missing classification, not a group.
-EXCLUDED_CATEGORIES: Tuple[str, ...] = ("Unknown", "Not Stated", "Missing", "")
+# Rollup and aggregate labels fabricated/derived from rollups, excluded from all group comparisons
+ROLLUP_LABELS: Tuple[str, ...] = (
+    "Total",
+    "TOTAL",
+    "All",
+    "ALL",
+    "Any",
+    "ANY",
+    "Grand Total",
+    "GRAND TOTAL",
+    "Overall",
+    "OVERALL",
+    "Total Visits",
+    "Total visits",
+)
+
+# Categories excluded platform-wide: they denote missing classification or roll-ups, not distinct cohorts.
+EXCLUDED_CATEGORIES: Tuple[str, ...] = (
+    "Unknown",
+    "Not Stated",
+    "Missing",
+    "None",
+    "",
+    *ROLLUP_LABELS,
+)
+
+# Canonical set of lowercase labels for strict case-insensitive exact matching
+EXCLUDED_CATEGORIES_LOWER: set = {c.strip().lower() for c in EXCLUDED_CATEGORIES}
 
 TEST_KRUSKAL = "Weighted Kruskal-Wallis H-Test with Dunn Post-Hoc"
 TEST_MANN_WHITNEY = "Weighted Mann-Whitney U Test"
 
 
-def _is_excluded(label: Any) -> bool:
-    return str(label).strip() in EXCLUDED_CATEGORIES
+def is_rollup_or_excluded(label: Any) -> bool:
+    """Case-insensitive exact match against rollup labels and missing placeholders.
+    
+    Guarantees that exact matches like 'Total', 'All', 'Unknown' are excluded,
+    while avoiding false positives on substring matches (e.g. 'Intra-Facility Transfer').
+    """
+    if label is None:
+        return True
+    return str(label).strip().lower() in EXCLUDED_CATEGORIES_LOWER
+
+
+_is_excluded = is_rollup_or_excluded
 
 
 def _clean_frame(df: pd.DataFrame, group_col: str, value_col: str, weight_col: str) -> pd.DataFrame:
-    """Drops unusable rows: missing keys, non-positive weights, negative LOS, placeholders."""
+    """Drops unusable rows: missing keys, non-positive weights, negative LOS, placeholders, and rollups."""
     out = df.dropna(subset=[group_col, value_col, weight_col]).copy()
     out = out[(out[weight_col] > 0) & (out[value_col] >= 0)]
-    return out[~out[group_col].map(_is_excluded)]
+    return out[~out[group_col].map(is_rollup_or_excluded)]
 
 
 def _split_groups(
@@ -138,6 +174,11 @@ def run_h1_test() -> Dict[str, Any]:
 
     return {
         "hypothesis": "H1: Length of Stay differs significantly across CTAS Triage Levels",
+        "cohort_scope_rule": (
+            "Compares all 5 defined clinical CTAS acuity tiers: CTAS I (Resuscitation), "
+            "CTAS II (Emergent), CTAS III (Urgent), CTAS IV (Less Urgent), and CTAS V (Non-Urgent). "
+            "Unknown / Not Stated non-acuity records and summary roll-up rows ('Total') are excluded."
+        ),
         "test_name": TEST_KRUSKAL,
         "h_statistic": round(kw["h_statistic"], 4),
         "degrees_of_freedom": kw["degrees_of_freedom"],
@@ -199,6 +240,10 @@ def run_h2_test() -> Dict[str, Any]:
 
     return {
         "hypothesis": "H2: Length of Stay differs significantly between Admitted and Non-Admitted ED Visits",
+        "cohort_scope_rule": (
+            "Evaluates Admitted vs Non-Admitted visit disposition records. "
+            "Summary roll-up rows ('Total') and unclassified categories ('Unknown') are excluded."
+        ),
         "test_name": TEST_MANN_WHITNEY,
         "u_statistic": round(mw["u_statistic"], 4),
         "z_score": round(mw["z_score"], 4),
@@ -243,6 +288,10 @@ def run_h4_test() -> Dict[str, Any]:
 
     # Life-stage order, so post-hoc pairs read youngest -> oldest rather than alphabetically.
     age_order = [
+        "Pediatric & Youth",
+        "Young Adult",
+        "Middle Adult",
+        "Older Adult",
         "Pediatric Population",
         "Young Adult Population",
         "Adult Population",
@@ -266,6 +315,10 @@ def run_h4_test() -> Dict[str, Any]:
 
     return {
         "hypothesis": "H4: Length of Stay differs significantly across Age Groups",
+        "cohort_scope_rule": (
+            "Compares defined demographic life-stage cohorts across the population. "
+            "Summary roll-up rows ('Total') and unclassified categories ('Unknown') are excluded."
+        ),
         "test_name": TEST_KRUSKAL,
         "h_statistic": round(kw["h_statistic"], 4),
         "degrees_of_freedom": kw["degrees_of_freedom"],

@@ -1,11 +1,11 @@
 from typing import Any, Dict, List, Optional, Sequence
-
+ 
 from backend.analytics.statistics.assumptions import check_normality, check_sample_size
 from backend.analytics.statistics.weighted import weighted_mann_whitney_u, weighted_mean, weighted_median
-
+ 
 STATISTICAL_METHOD = "Weighted Mann-Whitney U Test"
-
-
+ 
+ 
 def run(
     admitted: List[float],
     discharged: List[float],
@@ -13,7 +13,7 @@ def run(
     weights_discharged: Optional[Sequence[float]] = None,
 ) -> Dict[str, Any]:
     """H2: does reported median ED LOS differ between admitted and non-admitted visits?
-
+ 
     ``weights_*`` are ED visit counts; supplying them runs the test over the
     weight-expanded population rather than over the aggregate rows.
     """
@@ -21,16 +21,16 @@ def run(
     group_names = ["Admitted", "Discharged"]
     normality = [check_normality(g, name) for g, name in zip(groups, group_names)]
     size_check = check_sample_size(groups, group_names)
-
+ 
     mw = weighted_mann_whitney_u(
         admitted, discharged, weights_admitted, weights_discharged,
         label_a="Admitted", label_b="Discharged",
     )
     reject = mw["reject_null"]
-
+ 
     w_adm = weights_admitted if weights_admitted is not None else [1.0] * len(admitted)
     w_dis = weights_discharged if weights_discharged is not None else [1.0] * len(discharged)
-
+ 
     def group_summary(vals, wts, label: str) -> Dict[str, Any]:
         if not vals:
             return {"group": label, "n": 0, "weighted_n": 0, "mean_los": 0.0}
@@ -43,7 +43,7 @@ def run(
             "min_los": round(min(vals), 2),
             "max_los": round(max(vals), 2),
         }
-
+ 
     return {
         "hypothesis": "H2",
         "research_question": "Does LOS differ between Admitted and Discharged visits?",
@@ -73,3 +73,4 @@ def run(
             group_summary(discharged, w_dis, "Discharged"),
         ],
     }
+ 
