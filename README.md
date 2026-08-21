@@ -117,6 +117,55 @@ which resolves only when the root is the working directory.
 
 ---
 
+## Codebase knowledge graph (graphify)
+
+The repo ships a graphify setup under `.claude/`: a knowledge graph of the codebase that
+answers structural questions without grepping through the source. The configuration is
+committed; the tool itself is not, so each developer installs it once.
+
+### One-time setup
+
+The package is `graphifyy` (two y's); the command it installs is `graphify`.
+
+```bash
+uv tool install --upgrade graphifyy
+```
+
+`pip install graphifyy` works if you do not have `uv`. Then check that the command resolves
+on PATH, because the `PreToolUse` hooks in `.claude/settings.json` call it by bare name:
+
+```bash
+graphify --version
+```
+
+Until it resolves, those hooks fail on every Bash, Grep, Read and Glob call in Claude Code.
+If the command is not found, add your tool directory (`uv tool dir`, or pipx's
+`~/.local/bin`) to PATH and reopen the terminal.
+
+Build the graph once by typing `/graphify .` at the **Claude Code prompt**, from the repo
+root. It is a slash command, not a shell command: running it in PowerShell or cmd only
+returns "not recognized as an internal or external command".
+
+### Everyday use
+
+| Task | Command |
+| :--- | :--- |
+| Ask a structural question | `graphify query "how does H1 load its data"` |
+| Trace how two things connect | `graphify path "FitDiagnostics" "sqlite_loader"` |
+| Explain one concept | `graphify explain "ERBI"` |
+| List architectural hubs | `graphify god-nodes --top 10` |
+| Find what a change affects | `graphify affected "loader"` |
+| Refresh after committing | `graphify update .` |
+
+`graphify update .` re-extracts from the AST with no LLM call and no API cost. Run it after
+committing so the graph does not answer from code that no longer exists.
+
+Only `graphify-out/GRAPH_REPORT.md` is committed, as a readable architecture overview. The
+graph itself, the HTML view and the caches stay local: they are generated, and `graph.json`
+would conflict on nearly every merge.
+
+---
+
 ## Architecture
 
 The full specification, including layer contracts and conformance checks, is documented in
