@@ -1,6 +1,6 @@
 from typing import Dict, Any, List
 from backend.analytics.statistics.chi_square import chi_square_summary
-
+ 
 def run(observed_matrix: List[List[int]], row_labels: List[str], col_labels: List[str]) -> Dict[str, Any]:
     if not observed_matrix or not observed_matrix[0]:
         return {"error": "H5 requires valid contingency table."}
@@ -26,3 +26,4 @@ def run(observed_matrix: List[List[int]], row_labels: List[str], col_labels: Lis
         "operational_recommendation": "Stratify admission rate monitoring by sex." if reject else "Focus on other factors.",
         "contingency_table": {"row_labels": row_labels, "col_labels": col_labels, "observed": observed_matrix},
     }
+ 
