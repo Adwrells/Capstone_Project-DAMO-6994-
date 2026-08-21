@@ -681,7 +681,7 @@ export default function CustomChartBuilder({
         <div className="h-full w-full flex flex-col items-center justify-center p-4" id="custom-gauge">
           <svg className="w-36 h-20" viewBox="0 0 100 50">
             {/* Speedometer track */}
-            <path d="M10,50 A40,40 0 0,1 90,50" fill="none" stroke="#e2e8f0" strokeWidth="10" strokeLinecap="round" />
+            <path d="M10,50 A40,40 0 0,1 90,50" fill="none" stroke="var(--border)" strokeWidth="10" strokeLinecap="round" />
             {/* Active filled track */}
             <path 
               d="M10,50 A40,40 0 0,1 90,50" 
@@ -698,7 +698,7 @@ export default function CustomChartBuilder({
               y2={50 - 35 * Math.sin((180 - pct * 1.8) * Math.PI / 180)} 
               stroke="#f43f5e" strokeWidth="2.5" strokeLinecap="round" 
             />
-            <circle cx="50" cy="50" r="4" fill="#334155" />
+            <circle cx="50" cy="50" r="4" fill="var(--text-secondary)" />
           </svg>
           <div className="text-center mt-2 leading-none">
             <span className="text-sm font-black font-mono text-slate-800 dark:text-white block">{formatYValue(current)}</span>
@@ -755,7 +755,7 @@ export default function CustomChartBuilder({
           <div className="text-[8px] font-mono font-bold text-slate-400 uppercase tracking-widest text-center">Interactive Sankey Distribution Flow</div>
           <div className="flex justify-between items-center my-auto px-4">
             {/* Source Node */}
-            <div className="p-3 bg-indigo-650 text-white rounded-lg font-mono text-[9px] font-bold shadow-sm uppercase tracking-wider">
+            <div className="p-3 bg-indigo-600 text-white rounded-lg font-mono text-[9px] font-bold shadow-sm uppercase tracking-wider">
               {xAxis} <br />(Aggregate Source)
             </div>
             
@@ -946,7 +946,7 @@ export default function CustomChartBuilder({
                   <button 
                     onClick={() => setShowGridlines(!showGridlines)}
                     className={`w-full py-2 border rounded-lg font-bold ${
-                      showGridlines ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-950/40' : 'bg-transparent border-slate-200 text-slate-500'
+                      showGridlines ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-950/40 dark:border-indigo-800 dark:text-indigo-300' : 'bg-transparent border-slate-200 text-slate-500 dark:border-slate-700'
                     }`}
                   >
                     {showGridlines ? '✓ Gridlines On' : 'Gridlines Off'}
@@ -958,7 +958,7 @@ export default function CustomChartBuilder({
                   <button 
                     onClick={() => setShowDataLabels(!showDataLabels)}
                     className={`w-full py-2 border rounded-lg font-bold ${
-                      showDataLabels ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-950/40' : 'bg-transparent border-slate-200 text-slate-500'
+                      showDataLabels ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-950/40 dark:border-indigo-800 dark:text-indigo-300' : 'bg-transparent border-slate-200 text-slate-500 dark:border-slate-700'
                     }`}
                   >
                     {showDataLabels ? '✓ Labels On' : 'Labels Off'}
@@ -1042,7 +1042,7 @@ export default function CustomChartBuilder({
                   <button 
                     onClick={() => setEnableTrendLine(!enableTrendLine)}
                     className={`w-full py-2 border rounded-lg font-bold ${
-                      enableTrendLine ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-950/40' : 'bg-transparent border-slate-200 text-slate-500'
+                      enableTrendLine ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-950/40 dark:border-indigo-800 dark:text-indigo-300' : 'bg-transparent border-slate-200 text-slate-500 dark:border-slate-700'
                     }`}
                   >
                     {enableTrendLine ? '✓ Trend Line On' : 'Trend Line Off'}
@@ -1054,7 +1054,7 @@ export default function CustomChartBuilder({
                   <button 
                     onClick={() => setEnableMovingAverage(!enableMovingAverage)}
                     className={`w-full py-2 border rounded-lg font-bold ${
-                      enableMovingAverage ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-950/40' : 'bg-transparent border-slate-200 text-slate-500'
+                      enableMovingAverage ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-950/40 dark:border-indigo-800 dark:text-indigo-300' : 'bg-transparent border-slate-200 text-slate-500 dark:border-slate-700'
                     }`}
                   >
                     {enableMovingAverage ? '✓ Moving Average On' : 'Moving Average Off'}
@@ -1070,7 +1070,7 @@ export default function CustomChartBuilder({
                     type="number"
                     value={targetValue || ''}
                     onChange={(e) => setTargetValue(e.target.value ? Number(e.target.value) : undefined)}
-                    className="flex-1 bg-white dark:bg-slate-950 border border-slate-205 dark:border-slate-800 text-slate-800 dark:text-white text-xs rounded-lg p-2 font-medium"
+                    className="flex-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white text-xs rounded-lg p-2 font-medium"
                     placeholder="e.g. 500000"
                   />
                   {targetValue && (
@@ -1083,7 +1083,7 @@ export default function CustomChartBuilder({
 
           {activeConfigTab === 'chat' && (
             <div className="space-y-3 pt-1 text-xs">
-              <div className="p-3 bg-indigo-50/60 dark:bg-indigo-950/30 rounded-xl border border-indigo-100/50 dark:border-indigo-900/40 text-slate-650 text-[10px] leading-relaxed flex gap-2">
+              <div className="p-3 bg-indigo-50/60 dark:bg-indigo-950/30 rounded-xl border border-indigo-100/50 dark:border-indigo-900/40 text-slate-700 dark:text-slate-300 text-[10px] leading-relaxed flex gap-2">
                 <Bot size={16} className="text-indigo-600 shrink-0" />
                 <span>
                   <strong>Data Pilot Assistant:</strong> Type conversational instructions below to edit this visualization! I can alter layout, rename titles, set targets, or toggle gridlines instantly.
@@ -1097,7 +1097,7 @@ export default function CustomChartBuilder({
                   onChange={(e) => setChatPrompt(e.target.value)}
                   disabled={isChatLoading}
                   placeholder={isChatLoading ? "Generating visual design..." : "e.g. 'set type to pie and make title Revenue share'"}
-                  className="flex-1 bg-white dark:bg-slate-950 border border-slate-205 dark:border-slate-800 text-slate-800 dark:text-white text-xs rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:opacity-50"
+                  className="flex-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white text-xs rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:opacity-50"
                 />
                 <button 
                   type="submit" 
@@ -1132,7 +1132,7 @@ export default function CustomChartBuilder({
                 </span>
                 <span className="font-mono bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300 px-1.5 py-0.5 rounded text-[9px] font-bold">Confidence {aiRecommendation.confidence}%</span>
               </div>
-              <p className="text-slate-600 dark:text-slate-350 leading-relaxed font-light">
+              <p className="text-slate-600 dark:text-slate-400 leading-relaxed font-light">
                 <strong>Why {aiRecommendation.recommendedType}:</strong> {aiRecommendation.businessReason}
               </p>
               {type !== aiRecommendation.recommendedType && (
@@ -1173,7 +1173,7 @@ export default function CustomChartBuilder({
             <div className="flex gap-2">
               <button 
                 onClick={exportVisualCSV}
-                className="p-1.5 text-slate-500 hover:text-indigo-600 dark:text-slate-400 rounded-lg border hover:bg-slate-50 dark:hover:bg-slate-850 cursor-pointer flex items-center gap-1 text-[10px]"
+                className="p-1.5 text-slate-500 hover:text-indigo-600 dark:text-slate-400 rounded-lg border hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer flex items-center gap-1 text-[10px]"
                 title="Export this preview data as CSV"
               >
                 <Download size={11} /> CSV
@@ -1275,7 +1275,7 @@ export default function CustomChartBuilder({
           {drillCategory && (
             <div className="border-t border-slate-100 dark:border-slate-800 pt-3 text-xs" id="drilldown-sandbox">
               <div className="flex justify-between items-center mb-2">
-                <span className="font-extrabold text-[10px] text-indigo-650 dark:text-indigo-400 font-mono uppercase tracking-widest flex items-center gap-1.5">
+                <span className="font-extrabold text-[10px] text-indigo-600 dark:text-indigo-400 font-mono uppercase tracking-widest flex items-center gap-1.5">
                   <Table2 size={13} /> Drill-Through Detail: {drillCategory}
                 </span>
                 <button onClick={() => setDrillCategory(null)} className="text-red-500 hover:text-red-700 font-bold text-[9px] font-mono uppercase tracking-wider">Close Drill-Down</button>
@@ -1331,7 +1331,7 @@ export default function CustomChartBuilder({
             Dashboard Quality Review
           </div>
           <h4 className="text-sm font-extrabold text-slate-800 dark:text-white uppercase tracking-widest font-mono">AI Visual Quality Assessment Scorecard</h4>
-          <p className="text-xs text-slate-500 dark:text-slate-450 font-light max-w-xl">
+          <p className="text-xs text-slate-500 dark:text-slate-400 font-light max-w-xl">
             Autonomous visual diagnostics evaluate color contrasts, layout readability, categories counts, and accessibility targets.
           </p>
         </div>
@@ -1352,7 +1352,7 @@ export default function CustomChartBuilder({
 
         {/* Diagnostic Warnings List */}
         {dashboardQualityAssessment.warnings.length > 0 && (
-          <div className="border-l border-indigo-200 dark:border-slate-800 pl-4 text-[10px] space-y-1 text-slate-550 dark:text-slate-400 text-left max-w-xs">
+          <div className="border-l border-indigo-200 dark:border-slate-800 pl-4 text-[10px] space-y-1 text-slate-600 dark:text-slate-400 text-left max-w-xs">
             <span className="font-extrabold text-amber-600 flex items-center gap-1 uppercase tracking-wide">⚠️ Recommended Optimizations:</span>
             <ul className="list-disc pl-3.5 space-y-0.5">
               {dashboardQualityAssessment.warnings.slice(0, 3).map((w, idx) => (
