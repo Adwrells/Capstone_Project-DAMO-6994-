@@ -393,7 +393,7 @@ export default function ExportReports({
 
               <button
                 onClick={() => window.print()}
-                className="w-full py-2.5 px-4 rounded-lg border border-[#E5E7EB] hover:border-slate-350 dark:border-[#213454] dark:hover:border-slate-600 text-slate-600 dark:text-slate-300 hover:text-slate-800 font-semibold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer bg-white dark:bg-[#111a2e]"
+                className="w-full py-2.5 px-4 rounded-lg border border-[#E5E7EB] hover:border-slate-300 dark:border-[#213454] dark:hover:border-slate-600 text-slate-600 dark:text-slate-300 hover:text-slate-800 font-semibold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer bg-white dark:bg-[#111a2e]"
               >
                 <Printer size={13} />
                 <span>Direct Print Portfolio</span>

@@ -132,7 +132,7 @@ export default function ConsultantInsights({ isLoading }: ConsultantInsightsProp
         <button
           onClick={() => setActiveTab('summary')}
           className={`py-2.5 px-4 text-xs font-bold transition-all border-b-2 cursor-pointer flex items-center gap-2 ${
-            activeTab === 'summary' ? 'border-[#0F4C81] text-[#0F4C81] dark:border-[#3B82F6] dark:text-[#3B82F6]' : 'border-transparent text-slate-400 hover:text-slate-650'
+            activeTab === 'summary' ? 'border-[#0F4C81] text-[#0F4C81] dark:border-[#3B82F6] dark:text-[#3B82F6]' : 'border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
           }`}
         >
           <FileText size={14} />
@@ -141,7 +141,7 @@ export default function ConsultantInsights({ isLoading }: ConsultantInsightsProp
         <button
           onClick={() => setActiveTab('hospital')}
           className={`py-2.5 px-4 text-xs font-bold transition-all border-b-2 cursor-pointer flex items-center gap-2 ${
-            activeTab === 'hospital' ? 'border-[#0F4C81] text-[#0F4C81] dark:border-[#3B82F6] dark:text-[#3B82F6]' : 'border-transparent text-slate-400 hover:text-slate-650'
+            activeTab === 'hospital' ? 'border-[#0F4C81] text-[#0F4C81] dark:border-[#3B82F6] dark:text-[#3B82F6]' : 'border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
           }`}
         >
           <Activity size={14} />
@@ -150,7 +150,7 @@ export default function ConsultantInsights({ isLoading }: ConsultantInsightsProp
         <button
           onClick={() => setActiveTab('policy')}
           className={`py-2.5 px-4 text-xs font-bold transition-all border-b-2 cursor-pointer flex items-center gap-2 ${
-            activeTab === 'policy' ? 'border-[#0F4C81] text-[#0F4C81] dark:border-[#3B82F6] dark:text-[#3B82F6]' : 'border-transparent text-slate-400 hover:text-slate-650'
+            activeTab === 'policy' ? 'border-[#0F4C81] text-[#0F4C81] dark:border-[#3B82F6] dark:text-[#3B82F6]' : 'border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
           }`}
         >
           <Award size={14} />
@@ -159,7 +159,7 @@ export default function ConsultantInsights({ isLoading }: ConsultantInsightsProp
         <button
           onClick={() => setActiveTab('research')}
           className={`py-2.5 px-4 text-xs font-bold transition-all border-b-2 cursor-pointer flex items-center gap-2 ${
-            activeTab === 'research' ? 'border-[#0F4C81] text-[#0F4C81] dark:border-[#3B82F6] dark:text-[#3B82F6]' : 'border-transparent text-slate-400 hover:text-slate-650'
+            activeTab === 'research' ? 'border-[#0F4C81] text-[#0F4C81] dark:border-[#3B82F6] dark:text-[#3B82F6]' : 'border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
           }`}
         >
           <TrendingUp size={14} />
@@ -178,7 +178,7 @@ export default function ConsultantInsights({ isLoading }: ConsultantInsightsProp
               <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#0F4C81] dark:text-[#3B82F6] block mb-2">
                 Executive Abstract & Clinical Thesis
               </span>
-              <p className="text-sm font-bold text-slate-850 dark:text-white leading-relaxed">
+              <p className="text-sm font-bold text-slate-800 dark:text-white leading-relaxed">
                 "Our comprehensive evaluation of the CIHI NACRS Emergency Department cohort confirms that Length of Stay (LOS) is not a simple random distribution, but rather a structurally constrained clinical process. Systemic delays are highly concentrated in CTAS Level 3 'Urgent' cases and geriatric patient flows. By utilizing a multi-tier analytics solver, we have validated critical operational bottlenecks, enabling leadership to shift resources from reactive staffing models to proactive, predictive clinical pathways."
               </p>
             </div>
@@ -195,7 +195,7 @@ export default function ConsultantInsights({ isLoading }: ConsultantInsightsProp
                   </h3>
                 </div>
                 
-                <div className="space-y-3.5 text-xs text-slate-550">
+                <div className="space-y-3.5 text-xs text-slate-600 dark:text-slate-400">
                   <div className="flex items-start gap-2.5">
                     <CheckCircle2 size={14} className="text-[#2E8B57] mt-0.5 shrink-0" />
                     <p className="font-light leading-relaxed">
@@ -226,7 +226,7 @@ export default function ConsultantInsights({ isLoading }: ConsultantInsightsProp
                   </h3>
                 </div>
                 
-                <div className="space-y-3.5 text-xs text-slate-550">
+                <div className="space-y-3.5 text-xs text-slate-600 dark:text-slate-400">
                   <div className="flex items-start gap-2.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0 mt-1.5" />
                     <p className="font-light leading-relaxed">
@@ -354,7 +354,7 @@ function RecommendationCard({ rec }: { rec: StrategicRecommendation; key?: any }
         <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-stretch">
           
           {/* Action Column */}
-          <div className="md:col-span-8 space-y-1.5 text-slate-550">
+          <div className="md:col-span-8 space-y-1.5 text-slate-600 dark:text-slate-400">
             <span className="text-[10px] font-mono font-extrabold text-slate-400 uppercase tracking-widest block">
               Recommended Action & Clinical Context
             </span>
@@ -368,7 +368,7 @@ function RecommendationCard({ rec }: { rec: StrategicRecommendation; key?: any }
             <span className="text-[10px] font-mono font-extrabold text-[#2E8B57] uppercase tracking-widest block">
               Expected Operational Benefit
             </span>
-            <p className="text-slate-600 dark:text-slate-350 font-light font-mono text-[11px] leading-relaxed">
+            <p className="text-slate-600 dark:text-slate-400 font-light font-mono text-[11px] leading-relaxed">
               {rec.expectedBenefit}
             </p>
           </div>
@@ -376,7 +376,7 @@ function RecommendationCard({ rec }: { rec: StrategicRecommendation; key?: any }
         </div>
 
         {/* Micro-metrics Row */}
-        <div className="pt-4 border-t border-slate-100 dark:border-[#1e2d4a] flex justify-between items-center text-[10px] font-mono text-slate-450">
+        <div className="pt-4 border-t border-slate-100 dark:border-[#1e2d4a] flex justify-between items-center text-[10px] font-mono text-slate-500 dark:text-slate-400">
           <div className="flex items-center gap-1.5">
             <TrendingUp size={12} className="text-[#0F4C81] dark:text-[#3B82F6]" />
             <span>Expected Strategic Impact Level:</span>
