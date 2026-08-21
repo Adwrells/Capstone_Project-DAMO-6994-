@@ -52,3 +52,8 @@ MEMORY.md
 #   settings.local.json machine-specific permissions, per-developer by convention.
 .claude/worktrees/
 .claude/settings.local.json
+
+# graphify's generated knowledge graph. Regenerated from source by `/graphify .`
+# and refreshed with `graphify update .`, so it is derived data: large, and it would
+# conflict on nearly every merge. Each developer builds their own.
+graphify-out/
