@@ -1,16 +1,15 @@
 # Graph Report - Capstone_Project-DAMO-6994-  (2026-08-21)
 
 ## Corpus Check
-- 150 files · ~124,279 words
-- Verdict: corpus is large enough that graph structure adds value.
+- cluster-only mode — file stats not available
 
 ## Summary
-- 1676 nodes · 2637 edges · 140 communities (109 shown, 31 thin omitted)
+- 1684 nodes · 2644 edges · 139 communities (108 shown, 31 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 27 edges (avg confidence: 0.93)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `85650351`
+- Built from commit: `8e1bc434`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -31,12 +30,12 @@
 - get_statistics_dashboard
 - What You Must Do When Invoked
 - user_datasets.py
-- map_columns
+- align_to_table
 - test_dashboard.py
 - FakeDB
 - .diagnose
 - modelDiagnosticsService.ts
-- weighted_median
+- weighted_mann_whitney_u
 - database_manager.py
 - statistics.py
 - .get_kpis
@@ -52,7 +51,7 @@
 - .connection
 - dependencies
 - biEngine.ts
-- kruskal.py
+- H1.py
 - Healthcare Analytics Platform — Executive Dashboard Engineering Roadmap
 - dashboard.py
 - datasets.py
@@ -60,27 +59,27 @@
 - DataCleaning.tsx
 - launch.py
 - linear_regression
-- preprocessing_service.py
+- test_user_dataset_isolation.py
 - TestH4Module
-- analytics_service.py
+- map_columns
 - student_t_sf
 - main.py
 - api/insights.py
 - upload.py
-- .process_dataset
+- UserDatasetService
 - test_dependencies.py
 - TestH2Module
 - noisy_line
 - model_diagnostics.py
+- TestSeededCohortIsolation
 - run_preprocessing.py
-- backend/preprocessing/feature_engineering.py
 - test_dashboard_services.py
 - .get_recommendations
 - polynomial_fit
 - weighted_dunn_post_hoc
 - load_csv.py
-- apply_transformations
-- run_full_validation
+- infer_sql_type
+- schema.sql
 - App.tsx
 - TestH1Module
 - run_ed_visits_forecasting
@@ -93,9 +92,9 @@
 - schemas.py
 - detect_outlier_recommendations
 - graphify reference: extra exports and benchmark
-- userDatasetService.ts
+- APIRouter
 - train_test_split
-- sanitize_column
+- .execute_query
 - MetricCard.tsx
 - ArchitecturePipelineCard.tsx
 - TestH5Module
@@ -110,7 +109,6 @@
 - TestH3Module
 - sqlite_loader.py
 - _betai
-- APIRouter
 - APIRouter
 - init_database.py
 - graphify
@@ -146,32 +144,32 @@
 
 ## God Nodes (most connected - your core abstractions)
 1. `weighted_kruskal_wallis()` - 26 edges
-2. `weighted_mann_whitney_u()` - 21 edges
+2. `FakeDB` - 21 edges
 3. `DatabaseManager` - 21 edges
-4. `FakeDB` - 21 edges
+4. `weighted_mann_whitney_u()` - 21 edges
 5. `run_h1_test()` - 19 edges
 6. `run_h4_test()` - 18 edges
 7. `weighted_mean()` - 17 edges
-8. `weighted_dunn_post_hoc()` - 17 edges
-9. `rows()` - 17 edges
-10. `learning_curve()` - 16 edges
+8. `rows()` - 17 edges
+9. `weighted_dunn_post_hoc()` - 17 edges
+10. `TestH1` - 16 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `TestGuards` --uses--> `ModelDiagnosticsService`  [INFERRED]
   tests/test_model_diagnostics_service.py → backend/services/model_diagnostics_service.py
-- `TestOverfittingDetection` --uses--> `ModelDiagnosticsService`  [INFERRED]
-  tests/test_model_diagnostics_service.py → backend/services/model_diagnostics_service.py
 - `TestUnderfittingDetection` --uses--> `ModelDiagnosticsService`  [INFERRED]
   tests/test_model_diagnostics_service.py → backend/services/model_diagnostics_service.py
-- `TestOwnerScopedListing` --uses--> `UserDatasetService`  [INFERRED]
-  tests/test_user_dataset_isolation.py → backend/services/user_dataset_service.py
-- `TestSchemaMigration` --uses--> `UserDatasetService`  [INFERRED]
-  tests/test_user_dataset_isolation.py → backend/services/user_dataset_service.py
+- `IsolationTestCase` --uses--> `DatabaseManager`  [INFERRED]
+  tests/test_user_dataset_isolation.py → backend/database/database_manager.py
+- `TempDBTestCase` --uses--> `DatabaseManager`  [INFERRED]
+  tests/test_user_datasets.py → backend/database/database_manager.py
+- `TestOverfittingDetection` --uses--> `ModelDiagnosticsService`  [INFERRED]
+  tests/test_model_diagnostics_service.py → backend/services/model_diagnostics_service.py
 
 ## Import Cycles
 - None detected.
 
-## Communities (140 total, 31 thin omitted)
+## Communities (139 total, 31 thin omitted)
 
 ### Community 0 - "Healthcare Analytics Platform — Architecture Specification & Roadmap"
 Cohesion: 0.04
@@ -206,20 +204,20 @@ Cohesion: 0.06
 Nodes (36): A caution on polynomial degree, Additional commands, Analytical layering, Architecture, Author, Build and run, Codebase knowledge graph (graphify), Column contract (+28 more)
 
 ### Community 8 - "test_preprocessing.py"
-Cohesion: 0.12
-Nodes (22): add_los_columns(), add_population_category(), clean_missing_values(), normalize_age_group(), normalize_column_names(), _normalize_key(), normalize_population_category(), Any (+14 more)
+Cohesion: 0.05
+Nodes (49): compute_er_kpis(), Any, Helper method for calculating summary KPIs from record lists., add_los_columns(), add_population_category(), clean_missing_values(), normalize_age_group(), normalize_column_names() (+41 more)
 
 ### Community 9 - ".persist"
-Cohesion: 0.12
-Nodes (12): Any, Stores and retrieves user-cleaned datasets in isolated tables., Creates the registry, and migrates one that predates session scoping. ALTER…, Writes cleaned records to a new isolated table and registers it. Returns the…, Rows for one persisted dataset, or None when the id is unknown or not owned.…, Drops a persisted dataset and its registry row. False when the id is unknown,…, UserDatasetService, TestOwnerScopedAccess (+4 more)
+Cohesion: 0.23
+Nodes (3): Writes cleaned records to a new isolated table and registers it. Returns the…, Rows for one persisted dataset, or None when the id is unknown or not owned.…, TestPersistence
 
 ### Community 10 - "test_model_validation.py"
 Cohesion: 0.12
 Nodes (17): complexity_curve(), learning_curve(), mae(), polynomial_predict(), Any, r_squared(), Model validation primitives — train/test splitting, polynomial fitting, error…, Evaluate a polynomial (ascending coefficients) at each point via Horner's… (+9 more)
 
 ### Community 11 - "weighted.py"
-Cohesion: 0.11
-Nodes (17): _clean_pairs(), normal_sf(), Healthcare Analytics Platform - Statistics: Frequency-Weighted Non-Parametric…, Standard normal survival function P(Z > z), exact via the error function., Drops non-finite rows and non-positive weights, then coerces weights to counts., Midranks each unique value across the weight-expanded population. Returns…, 1 - sum(t^3 - t) / (N^3 - N). Returns 1.0 when the correction is undefined., Frequency-weighted Mann-Whitney U with tie-corrected normal approximation. The… (+9 more)
+Cohesion: 0.15
+Nodes (18): Any, H2: does reported median ED LOS differ between admitted and non-admitted…, run(), Any, H4: does reported median ED LOS differ across patient age groups? ``weights``…, run(), check_normality(), check_sample_size() (+10 more)
 
 ### Community 12 - "STATISTICAL COMPUTING HUB"
 Cohesion: 0.07
@@ -234,12 +232,12 @@ Cohesion: 0.07
 Nodes (26): For /graphify add and --watch, For /graphify query, For the commit hook and native CLAUDE.md integration, For --update and --cluster-only, /graphify, Honesty Rules, Interpreter guard for subcommands, Part A - Structural extraction for code files (+18 more)
 
 ### Community 15 - "user_datasets.py"
-Cohesion: 0.11
-Nodes (18): APIRouter, BaseModel, delete_user_dataset(), get_user_dataset(), HTTPException, list_user_datasets(), persist_cleaned_dataset(), PersistRequest (+10 more)
+Cohesion: 0.15
+Nodes (17): BaseModel, delete_user_dataset(), get_user_dataset(), HTTPException, list_user_datasets(), persist_cleaned_dataset(), PersistRequest, Any (+9 more)
 
-### Community 16 - "map_columns"
-Cohesion: 0.12
-Nodes (9): align_to_table(), map_columns(), DataFrame, Renames cleaned columns to schema names and drops analyst-only extras., Keeps only columns the target table actually declares, preserving table order., Test Suite: Cleaned-dataset loader column contract. Guards the mapping between…, TestAlignToTable, TestColumnMapping (+1 more)
+### Community 16 - "align_to_table"
+Cohesion: 0.19
+Nodes (5): align_to_table(), Keeps only columns the target table actually declares, preserving table order., Test Suite: Cleaned-dataset loader column contract. Guards the mapping between…, TestAlignToTable, TestLoaderConfiguration
 
 ### Community 17 - "test_dashboard.py"
 Cohesion: 0.16
@@ -257,13 +255,13 @@ Nodes (8): Full overfitting / underfitting assessment for one feature-target pai
 Cohesion: 0.13
 Nodes (19): FitDiagnostics(), FitDiagnosticsProps, VERDICT_STYLES, ExportReports(), ExportReportsProps, assessModelFit(), ComplexityCurvePoint, CrossValidation (+11 more)
 
-### Community 21 - "weighted_median"
-Cohesion: 0.20
-Nodes (18): Any, H1: does reported median ED LOS differ across CTAS triage levels? ``weights``…, run(), Any, H2: does reported median ED LOS differ between admitted and non-admitted…, run(), Any, H4: does reported median ED LOS differ across patient age groups? ``weights``… (+10 more)
+### Community 21 - "weighted_mann_whitney_u"
+Cohesion: 0.25
+Nodes (6): 1 - sum(t^3 - t) / (N^3 - N). Returns 1.0 when the correction is undefined., Frequency-weighted Mann-Whitney U with tie-corrected normal approximation. The…, _tie_correction(), weighted_mann_whitney_u(), Fully separated groups give the maximal effect size., TestWeightedMannWhitneyU
 
 ### Community 22 - "database_manager.py"
-Cohesion: 0.13
-Nodes (10): DatabaseManager, Healthcare Analytics Platform - Database Manager Handles SQLite database…, Thread-safe SQLite Database Manager for Healthcare Analytics Platform., Healthcare Analytics Platform - Test Suite: Database Manager, TestDatabaseManager, IsolationTestCase, Test Suite: Session-scoped isolation of user datasets. Two people using the…, H1-H5 must stay identical for everyone — that is the point of the seeded store. (+2 more)
+Cohesion: 0.21
+Nodes (5): DatabaseManager, Healthcare Analytics Platform - Database Manager Handles SQLite database…, Thread-safe SQLite Database Manager for Healthcare Analytics Platform., Healthcare Analytics Platform - Test Suite: Database Manager, TestDatabaseManager
 
 ### Community 23 - "statistics.py"
 Cohesion: 0.14
@@ -287,7 +285,7 @@ Nodes (9): Frequency-weighted Kruskal-Wallis H test with tie correction and exac
 
 ### Community 28 - "test_user_datasets.py"
 Cohesion: 0.18
-Nodes (8): build_schema(), infer_sql_type(), Healthcare Analytics Platform - User Dataset Persistence Persists a web user's…, INTEGER / REAL / TEXT from the observed non-null values., Ordered {safe_column: sql_type} derived from the record keys., Test Suite: User dataset persistence. Covers the Path A → SQLite write…, TestSchemaBuilding, TestTypeInference
+Nodes (8): build_schema(), Healthcare Analytics Platform - User Dataset Persistence Persists a web user's…, Rewrites an arbitrary key into a safe SQL identifier. Column names come from a…, Ordered {safe_column: sql_type} derived from the record keys., sanitize_column(), Test Suite: User dataset persistence. Covers the Path A → SQLite write…, TestColumnSanitisation, TestSchemaBuilding
 
 ### Community 29 - "DataExplorer.tsx"
 Cohesion: 0.13
@@ -310,8 +308,8 @@ Cohesion: 0.12
 Nodes (17): autoprefixer, esbuild, devDependencies, autoprefixer, esbuild, tailwindcss, tsx, @types/better-sqlite3 (+9 more)
 
 ### Community 34 - ".connection"
-Cohesion: 0.12
-Nodes (10): Any, DataFrame, Establishes and returns an optimized SQLite connection. The caller owns the…, Yields a connection and always closes it on exit. `with sqlite3.connect(...) as…, Executes a SELECT query and returns the results as a Pandas DataFrame., Executes a SELECT query and returns rows as dictionaries., Executes an INSERT, UPDATE, or DELETE command and returns affected row count., Executes a multi-statement SQL DDL/DML script. (+2 more)
+Cohesion: 0.18
+Nodes (7): DataFrame, Establishes and returns an optimized SQLite connection. The caller owns the…, Yields a connection and always closes it on exit. `with sqlite3.connect(...) as…, Executes a SELECT query and returns the results as a Pandas DataFrame., Executes an INSERT, UPDATE, or DELETE command and returns affected row count., Executes a multi-statement SQL DDL/DML script., Connection
 
 ### Community 35 - "dependencies"
 Cohesion: 0.12
@@ -321,9 +319,9 @@ Nodes (17): better-sqlite3, dotenv, dependencies, better-sqlite3, dotenv, @googl
 Cohesion: 0.13
 Nodes (11): AggregationType, ColumnRole, computeHistogramBins(), CoreStatsSummary, DateHierarchyNode, detectOutliersIndexes(), HistogramBin, RegressionResult (+3 more)
 
-### Community 37 - "kruskal.py"
-Cohesion: 0.18
-Nodes (8): kruskal_wallis(), mann_whitney_u(), Healthcare Analytics Platform - Statistics: Rank-Based Tests Thin adapters over…, Kruskal-Wallis H test. Returns ``(H, p)`` rounded for display., Mann-Whitney U test. Returns ``(U, p)`` rounded for display., TestDunnPostHoc, TestKruskalWallis, TestMannWhitneyU
+### Community 37 - "H1.py"
+Cohesion: 0.13
+Nodes (16): Any, H1: does reported median ED LOS differ across CTAS triage levels? ``weights``…, run(), dunn_post_hoc(), kruskal_wallis(), kruskal_wallis_full(), mann_whitney_u(), Any (+8 more)
 
 ### Community 38 - "Healthcare Analytics Platform — Executive Dashboard Engineering Roadmap"
 Cohesion: 0.12
@@ -338,8 +336,8 @@ Cohesion: 0.16
 Nodes (10): APIRouter, get_dataset_records(), get_datasets(), HTTPException, Any, Exception, get, Healthcare Analytics Platform - API Router: Datasets Management (+2 more)
 
 ### Community 41 - ".list_datasets"
-Cohesion: 0.18
-Nodes (6): Registry entries, newest first. With `owner_id`, only that session's datasets…, An existing database predates the column. Adding it must not require a rebuild,…, Backward compatibility: an unscoped call still sees all rows., Rows persisted before scoping existed have owner_id NULL. A scoped caller must…, TestOwnerScopedListing, TestSchemaMigration
+Cohesion: 0.24
+Nodes (4): Registry entries, newest first. With `owner_id`, only that session's datasets…, Backward compatibility: an unscoped call still sees all rows., Rows persisted before scoping existed have owner_id NULL. A scoped caller must…, TestOwnerScopedListing
 
 ### Community 42 - "DataCleaning.tsx"
 Cohesion: 0.20
@@ -353,17 +351,17 @@ Nodes (13): free_port(), in_container(), is_interactive(), main(), port_in_use()
 Cohesion: 0.28
 Nodes (6): Any, run(), linear_regression(), Any, regression_summary(), TestLinearRegression
 
-### Community 45 - "preprocessing_service.py"
-Cohesion: 0.29
-Nodes (7): calculate_null_ratios(), infer_column_types(), Any, run_health_check(), validate_schema(), Service layer for the architecture-aligned preprocessing pipeline., TestValidation
+### Community 45 - "test_user_dataset_isolation.py"
+Cohesion: 0.22
+Nodes (6): IsolationTestCase, Test Suite: Session-scoped isolation of user datasets. Two people using the…, An existing database predates the column. Adding it must not require a rebuild,…, H1-H5 must stay identical for everyone — that is the point of the seeded store., TestSchemaMigration, TestSeededCohortStillShared
 
 ### Community 46 - "TestH4Module"
 Cohesion: 0.15
 Nodes (3): Visit counts must actually drive the test, not merely decorate the output., The ordering constant must describe categories the database really stores., TestH4Module
 
-### Community 47 - "analytics_service.py"
-Cohesion: 0.24
-Nodes (8): compute_er_kpis(), Any, Helper method for calculating summary KPIs from record lists., AnalyticsService, Any, Healthcare Analytics Platform - Analytics Service Layer Decouples API…, Reports readiness of each analytical pipeline stage. Backs GET…, test_pipeline_overview_reports_architecture_stages()
+### Community 47 - "map_columns"
+Cohesion: 0.33
+Nodes (3): map_columns(), Renames cleaned columns to schema names and drops analyst-only extras., TestColumnMapping
 
 ### Community 48 - "student_t_sf"
 Cohesion: 0.21
@@ -374,16 +372,16 @@ Cohesion: 0.18
 Nodes (8): APIRouter, get_pipeline_overview(), Any, get, Architecture-oriented API endpoints for the platform pipeline overview., health_check(), get, root()
 
 ### Community 50 - "api/insights.py"
-Cohesion: 0.23
-Nodes (10): get_insights_summary(), get_strategic_recommendations(), HTTPException, Any, Exception, get, post, Healthcare Analytics Platform - API Router: Strategic Insights Generates data-… (+2 more)
+Cohesion: 0.16
+Nodes (11): APIRouter, get_insights_summary(), get_strategic_recommendations(), HTTPException, Any, Exception, get, post (+3 more)
 
 ### Community 51 - "upload.py"
 Cohesion: 0.20
 Nodes (8): APIRouter, Any, post, Healthcare Analytics Platform - API Router: Dataset Ingestion & Uploads, Ingests uploaded clinical dataset CSV/XLSX file., upload_dataset(), upload_dataset_fallback(), UploadFile
 
-### Community 52 - ".process_dataset"
-Cohesion: 0.20
-Nodes (11): clean_missing_values(), Any, Deduplicates records based on dictionary equality., Fills empty or None values with a specified fallback representation., remove_duplicates(), encode_sex_category(), Standardizes sex categories to Male, Female, or Other/Unknown/All., PreprocessingService (+3 more)
+### Community 52 - "UserDatasetService"
+Cohesion: 0.29
+Nodes (6): Any, Stores and retrieves user-cleaned datasets in isolated tables., Creates the registry, and migrates one that predates session scoping. ALTER…, Drops a persisted dataset and its registry row. False when the id is unknown,…, UserDatasetService, TestOwnerScopedAccess
 
 ### Community 53 - "test_dependencies.py"
 Cohesion: 0.24
@@ -397,13 +395,13 @@ Nodes (6): noisy_line(), Complexity, not the data, drives the verdict — the di
 Cohesion: 0.29
 Nodes (10): assess_fit(), BaseModel, ColumnsRequest, DiagnosticsRequest, modelable_columns(), Any, post, Overfitting / underfitting diagnostics for the post-cleaning dataset. (+2 more)
 
-### Community 57 - "run_preprocessing.py"
-Cohesion: 0.24
-Nodes (9): load_csv_datasets(), clean_raw_datasets(), DataFrame, Path, Healthcare Analytics Platform - Preprocessing: Cleaning Module Provides missing…, Parses original CIHI supplementary data tables from raw Excel file and extracts…, execute_pipeline(), Healthcare Analytics Platform - Preprocessing Pipeline Runner Executes the… (+1 more)
+### Community 57 - "TestSeededCohortIsolation"
+Cohesion: 0.20
+Nodes (4): The guarantee that makes H1-H5 reproducible: uploads never touch the seeded…, schema.sql drops its tables; the registry must not be there or a rebuild would…, TempDBTestCase, TestSeededCohortIsolation
 
-### Community 58 - "backend/preprocessing/feature_engineering.py"
-Cohesion: 0.24
-Nodes (10): add_feature_engineering(), classify_age_group(), extract_year_from_period(), map_ctas_urgency(), DataFrame, Healthcare Analytics Platform - Preprocessing: Feature Engineering Module…, Extracts starting fiscal year or calendar year as integer from period string., Maps CTAS triage text levels to numerical urgency scores (1=Resuscitation to… (+2 more)
+### Community 58 - "run_preprocessing.py"
+Cohesion: 0.07
+Nodes (36): load_csv_datasets(), clean_raw_datasets(), DataFrame, Path, Parses original CIHI supplementary data tables from raw Excel file and extracts…, add_feature_engineering(), classify_age_group(), extract_year_from_period() (+28 more)
 
 ### Community 59 - "test_dashboard_services.py"
 Cohesion: 0.25
@@ -418,24 +416,24 @@ Cohesion: 0.29
 Nodes (5): polynomial_fit(), Gaussian elimination with partial pivoting. Returns [] if singular., Least-squares polynomial coefficients in ascending order: [c0, c1, ...…, _solve(), TestPolynomialFit
 
 ### Community 62 - "weighted_dunn_post_hoc"
-Cohesion: 0.29
-Nodes (5): Any, Dunn's test: pairwise mean-rank z-tests sharing the pooled rank variance. This…, weighted_dunn_post_hoc(), Dunn shares one ranking across all groups; mean ranks must be global., TestWeightedDunnPostHoc
+Cohesion: 0.18
+Nodes (8): Any, Midranks each unique value across the weight-expanded population. Returns…, Dunn's test: pairwise mean-rank z-tests sharing the pooled rank variance. This…, weighted_dunn_post_hoc(), weighted_midranks(), Dunn shares one ranking across all groups; mean ranks must be global., TestWeightedDunnPostHoc, TestWeightedMidranks
 
 ### Community 63 - "load_csv.py"
-Cohesion: 0.27
-Nodes (9): load_datasets(), main(), Path, Healthcare Analytics Platform - Analytical Database Loader Rebuilds…, Initializes the schema and loads every cleaned dataset. Returns rows per table., Returns the CSV to read for a dataset: the cleaned copy if present, else raw., Loads every available dataset, workbook first, CSV directory as fallback., read_sources() (+1 more)
+Cohesion: 0.24
+Nodes (10): load_datasets(), main(), DataFrame, Path, Healthcare Analytics Platform - Analytical Database Loader Rebuilds…, Initializes the schema and loads every cleaned dataset. Returns rows per table., Returns the CSV to read for a dataset: the cleaned copy if present, else raw., Loads every available dataset, workbook first, CSV directory as fallback. (+2 more)
 
-### Community 64 - "apply_transformations"
-Cohesion: 0.22
-Nodes (9): aggregate_by_group(), apply_transformations(), normalize_fiscal_year(), Any, DataFrame, Healthcare Analytics Platform - Preprocessing: Transformations Module Provides…, Aggregates numeric column sums grouped by categorical key., Normalizes fiscal year string representations (e.g., '2021–2022' to… (+1 more)
+### Community 64 - "infer_sql_type"
+Cohesion: 0.36
+Nodes (3): infer_sql_type(), INTEGER / REAL / TEXT from the observed non-null values., TestTypeInference
 
-### Community 65 - "run_full_validation"
-Cohesion: 0.31
-Nodes (9): calculate_null_ratios(), Any, DataFrame, Healthcare Analytics Platform - Preprocessing: Data Validation Module Provides…, Validates presence of required columns and computes overall schema completeness., Calculates missing value percentage per column across dataset records., Executes complete validation checks across all six datasets: 1. Expected schema…, run_full_validation() (+1 more)
+### Community 65 - "schema.sql"
+Cohesion: 0.25
+Nodes (7): age_sex, ctas_triage, demographics, ed_visits, main_problems, metadata, visit_disposition
 
 ### Community 66 - "App.tsx"
-Cohesion: 0.29
-Nodes (7): App(), getStagePercentage(), SectionType, STAGES, AboutProject(), AboutProjectProps, buildSemanticModel()
+Cohesion: 0.17
+Nodes (15): App(), getStagePercentage(), SectionType, STAGES, AboutProject(), AboutProjectProps, deleteUserDataset(), fetchUserDataset() (+7 more)
 
 ### Community 67 - "TestH1Module"
 Cohesion: 0.20
@@ -481,17 +479,13 @@ Nodes (3): detect_outlier_recommendations(), Flags numeric columns whose Tukey-f
 Cohesion: 0.22
 Nodes (8): graphify reference: extra exports and benchmark, Step 6b - Wiki (only if --wiki flag), Step 7 - Neo4j export (only if --neo4j or --neo4j-push flag), Step 7a - FalkorDB export (only if --falkordb or --falkordb-push flag), Step 7b - SVG export (only if --svg flag), Step 7c - GraphML export (only if --graphml flag), Step 7d - MCP server (only if --mcp flag), Step 8 - Token reduction benchmark (only if total_words > 5000)
 
-### Community 78 - "userDatasetService.ts"
-Cohesion: 0.36
-Nodes (8): deleteUserDataset(), fetchUserDataset(), getSessionId(), listUserDatasets(), persistCleanedDataset(), PersistResult, sessionHeaders(), UserDatasetEntry
-
 ### Community 79 - "train_test_split"
 Cohesion: 0.39
 Nodes (3): Shuffle-split paired samples into (x_train, y_train, x_test, y_test).…, train_test_split(), TestTrainTestSplit
 
-### Community 80 - "sanitize_column"
-Cohesion: 0.39
-Nodes (3): Rewrites an arbitrary key into a safe SQL identifier. Column names come from a…, sanitize_column(), TestColumnSanitisation
+### Community 80 - ".execute_query"
+Cohesion: 0.40
+Nodes (3): Any, Executes a SELECT query and returns rows as dictionaries., Returns list of user tables in the SQLite database.
 
 ### Community 81 - "MetricCard.tsx"
 Cohesion: 0.25
@@ -562,23 +556,23 @@ Cohesion: 0.67
 Nodes (3): vite, vite, vite
 
 ## Knowledge Gaps
-- **283 isolated node(s):** `BaseModel`, `name`, `private`, `version`, `type` (+278 more)
+- **290 isolated node(s):** `LayoutProps`, `FitDiagnosticsProps`, `ExportReportsProps`, `ComplexityCurvePoint`, `CrossValidation` (+285 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **31 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `weighted_mann_whitney_u()` connect `weighted.py` to `hypothesis_testing.py`, `kruskal.py`, `weighted_median`, `weighted_dunn_post_hoc`?**
-  _High betweenness centrality (0.027) - this node is a cross-community bridge._
-- **Why does `DatabaseManager` connect `database_manager.py` to `.connection`, `test_user_datasets.py`, `load_csv.py`?**
-  _High betweenness centrality (0.026) - this node is a cross-community bridge._
-- **Why does `weighted_kruskal_wallis()` connect `weighted_kruskal_wallis` to `hypothesis_testing.py`, `kruskal.py`, `chi2_sf`, `weighted.py`, `weighted_median`, `weighted_dunn_post_hoc`?**
-  _High betweenness centrality (0.026) - this node is a cross-community bridge._
+- **Why does `weighted_kruskal_wallis()` connect `weighted_kruskal_wallis` to `hypothesis_testing.py`, `H1.py`, `chi2_sf`, `weighted.py`, `weighted_mann_whitney_u`, `weighted_dunn_post_hoc`?**
+  _High betweenness centrality (0.021) - this node is a cross-community bridge._
+- **Why does `run_h1_test()` connect `hypothesis_testing.py` to `TestH1`, `get_statistics_dashboard`, `statistics.py`, `weighted_kruskal_wallis`, `weighted_dunn_post_hoc`?**
+  _High betweenness centrality (0.020) - this node is a cross-community bridge._
+- **Why does `DatabaseManager` connect `database_manager.py` to `.connection`, `test_user_dataset_isolation.py`, `.execute_query`, `TestSeededCohortIsolation`, `test_user_datasets.py`, `load_csv.py`?**
+  _High betweenness centrality (0.019) - this node is a cross-community bridge._
 - **Are the 3 inferred relationships involving `DatabaseManager` (e.g. with `TestDatabaseManager` and `IsolationTestCase`) actually correct?**
   _`DatabaseManager` has 3 INFERRED edges - model-reasoned connections that need verification._
-- **What connects `BaseModel`, `name`, `private` to the rest of the system?**
-  _283 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **What connects `LayoutProps`, `FitDiagnosticsProps`, `ExportReportsProps` to the rest of the system?**
+  _290 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Healthcare Analytics Platform — Architecture Specification & Roadmap` be split into smaller, more focused modules?**
   _Cohesion score 0.044444444444444446 - nodes in this community are weakly interconnected._
 - **Should `hypothesis_testing.py` be split into smaller, more focused modules?**
