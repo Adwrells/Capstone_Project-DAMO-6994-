@@ -66,12 +66,12 @@ const fmt = (v: number | null | undefined, decimals = 2): string => {
 const Section = ({ title, icon: Icon, children, accent = '#2563EB' }: {
   title: string; icon: React.ElementType; children: React.ReactNode; accent?: string;
 }) => (
-  <div className="bg-white border border-[#E5E7EB] rounded-2xl shadow-sm overflow-hidden">
-    <div className="px-6 py-4 border-b border-[#E5E7EB] flex items-center gap-3">
+  <div className="bg-[var(--surface-card)] border border-[var(--border)] rounded-2xl shadow-sm overflow-hidden">
+    <div className="px-6 py-4 border-b border-[var(--border)] flex items-center gap-3">
       <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${accent}18` }}>
         <Icon size={16} style={{ color: accent }} />
       </div>
-      <h3 className="text-sm font-semibold text-[#111827]">{title}</h3>
+      <h3 className="text-sm font-semibold text-[var(--text-primary)]">{title}</h3>
     </div>
     <div className="p-6">{children}</div>
   </div>
@@ -79,15 +79,15 @@ const Section = ({ title, icon: Icon, children, accent = '#2563EB' }: {
 
 /** Stat chip */
 const StatChip = ({ label, value, color = '#2563EB' }: { label: string; value: string | number; color?: string }) => (
-  <div className="flex flex-col gap-0.5 px-4 py-3 rounded-xl bg-[#F8FAFC] border border-[#E5E7EB]">
-    <span className="text-[11px] font-medium text-[#6B7280] uppercase tracking-wider">{label}</span>
+  <div className="flex flex-col gap-0.5 px-4 py-3 rounded-xl bg-[var(--surface-bg)] border border-[var(--border)]">
+    <span className="text-[11px] font-medium text-[var(--text-secondary)] uppercase tracking-wider">{label}</span>
     <span className="text-lg font-bold" style={{ color }}>{String(value)}</span>
   </div>
 );
 
 /** Loading skeleton */
 const Skeleton = ({ className = '' }: { className?: string }) => (
-  <div className={`bg-[#F3F4F6] rounded-lg animate-pulse ${className}`} />
+  <div className={`bg-[var(--hover-bg)] rounded-lg animate-pulse ${className}`} />
 );
 
 /** Distribution bar chart for a numeric column */
@@ -115,17 +115,17 @@ function DistributionChart({ data, col }: { data: Record<string, any>[]; col: st
     return buckets;
   }, [values]);
 
-  if (bins.length === 0) return <p className="text-sm text-[#6B7280]">Insufficient numeric data.</p>;
+  if (bins.length === 0) return <p className="text-sm text-[var(--text-secondary)]">Insufficient numeric data.</p>;
 
   return (
     <ResponsiveContainer width="100%" height={180}>
       <BarChart data={bins} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
-        <XAxis dataKey="range" tick={{ fontSize: 10, fill: '#9CA3AF' }} interval="preserveStartEnd" />
-        <YAxis tick={{ fontSize: 10, fill: '#9CA3AF' }} />
+        <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+        <XAxis dataKey="range" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} interval="preserveStartEnd" />
+        <YAxis tick={{ fontSize: 10, fill: 'var(--text-muted)' }} />
         <Tooltip
-          contentStyle={{ fontSize: 12, border: '1px solid #E5E7EB', borderRadius: 8 }}
-          cursor={{ fill: '#EFF6FF' }}
+          contentStyle={{ fontSize: 12, border: '1px solid var(--border)', borderRadius: 8, backgroundColor: 'var(--surface-card)', color: 'var(--text-primary)' }}
+          cursor={{ fill: 'var(--hover-bg)' }}
         />
         <Bar dataKey="count" fill="#2563EB" radius={[3, 3, 0, 0]} />
       </BarChart>
@@ -147,16 +147,16 @@ function FrequencyChart({ data, col }: { data: Record<string, any>[]; col: strin
       .map(([name, count]) => ({ name, count, pct: `${((count / data.length) * 100).toFixed(1)}%` }));
   }, [data, col]);
 
-  if (freq.length === 0) return <p className="text-sm text-[#6B7280]">No data.</p>;
+  if (freq.length === 0) return <p className="text-sm text-[var(--text-secondary)]">No data.</p>;
 
   return (
     <ResponsiveContainer width="100%" height={Math.max(160, freq.length * 28)}>
       <BarChart data={freq} layout="vertical" margin={{ top: 4, right: 40, left: 0, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" horizontal={false} />
-        <XAxis type="number" tick={{ fontSize: 10, fill: '#9CA3AF' }} />
-        <YAxis type="category" dataKey="name" width={140} tick={{ fontSize: 10, fill: '#374151' }} />
+        <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" horizontal={false} />
+        <XAxis type="number" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} />
+        <YAxis type="category" dataKey="name" width={140} tick={{ fontSize: 10, fill: 'var(--text-primary)' }} />
         <Tooltip
-          contentStyle={{ fontSize: 12, border: '1px solid #E5E7EB', borderRadius: 8 }}
+          contentStyle={{ fontSize: 12, border: '1px solid var(--border)', borderRadius: 8, backgroundColor: 'var(--surface-card)', color: 'var(--text-primary)' }}
           formatter={(value: number) => [value.toLocaleString(), 'Count']}
         />
         <Bar dataKey="count" radius={[0, 3, 3, 0]}>
@@ -440,8 +440,8 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
       {/* Page Header */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold text-[#111827] tracking-tight">Dataset Explorer</h1>
-          <p className="text-sm text-[#6B7280] mt-1">
+          <h1 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">Dataset Explorer</h1>
+          <p className="text-sm text-[var(--text-secondary)] mt-1">
             Capstone Workbook — <span className="font-medium">Explanatory_and_Predictive_ED_Analytics_Dataset.xlsx</span>
           </p>
         </div>
@@ -461,12 +461,12 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
       )}
 
       {/* Workbook Status + Sheet Selector */}
-      <div className="bg-white border border-[#E5E7EB] rounded-2xl p-5 shadow-sm">
+      <div className="bg-[var(--surface-card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
         <div className="flex items-center gap-4 flex-wrap">
           {/* File badge */}
-          <div className="flex items-center gap-2.5 px-3 py-2 bg-[#EFF6FF] border border-[#DBEAFE] rounded-xl">
-            <FileSpreadsheet size={16} className="text-[#2563EB]" />
-            <span className="text-xs font-semibold text-[#1D4ED8]">Excel Workbook Loaded</span>
+          <div className="flex items-center gap-2.5 px-3 py-2 bg-[#EFF6FF] dark:bg-blue-950/30 border border-[#DBEAFE] dark:border-blue-900/50 rounded-xl">
+            <FileSpreadsheet size={16} className="text-[#2563EB] dark:text-blue-400" />
+            <span className="text-xs font-semibold text-[#1D4ED8] dark:text-blue-300">Excel Workbook Loaded</span>
           </div>
 
           {/* Sheet selector */}
@@ -476,19 +476,19 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
               disabled={loadingSheets || sheets.length === 0}
               aria-haspopup="listbox"
               aria-expanded={sheetDropOpen}
-              className="flex items-center gap-2 px-4 py-2.5 bg-white border border-[#E5E7EB] rounded-xl text-sm font-medium text-[#111827] hover:border-[#2563EB] transition-colors min-w-[240px] justify-between disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2.5 bg-[var(--surface-card)] border border-[var(--border)] rounded-xl text-sm font-medium text-[var(--text-primary)] hover:border-[#2563EB] transition-colors min-w-[240px] justify-between disabled:opacity-50"
             >
               <div className="flex items-center gap-2">
-                <Database size={15} className="text-[#6B7280]" />
+                <Database size={15} className="text-[var(--text-secondary)]" />
                 <span>{loadingSheets ? 'Loading sheets…' : (activeSheet || 'Select worksheet')}</span>
               </div>
-              <ChevronDown size={14} className={`text-[#9CA3AF] transition-transform ${sheetDropOpen ? 'rotate-180' : ''}`} />
+              <ChevronDown size={14} className={`text-[var(--text-muted)] transition-transform ${sheetDropOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {sheetDropOpen && sheets.length > 0 && (
               <div
                 role="listbox"
-                className="absolute top-full mt-1 left-0 w-full bg-white border border-[#E5E7EB] rounded-xl shadow-lg z-30 overflow-hidden"
+                className="absolute top-full mt-1 left-0 w-full bg-[var(--surface-card)] border border-[var(--border)] rounded-xl shadow-lg z-30 overflow-hidden"
               >
                 {sheets.map(s => (
                   <button
@@ -497,7 +497,7 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
                     aria-selected={s === activeSheet}
                     onClick={() => { setActiveSheet(s); setSheetDropOpen(false); setActiveTab('summary'); }}
                     className={`w-full flex items-center gap-2 px-4 py-2.5 text-sm text-left transition-colors
-                      ${s === activeSheet ? 'bg-[#EFF6FF] text-[#2563EB] font-semibold' : 'text-[#374151] hover:bg-[#F9FAFB]'}`}
+                      ${s === activeSheet ? 'bg-[#EFF6FF] dark:bg-blue-950/30 text-[#2563EB] dark:text-blue-400 font-semibold' : 'text-[var(--text-primary)] hover:bg-[var(--hover-bg)]'}`}
                   >
                     <Database size={13} className="shrink-0" />
                     <span className="truncate">{s}</span>
@@ -511,13 +511,13 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
           {/* Sheet metadata */}
           {sheetData && !loadingData && (
             <div className="flex items-center gap-3 ml-2">
-              <span className="text-xs text-[#6B7280]">
-                <strong className="text-[#111827]">{sheetData.rows_count.toLocaleString()}</strong> rows ×{' '}
-                <strong className="text-[#111827]">{sheetData.cols_count}</strong> columns
+              <span className="text-xs text-[var(--text-secondary)]">
+                <strong className="text-[var(--text-primary)]">{sheetData.rows_count.toLocaleString()}</strong> rows ×{' '}
+                <strong className="text-[var(--text-primary)]">{sheetData.cols_count}</strong> columns
               </span>
               {sheetStats && (
-                <span className="text-xs text-[#6B7280]">
-                  · <strong className="text-[#111827]">{sheetStats.missing_values}</strong> missing
+                <span className="text-xs text-[var(--text-secondary)]">
+                  · <strong className="text-[var(--text-primary)]">{sheetStats.missing_values}</strong> missing
                   · {sheetStats.memory_usage}
                 </span>
               )}
@@ -527,7 +527,7 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
           {/* Refresh */}
           <button
             onClick={() => { const s = activeSheet; setActiveSheet(''); setTimeout(() => setActiveSheet(s), 50); }}
-            className="ml-auto p-2 rounded-lg border border-[#E5E7EB] text-[#6B7280] hover:text-[#2563EB] hover:border-[#2563EB] transition-colors"
+            className="ml-auto p-2 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#2563EB] hover:border-[#2563EB] transition-colors"
             title="Refresh data"
             disabled={loadingData}
           >
@@ -540,7 +540,7 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
       {loadingData && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="bg-[#F3F4F6] rounded-lg animate-pulse h-24" />
+            <div key={i} className="bg-[var(--hover-bg)] rounded-lg animate-pulse h-24" />
           ))}
         </div>
       )}
@@ -558,7 +558,7 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
           </div>
 
           {/* Tab navigation */}
-          <div className="flex gap-1 bg-[#F3F4F6] p-1 rounded-xl overflow-x-auto" role="tablist">
+          <div className="flex gap-1 bg-[var(--hover-bg)] p-1 rounded-xl overflow-x-auto" role="tablist">
             {TABS.map(t => {
               const Icon = t.icon;
               return (
@@ -569,8 +569,8 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
                   onClick={() => setActiveTab(t.key)}
                   className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all duration-150
                     ${activeTab === t.key
-                      ? 'bg-white text-[#2563EB] shadow-sm border border-[#E5E7EB]'
-                      : 'text-[#6B7280] hover:text-[#374151]'}`}
+                      ? 'bg-[var(--surface-card)] text-[#2563EB] shadow-sm border border-[var(--border)]'
+                      : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
                 >
                   <Icon size={13} />
                   {t.label}
@@ -585,14 +585,14 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
           {activeTab === 'summary' && (
             <Section title="Summary Statistics" icon={Activity}>
               {sheetStats.numeric_columns.length === 0 ? (
-                <p className="text-sm text-[#6B7280]">No numeric columns in this worksheet.</p>
+                <p className="text-sm text-[var(--text-secondary)]">No numeric columns in this worksheet.</p>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm" role="grid">
                     <thead>
-                      <tr className="border-b border-[#E5E7EB]">
+                      <tr className="border-b border-[var(--border)]">
                         {['Column','Count','Missing','Min','Max','Mean','Median','Std Dev','Q1','Q3'].map(h => (
-                          <th key={h} className="text-left px-3 py-2.5 text-[10px] font-semibold text-[#6B7280] uppercase tracking-wider whitespace-nowrap">{h}</th>
+                          <th key={h} className="text-left px-3 py-2.5 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider whitespace-nowrap">{h}</th>
                         ))}
                       </tr>
                     </thead>
@@ -601,19 +601,19 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
                         const s = sheetStats.summary_statistics[col];
                         if (!s) return null;
                         return (
-                          <tr key={col} className={`border-b border-[#F3F4F6] transition-colors hover:bg-[#F9FAFB] ${i % 2 === 0 ? '' : 'bg-[#FAFAFA]'}`}>
-                            <td className="px-3 py-2.5 font-medium text-[#111827] max-w-[160px] truncate">{col}</td>
-                            <td className="px-3 py-2.5 text-[#374151]">{s.count.toLocaleString()}</td>
+                          <tr key={col} className={`border-b border-[var(--border)] transition-colors hover:bg-[var(--hover-bg)] ${i % 2 === 0 ? '' : 'bg-[var(--hover-bg)]'}`}>
+                            <td className="px-3 py-2.5 font-medium text-[var(--text-primary)] max-w-[160px] truncate">{col}</td>
+                            <td className="px-3 py-2.5 text-[var(--text-primary)]">{s.count.toLocaleString()}</td>
                             <td className="px-3 py-2.5">
                               <span className={`font-medium ${s.missing > 0 ? 'text-[#EF4444]' : 'text-[#10B981]'}`}>{s.missing}</span>
                             </td>
-                            <td className="px-3 py-2.5 text-[#374151]">{fmt(s.min)}</td>
-                            <td className="px-3 py-2.5 text-[#374151]">{fmt(s.max)}</td>
+                            <td className="px-3 py-2.5 text-[var(--text-primary)]">{fmt(s.min)}</td>
+                            <td className="px-3 py-2.5 text-[var(--text-primary)]">{fmt(s.max)}</td>
                             <td className="px-3 py-2.5 font-medium text-[#2563EB]">{fmt(s.mean)}</td>
-                            <td className="px-3 py-2.5 text-[#374151]">{fmt(s.median)}</td>
-                            <td className="px-3 py-2.5 text-[#374151]">{fmt(s.std_dev)}</td>
-                            <td className="px-3 py-2.5 text-[#374151]">{fmt(s.q1)}</td>
-                            <td className="px-3 py-2.5 text-[#374151]">{fmt(s.q3)}</td>
+                            <td className="px-3 py-2.5 text-[var(--text-primary)]">{fmt(s.median)}</td>
+                            <td className="px-3 py-2.5 text-[var(--text-primary)]">{fmt(s.std_dev)}</td>
+                            <td className="px-3 py-2.5 text-[var(--text-primary)]">{fmt(s.q1)}</td>
+                            <td className="px-3 py-2.5 text-[var(--text-primary)]">{fmt(s.q3)}</td>
                           </tr>
                         );
                       })}
@@ -632,7 +632,7 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
                 {sheetStats.numeric_columns.length > 0 && (
                   <Section title="Numeric Distribution (Histogram)" icon={BarChart2}>
                     <div className="mb-4">
-                      <label className="text-xs font-medium text-[#6B7280] mb-1.5 block">Select Column</label>
+                      <label className="text-xs font-medium text-[var(--text-secondary)] mb-1.5 block">Select Column</label>
                       <select
                         value={selectedNumCol}
                         onChange={e => setSelectedNumCol(e.target.value)}
@@ -649,7 +649,7 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
                 {sheetStats.categorical_columns.length > 0 && (
                   <Section title="Categorical Frequency" icon={BarChart2} accent="#0EA5A4">
                     <div className="mb-4">
-                      <label className="text-xs font-medium text-[#6B7280] mb-1.5 block">Select Column</label>
+                      <label className="text-xs font-medium text-[var(--text-secondary)] mb-1.5 block">Select Column</label>
                       <select
                         value={selectedCatCol}
                         onChange={e => setSelectedCatCol(e.target.value)}
@@ -671,24 +671,24 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
             <Section title="Pearson Correlation Matrix" icon={TrendingUp} accent="#8B5CF6">
               {correlationMatrix.length === 0 ? (
                 <div className="text-center py-8">
-                  <TrendingUp size={32} className="text-[#D1D5DB] mx-auto mb-2" />
-                  <p className="text-sm text-[#9CA3AF]">Need at least 2 numeric columns to compute correlations.</p>
+                  <TrendingUp size={32} className="text-[var(--text-disabled)] mx-auto mb-2" />
+                  <p className="text-sm text-[var(--text-muted)]">Need at least 2 numeric columns to compute correlations.</p>
                 </div>
               ) : (
                 <>
-                  <p className="text-xs text-[#6B7280] mb-4">
+                  <p className="text-xs text-[var(--text-secondary)] mb-4">
                     Pearson r measures linear association (–1 = perfect negative, 0 = none, +1 = perfect positive).
                     Computed on available non-null pairs.
                   </p>
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm" role="grid">
                       <thead>
-                        <tr className="border-b border-[#E5E7EB]">
-                          <th className="text-left px-3 py-2 text-[10px] font-semibold text-[#6B7280] uppercase tracking-wider">Variable A</th>
-                          <th className="text-left px-3 py-2 text-[10px] font-semibold text-[#6B7280] uppercase tracking-wider">Variable B</th>
-                          <th className="text-left px-3 py-2 text-[10px] font-semibold text-[#6B7280] uppercase tracking-wider">Pearson r</th>
-                          <th className="text-left px-3 py-2 text-[10px] font-semibold text-[#6B7280] uppercase tracking-wider">Strength</th>
-                          <th className="text-left px-3 py-2 text-[10px] font-semibold text-[#6B7280] uppercase tracking-wider">Visual</th>
+                        <tr className="border-b border-[var(--border)]">
+                          <th className="text-left px-3 py-2 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Variable A</th>
+                          <th className="text-left px-3 py-2 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Variable B</th>
+                          <th className="text-left px-3 py-2 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Pearson r</th>
+                          <th className="text-left px-3 py-2 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Strength</th>
+                          <th className="text-left px-3 py-2 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Visual</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -698,9 +698,9 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
                           const colour = r > 0 ? '#2563EB' : '#EF4444';
                           const strengthColour = abs >= 0.7 ? '#10B981' : abs >= 0.4 ? '#F59E0B' : '#9CA3AF';
                           return (
-                            <tr key={i} className={`border-b border-[#F3F4F6] hover:bg-[#F9FAFB] transition-colors ${i % 2 === 0 ? '' : 'bg-[#FAFAFA]'}`}>
-                              <td className="px-3 py-2.5 font-medium text-[#111827] max-w-[160px] truncate">{colA}</td>
-                              <td className="px-3 py-2.5 text-[#374151] max-w-[160px] truncate">{colB}</td>
+                            <tr key={i} className={`border-b border-[var(--border)] hover:bg-[var(--hover-bg)] transition-colors ${i % 2 === 0 ? '' : 'bg-[var(--hover-bg)]'}`}>
+                              <td className="px-3 py-2.5 font-medium text-[var(--text-primary)] max-w-[160px] truncate">{colA}</td>
+                              <td className="px-3 py-2.5 text-[var(--text-primary)] max-w-[160px] truncate">{colB}</td>
                               <td className="px-3 py-2.5 font-bold" style={{ color: colour }}>{r.toFixed(3)}</td>
                               <td className="px-3 py-2.5">
                                 <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold"
@@ -709,7 +709,7 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
                                 </span>
                               </td>
                               <td className="px-3 py-2.5">
-                                <div className="relative h-2 bg-[#F3F4F6] rounded-full w-24 overflow-hidden">
+                                <div className="relative h-2 bg-[var(--hover-bg)] rounded-full w-24 overflow-hidden">
                                   <div
                                     className="absolute top-0 h-full rounded-full transition-all"
                                     style={{
@@ -718,7 +718,7 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
                                       backgroundColor: colour,
                                     }}
                                   />
-                                  <div className="absolute top-0 left-1/2 w-px h-full bg-[#D1D5DB]" />
+                                  <div className="absolute top-0 left-1/2 w-px h-full bg-[var(--text-disabled)]" />
                                 </div>
                               </td>
                             </tr>
@@ -735,18 +735,18 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
           {/* OUTLIERS */}
           {activeTab === 'outliers' && (
             <Section title="Outlier Detection — IQR Method (1.5×IQR Fence)" icon={AlertTriangle} accent="#EF4444">
-              <p className="text-xs text-[#6B7280] mb-4">
+              <p className="text-xs text-[var(--text-secondary)] mb-4">
                 Tukey's fence: values below Q1 − 1.5·IQR or above Q3 + 1.5·IQR are flagged as outliers.
               </p>
               {outlierReport.length === 0 ? (
-                <p className="text-sm text-[#9CA3AF]">No numeric columns for outlier analysis.</p>
+                <p className="text-sm text-[var(--text-muted)]">No numeric columns for outlier analysis.</p>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm" role="grid">
                     <thead>
-                      <tr className="border-b border-[#E5E7EB]">
+                      <tr className="border-b border-[var(--border)]">
                         {['Column','Q1','Q3','IQR','Lower Fence','Upper Fence','Outlier Count','% of Data','Severity'].map(h => (
-                          <th key={h} className="text-left px-3 py-2 text-[10px] font-semibold text-[#6B7280] uppercase tracking-wider whitespace-nowrap">{h}</th>
+                          <th key={h} className="text-left px-3 py-2 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider whitespace-nowrap">{h}</th>
                         ))}
                       </tr>
                     </thead>
@@ -754,17 +754,17 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
                       {outlierReport.map((r, i) => {
                         const sevColour = r.severity === 'High' ? '#EF4444' : r.severity === 'Low' ? '#F59E0B' : '#10B981';
                         return (
-                          <tr key={r.col} className={`border-b border-[#F3F4F6] hover:bg-[#F9FAFB] transition-colors ${i % 2 === 0 ? '' : 'bg-[#FAFAFA]'}`}>
-                            <td className="px-3 py-2.5 font-medium text-[#111827] max-w-[160px] truncate">{r.col}</td>
-                            <td className="px-3 py-2.5 text-[#374151]">{fmt(r.q1)}</td>
-                            <td className="px-3 py-2.5 text-[#374151]">{fmt(r.q3)}</td>
-                            <td className="px-3 py-2.5 text-[#374151]">{fmt(r.iqr)}</td>
+                          <tr key={r.col} className={`border-b border-[var(--border)] hover:bg-[var(--hover-bg)] transition-colors ${i % 2 === 0 ? '' : 'bg-[var(--hover-bg)]'}`}>
+                            <td className="px-3 py-2.5 font-medium text-[var(--text-primary)] max-w-[160px] truncate">{r.col}</td>
+                            <td className="px-3 py-2.5 text-[var(--text-primary)]">{fmt(r.q1)}</td>
+                            <td className="px-3 py-2.5 text-[var(--text-primary)]">{fmt(r.q3)}</td>
+                            <td className="px-3 py-2.5 text-[var(--text-primary)]">{fmt(r.iqr)}</td>
                             <td className="px-3 py-2.5 text-[#EF4444]">{fmt(r.lowerFence)}</td>
                             <td className="px-3 py-2.5 text-[#EF4444]">{fmt(r.upperFence)}</td>
                             <td className="px-3 py-2.5 font-bold" style={{ color: r.outlierCount > 0 ? '#EF4444' : '#10B981' }}>
                               {r.outlierCount.toLocaleString()}
                             </td>
-                            <td className="px-3 py-2.5 text-[#374151]">{r.pct}%</td>
+                            <td className="px-3 py-2.5 text-[var(--text-primary)]">{r.pct}%</td>
                             <td className="px-3 py-2.5">
                               <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold"
                                 style={{ backgroundColor: `${sevColour}18`, color: sevColour }}>
@@ -784,28 +784,28 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
           {/* FEATURE ENGINEERING */}
           {activeTab === 'features' && (
             <Section title="Feature Engineering Recommendations" icon={Zap} accent="#F59E0B">
-              <p className="text-xs text-[#6B7280] mb-4">
+              <p className="text-xs text-[var(--text-secondary)] mb-4">
                 Automatically generated feature transformation recommendations based on column types and statistical profiles.
               </p>
               {featureIdeas.length === 0 ? (
-                <p className="text-sm text-[#9CA3AF]">No feature engineering opportunities identified.</p>
+                <p className="text-sm text-[var(--text-muted)]">No feature engineering opportunities identified.</p>
               ) : (
                 <div className="space-y-3">
                   {featureIdeas.map((idea, i) => (
-                    <div key={i} className="p-4 border border-[#FEF3C7] bg-[#FFFBEB] rounded-xl">
+                    <div key={i} className="p-4 border border-[#FEF3C7] dark:border-amber-900/50 bg-[#FFFBEB] dark:bg-amber-950/20 rounded-xl">
                       <div className="flex items-start gap-3">
                         <div className="w-7 h-7 rounded-lg bg-[#F59E0B] text-white flex items-center justify-center text-xs font-bold shrink-0">
                           {i + 1}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <code className="text-xs bg-[#FEF3C7] px-2 py-0.5 rounded font-mono text-[#92400E]">{idea.feature}</code>
-                            <span className="text-[10px] font-semibold text-[#B45309] bg-[#FDE68A] px-2 py-0.5 rounded-full">{idea.technique}</span>
+                            <code className="text-xs bg-[#FEF3C7] dark:bg-amber-900/40 px-2 py-0.5 rounded font-mono text-[#92400E] dark:text-amber-300">{idea.feature}</code>
+                            <span className="text-[10px] font-semibold text-[#B45309] dark:text-amber-300 bg-[#FDE68A] dark:bg-amber-900/40 px-2 py-0.5 rounded-full">{idea.technique}</span>
                           </div>
-                          <p className="text-xs text-[#78350F] mt-1">
+                          <p className="text-xs text-[#78350F] dark:text-amber-200 mt-1">
                             <strong>Source:</strong> {idea.derivedFrom}
                           </p>
-                          <p className="text-xs text-[#6B7280] mt-1">{idea.rationale}</p>
+                          <p className="text-xs text-[var(--text-secondary)] mt-1">{idea.rationale}</p>
                         </div>
                       </div>
                     </div>
@@ -821,30 +821,30 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm" role="grid">
                   <thead>
-                    <tr className="border-b border-[#E5E7EB]">
+                    <tr className="border-b border-[var(--border)]">
                       {['Column Name','Data Type','Unique Values','Missing','Range / Sample Values','Business Description'].map(h => (
-                        <th key={h} className="text-left px-3 py-2 text-[10px] font-semibold text-[#6B7280] uppercase tracking-wider whitespace-nowrap">{h}</th>
+                        <th key={h} className="text-left px-3 py-2 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider whitespace-nowrap">{h}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
                     {dataDictionary.map((row, i) => (
-                      <tr key={row.name} className={`border-b border-[#F3F4F6] hover:bg-[#F9FAFB] transition-colors ${i % 2 === 0 ? '' : 'bg-[#FAFAFA]'}`}>
-                        <td className="px-3 py-2.5 font-mono text-xs text-[#111827] font-semibold whitespace-nowrap">{row.name}</td>
+                      <tr key={row.name} className={`border-b border-[var(--border)] hover:bg-[var(--hover-bg)] transition-colors ${i % 2 === 0 ? '' : 'bg-[var(--hover-bg)]'}`}>
+                        <td className="px-3 py-2.5 font-mono text-xs text-[var(--text-primary)] font-semibold whitespace-nowrap">{row.name}</td>
                         <td className="px-3 py-2.5">
                           <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold
-                            ${row.type === 'numeric' ? 'bg-[#EFF6FF] text-[#2563EB]' : 'bg-[#F0FDF4] text-[#16A34A]'}`}>
+                            ${row.type === 'numeric' ? 'bg-[#EFF6FF] dark:bg-blue-950/30 text-[#2563EB] dark:text-blue-400' : 'bg-[#F0FDF4] dark:bg-emerald-950/30 text-[#16A34A] dark:text-emerald-400'}`}>
                             {row.type}
                           </span>
                         </td>
-                        <td className="px-3 py-2.5 text-[#374151]">{row.uniqueCount.toLocaleString()}</td>
+                        <td className="px-3 py-2.5 text-[var(--text-primary)]">{row.uniqueCount.toLocaleString()}</td>
                         <td className="px-3 py-2.5">
                           <span className={row.missing > 0 ? 'text-[#EF4444] font-medium' : 'text-[#10B981]'}>
                             {row.missing}
                           </span>
                         </td>
-                        <td className="px-3 py-2.5 text-[#6B7280] max-w-[200px] truncate text-xs">{row.range}</td>
-                        <td className="px-3 py-2.5 text-[#6B7280] text-xs">{row.description}</td>
+                        <td className="px-3 py-2.5 text-[var(--text-secondary)] max-w-[200px] truncate text-xs">{row.range}</td>
+                        <td className="px-3 py-2.5 text-[var(--text-secondary)] text-xs">{row.description}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -859,7 +859,7 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
               {/* Toolbar */}
               <div className="flex items-center gap-3 mb-4 flex-wrap">
                 <div className="relative flex-1 min-w-[200px]">
-                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9CA3AF]" />
+                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
                   <input
                     type="search"
                     placeholder="Search all columns…"
@@ -869,7 +869,7 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
                     aria-label="Search data table"
                   />
                 </div>
-                <span className="text-xs text-[#6B7280] shrink-0">
+                <span className="text-xs text-[var(--text-secondary)] shrink-0">
                   {tableRows.length.toLocaleString()} of {sheetData.rows_count.toLocaleString()} rows
                 </span>
                 <button onClick={exportCSV} className="btn-secondary text-xs gap-1.5 px-3 h-9 shrink-0">
@@ -878,7 +878,7 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
               </div>
 
               {/* Table */}
-              <div className="overflow-auto max-h-[480px] rounded-xl border border-[#E5E7EB]">
+              <div className="overflow-auto max-h-[480px] rounded-xl border border-[var(--border)]">
                 <table className="w-full text-sm" role="grid">
                   <thead className="sticky top-0 z-10">
                     <tr>
@@ -886,13 +886,13 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
                         <th
                           key={f.name}
                           onClick={() => handleSort(f.name)}
-                          className="px-3 py-2.5 text-left bg-[#F8FAFC] border-b border-[#E5E7EB] text-[10px] font-semibold text-[#6B7280] uppercase tracking-wider whitespace-nowrap cursor-pointer hover:bg-[#F1F5F9] select-none transition-colors"
+                          className="px-3 py-2.5 text-left bg-[var(--surface-bg)] border-b border-[var(--border)] text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider whitespace-nowrap cursor-pointer hover:bg-[var(--hover-bg)] select-none transition-colors"
                         >
                           <div className="flex items-center gap-1">
                             <span className="truncate max-w-[120px]">{f.name}</span>
                             {sortCol === f.name
                               ? sortDir === 'asc' ? <ArrowUp size={11} className="text-[#2563EB] shrink-0" /> : <ArrowDown size={11} className="text-[#2563EB] shrink-0" />
-                              : <ArrowUpDown size={11} className="text-[#D1D5DB] shrink-0" />}
+                              : <ArrowUpDown size={11} className="text-[var(--text-disabled)] shrink-0" />}
                           </div>
                         </th>
                       ))}
@@ -901,16 +901,16 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
                   <tbody>
                     {pagedRows.length === 0 ? (
                       <tr>
-                        <td colSpan={sheetData.fields.length} className="px-3 py-8 text-center text-sm text-[#9CA3AF]">
+                        <td colSpan={sheetData.fields.length} className="px-3 py-8 text-center text-sm text-[var(--text-muted)]">
                           No rows match your search.
                         </td>
                       </tr>
                     ) : pagedRows.map((row, ri) => (
-                      <tr key={ri} className={`border-b border-[#F3F4F6] hover:bg-[#F9FAFB] transition-colors ${ri % 2 === 0 ? '' : 'bg-[#FAFAFA]'}`}>
+                      <tr key={ri} className={`border-b border-[var(--border)] hover:bg-[var(--hover-bg)] transition-colors ${ri % 2 === 0 ? '' : 'bg-[var(--hover-bg)]'}`}>
                         {sheetData.fields.map(f => (
-                          <td key={f.name} className="px-3 py-2.5 text-[#374151] max-w-[180px]">
+                          <td key={f.name} className="px-3 py-2.5 text-[var(--text-primary)] max-w-[180px]">
                             <span className="block truncate" title={String(row[f.name] ?? '')}>
-                              {row[f.name] == null ? <span className="text-[#D1D5DB] italic text-xs">null</span> : String(row[f.name])}
+                              {row[f.name] == null ? <span className="text-[var(--text-disabled)] italic text-xs">null</span> : String(row[f.name])}
                             </span>
                           </td>
                         ))}
@@ -922,20 +922,20 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
 
               {/* Pagination */}
               <div className="flex items-center justify-between mt-4 flex-wrap gap-2">
-                <span className="text-xs text-[#6B7280]">
+                <span className="text-xs text-[var(--text-secondary)]">
                   Page {tablePage} of {totalPages} ({tableRows.length.toLocaleString()} rows)
                 </span>
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => setTablePage(1)}
                     disabled={tablePage === 1}
-                    className="p-1.5 rounded-lg border border-[#E5E7EB] text-[#6B7280] hover:bg-[#F9FAFB] disabled:opacity-40 disabled:cursor-not-allowed text-xs px-2"
+                    className="p-1.5 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--hover-bg)] disabled:opacity-40 disabled:cursor-not-allowed text-xs px-2"
                     aria-label="First page"
                   >«</button>
                   <button
                     onClick={() => setTablePage(p => Math.max(1, p - 1))}
                     disabled={tablePage === 1}
-                    className="p-1.5 rounded-lg border border-[#E5E7EB] text-[#6B7280] hover:bg-[#F9FAFB] disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="p-1.5 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--hover-bg)] disabled:opacity-40 disabled:cursor-not-allowed"
                     aria-label="Previous page"
                   ><ChevronLeft size={14} /></button>
 
@@ -946,7 +946,7 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
                         key={page}
                         onClick={() => setTablePage(page)}
                         className={`w-8 h-8 rounded-lg text-xs font-medium transition-colors
-                          ${page === tablePage ? 'bg-[#2563EB] text-white border border-[#2563EB]' : 'border border-[#E5E7EB] text-[#374151] hover:bg-[#F9FAFB]'}`}
+                          ${page === tablePage ? 'bg-[#2563EB] text-white border border-[#2563EB]' : 'border border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--hover-bg)]'}`}
                       >{page}</button>
                     );
                   })}
@@ -954,13 +954,13 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
                   <button
                     onClick={() => setTablePage(p => Math.min(totalPages, p + 1))}
                     disabled={tablePage === totalPages}
-                    className="p-1.5 rounded-lg border border-[#E5E7EB] text-[#6B7280] hover:bg-[#F9FAFB] disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="p-1.5 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--hover-bg)] disabled:opacity-40 disabled:cursor-not-allowed"
                     aria-label="Next page"
                   ><ChevronRight size={14} /></button>
                   <button
                     onClick={() => setTablePage(totalPages)}
                     disabled={tablePage === totalPages}
-                    className="p-1.5 rounded-lg border border-[#E5E7EB] text-[#6B7280] hover:bg-[#F9FAFB] disabled:opacity-40 disabled:cursor-not-allowed text-xs px-2"
+                    className="p-1.5 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--hover-bg)] disabled:opacity-40 disabled:cursor-not-allowed text-xs px-2"
                     aria-label="Last page"
                   >»</button>
                 </div>
@@ -972,9 +972,9 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
 
       {/* Empty state */}
       {!loadingData && !loadingSheets && !sheetData && !error && (
-        <div className="text-center py-16 bg-white border border-[#E5E7EB] rounded-2xl">
-          <Database size={40} className="text-[#D1D5DB] mx-auto mb-3" />
-          <p className="text-sm text-[#6B7280]">Select a worksheet to begin exploration</p>
+        <div className="text-center py-16 bg-[var(--surface-card)] border border-[var(--border)] rounded-2xl">
+          <Database size={40} className="text-[var(--text-disabled)] mx-auto mb-3" />
+          <p className="text-sm text-[var(--text-secondary)]">Select a worksheet to begin exploration</p>
         </div>
       )}
     </div>

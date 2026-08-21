@@ -1066,7 +1066,7 @@ export default function ExecutiveDashboard({
                 const bm = bookmarks.find(b => b.id === e.target.value);
                 if (bm) applyBookmark(bm);
               }}
-              className={`p-2 rounded-lg text-xs font-semibold border cursor-pointer select-none bg-white ${isDarkMode ? 'bg-[#182640] text-slate-100 border-[#1e2d4a]' : 'border-[#E5E7EB] text-slate-600'}`}
+              className={`p-2 rounded-lg text-xs font-semibold border cursor-pointer select-none ${isDarkMode ? 'bg-[#182640] text-slate-100 border-[#1e2d4a]' : 'bg-white border-[#E5E7EB] text-slate-600'}`}
             >
               <option value="">-- Apply Bookmarks --</option>
               {bookmarks.map(bm => <option key={bm.id} value={bm.id}>{bm.name}</option>)}
@@ -1445,7 +1445,7 @@ export default function ExecutiveDashboard({
                       setCrossFilterField(drillLevel === 0 ? (mapping.region || fields[0]?.name) : (mapping.category || fields[1]?.name));
                       setCrossFilterValue(item.name);
                     }}
-                    className={`px-1.5 py-0.5 rounded text-[10px] font-bold flex items-center gap-1.5 cursor-pointer hover:bg-slate-100 hover:dark:bg-slate-850 border transition-all ${
+                    className={`px-1.5 py-0.5 rounded text-[10px] font-bold flex items-center gap-1.5 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 border transition-all ${
                       crossFilterValue === item.name ? 'border-[#0F4C81] bg-[#0F4C81]/10 shadow-xs' : 'border-transparent'
                     }`}
                   >
@@ -1506,7 +1506,7 @@ export default function ExecutiveDashboard({
             {/* Visual Histogram */}
             <div className="lg:col-span-8 h-[250px]">
               {distributionData.bins.length === 0 ? (
-                <div className="h-full flex items-center justify-center text-slate-405 text-slate-400 text-xs font-mono">VARIANCE METRICS UNAVAILABLE</div>
+                <div className="h-full flex items-center justify-center text-slate-400 text-xs font-mono">VARIANCE METRICS UNAVAILABLE</div>
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
                   <ComposedChart data={distributionData.bins} margin={{ left: -10, right: 10, top: 10 }}>
@@ -1530,8 +1530,8 @@ export default function ExecutiveDashboard({
               <h5 className="text-[10px] font-mono tracking-widest uppercase font-bold text-slate-400">DISTRIBUTION SYNOPSIS</h5>
               
               <div className="space-y-3.5 font-sans">
-                <div className="p-3 bg-slate-50 dark:bg-slate-850 rounded-lg border dark:border-slate-800 space-y-1">
-                  <span className="text-[9px] text-slate-450 text-slate-400 font-mono uppercase block">SKEWNESS COEFFICIENT</span>
+                <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg border dark:border-slate-800 space-y-1">
+                  <span className="text-[9px] text-slate-400 font-mono uppercase block">SKEWNESS COEFFICIENT</span>
                   <div className="flex items-center gap-2">
                     <span className="text-xl font-extrabold">{distributionData.skewness.toFixed(3)}</span>
                     <span className={`px-1 rounded text-[8px] font-bold uppercase ${
@@ -1545,14 +1545,14 @@ export default function ExecutiveDashboard({
                   </p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 text-[10px] font-mono text-slate-350">
+                <div className="grid grid-cols-2 gap-3 text-[10px] font-mono text-slate-600 dark:text-slate-400">
                   <div className="p-2.5 border dark:border-slate-800 rounded bg-slate-50/20">
                     <span className="text-[8px] block uppercase text-slate-400 mb-0.5">DEVIATION (σ)</span>
-                    <span className="font-extrabold text-xs text-slate-650 dark:text-slate-100">{formatYValue(distributionData.stdDev, 'currency')}</span>
+                    <span className="font-extrabold text-xs text-slate-700 dark:text-slate-100">{formatYValue(distributionData.stdDev, 'currency')}</span>
                   </div>
                   <div className="p-2.5 border dark:border-slate-800 rounded bg-slate-50/20">
                     <span className="text-[8px] block uppercase text-slate-400 mb-0.5">HIST HIST MEAN</span>
-                    <span className="font-extrabold text-xs text-slate-650 dark:text-slate-100">{formatYValue(distributionData.mean, 'currency')}</span>
+                    <span className="font-extrabold text-xs text-slate-700 dark:text-slate-100">{formatYValue(distributionData.mean, 'currency')}</span>
                   </div>
                 </div>
               </div>
@@ -1677,7 +1677,7 @@ export default function ExecutiveDashboard({
         {/* ROW 6: AI VISUAL SUITABILITY & QUALITY ENGINE */}
         <div className={`border rounded-xl p-5 shadow-xs flex flex-col md:flex-row gap-6 justify-between items-center ${isDarkMode ? 'border-[#1e2d4a] bg-[#131f37]' : 'border-[#0F4C81]/20 bg-[#0F4C81]/5'}`}>
           <div className="flex items-start gap-4">
-            <div className="p-3.5 bg-[#0F4C81]/10 dark:bg-slate-850 rounded-xl border border-[#0F4C81]/20 flex items-center justify-center text-[#0F4C81] dark:text-[#3B82F6] shrink-0">
+            <div className="p-3.5 bg-[#0F4C81]/10 dark:bg-slate-800 rounded-xl border border-[#0F4C81]/20 flex items-center justify-center text-[#0F4C81] dark:text-[#3B82F6] shrink-0">
               <Sparkles size={18} className="animate-pulse" />
             </div>
             <div className="text-left space-y-1">
@@ -1895,7 +1895,7 @@ export default function ExecutiveDashboard({
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-55 scroll-none">
           <div className={`${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'} border rounded-3xl max-w-5xl w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto`}>
             
-            <div className="flex justify-between items-center pb-4 border-b border-slate-150 dark:border-slate-800 mb-6">
+            <div className="flex justify-between items-center pb-4 border-b border-slate-200 dark:border-slate-800 mb-6">
               <div>
                 <span className="px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900 text-[9px] text-indigo-700 dark:text-indigo-400 font-mono tracking-wider uppercase font-semibold">Intelligence Studio</span>
                 <h3 className="text-lg font-black text-slate-800 dark:text-white mt-1 flex items-center gap-1.5 font-sans">
@@ -1906,7 +1906,7 @@ export default function ExecutiveDashboard({
               
               <button
                 onClick={() => setBuilderModalOpen(false)}
-                className="p-1.5 text-slate-400 hover:text-slate-850 dark:hover:text-slate-200 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 border border-transparent hover:border-slate-150 dark:hover:border-slate-800 cursor-pointer"
+                className="p-1.5 text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-800 cursor-pointer"
               >
                 <X size={16} />
               </button>

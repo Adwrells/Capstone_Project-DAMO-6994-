@@ -69,10 +69,10 @@ function TrendBadge({ pct, label }: { pct: number; label?: string }) {
 
   const Icon = isFlat ? Minus : isUp ? TrendingUp : TrendingDown;
   const colour = isFlat
-    ? 'text-[#6B7280] bg-[#F3F4F6]'
+    ? 'text-[#6B7280] bg-[#F3F4F6] dark:text-slate-400 dark:bg-slate-800'
     : isUp
-    ? 'text-[#16A34A] bg-[#F0FDF4]'
-    : 'text-[#DC2626] bg-[#FEF2F2]';
+    ? 'text-[#16A34A] bg-[#F0FDF4] dark:text-emerald-400 dark:bg-emerald-950/30'
+    : 'text-[#DC2626] bg-[#FEF2F2] dark:text-rose-400 dark:bg-rose-950/30';
 
   return (
     <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold ${colour}`}
@@ -115,38 +115,38 @@ function Sparkline({ data, colour = '#2563EB' }: { data: number[]; colour?: stri
 /* ─── Variant Styles ──────────────────────────────────────────────────────── */
 const VARIANT_STYLES = {
   default: {
-    card:    'bg-white border border-[#E5E7EB]',
-    title:   'text-[#6B7280]',
-    value:   'text-[#111827]',
-    icon:    'bg-[#F3F4F6] text-[#374151]',
+    card:    'bg-white dark:bg-slate-900 border border-[#E5E7EB] dark:border-slate-800',
+    title:   'text-[#6B7280] dark:text-slate-400',
+    value:   'text-[#111827] dark:text-white',
+    icon:    'bg-[#F3F4F6] text-[#374151] dark:bg-slate-800 dark:text-slate-300',
     sparkline: '#2563EB',
   },
   highlight: {
-    card:    'bg-white border border-[#DBEAFE]',
-    title:   'text-[#2563EB]',
-    value:   'text-[#1D4ED8]',
-    icon:    'bg-[#EFF6FF] text-[#2563EB]',
+    card:    'bg-white dark:bg-slate-900 border border-[#DBEAFE] dark:border-blue-900/50',
+    title:   'text-[#2563EB] dark:text-blue-400',
+    value:   'text-[#1D4ED8] dark:text-blue-300',
+    icon:    'bg-[#EFF6FF] text-[#2563EB] dark:bg-blue-950/30 dark:text-blue-400',
     sparkline: '#2563EB',
   },
   success: {
-    card:    'bg-white border border-[#BBF7D0]',
-    title:   'text-[#166534]',
-    value:   'text-[#15803D]',
-    icon:    'bg-[#F0FDF4] text-[#16A34A]',
+    card:    'bg-white dark:bg-slate-900 border border-[#BBF7D0] dark:border-emerald-900/50',
+    title:   'text-[#166534] dark:text-emerald-400',
+    value:   'text-[#15803D] dark:text-emerald-300',
+    icon:    'bg-[#F0FDF4] text-[#16A34A] dark:bg-emerald-950/30 dark:text-emerald-400',
     sparkline: '#22C55E',
   },
   warning: {
-    card:    'bg-white border border-[#FDE68A]',
-    title:   'text-[#92400E]',
-    value:   'text-[#B45309]',
-    icon:    'bg-[#FFFBEB] text-[#D97706]',
+    card:    'bg-white dark:bg-slate-900 border border-[#FDE68A] dark:border-amber-900/50',
+    title:   'text-[#92400E] dark:text-amber-400',
+    value:   'text-[#B45309] dark:text-amber-300',
+    icon:    'bg-[#FFFBEB] text-[#D97706] dark:bg-amber-950/30 dark:text-amber-400',
     sparkline: '#F59E0B',
   },
   danger: {
-    card:    'bg-white border border-[#FECACA]',
-    title:   'text-[#991B1B]',
-    value:   'text-[#DC2626]',
-    icon:    'bg-[#FEF2F2] text-[#EF4444]',
+    card:    'bg-white dark:bg-slate-900 border border-[#FECACA] dark:border-rose-900/50',
+    title:   'text-[#991B1B] dark:text-rose-400',
+    value:   'text-[#DC2626] dark:text-rose-300',
+    icon:    'bg-[#FEF2F2] text-[#EF4444] dark:bg-rose-950/30 dark:text-rose-400',
     sparkline: '#EF4444',
   },
   gradient: {
@@ -205,7 +205,7 @@ export default function MetricCard({
 
   if (loading) {
     return (
-      <div className={`rounded-2xl border border-[#E5E7EB] ${sizeStyles.padding} ${className}`} aria-busy="true" aria-label={`Loading ${title}`}>
+      <div className={`rounded-2xl border border-[#E5E7EB] dark:border-slate-800 ${sizeStyles.padding} ${className}`} aria-busy="true" aria-label={`Loading ${title}`}>
         <div className="skeleton h-3 w-24 rounded mb-3" />
         <div className="skeleton h-7 w-32 rounded mb-2" />
         <div className="skeleton h-3 w-16 rounded" />
@@ -240,7 +240,7 @@ export default function MetricCard({
             {tooltip && (
               <div className="relative">
                 <button
-                  className="text-[#9CA3AF] hover:text-[#6B7280] transition-colors"
+                  className="text-[#9CA3AF] hover:text-[#6B7280] dark:text-slate-500 dark:hover:text-slate-300 transition-colors"
                   onMouseEnter={() => setShowTooltip(true)}
                   onMouseLeave={() => setShowTooltip(false)}
                   onFocus={() => setShowTooltip(true)}
@@ -286,7 +286,7 @@ export default function MetricCard({
             <TrendBadge pct={computedTrendPct} label={trendLabel} />
           )}
           {description && (
-            <p className={`text-[11px] ${variant === 'gradient' ? 'text-blue-100' : 'text-[#9CA3AF]'} leading-tight`}>
+            <p className={`text-[11px] ${variant === 'gradient' ? 'text-blue-100' : 'text-[#9CA3AF] dark:text-slate-500'} leading-tight`}>
               {description}
             </p>
           )}
