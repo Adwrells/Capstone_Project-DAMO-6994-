@@ -5,10 +5,15 @@
 # CodeQL's query packs are updated continuously: code that was clean last week can be
 # flagged this week without a single line changing.
 #
-# Results appear under the repository's Security → Code scanning tab.
+# This repo is private, and uploading results to the Security → Code scanning tab
+# requires GitHub Advanced Security, which isn't enabled here (that upload step fails
+# with "Code scanning is not enabled for this repository"). So this workflow analyzes
+# but never uploads: results are written to SARIF and published as a workflow artifact
+# instead, downloadable from the run's summary page for ~30 days.
 #
-# NOTE: CodeQL is free for public repositories. On a private repository it requires
-# GitHub Advanced Security; without it this workflow fails with a licensing error.
+# If GHAS is ever enabled (or the repo goes public), delete the `upload: false` /
+# `output` lines below and add back `security-events: write` to get the Security-tab
+# integration this Action supports out of the box.
 
 name: CodeQL
 
@@ -30,7 +35,6 @@ jobs:
     timeout-minutes: 30
 
     permissions:
-      security-events: write # upload findings to the Security tab
       actions: read
       contents: read
 
@@ -65,3 +69,12 @@ jobs:
         uses: github/codeql-action/analyze@v4
         with:
           category: '/language:${{ matrix.language }}'
+          output: sarif-results
+          upload: false
+
+      - name: Upload SARIF as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: codeql-${{ matrix.language }}-sarif
+          path: sarif-results
+          retention-days: 30
