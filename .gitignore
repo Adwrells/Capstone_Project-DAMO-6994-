@@ -54,6 +54,14 @@ MEMORY.md
 .claude/settings.local.json
 
 # graphify's generated knowledge graph. Regenerated from source by `/graphify .`
-# and refreshed with `graphify update .`, so it is derived data: large, and it would
-# conflict on nearly every merge. Each developer builds their own.
-graphify-out/
+# and refreshed with `graphify update .`, so it is derived data: large, and graph.json
+# would conflict on nearly every merge. Each developer builds their own.
+#
+# GRAPH_REPORT.md is the exception, committed on purpose: it is the human-readable
+# architecture overview, it diffs legibly, and it is useful in the capstone write-up.
+#
+# Note the pattern is `graphify-out/*`, not `graphify-out/`. Git cannot re-include a
+# file inside an excluded *directory*, so the trailing-slash form would make the
+# negation below silently do nothing.
+graphify-out/*
+!graphify-out/GRAPH_REPORT.md
