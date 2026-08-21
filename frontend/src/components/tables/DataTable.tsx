@@ -66,7 +66,7 @@ function downloadCSV(data: Record<string, any>[], columns: TableColumn[], filena
 function SortIcon({ col, sortKey, sortDir }: {
   col: string; sortKey: string; sortDir: 'asc' | 'desc';
 }) {
-  if (sortKey !== col) return <ArrowUpDown size={12} className="text-[#D1D5DB] ml-1 shrink-0" aria-hidden="true" />;
+  if (sortKey !== col) return <ArrowUpDown size={12} className="text-[var(--text-disabled)] ml-1 shrink-0" aria-hidden="true" />;
   return sortDir === 'asc'
     ? <ArrowUp size={12} className="text-[#2563EB] ml-1 shrink-0" aria-hidden="true" />
     : <ArrowDown size={12} className="text-[#2563EB] ml-1 shrink-0" aria-hidden="true" />;
@@ -199,12 +199,12 @@ export default function DataTable({
   /* Skeleton loading rows */
   if (loading) {
     return (
-      <div className={`bg-white border border-[#E5E7EB] rounded-2xl overflow-hidden ${className}`} aria-busy="true" aria-label="Loading data table…">
-        <div className="px-5 py-4 border-b border-[#E5E7EB] flex items-center justify-between">
+      <div className={`bg-[var(--surface-card)] border border-[var(--border)] rounded-2xl overflow-hidden ${className}`} aria-busy="true" aria-label="Loading data table…">
+        <div className="px-5 py-4 border-b border-[var(--border)] flex items-center justify-between">
           <div className="skeleton h-5 w-40 rounded" />
           <div className="skeleton h-8 w-56 rounded" />
         </div>
-        <div className="divide-y divide-[#F3F4F6]">
+        <div className="divide-y divide-[var(--border)]">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="px-5 py-3 flex gap-4">
               {Array.from({ length: 4 }).map((_, j) => (
@@ -219,32 +219,32 @@ export default function DataTable({
 
   return (
     <div
-      className={`bg-white border border-[#E5E7EB] rounded-2xl overflow-hidden shadow-sm ${className}`}
+      className={`bg-[var(--surface-card)] border border-[var(--border)] rounded-2xl overflow-hidden shadow-sm ${className}`}
       role="region"
       aria-label={ariaLabel || title || 'Data table'}
     >
       {/* ── Toolbar ── */}
-      <div className="px-5 py-3 border-b border-[#E5E7EB] flex items-center gap-3 flex-wrap bg-white">
+      <div className="px-5 py-3 border-b border-[var(--border)] flex items-center gap-3 flex-wrap bg-[var(--surface-card)]">
         {title && (
-          <span className="text-sm font-semibold text-[#111827] mr-2 shrink-0">{title}</span>
+          <span className="text-sm font-semibold text-[var(--text-primary)] mr-2 shrink-0">{title}</span>
         )}
 
         {searchable && (
           <div className="relative flex-1 min-w-[180px] max-w-xs">
-            <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9CA3AF]" aria-hidden="true" />
+            <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" aria-hidden="true" />
             <input
               type="search"
               value={search}
               onChange={handleSearch}
               placeholder="Search all columns…"
-              className="pl-8 pr-3 py-1.5 text-xs border border-[#E5E7EB] rounded-lg w-full focus:border-[#2563EB] focus:ring-0 bg-[#F9FAFB] placeholder:text-[#9CA3AF]"
+              className="pl-8 pr-3 py-1.5 text-xs border border-[var(--border)] rounded-lg w-full focus:border-[#2563EB] focus:ring-0 bg-[var(--hover-bg)] placeholder:text-[var(--text-muted)]"
               aria-label="Search table data"
             />
           </div>
         )}
 
         {selectable && selectedRows.size > 0 && (
-          <span className="text-xs text-[#6B7280] bg-[#EFF6FF] px-2.5 py-1 rounded-lg border border-[#DBEAFE] font-medium">
+          <span className="text-xs text-[var(--text-secondary)] bg-[#EFF6FF] dark:bg-blue-950/30 px-2.5 py-1 rounded-lg border border-[#DBEAFE] dark:border-blue-900/50 font-medium">
             {selectedRows.size} selected
           </span>
         )}
@@ -254,7 +254,7 @@ export default function DataTable({
           <select
             value={pageSize}
             onChange={e => { setPageSize(Number(e.target.value)); setPage(1); }}
-            className="text-xs border border-[#E5E7EB] rounded-lg px-2 py-1.5 bg-white text-[#374151] pr-7 cursor-pointer w-auto"
+            className="text-xs border border-[var(--border)] rounded-lg px-2 py-1.5 bg-[var(--surface-card)] text-[var(--text-primary)] pr-7 cursor-pointer w-auto"
             aria-label="Rows per page"
             style={{ backgroundSize: '12px', backgroundPosition: 'right 6px center' }}
           >
@@ -267,7 +267,7 @@ export default function DataTable({
           <div className="relative" ref={colPickerRef}>
             <button
               onClick={() => setColPickerOpen(o => !o)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs border border-[#E5E7EB] rounded-lg text-[#374151] hover:bg-[#F9FAFB] transition-colors"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs border border-[var(--border)] rounded-lg text-[var(--text-primary)] hover:bg-[var(--hover-bg)] transition-colors"
               aria-label="Toggle column visibility"
               aria-haspopup="true"
               aria-expanded={colPickerOpen}
@@ -277,19 +277,19 @@ export default function DataTable({
             </button>
             {colPickerOpen && (
               <div
-                className="absolute right-0 top-full mt-1 z-30 bg-white border border-[#E5E7EB] rounded-xl shadow-lg p-2 min-w-[180px]"
+                className="absolute right-0 top-full mt-1 z-30 bg-[var(--surface-card)] border border-[var(--border)] rounded-xl shadow-lg p-2 min-w-[180px]"
                 role="menu"
               >
                 {columns.map(col => (
                   <button
                     key={col.key}
                     onClick={() => toggleCol(col.key)}
-                    className="flex items-center gap-2 w-full px-3 py-1.5 text-xs text-left text-[#374151] hover:bg-[#F9FAFB] rounded-lg transition-colors"
+                    className="flex items-center gap-2 w-full px-3 py-1.5 text-xs text-left text-[var(--text-primary)] hover:bg-[var(--hover-bg)] rounded-lg transition-colors"
                     role="menuitemcheckbox"
                     aria-checked={!hiddenCols.has(col.key)}
                   >
                     <span className={`w-3.5 h-3.5 flex items-center justify-center rounded border shrink-0
-                      ${!hiddenCols.has(col.key) ? 'bg-[#2563EB] border-[#2563EB]' : 'border-[#D1D5DB]'}`}>
+                      ${!hiddenCols.has(col.key) ? 'bg-[#2563EB] border-[#2563EB]' : 'border-[var(--text-disabled)]'}`}>
                       {!hiddenCols.has(col.key) && <Check size={9} className="text-white" aria-hidden="true" />}
                     </span>
                     {col.label}
@@ -303,7 +303,7 @@ export default function DataTable({
           {exportable && (
             <button
               onClick={() => downloadCSV(sorted, visibleColumns, title || 'export')}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs border border-[#E5E7EB] rounded-lg text-[#374151] hover:bg-[#F9FAFB] transition-colors"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs border border-[var(--border)] rounded-lg text-[var(--text-primary)] hover:bg-[var(--hover-bg)] transition-colors"
               title="Export to CSV"
               aria-label="Export to CSV"
             >
@@ -330,12 +330,12 @@ export default function DataTable({
           <thead role="rowgroup">
             <tr role="row" className={stickyHeader ? 'sticky top-0 z-10' : ''}>
               {selectable && (
-                <th className="w-10 px-3 py-2.5 bg-[#F8FAFC] border-b border-[#E5E7EB] text-center" role="columnheader">
+                <th className="w-10 px-3 py-2.5 bg-[var(--surface-bg)] border-b border-[var(--border)] text-center" role="columnheader">
                   <input
                     type="checkbox"
                     checked={allSelected}
                     onChange={toggleAllRows}
-                    className="rounded border-[#D1D5DB] text-[#2563EB] cursor-pointer"
+                    className="rounded border-[var(--text-disabled)] text-[#2563EB] cursor-pointer"
                     aria-label="Select all rows on this page"
                   />
                 </th>
@@ -346,9 +346,9 @@ export default function DataTable({
                   role="columnheader"
                   aria-sort={sortKey === col.key ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
                   onClick={col.sortable !== false ? () => handleSort(col.key) : undefined}
-                  className={`px-4 py-2.5 bg-[#F8FAFC] border-b border-[#E5E7EB] text-[11px] font-semibold text-[#6B7280] uppercase tracking-wider
+                  className={`px-4 py-2.5 bg-[var(--surface-bg)] border-b border-[var(--border)] text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider
                     ${col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : 'text-left'}
-                    ${col.sortable !== false ? 'cursor-pointer hover:bg-[#F1F5F9] select-none transition-colors' : ''}
+                    ${col.sortable !== false ? 'cursor-pointer hover:bg-[var(--hover-bg)] select-none transition-colors' : ''}
                     ${col.width ? '' : ''}`}
                   style={{ width: col.width }}
                 >
@@ -373,8 +373,8 @@ export default function DataTable({
                   role="gridcell"
                 >
                   <div className="flex flex-col items-center gap-2">
-                    <Search size={28} className="text-[#D1D5DB]" aria-hidden="true" />
-                    <span className="text-sm text-[#9CA3AF]">{emptyMessage}</span>
+                    <Search size={28} className="text-[var(--text-disabled)]" aria-hidden="true" />
+                    <span className="text-sm text-[var(--text-muted)]">{emptyMessage}</span>
                     {search && (
                       <button
                         onClick={() => setSearch('')}
@@ -397,10 +397,10 @@ export default function DataTable({
                     aria-rowindex={absoluteIndex + 2}
                     aria-selected={selectable ? isSelected : undefined}
                     onClick={() => { if (selectable) toggleRow(absoluteIndex); onRowClick?.(row, absoluteIndex); }}
-                    className={`border-b border-[#F3F4F6] transition-colors
-                      ${ri % 2 === 0 ? '' : 'bg-[#FAFAFA]'}
-                      ${isSelected ? 'bg-[#EFF6FF]' : ''}
-                      ${onRowClick || selectable ? 'cursor-pointer hover:bg-[#F5F7FF]' : 'hover:bg-[#F9FAFB]'}`}
+                    className={`border-b border-[var(--border)] transition-colors
+                      ${ri % 2 === 0 ? '' : 'bg-[var(--hover-bg)]'}
+                      ${isSelected ? 'bg-[#EFF6FF] dark:bg-blue-950/20' : ''}
+                      ${onRowClick || selectable ? 'cursor-pointer hover:bg-[#F5F7FF] dark:hover:bg-slate-800/60' : 'hover:bg-[var(--hover-bg)]'}`}
                   >
                     {selectable && (
                       <td className="w-10 px-3 py-2.5 text-center" role="gridcell">
@@ -408,7 +408,7 @@ export default function DataTable({
                           type="checkbox"
                           checked={isSelected}
                           onChange={e => { e.stopPropagation(); toggleRow(absoluteIndex); }}
-                          className="rounded border-[#D1D5DB] text-[#2563EB] cursor-pointer"
+                          className="rounded border-[var(--text-disabled)] text-[#2563EB] cursor-pointer"
                           aria-label={`Select row ${absoluteIndex + 1}`}
                         />
                       </td>
@@ -420,13 +420,13 @@ export default function DataTable({
                           key={col.key}
                           role="gridcell"
                           aria-colindex={visibleColumns.indexOf(col) + 1 + (selectable ? 1 : 0)}
-                          className={`px-4 py-2.5 text-[13px] text-[#374151]
+                          className={`px-4 py-2.5 text-[13px] text-[var(--text-primary)]
                             ${col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : 'text-left'}`}
                         >
                           {col.render ? (
                             col.render(value, row)
                           ) : value == null ? (
-                            <span className="text-[#D1D5DB] italic text-xs">—</span>
+                            <span className="text-[var(--text-disabled)] italic text-xs">—</span>
                           ) : (
                             <span className="block max-w-[240px] truncate" title={String(value)}>
                               {String(value)}
@@ -444,8 +444,8 @@ export default function DataTable({
       </div>
 
       {/* ── Pagination Footer ── */}
-      <div className="px-5 py-3 border-t border-[#E5E7EB] flex items-center justify-between flex-wrap gap-3 bg-white">
-        <span className="text-xs text-[#6B7280]" aria-live="polite" aria-atomic="true">
+      <div className="px-5 py-3 border-t border-[var(--border)] flex items-center justify-between flex-wrap gap-3 bg-[var(--surface-card)]">
+        <span className="text-xs text-[var(--text-secondary)]" aria-live="polite" aria-atomic="true">
           {sorted.length === 0
             ? 'No results'
             : `Showing ${pageStart.toLocaleString()}–${pageEnd.toLocaleString()} of ${sorted.length.toLocaleString()} rows`}
@@ -460,19 +460,19 @@ export default function DataTable({
           <button
             onClick={() => setPage(1)}
             disabled={page === 1}
-            className="h-7 px-2 rounded-lg border border-[#E5E7EB] text-xs text-[#6B7280] hover:bg-[#F9FAFB] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="h-7 px-2 rounded-lg border border-[var(--border)] text-xs text-[var(--text-secondary)] hover:bg-[var(--hover-bg)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             aria-label="First page"
           >«</button>
           <button
             onClick={() => setPage(p => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="h-7 w-7 flex items-center justify-center rounded-lg border border-[#E5E7EB] text-[#6B7280] hover:bg-[#F9FAFB] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="h-7 w-7 flex items-center justify-center rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--hover-bg)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             aria-label="Previous page"
           ><ChevronLeft size={13} aria-hidden="true" /></button>
 
           {pageRange.map((p, i) =>
             p === '…' ? (
-              <span key={`ellipsis-${i}`} className="h-7 w-7 flex items-center justify-center text-xs text-[#9CA3AF]">…</span>
+              <span key={`ellipsis-${i}`} className="h-7 w-7 flex items-center justify-center text-xs text-[var(--text-muted)]">…</span>
             ) : (
               <button
                 key={p}
@@ -480,7 +480,7 @@ export default function DataTable({
                 className={`h-7 w-7 flex items-center justify-center rounded-lg text-xs font-medium transition-colors
                   ${p === page
                     ? 'bg-[#2563EB] text-white border border-[#2563EB]'
-                    : 'border border-[#E5E7EB] text-[#374151] hover:bg-[#F9FAFB]'}`}
+                    : 'border border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--hover-bg)]'}`}
                 aria-label={`Page ${p}`}
                 aria-current={p === page ? 'page' : undefined}
               >{p}</button>
@@ -490,13 +490,13 @@ export default function DataTable({
           <button
             onClick={() => setPage(p => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
-            className="h-7 w-7 flex items-center justify-center rounded-lg border border-[#E5E7EB] text-[#6B7280] hover:bg-[#F9FAFB] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="h-7 w-7 flex items-center justify-center rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--hover-bg)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             aria-label="Next page"
           ><ChevronRight size={13} aria-hidden="true" /></button>
           <button
             onClick={() => setPage(totalPages)}
             disabled={page === totalPages}
-            className="h-7 px-2 rounded-lg border border-[#E5E7EB] text-xs text-[#6B7280] hover:bg-[#F9FAFB] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="h-7 px-2 rounded-lg border border-[var(--border)] text-xs text-[var(--text-secondary)] hover:bg-[var(--hover-bg)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             aria-label="Last page"
           >»</button>
         </nav>

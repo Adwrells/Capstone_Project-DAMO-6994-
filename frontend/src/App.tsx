@@ -437,8 +437,8 @@ export default function App() {
           <div className="flex items-center gap-4">
 
             {/* Status Pill */}
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-[#F0FDF4] border border-[#DCFCE7] text-[#16A34A] text-xs font-semibold">
-              <span className="w-2 h-2 rounded-full bg-[#16A34A] animate-pulse" />
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-[#F0FDF4] dark:bg-emerald-950/30 border border-[#DCFCE7] dark:border-emerald-900/50 text-[#16A34A] dark:text-emerald-400 text-xs font-semibold">
+              <span className="w-2 h-2 rounded-full bg-[#16A34A] dark:bg-emerald-400 animate-pulse" />
               <span>STATUS: {getCurrentStatus()}</span>
             </div>
 
