@@ -481,7 +481,16 @@ tbody tr:last-child td {
 
 /* Fade in */
 .animate-fade-in {
-  animation: fadeIn 200ms ease-out both;
+  /* `backwards`, not `both`: keeps the pre-start "from" frame (no flash of
+     full opacity before the animation kicks in) but lets the transform
+     revert to none once it ends. `both` would pin transform:translateY(0)
+     on this element forever — an identity transform, but CSS still treats
+     any non-`none` transform as creating a new containing block, which
+     silently breaks `position: fixed` descendants (e.g. modals) nested
+     anywhere inside an animate-fade-in ancestor: instead of covering the
+     viewport, they end up centered within this element's full scrollable
+     height. */
+  animation: fadeIn 200ms ease-out backwards;
 }
 
 @keyframes fadeIn {
@@ -491,7 +500,8 @@ tbody tr:last-child td {
 
 /* Slide up */
 .animate-slide-up {
-  animation: slideUp 250ms ease-out both;
+  /* See .animate-fade-in above for why this is `backwards`, not `both`. */
+  animation: slideUp 250ms ease-out backwards;
 }
 
 @keyframes slideUp {
@@ -501,7 +511,8 @@ tbody tr:last-child td {
 
 /* Scale in */
 .animate-scale-in {
-  animation: scaleIn 200ms var(--transition-spring) both;
+  /* See .animate-fade-in above for why this is `backwards`, not `both`. */
+  animation: scaleIn 200ms var(--transition-spring) backwards;
 }
 
 @keyframes scaleIn {
