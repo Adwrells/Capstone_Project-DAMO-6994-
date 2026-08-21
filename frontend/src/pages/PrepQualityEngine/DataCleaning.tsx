@@ -549,7 +549,6 @@ export default function DataCleaning({
               records: '19 records',
               cols: '10 fields',
               matcher: '2003',
-              rule: 'Interpreted in the context of changes in reporting coverage and participating facilities over time.'
             },
             {
               sheetNum: 'Sheet 2',
@@ -561,7 +560,6 @@ export default function DataCleaning({
               records: '4 records',
               cols: '8 fields',
               matcher: 'disposition',
-              rule: 'Roll-up categories such as "Total" are excluded from disaggregated statistical comparisons to prevent double-counting.'
             },
             {
               sheetNum: 'Sheet 3',
@@ -573,7 +571,6 @@ export default function DataCleaning({
               records: '5 records',
               cols: '8 fields',
               matcher: 'triage',
-              rule: 'Preserved as categorical clinical urgency. Numerical encoding applied only where required by specific models.'
             },
             {
               sheetNum: 'Sheet 4',
@@ -585,7 +582,6 @@ export default function DataCleaning({
               records: '17 records',
               cols: '12 fields',
               matcher: 'top 10',
-              rule: 'Roll-up categories such as "Any" are excluded from detailed problem comparisons to prevent double-counting.'
             },
             {
               sheetNum: 'Sheet 5',
@@ -597,7 +593,6 @@ export default function DataCleaning({
               records: '3 records',
               cols: '10 fields',
               matcher: 'month',
-              rule: 'Preserves original reporting groups unless transformation is required for a documented analytical purpose.'
             },
           ].map((item, idx) => (
             <div
@@ -626,14 +621,6 @@ export default function DataCleaning({
                   <p className="text-[11px] text-slate-600 dark:text-slate-300 font-normal leading-relaxed">
                     {item.focus}
                   </p>
-                </div>
-
-                {/* Aggregate Category Rule Callout */}
-                <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/60 text-[10px] text-slate-600 dark:text-slate-400 leading-snug">
-                  <strong className="text-indigo-600 dark:text-indigo-400 block font-mono uppercase text-[9px] mb-0.5">
-                    Aggregate Rule / Note:
-                  </strong>
-                  <span>{item.rule}</span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 text-[11px] font-mono pt-2 border-t border-slate-100 dark:border-slate-800">
