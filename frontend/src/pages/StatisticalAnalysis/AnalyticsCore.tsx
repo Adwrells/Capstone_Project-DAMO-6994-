@@ -452,7 +452,7 @@ function InterpPanel({ stat, clinical, operational }: { stat: string; clinical: 
       ].map(p => (
         <div key={p.title} className={`p-3.5 ${p.bg} border-l-[3px] ${p.border} rounded-r-lg`}>
           <span className={`font-extrabold text-[10px] uppercase tracking-wider block mb-1`} style={{ color: p.color }}>{p.title}</span>
-          <p className="text-slate-600 dark:text-slate-350 leading-relaxed font-light text-xs">{p.text}</p>
+          <p className="text-slate-600 dark:text-slate-400 leading-relaxed font-light text-xs">{p.text}</p>
         </div>
       ))}
     </div>
