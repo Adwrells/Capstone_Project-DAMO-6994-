@@ -22,10 +22,25 @@ class TestLinearRegression(unittest.TestCase):
         res = regression_summary([1, 2, 3, 4, 5], [10, 20, 30, 40, 50], "X", "Y")
         self.assertIn("slope", res)
 
+    def test_weighted_linear_regression(self):
+        res = regression_summary([1, 2, 3, 4, 5], [2, 4, 6, 8, 10], "X", "Y", weights=[10, 20, 30, 40, 50])
+        self.assertAlmostEqual(res["slope"], 2.0, places=3)
+        self.assertAlmostEqual(res["r_squared"], 1.0, places=3)
+
 class TestH3Module(unittest.TestCase):
     def test_h3_run_with_linear_relationship(self):
         res = H3.run([5.0, 4.0, 3.0, 2.0, 1.0, 5.0, 4.0, 3.0], [200.0, 160.0, 120.0, 80.0, 40.0, 210.0, 155.0, 115.0])
         self.assertEqual(res["hypothesis"], "H3")
+
+    def test_h3_run_with_weights(self):
+        res = H3.run(
+            [5.0, 4.0, 3.0, 2.0, 1.0],
+            [200.0, 160.0, 120.0, 80.0, 40.0],
+            weights=[100.0, 200.0, 300.0, 200.0, 100.0]
+        )
+        self.assertEqual(res["hypothesis"], "H3")
+        self.assertEqual(res["statistical_method"], "Weighted Least Squares Linear Regression")
+        self.assertAlmostEqual(res["results"]["r_squared"], 1.0, places=3)
 
     def test_h3_run_insufficient_data_returns_error(self):
         res = H3.run([1.0, 2.0], [3.0, 4.0])

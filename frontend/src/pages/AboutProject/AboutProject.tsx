@@ -345,11 +345,11 @@ export default function AboutProject({ onReset, isDarkMode = false, onBeginPrep 
           <div className="space-y-4 animate-fade-in">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
               {[
-                { tag: 'H1', title: 'Triage Acuity & LOS', question: 'Does median ED stay differ across CTAS urgency levels?', method: "Welch's T-Test / Kruskal-Wallis", status: '✅ Confirmed (p < 0.001)' },
-                { tag: 'H2', title: 'Pandemic Period Shifts', question: 'Did stay times significantly shift during COVID-19 fiscal years?', method: 'OLS Regression & Indicator Shocks', status: '✅ Confirmed (p < 0.001)' },
-                { tag: 'H3', title: 'Age Vulnerability', question: 'Is older age independently associated with prolonged stay duration?', method: 'Multivariate Regression & Control', status: '✅ Confirmed (p < 0.001)' },
-                { tag: 'H4', title: 'Disposition Outcomes', question: 'Do admitted vs. discharged stays show significant variation?', method: 'Weighted Kruskal-Wallis & Dunn', status: '✅ Confirmed (p < 0.001)' },
-                { tag: 'H5', title: 'Longitudinal TEM Trend', question: 'Has aggregate ED resource burden increased across the 19-year series?', method: 'Longitudinal Trend & Forecasting', status: '✅ Confirmed (p < 0.001)' },
+                { tag: 'H1', title: 'CTAS Triage Acuity & LOS', question: 'Does median ED stay differ across CTAS urgency levels?', method: 'Weighted Kruskal-Wallis & Dunn Post-Hoc', status: '✅ Confirmed (p < 0.001)' },
+                { tag: 'H2', title: 'Admission Status & LOS', question: 'Does length of stay differ between admitted and non-admitted visits?', method: 'Weighted Mann-Whitney U Test', status: '✅ Confirmed (p < 0.001)' },
+                { tag: 'H3', title: 'CTAS Urgency Score as Predictor', question: 'Does CTAS urgency score significantly predict median length of stay?', method: 'Weighted Least Squares (WLS) Regression', status: '✅ Confirmed (p < 0.001)' },
+                { tag: 'H4', title: 'Patient Age Group & LOS', question: 'Does reported median stay differ across broad age categories?', method: 'Weighted Kruskal-Wallis & Dunn Post-Hoc', status: '✅ Confirmed (p < 0.001)' },
+                { tag: 'H5', title: 'Patient Sex & Visit Disposition', question: 'Is patient sex significantly associated with ED admission status?', method: 'Pearson Chi-Square Test of Independence', status: '✅ Confirmed (p < 0.001)' },
               ].map((h) => (
                 <div key={h.tag} className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-2">
                   <div className="flex items-center justify-between">
