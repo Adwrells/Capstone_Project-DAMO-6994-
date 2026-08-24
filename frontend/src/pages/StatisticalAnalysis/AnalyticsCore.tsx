@@ -666,9 +666,8 @@ export default function AnalyticsCore({ fields, data, onNavigateNext }: Analytic
       visits: fd([/number.of.*visit/i, /visit.count/i, /ed.visits/i, /visits/i]) || 'Number of ED Visits',
       fy: fd([/fiscal.year/i, /fiscal/i]) || 'Fiscal Year',
       disp: fd([/visit.disposition/i, /disposition/i]) || 'Disposition',
-      // A bare /age/i matches "triage_level" — "tri-AGE" — so a dataset with no age column
-      // silently regressed LOS on triage twice. Anchor the match instead.
-      age: fd([/age.group/i, /age.broad/i, /population.category/i, /^age/i, /_age/i]) || 'Age Group',
+      // Robust age column detection: check broad categories first, then age groups
+      age: fd([/population.category/i, /age.broad/i, /age_broad_category/i, /age.group/i, /age_group/i, /^age/i, /_age/i]) || 'Age Group',
       sex: fd([/^sex/i, /_sex/i, /gender/i]) || 'Sex',
       prob: fd([/presenting.problem/i, /main.problem/i, /problem/i, /diagnosis/i]) || 'Main Presenting Problem',
     };
@@ -805,16 +804,43 @@ export default function AnalyticsCore({ fields, data, onNavigateNext }: Analytic
     const gm: Record<string, { los: number[]; wts: number[] }> = {};
     ORDER.forEach(k => { gm[k] = { los: [], wts: [] }; });
 
+    // Robust life-stage mapper supporting both broad titles and age intervals with en-dash/mojibake handling
+    const mapToBroadAge = (rawStr: string): string | null => {
+      const s = rawStr.toLowerCase().replace(/â|â€“|–|—/g, '-').trim();
+      if (s.includes('pediatric') || s.includes('youth') || s.includes('child') || s === '00-19' || s === '0-19' || s.startsWith('00') || s.startsWith('0-')) {
+        return 'Pediatric & Youth';
+      }
+      if (s.includes('young adult') || s === '20-44' || s.includes('20-44')) {
+        return 'Young Adult';
+      }
+      if (s.includes('middle adult') || s === '45-64' || s.includes('45-64')) {
+        return 'Middle Adult';
+      }
+      if (s.includes('older adult') || s.includes('senior') || s.includes('elderly') || s.includes('65+') || s.includes('65-') || s === '65+') {
+        return 'Older Adult';
+      }
+      return null;
+    };
+
     data.forEach(row => {
-      const raw = String(getV(row, cols.age) || '').trim();
+      const raw = String(
+        getV(row, cols.age) || 
+        getV(row, 'POPULATION_CATEGORY') || 
+        getV(row, 'population_category') || 
+        getV(row, 'AGE_GROUP') || 
+        getV(row, 'age_group') || 
+        getV(row, 'age_broad_category') || 
+        ''
+      ).trim();
       const los = Number(getV(row, cols.los) || 0), wt = Number(getV(row, cols.visits) || 1);
       if (!raw || !isFinite(los) || los <= 0) return;
       if (['total', 'all', 'any', 'unknown', 'not stated', 'missing', 'grand total', 'overall'].includes(raw.toLowerCase())) return;
 
-      const key = ORDER.find(k => raw.toLowerCase().includes(k.toLowerCase())) || raw;
-      if (!gm[key]) gm[key] = { los: [], wts: [] };
-      gm[key].los.push(los);
-      gm[key].wts.push(wt);
+      const key = mapToBroadAge(raw);
+      if (key && gm[key]) {
+        gm[key].los.push(los);
+        gm[key].wts.push(wt);
+      }
     });
 
     const present = ORDER.filter(k => gm[k]?.los.length > 0);
