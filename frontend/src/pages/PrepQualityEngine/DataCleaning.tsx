@@ -744,7 +744,9 @@ export default function DataCleaning({
                                 const keyName = typeof f === 'string' ? f : f.name;
                                 return (
                                   <td key={fIdx} className="p-3 whitespace-nowrap">
-                                    {String(row[keyName] !== undefined && row[keyName] !== null ? row[keyName] : '--')}
+                                    {row[keyName] !== undefined && row[keyName] !== null
+                                      ? String(row[keyName]).replace(/â€“|â|–|—/g, '-')
+                                      : '--'}
                                   </td>
                                 );
                               })}

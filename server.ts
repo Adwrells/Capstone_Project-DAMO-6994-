@@ -5,7 +5,7 @@ import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, Type } from "@google/genai";
 import dotenv from "dotenv";
 import { createRequire } from "module";
-const _require = createRequire(import.meta.url);
+const _require = typeof require !== "undefined" ? require : createRequire(typeof import.meta !== "undefined" && import.meta.url ? import.meta.url : "file://" + __filename);
 const XLSX = _require("xlsx") as typeof import("xlsx");
 const BetterSQLite3 = _require("better-sqlite3");
 
@@ -732,8 +732,14 @@ function loadFromSQLite(tableName: string): Record<string, any>[] {
   const db = getSqliteDb();
   if (!db) return [];
   try {
-    const rows = db.prepare('SELECT * FROM "' + tableName + '"').all();
-    return rows as Record<string, any>[];
+    const rawRows = db.prepare('SELECT * FROM "' + tableName + '"').all() as Record<string, any>[];
+    return rawRows.map(row => {
+      const cleanRow: Record<string, any> = {};
+      for (const [k, v] of Object.entries(row)) {
+        cleanRow[k] = typeof v === 'string' ? v.replace(/â€“|â€“|–|—/g, '-') : v;
+      }
+      return cleanRow;
+    });
   } catch (err: any) {
     console.error("[SQLite] Failed to load table " + tableName + ":", err);
     return [];
