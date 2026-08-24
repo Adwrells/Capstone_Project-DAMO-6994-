@@ -1,16 +1,16 @@
-# Graph Report - Capstone_Project-DAMO-6994-  (2026-08-23)
+# Graph Report - Capstone_Project-DAMO-6994-  (2026-08-24)
 
 ## Corpus Check
-- 134 files · ~111,940 words
+- 148 files · ~127,140 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1605 nodes · 2580 edges · 119 communities (98 shown, 21 thin omitted)
+- 1708 nodes · 2670 edges · 138 communities (107 shown, 31 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 27 edges (avg confidence: 0.93)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `a9ff8b8d`
+- Built from commit: `481b5653`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -20,12 +20,12 @@
 - dataset_explorer_api.py
 - server.ts
 - TestH1
-- hypothesis_testing.py
+- run_h1_test
 - AnalyticsCore.tsx
 - test_preprocessing.py
-- get_statistics_dashboard
+- test_api.py
 - test_analytics.py
-- weighted_mean
+- hypothesis_testing.py
 - weighted.py
 - chi_square_test
 - user_datasets.py
@@ -38,7 +38,7 @@
 - backend/preprocessing/feature_engineering.py
 - Healthcare Analytics Platform — Architecture Specification & Roadmap
 - run_ed_visits_forecasting
-- weighted_mann_whitney_u
+- test_weighted_statistics.py
 - weighted_kruskal_wallis
 - DataExplorer.tsx
 - compilerOptions
@@ -59,8 +59,8 @@
 - launch.py
 - TestH4Module
 - analytics_service.py
-- weighted_dunn_post_hoc
-- architecture.py
+- skipUnless
+- main.py
 - api/insights.py
 - upload.py
 - test_dependencies.py
@@ -90,7 +90,7 @@
 - MetricCard.tsx
 - ArchitecturePipelineCard.tsx
 - DataTable.tsx
-- ConsultantInsights.tsx
+- 🏥 Healthcare Analytics Platform
 - polynomial_fit
 - dataset_service.py
 - apply_transformations
@@ -112,17 +112,35 @@
 - utils/__init__.py
 - tests/__init__.py
 - init_database.py
-- main.py
-- APIRouter
+- What You Must Do When Invoked
 - schema.sql
+- weighted_mann_whitney_u
 - package.json
-- compute_erbi_metrics
+- TestH2
 - vite
 - express
 - motion
-- react
+- graphify reference: extra exports and benchmark
 - recharts
 - @tailwindcss/vite
+- graphify reference: query, path, explain
+- graphify
+- graphify reference: add a URL and watch a folder
+- graphify reference: commit hook and native CLAUDE.md integration
+- graphify reference: incremental update and cluster-only
+- Project Notes
+- graphify reference: GitHub clone and cross-repo merge
+- graphify reference: transcribe video and audio
+- TestH4
+- extraction-spec.md
+- ConsultantInsights.tsx
+- TestAPIEndpoints
+- test_hypothesis_pipeline.py
+- HypothesisResultContract
+- .assert_weighting_applied
+- APIRouter
+- APIRouter
+- react
 
 ## God Nodes (most connected - your core abstractions)
 1. `weighted_kruskal_wallis()` - 26 edges
@@ -151,7 +169,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (119 total, 21 thin omitted)
+## Communities (138 total, 31 thin omitted)
 
 ### Community 0 - "test_model_validation.py"
 Cohesion: 0.12
@@ -170,12 +188,12 @@ Cohesion: 0.07
 Nodes (34): activeJobs, app, BackgroundJob, BetterSQLite3, cache, DATASET_TABLE_MAP, DB_PATH, DIRS (+26 more)
 
 ### Community 4 - "TestH1"
-Cohesion: 0.06
-Nodes (9): HypothesisResultContract, Resuscitation/Emergent should not rank below Non-urgent on LOS., Shared contract every hypothesis result must satisfy., weighted_n counts VISITS; n_records counts aggregate rows. They must differ., Must be in (0, 1]. The source notebook reported 1.0000001932 via int64 overflow., Anchored to backend/hypothesis testing/H1_testing.ipynb (N and effect size)., TestH1, TestH2 (+1 more)
+Cohesion: 0.13
+Nodes (4): Resuscitation/Emergent should not rank below Non-urgent on LOS., Must be in (0, 1]. The source notebook reported 1.0000001932 via int64 overflow., Anchored to backend/hypothesis testing/H1_testing.ipynb (N and effect size)., TestH1
 
-### Community 5 - "hypothesis_testing.py"
-Cohesion: 0.10
-Nodes (27): _clean_frame(), _effect_label(), is_rollup_or_excluded(), Any, DataFrame, Healthcare Analytics Platform - Analytics: Hypothesis Testing Engine Executes…, Splits a frame into parallel value/name/weight lists, honouring a display order., Builds the per-group descriptive block returned to the API. (+19 more)
+### Community 5 - "run_h1_test"
+Cohesion: 0.14
+Nodes (19): compute_erbi_metrics(), Healthcare Analytics Platform - Analytics: ERBI Engine Computes Estimated…, Computes Estimated Resource Burden Index (ERBI) per triage level and age…, _effect_label(), Any, DataFrame, Splits a frame into parallel value/name/weight lists, honouring a display order., Builds the per-group descriptive block returned to the API. (+11 more)
 
 ### Community 6 - "AnalyticsCore.tsx"
 Cohesion: 0.10
@@ -185,17 +203,17 @@ Nodes (28): AnalyticsCore(), AnalyticsCoreProps, BoxGroup, boxStats(), chiSqP(),
 Cohesion: 0.12
 Nodes (22): add_los_columns(), add_population_category(), clean_missing_values(), normalize_age_group(), normalize_column_names(), _normalize_key(), normalize_population_category(), Any (+14 more)
 
-### Community 8 - "get_statistics_dashboard"
-Cohesion: 0.12
-Nodes (24): get_hypothesis_h1(), get_hypothesis_h2(), get_hypothesis_h3(), get_hypothesis_h4(), get_hypothesis_h5(), get_linear_regression(), get_statistical_methods(), get_statistics_dashboard() (+16 more)
+### Community 8 - "test_api.py"
+Cohesion: 0.16
+Nodes (20): get_hypothesis_h1(), get_hypothesis_h2(), get_hypothesis_h3(), get_hypothesis_h4(), get_hypothesis_h5(), get_linear_regression(), get_statistical_methods(), HTTPException (+12 more)
 
 ### Community 9 - "test_analytics.py"
 Cohesion: 0.14
 Nodes (16): linear_regression(), Any, Healthcare Analytics Platform - Analytics: Regression Engine Computes Weighted…, Computes ordinary least squares (OLS) linear regression helper., H3 Hypothesis Test: Performs Weighted Least Squares (WLS) linear regression…, run_h3_regression(), mann_kendall_test(), _norm_cdf() (+8 more)
 
-### Community 10 - "weighted_mean"
-Cohesion: 0.15
-Nodes (20): Any, H1: does reported median ED LOS differ across CTAS triage levels? ``weights``…, run(), Any, H2: does reported median ED LOS differ between admitted and non-admitted…, run(), Any, H4: does reported median ED LOS differ across patient age groups? ``weights``… (+12 more)
+### Community 10 - "hypothesis_testing.py"
+Cohesion: 0.14
+Nodes (22): Any, H1: does reported median ED LOS differ across CTAS triage levels? ``weights``…, run(), Any, H2: does reported median ED LOS differ between admitted and non-admitted…, run(), Any, H4: does reported median ED LOS differ across patient age groups? ``weights``… (+14 more)
 
 ### Community 11 - "weighted.py"
 Cohesion: 0.10
@@ -245,9 +263,9 @@ Nodes (43): 1. Executive Overview, 2. System Architecture Diagram, 3.1 Frontend 
 Cohesion: 0.29
 Nodes (7): exponential_smoothing_forecast(), Any, Healthcare Analytics Platform - Analytics: Forecasting Engine Computes Simple…, Performs Simple Exponential Smoothing (SES) forecasting with 95% confidence…, Queries annual ED visit totals from SQLite and generates Simple Exponential…, run_ed_visits_forecasting(), Forecasting Submodule Re-exports the SES forecasting engine so `from…
 
-### Community 23 - "weighted_mann_whitney_u"
-Cohesion: 0.16
-Nodes (10): normal_sf(), Standard normal survival function P(Z > z), exact via the error function., Midranks each unique value across the weight-expanded population. Returns…, Frequency-weighted Mann-Whitney U with tie-corrected normal approximation. The…, weighted_mann_whitney_u(), weighted_midranks(), Tests for the frequency-weighted non-parametric engine that backs H1/H2/H4. Two…, Fully separated groups give the maximal effect size. (+2 more)
+### Community 23 - "test_weighted_statistics.py"
+Cohesion: 0.15
+Nodes (11): normal_sf(), Any, Standard normal survival function P(Z > z), exact via the error function., Midranks each unique value across the weight-expanded population. Returns…, Dunn's test: pairwise mean-rank z-tests sharing the pooled rank variance. This…, weighted_dunn_post_hoc(), weighted_midranks(), Tests for the frequency-weighted non-parametric engine that backs H1/H2/H4. Two… (+3 more)
 
 ### Community 24 - "weighted_kruskal_wallis"
 Cohesion: 0.16
@@ -286,12 +304,12 @@ Cohesion: 0.12
 Nodes (17): autoprefixer, esbuild, devDependencies, autoprefixer, esbuild, tailwindcss, tsx, @types/better-sqlite3 (+9 more)
 
 ### Community 33 - "kruskal.py"
-Cohesion: 0.18
-Nodes (8): kruskal_wallis(), mann_whitney_u(), Healthcare Analytics Platform - Statistics: Rank-Based Tests Thin adapters over…, Kruskal-Wallis H test. Returns ``(H, p)`` rounded for display., Mann-Whitney U test. Returns ``(U, p)`` rounded for display., TestDunnPostHoc, TestKruskalWallis, TestMannWhitneyU
+Cohesion: 0.16
+Nodes (11): dunn_post_hoc(), kruskal_wallis(), mann_whitney_u(), Any, Healthcare Analytics Platform - Statistics: Rank-Based Tests Thin adapters over…, Kruskal-Wallis H test. Returns ``(H, p)`` rounded for display., Dunn's post-hoc test with Bonferroni-adjusted p-values. This is now the genuine…, Mann-Whitney U test. Returns ``(U, p)`` rounded for display. (+3 more)
 
 ### Community 34 - "Healthcare Analytics Platform"
 Cohesion: 0.06
-Nodes (33): A caution on polynomial degree, Additional commands, Analytical layering, Architecture, Author, Build and run, Column contract, Concurrent users (+25 more)
+Nodes (36): A caution on polynomial degree, Additional commands, Analytical layering, Architecture, Author, Build and run, Codebase knowledge graph (graphify), Column contract (+28 more)
 
 ### Community 35 - ".persist"
 Cohesion: 0.16
@@ -302,8 +320,8 @@ Cohesion: 0.05
 Nodes (39): dependencies, @google/genai, html-to-image, jszip, lucide-react, motion, react, react-dom (+31 more)
 
 ### Community 38 - "dashboard.py"
-Cohesion: 0.23
-Nodes (9): get_dashboard_kpis(), get_dashboard_summary(), HTTPException, Any, Exception, get, Healthcare Analytics Platform - FastAPI Router: Executive Dashboard Analytics…, Returns high-level executive KPIs derived from real SQLite ED dataset tables. (+1 more)
+Cohesion: 0.17
+Nodes (10): APIRouter, get_dashboard_kpis(), get_dashboard_summary(), HTTPException, Any, Exception, get, Healthcare Analytics Platform - FastAPI Router: Executive Dashboard Analytics… (+2 more)
 
 ### Community 39 - "datasets.py"
 Cohesion: 0.16
@@ -325,13 +343,13 @@ Nodes (3): Visit counts must actually drive the test, not merely decorate the ou
 Cohesion: 0.24
 Nodes (8): compute_er_kpis(), Any, Helper method for calculating summary KPIs from record lists., AnalyticsService, Any, Healthcare Analytics Platform - Analytics Service Layer Decouples API…, Reports readiness of each analytical pipeline stage. Backs GET…, test_pipeline_overview_reports_architecture_stages()
 
-### Community 44 - "weighted_dunn_post_hoc"
-Cohesion: 0.23
-Nodes (7): _clean_pairs(), Any, Drops non-finite rows and non-positive weights, then coerces weights to counts., Dunn's test: pairwise mean-rank z-tests sharing the pooled rank variance. This…, weighted_dunn_post_hoc(), Dunn shares one ranking across all groups; mean ranks must be global., TestWeightedDunnPostHoc
+### Community 44 - "skipUnless"
+Cohesion: 0.21
+Nodes (5): skipUnless, Task 01 Acceptance Criteria: Asserts rollup categories are filtered out…, Task 07: Live query reconciliation & staleness validation guard. Verifies that…, TestRollupCategoryFiltering, TestStalenessAndLiveQueryReconciliation
 
-### Community 45 - "architecture.py"
-Cohesion: 0.25
-Nodes (5): APIRouter, get_pipeline_overview(), Any, get, Architecture-oriented API endpoints for the platform pipeline overview.
+### Community 45 - "main.py"
+Cohesion: 0.18
+Nodes (8): APIRouter, get_pipeline_overview(), Any, get, Architecture-oriented API endpoints for the platform pipeline overview., health_check(), get, root()
 
 ### Community 46 - "api/insights.py"
 Cohesion: 0.23
@@ -350,8 +368,8 @@ Cohesion: 0.29
 Nodes (7): calculate_null_ratios(), infer_column_types(), Any, run_health_check(), validate_schema(), Service layer for the architecture-aligned preprocessing pipeline., TestValidation
 
 ### Community 51 - "model_diagnostics.py"
-Cohesion: 0.19
-Nodes (11): APIRouter, assess_fit(), BaseModel, ColumnsRequest, DiagnosticsRequest, modelable_columns(), Any, post (+3 more)
+Cohesion: 0.29
+Nodes (10): assess_fit(), BaseModel, ColumnsRequest, DiagnosticsRequest, modelable_columns(), Any, post, Overfitting / underfitting diagnostics for the post-cleaning dataset. (+2 more)
 
 ### Community 52 - "map_columns"
 Cohesion: 0.09
@@ -378,8 +396,8 @@ Cohesion: 0.07
 Nodes (29): H1: Weighted Kruskal–Wallis H-Test · Weighted Dunn Post-Hoc (Bonferroni) · $\varepsilon^2$ Effect Size, H2: Weighted Mann–Whitney U Test (Two-Sided) · Rank-Biserial Correlation, H3: Weighted Least Squares (WLS) Regression · Visit-Count Weights · Forest Plot, H4: Weighted Kruskal–Wallis H-Test · Weighted Dunn Post-Hoc (Bonferroni) · $\varepsilon^2$ Effect Size, H5: Mann–Kendall Trend Test · Simple Exponential Smoothing (FY+1, FY+2 Forecast), Mann–Kendall Trend & SES Forecast: Estimated Emergency Department Resource Burden Index (ERBI), Model Summary, Pipeline Telemetry (+21 more)
 
 ### Community 58 - "statistics.py"
-Cohesion: 0.12
-Nodes (18): calculate_five_number_summary(), calculate_mean(), calculate_std(), get_table_descriptive_metrics(), Any, Healthcare Analytics Platform - Analytics: Descriptive Statistics Engine…, Calculates min, Q1, median, Q3, and max summary stats., Calculates arithmetic mean of numeric sequence. (+10 more)
+Cohesion: 0.15
+Nodes (17): calculate_five_number_summary(), calculate_mean(), calculate_std(), get_table_descriptive_metrics(), Any, Healthcare Analytics Platform - Analytics: Descriptive Statistics Engine…, Calculates min, Q1, median, Q3, and max summary stats., Calculates arithmetic mean of numeric sequence. (+9 more)
 
 ### Community 59 - "run_preprocessing.py"
 Cohesion: 0.16
@@ -445,9 +463,9 @@ Nodes (5): ArchitecturePipelineCard(), ArchitecturePipelineCardProps, Architectu
 Cohesion: 0.40
 Nodes (4): DataTable(), DataTableProps, downloadCSV(), TableColumn
 
-### Community 76 - "ConsultantInsights.tsx"
-Cohesion: 0.40
-Nodes (3): ConsultantInsights(), ConsultantInsightsProps, StrategicRecommendation
+### Community 76 - "🏥 Healthcare Analytics Platform"
+Cohesion: 0.07
+Nodes (29): 10. 🗄️ Database Architecture & Clinical Schemas, 11. 📁 Key Source Code & File Mapping, 12. ⚡ Quick Reference Matrix, 1. 🏗️ High-Level Architecture, 1️⃣ Stage 1 — About Project, 2. 🚀 Quick Start & Execution Guide, 2️⃣ Stage 2 — Prep & Quality Engine, 3. 🔄 End-to-End Data Pipeline Flow (+21 more)
 
 ### Community 77 - "polynomial_fit"
 Cohesion: 0.29
@@ -481,44 +499,76 @@ Nodes (3): Shuffle-split paired samples into (x_train, y_train, x_test, y_test).
 Cohesion: 0.50
 Nodes (3): init_db(), Healthcare Analytics Platform - Database Schema Initializer Executes schema.sql…, Initializes SQLite database schema by executing schema.sql.
 
-### Community 107 - "main.py"
-Cohesion: 0.67
-Nodes (3): health_check(), get, root()
+### Community 107 - "What You Must Do When Invoked"
+Cohesion: 0.07
+Nodes (26): For /graphify add and --watch, For /graphify query, For the commit hook and native CLAUDE.md integration, For --update and --cluster-only, /graphify, Honesty Rules, Interpreter guard for subcommands, Part A - Structural extraction for code files (+18 more)
 
-### Community 109 - "schema.sql"
+### Community 108 - "schema.sql"
 Cohesion: 0.25
 Nodes (7): age_sex, ctas_triage, demographics, ed_visits, main_problems, metadata, visit_disposition
+
+### Community 109 - "weighted_mann_whitney_u"
+Cohesion: 0.25
+Nodes (6): _clean_pairs(), Drops non-finite rows and non-positive weights, then coerces weights to counts., Frequency-weighted Mann-Whitney U with tie-corrected normal approximation. The…, weighted_mann_whitney_u(), Fully separated groups give the maximal effect size., TestWeightedMannWhitneyU
 
 ### Community 110 - "package.json"
 Cohesion: 0.40
 Nodes (4): name, private, type, version
 
-### Community 111 - "compute_erbi_metrics"
-Cohesion: 0.50
-Nodes (3): compute_erbi_metrics(), Healthcare Analytics Platform - Analytics: ERBI Engine Computes Estimated…, Computes Estimated Resource Burden Index (ERBI) per triage level and age…
-
 ### Community 113 - "vite"
 Cohesion: 0.67
 Nodes (3): vite, vite, vite
 
+### Community 116 - "graphify reference: extra exports and benchmark"
+Cohesion: 0.22
+Nodes (8): graphify reference: extra exports and benchmark, Step 6b - Wiki (only if --wiki flag), Step 7 - Neo4j export (only if --neo4j or --neo4j-push flag), Step 7a - FalkorDB export (only if --falkordb or --falkordb-push flag), Step 7b - SVG export (only if --svg flag), Step 7c - GraphML export (only if --graphml flag), Step 7d - MCP server (only if --mcp flag), Step 8 - Token reduction benchmark (only if total_words > 5000)
+
+### Community 119 - "graphify reference: query, path, explain"
+Cohesion: 0.33
+Nodes (5): For /graphify explain, For /graphify path, graphify reference: query, path, explain, Step 0 — Constrained query expansion (REQUIRED before traversal), Step 1 — Traversal
+
+### Community 120 - "graphify"
+Cohesion: 0.50
+Nodes (3): After every commit, graphify, Setup — every developer must do this once
+
+### Community 121 - "graphify reference: add a URL and watch a folder"
+Cohesion: 0.50
+Nodes (3): For /graphify add, For --watch, graphify reference: add a URL and watch a folder
+
+### Community 122 - "graphify reference: commit hook and native CLAUDE.md integration"
+Cohesion: 0.50
+Nodes (3): For git commit hook, For native CLAUDE.md integration, graphify reference: commit hook and native CLAUDE.md integration
+
+### Community 123 - "graphify reference: incremental update and cluster-only"
+Cohesion: 0.50
+Nodes (3): For --cluster-only, For --update (incremental re-extraction), graphify reference: incremental update and cluster-only
+
+### Community 130 - "ConsultantInsights.tsx"
+Cohesion: 0.40
+Nodes (3): ConsultantInsights(), ConsultantInsightsProps, StrategicRecommendation
+
+### Community 132 - "test_hypothesis_pipeline.py"
+Cohesion: 0.33
+Nodes (3): Integration tests for the H1/H2/H4 pipeline against the seeded analytical…, No sampling, no capping - the same data must give bit-identical results., TestDeterminism
+
 ## Knowledge Gaps
-- **240 isolated node(s):** `BaseModel`, `ed_visits`, `ctas_triage`, `visit_disposition`, `age_sex` (+235 more)
+- **309 isolated node(s):** `BaseModel`, `ed_visits`, `ctas_triage`, `visit_disposition`, `age_sex` (+304 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **21 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **31 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `weighted_kruskal_wallis()` connect `weighted_kruskal_wallis` to `kruskal.py`, `hypothesis_testing.py`, `weighted_mean`, `weighted.py`, `weighted_dunn_post_hoc`, `weighted_mann_whitney_u`?**
-  _High betweenness centrality (0.031) - this node is a cross-community bridge._
-- **Why does `weighted_mann_whitney_u()` connect `weighted_mann_whitney_u` to `kruskal.py`, `hypothesis_testing.py`, `weighted_mean`, `weighted.py`, `weighted_dunn_post_hoc`?**
-  _High betweenness centrality (0.031) - this node is a cross-community bridge._
+- **Why does `weighted_mann_whitney_u()` connect `weighted_mann_whitney_u` to `kruskal.py`, `run_h1_test`, `hypothesis_testing.py`, `weighted.py`, `test_weighted_statistics.py`?**
+  _High betweenness centrality (0.029) - this node is a cross-community bridge._
+- **Why does `weighted_kruskal_wallis()` connect `weighted_kruskal_wallis` to `kruskal.py`, `run_h1_test`, `hypothesis_testing.py`, `weighted.py`, `weighted_mann_whitney_u`, `test_weighted_statistics.py`?**
+  _High betweenness centrality (0.029) - this node is a cross-community bridge._
 - **Why does `DatabaseManager` connect `database_manager.py` to `TestSeededCohortIsolation`, `map_columns`, `test_user_datasets.py`?**
-  _High betweenness centrality (0.023) - this node is a cross-community bridge._
+  _High betweenness centrality (0.021) - this node is a cross-community bridge._
 - **Are the 3 inferred relationships involving `DatabaseManager` (e.g. with `TestDatabaseManager` and `IsolationTestCase`) actually correct?**
   _`DatabaseManager` has 3 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `BaseModel`, `ed_visits`, `ctas_triage` to the rest of the system?**
-  _240 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _309 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `test_model_validation.py` be split into smaller, more focused modules?**
   _Cohesion score 0.12298387096774194 - nodes in this community are weakly interconnected._
 - **Should `dataset_explorer_api.py` be split into smaller, more focused modules?**
