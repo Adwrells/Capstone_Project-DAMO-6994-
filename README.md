@@ -34,7 +34,7 @@ dashboard, all reading from a reproducible analytical database.
 | Node server | Express (`server.ts`), port **3000** — serves Vite in middleware mode, handles uploads, Excel parsing and Gemini insight calls |
 | Python backend | FastAPI (`backend/main.py`), port **8000** — 31 routes |
 | Database | SQLite, schema in `backend/database/schema.sql` |
-| Testing | pytest — 291 tests across 20 suites |
+| Testing | pytest / unittest — 300 tests across 20 suites (100% pass rate) |
 
 The platform runs as two services on two ports. The user interface remains functional
 without the Python backend, though model diagnostics and dataset persistence report as
@@ -410,7 +410,7 @@ as the print destination.
 
 ## Testing
 
-The platform ships **291 tests across 20 suites**.
+The platform ships **300 tests across 20 suites** with a 100% pass rate.
 
 ```bash
 python -m pytest tests

@@ -63,7 +63,7 @@ export default function ConsultantInsights({ isLoading }: ConsultantInsightsProp
       priority: "CRITICAL",
       riskLevel: "HIGH",
       expectedImpact: "HIGH",
-      recommendedAction: "Advocate for provincial ministries of health to transition global emergency block funding models into activity-based models indexed directly against NACRS-measured triage acuity and engineered Resource Utilization Indexes (RUI).",
+      recommendedAction: "Advocate for provincial ministries of health to transition global emergency block funding models into activity-based models indexed directly against NACRS-measured triage acuity and the canonical Emergency Department Resource Burden Index (ERBI).",
       expectedBenefit: "Creates systemic incentives for hospitals to optimize throughput efficiency while ensuring high-complexity trauma hubs are fairly compensated."
     },
     {
@@ -82,7 +82,7 @@ export default function ConsultantInsights({ isLoading }: ConsultantInsightsProp
       priority: "MEDIUM",
       riskLevel: "LOW",
       expectedImpact: "HIGH",
-      recommendedAction: "Expand the static ARIMA time-series models into dynamic, deep recurrent neural networks (LSTM) that ingest live local weather patterns, municipal transit feeds, and regional influenza trackers to predict patient influxes 48 hours in advance.",
+      recommendedAction: "Expand the baseline Holt's linear exponential smoothing time-series models into dynamic, deep recurrent neural networks (LSTM) that ingest live local weather patterns, municipal transit feeds, and regional influenza trackers to predict patient influxes 48 hours in advance.",
       expectedBenefit: "Enables precise predictive scheduling of nursing cohorts, curbing overtime costs by up to 18% while preventing active wait spikes before they occur."
     },
     {

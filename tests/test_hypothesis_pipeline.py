@@ -19,6 +19,7 @@ from backend.analytics.hypothesis_testing import (
     run_h1_test,
     run_h2_test,
     run_h4_test,
+    run_h5_test,
 )
 from backend.database.database_manager import db_manager
 
@@ -325,6 +326,29 @@ class TestStalenessAndLiveQueryReconciliation(unittest.TestCase):
             act_records, act_visits = solver_map[cat]
             self.assertEqual(act_records, exp_records, f"Record count drift for age category {cat}")
             self.assertEqual(act_visits, exp_visits, f"Weighted visit count drift for age category {cat}")
+
+    @unittest.skipUnless(_seeded("visit_disposition"), "visit_disposition not seeded")
+    def test_h5_live_query_reconciliation(self):
+        # Direct SQL aggregation for sex x admission contingency table
+        df = db_manager.read_sql(
+            """
+            SELECT sex, is_admitted, SUM(ed_visits) as visit_count
+            FROM visit_disposition
+            WHERE sex NOT IN ('Total', 'Total visits', 'Unknown', 'Not Stated', 'Missing')
+              AND is_admitted IS NOT NULL
+              AND ed_visits > 0
+            GROUP BY sex, is_admitted
+            ORDER BY sex, is_admitted
+            """
+        )
+        exp_total_visits = int(df["visit_count"].sum())
+        res = run_h5_test()
+        self.assertEqual(res["hypothesis"], "H5")
+        self.assertEqual(res["statistical_method"], "Pearson Chi-Square Test of Independence")
+        self.assertEqual(res["total_visits_analyzed"], exp_total_visits)
+        self.assertIn("chi2_statistic", res["results"])
+        self.assertIn("cramers_v", res)
+        self.assertTrue(res["results"]["reject_null"])
 
 
 if __name__ == "__main__":

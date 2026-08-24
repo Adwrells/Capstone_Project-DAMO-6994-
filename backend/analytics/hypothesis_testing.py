@@ -4,6 +4,7 @@ Executes non-parametric statistical hypothesis tests from SQLite analytical tabl
 - H1: Weighted Kruskal-Wallis & Dunn Post Hoc (CTAS Triage Levels)
 - H2: Weighted Mann-Whitney U (Visit Disposition: Admitted vs Non-Admitted)
 - H4: Weighted Kruskal-Wallis & Dunn Post Hoc (Age Groups)
+- H5: Pearson Chi-Square Test of Independence (Sex × Admission Status)
 
 Weighting
 ---------
@@ -15,6 +16,7 @@ delegated to backend.analytics.statistics.weighted, which is the single definiti
 these tests across the platform.
 """
 
+import math
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 import pandas as pd
@@ -342,3 +344,98 @@ def run_h4_test() -> Dict[str, Any]:
         "group_summaries": _summarise("age_category", names, groups, weights),
         "dunn_post_hoc": dunn,
     }
+
+
+def _cramers_v(chi2: float, n: float, n_rows: int, n_cols: int) -> float:
+    """Cramér's V effect size for chi-square tests."""
+    if n <= 0 or chi2 < 0:
+        return 0.0
+    k = min(n_rows, n_cols) - 1
+    if k <= 0:
+        return 0.0
+    return math.sqrt(chi2 / (n * k))
+
+
+def run_h5_test() -> Dict[str, Any]:
+    """
+    H5 Hypothesis Test: Pearson Chi-Square Test of Independence.
+    Evaluates whether patient sex is associated with visit disposition
+    (admitted vs non-admitted) using aggregate visit counts from visit_disposition.
+
+    Contingency table:
+        Rows = Sex (Female, Male)
+        Cols = Disposition (Non-Admitted [is_admitted=0], Admitted [is_admitted=1])
+        Cell values = sum(ed_visits) — aggregate visit frequencies
+
+    Note: The contingency table is built from aggregate records, not individual
+    patient records. Each cell aggregates the total reported visits across all
+    disposition-sex-fiscal_year combinations in the source table.
+    """
+    from backend.analytics.hypothesis.H5 import run as h5_run
+
+    df = db_manager.read_sql(
+        """
+        SELECT sex, is_admitted, SUM(ed_visits) as visit_count
+        FROM visit_disposition
+        WHERE sex NOT IN ('Total', 'Total visits', 'Unknown', 'Not Stated', 'Missing')
+          AND is_admitted IS NOT NULL
+          AND ed_visits > 0
+        GROUP BY sex, is_admitted
+        ORDER BY sex, is_admitted
+        """
+    )
+
+    if df.empty:
+        return {"error": "No valid sex x admission records found in visit_disposition table."}
+
+    sexes = sorted(df["sex"].unique().tolist())
+    col_labels = ["Non-Admitted", "Admitted"]   # is_admitted=0, is_admitted=1
+
+    # Build 2-D matrix: rows = sexes, cols = [Non-Admitted, Admitted]
+    observed_matrix: List[List[int]] = []
+    missing_cells: List[str] = []
+    for sex in sexes:
+        sex_rows = df[df["sex"] == sex]
+        row: List[int] = []
+        for admitted_flag in [0, 1]:
+            cell_rows = sex_rows[sex_rows["is_admitted"] == admitted_flag]
+            if cell_rows.empty:
+                missing_cells.append(f"{sex} x {'Admitted' if admitted_flag else 'Non-Admitted'}")
+                row.append(0)
+            else:
+                row.append(int(cell_rows["visit_count"].iloc[0]))
+        observed_matrix.append(row)
+
+    if not sexes or not observed_matrix:
+        return {"error": "Could not construct contingency table from visit_disposition."}
+
+    # Call the canonical H5 module
+    h5_result = h5_run(observed_matrix, sexes, col_labels)
+
+    # Enrich with Cramér's V, total N, and structured cohort metadata
+    total_n = sum(cell for row in observed_matrix for cell in row)
+    chi2 = h5_result.get("results", {}).get("chi2_statistic", 0.0)
+    n_rows, n_cols = len(observed_matrix), len(col_labels)
+    cv = _cramers_v(chi2, total_n, n_rows, n_cols)
+
+    h5_result["total_visits_analyzed"] = total_n
+    h5_result["cramers_v"] = round(cv, 6)
+    h5_result["effect_size_magnitude"] = (
+        "Negligible" if cv < 0.10 else
+        "Small"      if cv < 0.30 else
+        "Medium"     if cv < 0.50 else
+        "Large"
+    )
+    if missing_cells:
+        h5_result["missing_cells_warning"] = missing_cells
+
+    h5_result["cohort_scope_rule"] = (
+        "2x2 contingency table: Sex (Female, Male) x Disposition (Non-Admitted, Admitted). "
+        "Cell values are summed ed_visits across all matching records in visit_disposition. "
+        "Summary rows (sex IN ('Total', 'Total visits')) and NULL is_admitted records are excluded. "
+        "Observation unit is aggregate visit counts, not individual patients."
+    )
+    h5_result["source_table"] = "visit_disposition"
+    h5_result["alpha"] = ALPHA
+
+    return h5_result

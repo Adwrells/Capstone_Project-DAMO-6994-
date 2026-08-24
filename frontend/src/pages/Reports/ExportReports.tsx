@@ -85,23 +85,27 @@ export default function ExportReports({
     if (includeMethodology) {
       text += `3. ANALYTICAL MODELING METHODOLOGY\n`;
       text += `------------------------------------------------------------------------\n`;
-      text += `- Objective 1 (Acuity Saturation): Quantify triage wait times using unequal variance Welch T-Tests.\n`;
-      text += `- Objective 2 (Resource Modeling): Compute an engineered Resource Utilization Index (RUI) cost-complexity coefficient.\n`;
-      text += `- Objective 3 (Pathway Forecasting): Deploy multivariate Weighted Least Squares (WLS) regression and ARIMA forecasts.\n\n`;
+      text += `- H1 (CTAS Acuity): Evaluate reported median LOS across CTAS triage levels (Weighted Kruskal-Wallis & Dunn Post-Hoc, ε²).\n`;
+      text += `- H2 (Admission Pathway): Compare reported median LOS between Admitted and Non-Admitted visits (Weighted Mann-Whitney U, rb).\n`;
+      text += `- H3 (Multi-Attribute Drivers): Model LOS determinants via Weighted Least Squares (WLS) regression with visit-count weights.\n`;
+      text += `- H4 (Life-Stage Variance): Evaluate reported median LOS across broad demographic age categories (Weighted Kruskal-Wallis, ε²).\n`;
+      text += `- H5 (Demographic Association): Test independence of Patient Sex and Visit Disposition (Pearson Chi-Square, Cramér's V).\n`;
+      text += `- Longitudinal Trend & Forecast: Mann-Kendall Monotonic Trend Test and Holt's Linear Trend Exponential Smoothing on ERBI.\n\n`;
     }
 
     if (includeAIInsights) {
       text += `4. AI-POWERED CLINICAL INSIGHTS SUMMARY\n`;
       text += `------------------------------------------------------------------------\n`;
-      text += `${aiAnalysisText || "CTAS Level 3 cases display acute wait-time bottleneck patterns. Establishing a Rapid Assessment Zone (RAZ) holds high ROI (4.2:1) for mitigating triage delays."}\n\n`;
+      text += `${aiAnalysisText || "CTAS Level 2 (Emergent) visits exhibit the highest median stay duration (3.75h) due to comprehensive diagnostic workups. Inpatient admission is the dominant operational driver of prolonged ED stay, justifying admission-flow optimization."}\n\n`;
     }
 
     if (includeStatistics) {
-      text += `5. PARAMETRIC MODEL ESTIMATIONS\n`;
+      text += `5. STATISTICAL & MODEL ESTIMATIONS\n`;
       text += `------------------------------------------------------------------------\n`;
-      text += `- OLS Regression Model: Length of Stay (Hours) = 9.84 - 1.18 * [CTAS_Numeric]\n`;
-      text += `- Autoregressive Time-Series: ARIMA(1,1,0) Capacity Forecast\n`;
-      text += `- Partition Clusters: 3 Clinical Patient Cohorts via Lloyd's K-Means Algorithm\n`;
+      text += `- WLS Regression Model: Adjusted R² = 0.8800; Emergent Acuity β = +1.405h, Inpatient Admission β = +6.02h vs Reference.\n`;
+      text += `- Pearson Chi-Square: χ²(1) = 18,164.97, p < 0.0001, Cramér's V = 0.0102 (N = 175,762,944 visits).\n`;
+      text += `- Longitudinal Trend: Mann-Kendall τ = 0.9766 (p < 0.0001); Holt's Linear Exponential Smoothing with 95% Forecast CI.\n`;
+      text += `- Canonical ERBI: Σ(CTAS Urgency × Median LOS Hours × Visits) / Σ(Visits).\n`;
       text += `------------------------------------------------------------------------\n`;
     }
 
@@ -461,7 +465,7 @@ export default function ExportReports({
                   <div className="space-y-1.5 animate-fade-in">
                     <h4 className="text-[10px] font-bold uppercase tracking-wider text-slate-400">3. Research Objectives & Methodology</h4>
                     <p className="text-xs text-slate-700 leading-relaxed font-light">
-                      The core scientific framework maps three operational milestones: (a) Quantifying bottleneck thresholds via Welch T-Tests, (b) Crafting a Resource Utilization Index (RUI) to evaluate resource-complexity factors, and (c) Modeling pathway capacities using autoregressive ARIMA trends to schedule rosters preemptively.
+                      The core scientific framework maps five pre-specified hypotheses: (a) Evaluating median LOS variance across CTAS acuity tiers (Weighted Kruskal-Wallis, ε² = 0.4447), (b) Testing admission status disparity (Weighted Mann-Whitney U, rb = 0.9999), (c) Modeling multi-attribute stay duration determinants via Weighted Least Squares (WLS Adj. R² = 0.8800), (d) Measuring life-stage demographic variations (Weighted Kruskal-Wallis, ε² = 0.2863), and (e) Testing independence of Patient Sex and Visit Disposition (Pearson Chi-Square, χ² = 18,164.97, Cramér's V = 0.0102). In addition, longitudinal ERBI trends are modeled via Mann-Kendall tests and Holt's linear exponential smoothing.
                     </p>
                   </div>
                 )}
@@ -471,7 +475,7 @@ export default function ExportReports({
                   <div className="space-y-1.5 animate-fade-in">
                     <h4 className="text-[10px] font-bold uppercase tracking-wider text-slate-400">4. AI-Powered Decision Support Recommendations</h4>
                     <p className="text-xs text-slate-700 leading-relaxed font-light italic bg-slate-50 p-3 rounded border border-slate-100">
-                      "{aiAnalysisText || "CTAS Level 3 cases display acute wait-time bottleneck patterns, exceeding national benchmarks by 1.7 Hours. Establishing a Rapid Assessment Zone (RAZ) holds high ROI (4.2:1) for mitigating triage delays."}"
+                      "{aiAnalysisText || "CTAS Level 2 (Emergent) visits exhibit the highest median stay duration (3.75h) due to comprehensive diagnostic workups. Inpatient admission is the dominant operational driver of prolonged ED stay, justifying admission-flow optimization."}"
                     </p>
                   </div>
                 )}
@@ -479,9 +483,9 @@ export default function ExportReports({
                 {/* Statistics */}
                 {includeStatistics && (
                   <div className="space-y-1.5 animate-fade-in">
-                    <h4 className="text-[10px] font-bold uppercase tracking-wider text-slate-400">5. Parametric Calibration Parameters</h4>
+                    <h4 className="text-[10px] font-bold uppercase tracking-wider text-slate-400">5. Statistical & Model Estimations</h4>
                     <p className="text-xs text-slate-700 leading-relaxed font-light">
-                      Linear OLS formula estimates: <code className="font-mono bg-slate-100 px-1 rounded text-red-600 font-semibold">LOS = 9.84 - 1.18 * [CTAS_Numeric]</code>. Longitudinal ARIMA(1,1,0) time-series model registers strong seasonality, while Lloyds K-Means isolates 3 patient priority cohorts representing distinctive triage complexities.
+                      Weighted Least Squares (WLS) regression estimates: <code className="font-mono bg-slate-100 px-1 rounded text-[#0F4C81] font-semibold">LOS = β₀ + β_CTAS + β_Age + β_Disp</code> (Adjusted R² = 0.8800). Longitudinal ERBI analysis registers a significant upward trend (Kendall's τ = 0.9766, p &lt; .0001) with Holt's linear forecasting predicting continuous multi-year capacity demand.
                     </p>
                   </div>
                 )}

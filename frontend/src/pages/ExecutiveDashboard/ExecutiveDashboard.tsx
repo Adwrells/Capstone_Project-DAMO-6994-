@@ -689,19 +689,33 @@ export default function ExecutiveDashboard({
     }
 
     // Highest resource burden (ERBI)
-    const urgMap: Record<string,number> = {'1':5,'2':4,'3':3,'4':2,'5':1};
-    const bMap: Record<string,number> = {};
-    if (COL.ctas) {
+    // Canonical formula: ctas_urgency_score × los_hours × visits
+    const bMap: Record<string, { totalBurden: number; totalVisits: number }> = {};
+    const burdenGroupCol = COL.ctas || COL.popCat || COL.ageGroup;
+    if (burdenGroupCol) {
       filtered.forEach(r => {
-        const lvl = String(r[COL.ctas]??'').replace(/[^0-9]/g,'') || '3';
-        const urg = urgMap[lvl]??3;
-        const lo  = Number(r[COL.los]??0);
-        const v   = Number(r[COL.visits]??1);
-        const key = String(r[COL.ctas]??'');
-        bMap[key] = (bMap[key]??0) + urg*lo*v;
+        let urg = Number(r.ctas_urgency_score ?? 0);
+        if (!urg || isNaN(urg)) {
+          const rawCtas = String(r[COL.ctas] ?? '');
+          const match = rawCtas.match(/[1-5]/);
+          urg = match ? parseInt(match[0], 10) : 3;
+        }
+        const rawLOS = Number(r[COL.los] ?? 0);
+        const losHours = rawLOS > 24 ? rawLOS / 60.0 : rawLOS; // convert minutes to hours if > 24
+        const v = Number(r[COL.visits] ?? 1);
+        const key = String(r[burdenGroupCol] ?? 'Unknown');
+        if (key !== 'Unknown' && !['total', 'all'].includes(key.toLowerCase())) {
+          if (!bMap[key]) bMap[key] = { totalBurden: 0, totalVisits: 0 };
+          bMap[key].totalBurden += urg * losHours * v;
+          bMap[key].totalVisits += v;
+        }
       });
     }
-    const bestBurden = Object.entries(bMap).sort((a,b)=>b[1]-a[1])[0];
+    const bestBurden = Object.entries(bMap).sort((a, b) => {
+      const erbiA = a[1].totalVisits > 0 ? a[1].totalBurden / a[1].totalVisits : 0;
+      const erbiB = b[1].totalVisits > 0 ? b[1].totalBurden / b[1].totalVisits : 0;
+      return erbiB - erbiA;
+    })[0];
     const maxBurdenGroup = bestBurden ? bestBurden[0] : '—';
 
     const keyFinding = medLOS > 6

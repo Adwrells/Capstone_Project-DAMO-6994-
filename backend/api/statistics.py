@@ -41,11 +41,13 @@ from backend.analytics.hypothesis_testing import (
     run_h1_test,
     run_h2_test,
     run_h4_test,
+    run_h5_test,
 )
 from backend.analytics.regression import run_h3_regression, linear_regression
 from backend.analytics.trend_analysis import run_ed_visits_trend_analysis, mann_kendall_test
 from backend.analytics.forecasting import run_ed_visits_forecasting
 from backend.analytics.erbi import compute_erbi_metrics
+from backend.analytics.hypotheses_registry import methods_payload
 
 router = APIRouter(prefix="/api/statistics", tags=["Statistics Engine"])
 
@@ -115,7 +117,31 @@ async def get_hypothesis_h4() -> Dict[str, Any]:
 
 @router.get("/h5")
 async def get_hypothesis_h5() -> Dict[str, Any]:
-    """GET /statistics/h5: Mann-Kendall Trend Test & Exponential Smoothing Forecast."""
+    """
+    GET /statistics/h5: Pearson Chi-Square Test of Independence — Sex × Admission Status.
+
+    Constructs a 2×2 contingency table from visit_disposition aggregate records:
+        Rows = Sex (Female, Male)
+        Cols = Disposition (Non-Admitted, Admitted)
+        Cell values = sum(ed_visits) — aggregate visit frequencies
+
+    Returns chi2 statistic, degrees of freedom, p-value, Cramér's V, and
+    the observed contingency table.
+    """
+    try:
+        res = run_h5_test()
+        return {"success": True, "source": "SQLite Database (visit_disposition)", **res}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"H5 execution error: {str(e)}")
+
+
+@router.get("/trends")
+async def get_ed_trends() -> Dict[str, Any]:
+    """
+    GET /statistics/trends: Mann-Kendall Trend Test, Exponential Smoothing Forecast,
+    and ERBI metrics. This is the longitudinal resource burden analysis (previously
+    misassigned to /h5).
+    """
     try:
         trend_res = run_ed_visits_trend_analysis()
         forecast_res = run_ed_visits_forecasting(horizon=5)
@@ -125,21 +151,21 @@ async def get_hypothesis_h5() -> Dict[str, Any]:
             "source": "SQLite Database",
             "trend_analysis": trend_res,
             "forecasting": forecast_res,
-            "erbi_metrics": erbi_res
+            "erbi_metrics": erbi_res,
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"H5 execution error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Trends execution error: {str(e)}")
 
 
 @router.get("/dashboard")
 async def get_statistics_dashboard() -> Dict[str, Any]:
-    """GET /statistics/dashboard: Comprehensive summary of all statistical hypothesis testing results."""
+    """GET /statistics/dashboard: Summary of all 5 hypothesis test results from SQLite."""
     try:
         h1 = run_h1_test()
         h2 = run_h2_test()
         h3 = run_h3_regression()
         h4 = run_h4_test()
-        h5 = run_ed_visits_trend_analysis()
+        h5 = run_h5_test()
         erbi = compute_erbi_metrics()
 
         return {
@@ -148,6 +174,7 @@ async def get_statistics_dashboard() -> Dict[str, Any]:
             "alpha": ALPHA,
             "summary_dashboard": {
                 "H1_Triage_Difference": {
+                    "hypothesis": "H1: LOS differs across CTAS Triage Levels",
                     "test": h1.get("test_name"),
                     "decision": h1.get("decision"),
                     "p_value": h1.get("p_value"),
@@ -158,6 +185,7 @@ async def get_statistics_dashboard() -> Dict[str, Any]:
                     "weighted_n": h1.get("weighted_n"),
                 },
                 "H2_Admission_Difference": {
+                    "hypothesis": "H2: LOS differs between Admitted and Non-Admitted visits",
                     "test": h2.get("test_name"),
                     "decision": h2.get("decision"),
                     "p_value": h2.get("p_value"),
@@ -166,12 +194,15 @@ async def get_statistics_dashboard() -> Dict[str, Any]:
                     "weighted_n": h2.get("weighted_n"),
                 },
                 "H3_Urgency_WLS_Regression": {
+                    "hypothesis": "H3: CTAS Urgency Score predicts LOS (WLS)",
                     "model": h3.get("regression_type"),
                     "r_squared": h3.get("r_squared"),
                     "slope": h3.get("slope"),
-                    "decision": h3.get("decision")
+                    "decision": h3.get("decision"),
+                    "p_value": h3.get("p_value_slope"),
                 },
                 "H4_Age_Group_Difference": {
+                    "hypothesis": "H4: LOS differs across Broad Age Categories",
                     "test": h4.get("test_name"),
                     "decision": h4.get("decision"),
                     "p_value": h4.get("p_value"),
@@ -181,15 +212,22 @@ async def get_statistics_dashboard() -> Dict[str, Any]:
                     "effect_size_magnitude": h4.get("effect_size_magnitude"),
                     "weighted_n": h4.get("weighted_n"),
                 },
-                "H5_Volume_Trend": {
-                    "test": "Mann-Kendall Trend Test",
-                    "trend": h5.get("mann_kendall_result", {}).get("trend"),
-                    "p_value": h5.get("mann_kendall_result", {}).get("p_value")
+                "H5_Sex_vs_Disposition": {
+                    "hypothesis": "H5: Sex and Visit Disposition are associated (Chi-Square)",
+                    "test": "Pearson Chi-Square Test of Independence",
+                    "decision": h5.get("results", {}).get("decision"),
+                    "p_value": h5.get("results", {}).get("p_value"),
+                    "chi2_statistic": h5.get("results", {}).get("chi2_statistic"),
+                    "degrees_of_freedom": h5.get("results", {}).get("degrees_of_freedom"),
+                    "effect_size": h5.get("cramers_v"),
+                    "effect_size_metric": "cramers_v",
+                    "effect_size_magnitude": h5.get("effect_size_magnitude"),
+                    "total_visits_analyzed": h5.get("total_visits_analyzed"),
                 },
                 "Resource_Burden": {
                     "overall_erbi": erbi.get("overall_erbi_score")
-                }
-            }
+                },
+            },
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Dashboard error: {str(e)}")
@@ -197,33 +235,11 @@ async def get_statistics_dashboard() -> Dict[str, Any]:
 
 @router.get("/methods")
 async def get_statistical_methods() -> Dict[str, Any]:
-    """GET /statistics/methods: the algorithms actually executed by the engine.
-
-    Read from the analytics modules rather than restated here, so this endpoint cannot
-    drift from the code the way a hardcoded methodology list would.
     """
-    return {
-        "success": True,
-        "alpha": ALPHA,
-        "weighting": {
-            "applied": True,
-            "weight_column": "ed_visits",
-            "rationale": (
-                "Rows are aggregates carrying a visit count, so ed_visits is a frequency "
-                "weight. Tests run over the weight-expanded population."
-            ),
-        },
-        "engine": "backend.analytics.statistics.weighted",
-        "methods": {
-            "H1": {"test": TEST_KRUSKAL, "effect_size": "epsilon_squared", "post_hoc": "Dunn (Bonferroni-adjusted)"},
-            "H2": {"test": TEST_MANN_WHITNEY, "effect_size": "rank_biserial", "post_hoc": None},
-            "H3": {"test": "Weighted Least Squares Linear Regression", "effect_size": "r_squared", "post_hoc": None},
-            "H4": {"test": TEST_KRUSKAL, "effect_size": "epsilon_squared", "post_hoc": "Dunn (Bonferroni-adjusted)"},
-            "H5": {"test": "Mann-Kendall Trend Test", "effect_size": "kendall_tau", "post_hoc": None},
-        },
-        "p_value_computation": "Exact chi-square / normal survival functions (pure Python, SciPy-independent)",
-        "tie_handling": "Midrank assignment with 1 - sum(t^3 - t) / (N^3 - N) correction",
-    }
+    GET /statistics/methods: the algorithms actually executed by the engine.
+    Sourced from the central hypotheses_registry — cannot drift from the code.
+    """
+    return {"success": True, **methods_payload()}
 
 
 @router.post("/regression")
