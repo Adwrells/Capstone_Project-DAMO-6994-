@@ -6,9 +6,12 @@ correlation matrices, outlier detection, feature engineering, and data dictionar
 
 from typing import Dict, Any, List
 import math
+import os
+from pathlib import Path
 
 try:
     from fastapi import APIRouter, HTTPException
+    from fastapi.responses import FileResponse, Response
 except ImportError:
     class APIRouter:
         def __init__(self, *args, **kwargs): pass
@@ -18,6 +21,10 @@ except ImportError:
         def __init__(self, status_code: int, detail: str):
             self.status_code = status_code
             self.detail = detail
+    class FileResponse:
+        def __init__(self, *args, **kwargs): pass
+    class Response:
+        def __init__(self, *args, **kwargs): pass
 
 try:
     from backend.services.excel_service import excel_service
@@ -25,6 +32,41 @@ except ImportError:
     from services.excel_service import excel_service
 
 router = APIRouter(prefix="/api/dataset", tags=["Dataset Explorer Engine"])
+
+
+@router.get("/download/raw-xlsx")
+async def download_raw_xlsx():
+    """Downloads the master Excel workbook (.xlsx) as it is."""
+    try:
+        path = excel_service.get_excel_path()
+        if not path or not os.path.exists(path):
+            raise HTTPException(status_code=404, detail="Master Excel workbook not found.")
+        filename = os.path.basename(path)
+        return FileResponse(
+            path=str(path),
+            filename=filename,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to stream raw Excel workbook: {str(e)}")
+
+
+@router.get("/download/csv/{sheet}")
+async def download_sheet_csv(sheet: str):
+    """Downloads the specified worksheet as a CSV file."""
+    try:
+        sheets = excel_service.load_all_sheets()
+        if sheet not in sheets:
+            raise HTTPException(status_code=404, detail=f"Worksheet '{sheet}' not found.")
+        df = sheets[sheet]
+        csv_bytes = df.to_csv(index=False).encode('utf-8')
+        return Response(
+            content=csv_bytes,
+            media_type="text/csv",
+            headers={"Content-Disposition": f'attachment; filename="{sheet}_export.csv"'}
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to generate CSV for '{sheet}': {str(e)}")
 
 
 @router.get("/sheets")

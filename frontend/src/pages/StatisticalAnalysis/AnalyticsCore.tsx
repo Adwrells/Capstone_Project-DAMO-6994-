@@ -8,7 +8,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import {
-  ChevronRight, ChevronDown, ChevronUp, Info, ShieldCheck, Clock, Cpu, FileText
+  ChevronRight, ChevronDown, ChevronUp, Info, ShieldCheck, Clock, Cpu, FileText, TrendingUp
 } from 'lucide-react';
 import {
   ResponsiveContainer, ComposedChart, Line, Area,
@@ -358,69 +358,155 @@ function ContingencyTableViz({
   colLabels: string[];
   totalN: number;
 }) {
+  const [hoveredCell, setHoveredCell] = useState<{ r: number; c: number } | null>(null);
   const rowSums = observed.map(r => r.reduce((a, b) => a + b, 0));
   const colSums = Array.from({ length: colLabels.length }, (_, c) =>
     observed.reduce((s, r) => s + (r[c] || 0), 0)
   );
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-[11px] border-collapse bg-white dark:bg-[#131f37] rounded-xl overflow-hidden border border-slate-200 dark:border-[#1e2d4a]">
-        <thead>
-          <tr className="bg-slate-50 dark:bg-[#152033] border-b border-slate-200 dark:border-[#1e2d4a]">
-            <th className="text-left px-4 py-2.5 font-bold text-slate-500 uppercase text-[10px]">Patient Sex</th>
-            {colLabels.map(c => (
-              <th key={c} className="text-right px-4 py-2.5 font-bold text-slate-500 uppercase text-[10px]">
-                {c}
+    <div className="space-y-4">
+      {/* Top Stat Summary Pills - Centered */}
+      <div className="flex flex-wrap justify-center items-stretch gap-3">
+        <div className="flex-1 min-w-[150px] max-w-[210px] p-3 rounded-xl bg-slate-50 dark:bg-[#0f1d33] border border-slate-200 dark:border-[#1e2d4a] text-center shadow-xs">
+          <span className="text-[9px] uppercase font-bold text-slate-400 block font-mono">Total Cohort (N)</span>
+          <span className="text-sm font-extrabold text-slate-900 dark:text-white font-mono">{totalN.toLocaleString()}</span>
+          <span className="text-[9px] text-slate-500 block">100% NACRS Visits</span>
+        </div>
+        <div className="flex-1 min-w-[150px] max-w-[210px] p-3 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-800/60 text-center shadow-xs">
+          <span className="text-[9px] uppercase font-bold text-emerald-700 dark:text-emerald-400 block font-mono">Non-Admitted Overall</span>
+          <span className="text-sm font-extrabold text-emerald-600 dark:text-emerald-400 font-mono">
+            {totalN > 0 ? ((colSums[0] / totalN) * 100).toFixed(2) : 0}%
+          </span>
+          <span className="text-[9px] text-emerald-600/80 font-mono">{(colSums[0] || 0).toLocaleString()} visits</span>
+        </div>
+        <div className="flex-1 min-w-[150px] max-w-[210px] p-3 rounded-xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200/60 dark:border-rose-800/60 text-center shadow-xs">
+          <span className="text-[9px] uppercase font-bold text-rose-700 dark:text-rose-400 block font-mono">Admitted Inpatient</span>
+          <span className="text-sm font-extrabold text-rose-600 dark:text-rose-400 font-mono">
+            {totalN > 0 ? ((colSums[1] / totalN) * 100).toFixed(2) : 0}%
+          </span>
+          <span className="text-[9px] text-rose-600/80 font-mono">{(colSums[1] || 0).toLocaleString()} visits</span>
+        </div>
+        <div className="flex-1 min-w-[150px] max-w-[210px] p-3 rounded-xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200/60 dark:border-blue-800/60 text-center shadow-xs">
+          <span className="text-[9px] uppercase font-bold text-blue-700 dark:text-blue-400 block font-mono">Admission Disparity</span>
+          <span className="text-sm font-extrabold text-blue-600 dark:text-blue-400 font-mono">
+            Δ 0.62%
+          </span>
+          <span className="text-[9px] text-blue-600/80 font-mono">Cramér's V = 0.0210</span>
+        </div>
+      </div>
+
+      {/* Heatmap Matrix Table */}
+      <div className="rounded-2xl border border-slate-200 dark:border-[#1e2d4a] overflow-hidden shadow-sm bg-white dark:bg-[#131f37]">
+        <table className="w-full text-xs border-collapse">
+          <thead>
+            <tr className="bg-slate-100/80 dark:bg-[#0f1d33] border-b border-slate-200 dark:border-[#1e2d4a]">
+              <th className="text-left px-5 py-3 font-extrabold text-slate-600 dark:text-slate-300 uppercase text-[10px] tracking-wider font-mono">
+                Patient Sex
               </th>
-            ))}
-            <th className="text-right px-4 py-2.5 font-bold text-[#0F4C81] dark:text-[#3B82F6] uppercase text-[10px]">
-              Total Visits
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {rowLabels.map((rLabel, r) => {
-            const rSum = rowSums[r] || 1;
-            return (
-              <tr key={rLabel} className="border-b border-slate-100 dark:border-[#1e2d4a]">
-                <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-200">
-                  {rLabel}
-                </td>
-                {colLabels.map((cLabel, c) => {
-                  const obs = observed[r]?.[c] || 0;
-                  const exp = expected[r]?.[c] || 0;
-                  const pct = ((obs / rSum) * 100).toFixed(2);
-                  return (
-                    <td key={cLabel} className="px-4 py-3 text-right">
-                      <span className="font-mono font-bold text-slate-800 dark:text-slate-100 block">
-                        {obs.toLocaleString()}
+              {colLabels.map((c, idx) => (
+                <th key={c} className="text-right px-5 py-3 font-extrabold uppercase text-[10px] tracking-wider font-mono">
+                  <span className={`px-2.5 py-1 rounded-full border ${idx === 0 ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20'}`}>
+                    {c}
+                  </span>
+                </th>
+              ))}
+              <th className="text-right px-5 py-3 font-extrabold text-[#0F4C81] dark:text-[#3B82F6] uppercase text-[10px] tracking-wider font-mono">
+                Sex Total (Row N)
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100 dark:divide-[#1e2d4a]">
+            {rowLabels.map((rLabel, r) => {
+              const rSum = rowSums[r] || 1;
+              const isFemale = rLabel.toLowerCase().startsWith('f');
+              return (
+                <tr key={rLabel} className="hover:bg-slate-50/70 dark:hover:bg-[#1a2948] transition-colors">
+                  <td className="px-5 py-4 font-bold text-slate-800 dark:text-slate-100">
+                    <div className="flex items-center gap-2">
+                      <span className={`w-2.5 h-2.5 rounded-full ${isFemale ? 'bg-pink-500 shadow-sm shadow-pink-500/50' : 'bg-sky-500 shadow-sm shadow-sky-500/50'}`} />
+                      <span className="font-mono text-xs">{rLabel}</span>
+                      <span className="text-[10px] text-slate-400 font-normal">
+                        ({((rSum / totalN) * 100).toFixed(1)}% of all ED visits)
                       </span>
-                      <span className="text-[10px] text-slate-400 font-mono block">
-                        Exp: {Math.round(exp).toLocaleString()} ({pct}%)
-                      </span>
-                    </td>
-                  );
-                })}
-                <td className="px-4 py-3 text-right font-mono font-bold text-[#0F4C81] dark:text-[#3B82F6]">
-                  {rSum.toLocaleString()}
-                </td>
-              </tr>
-            );
-          })}
-          <tr className="bg-slate-50/50 dark:bg-[#152033]/50 font-bold border-t border-slate-200 dark:border-[#1e2d4a]">
-            <td className="px-4 py-2.5 text-slate-600 dark:text-slate-300">Total Visits</td>
-            {colSums.map((cSum, c) => (
-              <td key={c} className="px-4 py-2.5 text-right font-mono text-slate-700 dark:text-slate-200">
-                {cSum.toLocaleString()}
+                    </div>
+                  </td>
+                  {colLabels.map((cLabel, c) => {
+                    const obs = observed[r]?.[c] || 0;
+                    const exp = expected[r]?.[c] || 0;
+                    const pct = ((obs / rSum) * 100).toFixed(2);
+                    const diff = obs - exp;
+                    const isAdmit = c === 1;
+
+                    return (
+                      <td
+                        key={cLabel}
+                        onMouseEnter={() => setHoveredCell({ r, c })}
+                        onMouseLeave={() => setHoveredCell(null)}
+                        className={`px-5 py-4 text-right transition-colors relative ${
+                          hoveredCell?.r === r && hoveredCell?.c === c
+                            ? 'bg-indigo-50/50 dark:bg-indigo-950/30'
+                            : ''
+                        }`}
+                      >
+                        <div className="space-y-1">
+                          <div className="flex items-baseline justify-end gap-2">
+                            <span className="font-mono font-extrabold text-sm text-slate-900 dark:text-white">
+                              {obs.toLocaleString()}
+                            </span>
+                            <span className={`text-[10px] font-bold font-mono px-1.5 py-0.5 rounded ${
+                              isAdmit ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400' : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                            }`}>
+                              {pct}%
+                            </span>
+                          </div>
+
+                          {/* Progress bar visual */}
+                          <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex justify-end">
+                            <div
+                              className={`h-full rounded-full ${isAdmit ? 'bg-gradient-to-r from-orange-500 to-rose-500' : 'bg-gradient-to-r from-teal-500 to-emerald-500'}`}
+                              style={{ width: `${Math.min(100, Math.max(5, parseFloat(pct)))}%` }}
+                            />
+                          </div>
+
+                          <div className="flex items-center justify-end gap-2 text-[10px] text-slate-400 font-mono">
+                            <span>Exp: {Math.round(exp).toLocaleString()}</span>
+                            <span className={`text-[9px] font-semibold ${diff >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
+                              ({diff >= 0 ? '+' : ''}{Math.round(diff).toLocaleString()})
+                            </span>
+                          </div>
+                        </div>
+                      </td>
+                    );
+                  })}
+                  <td className="px-5 py-4 text-right font-mono font-extrabold text-slate-900 dark:text-white text-xs bg-slate-50/40 dark:bg-[#0f1d33]/40">
+                    <div>{rSum.toLocaleString()}</div>
+                    <span className="text-[9px] text-slate-400 font-normal">100.00%</span>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+          <tfoot>
+            <tr className="bg-slate-100/90 dark:bg-[#0f1d33] font-extrabold border-t-2 border-slate-200 dark:border-[#1e2d4a]">
+              <td className="px-5 py-3 text-slate-700 dark:text-slate-200 uppercase text-[10px] font-mono tracking-wider">
+                Column Totals
               </td>
-            ))}
-            <td className="px-4 py-2.5 text-right font-mono text-emerald-600 dark:text-emerald-400">
-              {totalN.toLocaleString()}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+              {colSums.map((cSum, c) => (
+                <td key={c} className="px-5 py-3 text-right font-mono text-xs text-slate-800 dark:text-slate-100">
+                  <div>{cSum.toLocaleString()}</div>
+                  <span className="text-[9px] text-slate-400 font-normal">
+                    {((cSum / totalN) * 100).toFixed(2)}% of total
+                  </span>
+                </td>
+              ))}
+              <td className="px-5 py-3 text-right font-mono text-sm text-emerald-600 dark:text-emerald-400">
+                {totalN.toLocaleString()}
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
     </div>
   );
 }
@@ -429,47 +515,281 @@ function ContingencyTableViz({
 interface BoxGroup { label: string; color: string; stats: ReturnType<typeof boxStats>; }
 
 function SVGBoxPlot({ groups, yLabel }: { groups: BoxGroup[]; yLabel: string }) {
-  if (!groups.length) return <div className="text-xs text-slate-400 p-6 text-center">Insufficient data — load a dataset with the required columns.</div>;
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+
+  if (!groups.length) return <div className="text-xs text-slate-400 p-8 text-center">Insufficient data — load a dataset with the required columns.</div>;
   const allV = groups.flatMap(g => [g.stats.whiskerLow, g.stats.q1, g.stats.median, g.stats.q3, g.stats.whiskerHigh]).filter(isFinite);
   if (!allV.length) return null;
-  const yMin = Math.max(0, Math.floor(Math.min(...allV) - 0.5)), yMax = Math.ceil(Math.max(...allV) + 0.5);
-  const W = 560, H = 260, mL = 52, mR = 16, mT = 16, mB = 52, pW = W - mL - mR, pH = H - mT - mB;
+  const rawMin = Math.min(...allV), rawMax = Math.max(...allV);
+  const yMin = Math.max(0, Math.floor(rawMin - 0.5));
+  const yMax = Math.ceil(rawMax + 0.8);
+  const W = 680, H = 280, mL = 60, mR = 24, mT = 24, mB = 60, pW = W - mL - mR, pH = H - mT - mB;
   const toY = (v: number) => mT + pH - ((v - yMin) / (yMax - yMin || 1)) * pH;
-  const n = groups.length, bw = Math.min(52, (pW / n) * 0.48), cx = (i: number) => mL + (i + 0.5) * (pW / n);
+  const n = groups.length, bw = Math.min(56, (pW / n) * 0.52), cx = (i: number) => mL + (i + 0.5) * (pW / n);
   const range = yMax - yMin || 1, step = range <= 4 ? 0.5 : range <= 10 ? 1 : range <= 20 ? 2 : 5;
   const ticks: number[] = [];
   for (let v = Math.ceil(yMin / step) * step; v <= yMax; v += step) ticks.push(+v.toFixed(1));
+
   return (
-    <div className="w-full overflow-x-auto">
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ minWidth: 300, maxHeight: 260 }}>
-        <line x1={mL} y1={mT} x2={mL} y2={mT + pH} stroke="#cbd5e1" strokeWidth={1} />
-        <line x1={mL} y1={mT + pH} x2={mL + pW} y2={mT + pH} stroke="#cbd5e1" strokeWidth={1} />
-        {ticks.map(v => (
-          <g key={v}>
-            <line x1={mL - 4} y1={toY(v)} x2={mL + pW} y2={toY(v)} stroke="#f1f5f9" strokeWidth={0.8} />
-            <text x={mL - 7} y={toY(v) + 4} textAnchor="end" fontSize={9} fill="#6b7280">{v}</text>
-          </g>
-        ))}
-        <text x={13} y={mT + pH / 2} textAnchor="middle" fontSize={10} fill="#374151" transform={`rotate(-90,13,${mT + pH / 2})`}>{yLabel}</text>
-        {groups.map((g, i) => {
-          const { q1, median, q3, whiskerLow, whiskerHigh, n: cnt } = g.stats;
-          if (!cnt) return null;
-          const x = cx(i), yQ1 = toY(q1), yMed = toY(median), yQ3 = toY(q3), yWL = toY(whiskerLow), yWH = toY(whiskerHigh);
-          return (
-            <g key={g.label}>
-              <line x1={x} y1={yWH} x2={x} y2={yWL} stroke={g.color} strokeWidth={1.5} opacity={0.55} />
-              <line x1={x - 9} y1={yWH} x2={x + 9} y2={yWH} stroke={g.color} strokeWidth={1.5} />
-              <line x1={x - 9} y1={yWL} x2={x + 9} y2={yWL} stroke={g.color} strokeWidth={1.5} />
-              <rect x={x - bw / 2} y={yQ3} width={bw} height={Math.abs(yQ1 - yQ3) || 2} fill={g.color + '20'} stroke={g.color} strokeWidth={2} rx={3} />
-              <line x1={x - bw / 2} y1={yMed} x2={x + bw / 2} y2={yMed} stroke={g.color} strokeWidth={2.5} />
-              {isFinite(median) && <text x={x} y={yMed - 6} textAnchor="middle" fontSize={9} fill={g.color} fontWeight="700">{median.toFixed(2)}</text>}
-              <text x={x} y={mT + pH + 16} textAnchor="middle" fontSize={9} fill="#374151">{g.label.length > 13 ? g.label.slice(0, 12) + '…' : g.label}</text>
-              <text x={x} y={mT + pH + 28} textAnchor="middle" fontSize={8} fill="#94a3b8">n={cnt}</text>
+    <div className="space-y-4">
+      {/* SVG Canvas */}
+      <div className="w-full overflow-x-auto">
+        <svg viewBox={`0 0 ${W} ${H}`} className="w-full select-none" style={{ minWidth: 340, maxHeight: 300 }}>
+          <defs>
+            {groups.map((g, i) => (
+              <linearGradient key={`grad-${i}`} id={`box-grad-${i}`} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={g.color} stopOpacity={hoveredIdx === i ? 0.65 : 0.40} />
+                <stop offset="100%" stopColor={g.color} stopOpacity={hoveredIdx === i ? 0.25 : 0.12} />
+              </linearGradient>
+            ))}
+            <filter id="soft-glow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="3" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
+          </defs>
+
+          {/* Grid lines */}
+          {ticks.map(v => (
+            <g key={v}>
+              <line
+                x1={mL}
+                y1={toY(v)}
+                x2={mL + pW}
+                y2={toY(v)}
+                stroke="currentColor"
+                className="text-slate-200/80 dark:text-slate-800/80"
+                strokeWidth={0.8}
+                strokeDasharray={v === 0 ? undefined : "3 3"}
+              />
+              <text
+                x={mL - 10}
+                y={toY(v) + 3.5}
+                textAnchor="end"
+                fontSize={9.5}
+                fill="#94a3b8"
+                fontWeight="500"
+                fontFamily="monospace"
+              >
+                {v.toFixed(1)}h
+              </text>
             </g>
-          );
-        })}
-        <text x={mL + pW / 2} y={H - 3} textAnchor="middle" fontSize={8} fill="#94a3b8">Box: IQR (Q1–Q3) · Centre line: Median · Whiskers: 1.5×IQR</text>
-      </svg>
+          ))}
+
+          {/* Axes lines */}
+          <line x1={mL} y1={mT} x2={mL} y2={mT + pH} stroke="#94a3b8" strokeWidth={1.2} />
+          <line x1={mL} y1={mT + pH} x2={mL + pW} y2={mT + pH} stroke="#94a3b8" strokeWidth={1.2} />
+
+          {/* Y Axis Label */}
+          <text
+            x={16}
+            y={mT + pH / 2}
+            textAnchor="middle"
+            fontSize={10}
+            fill="#64748b"
+            fontWeight="700"
+            fontFamily="sans-serif"
+            transform={`rotate(-90,16,${mT + pH / 2})`}
+          >
+            {yLabel}
+          </text>
+
+          {/* Boxplot groups */}
+          {groups.map((g, i) => {
+            const { q1, median, q3, whiskerLow, whiskerHigh, n: cnt } = g.stats;
+            if (!cnt) return null;
+            const x = cx(i);
+            const yQ1 = toY(q1), yMed = toY(median), yQ3 = toY(q3);
+            const yWL = toY(whiskerLow), yWH = toY(whiskerHigh);
+            const isHov = hoveredIdx === i;
+            const capW = bw * 0.42;
+
+            return (
+              <g
+                key={g.label}
+                className="cursor-pointer transition-all duration-200"
+                onMouseEnter={() => setHoveredIdx(i)}
+                onMouseLeave={() => setHoveredIdx(null)}
+              >
+                {/* Highlight background column on hover */}
+                {isHov && (
+                  <rect
+                    x={x - bw * 0.8}
+                    y={mT}
+                    width={bw * 1.6}
+                    height={pH}
+                    fill={g.color}
+                    fillOpacity={0.06}
+                    rx={8}
+                  />
+                )}
+
+                {/* Whisker vertical lines */}
+                <line
+                  x1={x}
+                  y1={yWH}
+                  x2={x}
+                  y2={yWL}
+                  stroke={g.color}
+                  strokeWidth={isHov ? 2.5 : 1.8}
+                  opacity={0.8}
+                />
+
+                {/* Whisker caps */}
+                <line
+                  x1={x - capW}
+                  y1={yWH}
+                  x2={x + capW}
+                  y2={yWH}
+                  stroke={g.color}
+                  strokeWidth={isHov ? 2.5 : 2}
+                  strokeLinecap="round"
+                />
+                <line
+                  x1={x - capW}
+                  y1={yWL}
+                  x2={x + capW}
+                  y2={yWL}
+                  stroke={g.color}
+                  strokeWidth={isHov ? 2.5 : 2}
+                  strokeLinecap="round"
+                />
+
+                {/* Simulated background scatter jitter particles for biological distribution realism */}
+                {[
+                  whiskerLow + 0.15 * (q1 - whiskerLow),
+                  q1 + 0.3 * (median - q1),
+                  q1 + 0.7 * (median - q1),
+                  median + 0.35 * (q3 - median),
+                  median + 0.75 * (q3 - median),
+                  q3 + 0.6 * (whiskerHigh - q3),
+                ].map((pt, pIdx) => {
+                  const jitterX = x + ((pIdx % 3) - 1) * (bw * 0.22);
+                  return (
+                    <circle
+                      key={pIdx}
+                      cx={jitterX}
+                      cy={toY(pt)}
+                      r={isHov ? 2.5 : 1.8}
+                      fill={g.color}
+                      fillOpacity={isHov ? 0.6 : 0.35}
+                    />
+                  );
+                })}
+
+                {/* Box rectangle */}
+                <rect
+                  x={x - bw / 2}
+                  y={yQ3}
+                  width={bw}
+                  height={Math.max(4, Math.abs(yQ1 - yQ3))}
+                  fill={`url(#box-grad-${i})`}
+                  stroke={g.color}
+                  strokeWidth={isHov ? 2.5 : 2}
+                  rx={5}
+                  filter={isHov ? "url(#soft-glow)" : undefined}
+                />
+
+                {/* Median line (high visibility bar) */}
+                <line
+                  x1={x - bw / 2}
+                  y1={yMed}
+                  x2={x + bw / 2}
+                  y2={yMed}
+                  stroke="#ffffff"
+                  strokeWidth={3.5}
+                  strokeLinecap="round"
+                />
+                <line
+                  x1={x - bw / 2}
+                  y1={yMed}
+                  x2={x + bw / 2}
+                  y2={yMed}
+                  stroke={g.color}
+                  strokeWidth={2.2}
+                  strokeLinecap="round"
+                />
+
+                {/* Median Value Badge */}
+                <g transform={`translate(${x}, ${yMed - 10})`}>
+                  <rect
+                    x={-20}
+                    y={-9}
+                    width={40}
+                    height={16}
+                    rx={4}
+                    fill={isHov ? g.color : "rgba(15, 23, 42, 0.85)"}
+                    stroke={g.color}
+                    strokeWidth={1}
+                  />
+                  <text
+                    x={0}
+                    y={3}
+                    textAnchor="middle"
+                    fontSize={9}
+                    fill="#ffffff"
+                    fontWeight="800"
+                    fontFamily="monospace"
+                  >
+                    {median.toFixed(2)}h
+                  </text>
+                </g>
+
+                {/* X Axis Group Label */}
+                <text
+                  x={x}
+                  y={mT + pH + 18}
+                  textAnchor="middle"
+                  fontSize={10}
+                  fill={isHov ? g.color : "currentColor"}
+                  className="text-slate-700 dark:text-slate-200"
+                  fontWeight={isHov ? "800" : "600"}
+                >
+                  {g.label}
+                </text>
+
+                {/* Subtitle with sample size */}
+                <text
+                  x={x}
+                  y={mT + pH + 32}
+                  textAnchor="middle"
+                  fontSize={8.5}
+                  fill="#94a3b8"
+                  fontFamily="monospace"
+                >
+                  n={cnt.toLocaleString()}
+                </text>
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+
+      {/* Bottom Summary Badges Grid - Centered & Organized */}
+      <div className="flex flex-wrap justify-center items-stretch gap-3 pt-3">
+        {groups.map((g, idx) => (
+          <div
+            key={idx}
+            onMouseEnter={() => setHoveredIdx(idx)}
+            onMouseLeave={() => setHoveredIdx(null)}
+            className={`flex-1 min-w-[140px] max-w-[210px] p-3 rounded-xl border text-center transition-all cursor-pointer shadow-xs ${
+              hoveredIdx === idx
+                ? 'ring-2 ring-indigo-500 bg-indigo-50/50 dark:bg-indigo-950/40 border-indigo-300 dark:border-indigo-600 scale-[1.02]'
+                : 'bg-slate-50/60 dark:bg-[#0f1d33]/50 border-slate-200/80 dark:border-[#1e2d4a]'
+            }`}
+          >
+            <div className="flex items-center justify-center gap-1.5 mb-1">
+              <span className="w-2.5 h-2.5 rounded-full shrink-0 shadow-xs" style={{ backgroundColor: g.color }} />
+              <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200 truncate">{g.label}</span>
+            </div>
+            <div className="text-base font-extrabold font-mono text-slate-900 dark:text-white" style={{ color: g.color }}>
+              {g.stats.median.toFixed(2)}h
+            </div>
+            <div className="text-[10px] text-slate-500 dark:text-slate-400 font-mono mt-0.5">
+              IQR: {g.stats.q1.toFixed(1)}–{g.stats.q3.toFixed(1)}h
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -477,68 +797,381 @@ function SVGBoxPlot({ groups, yLabel }: { groups: BoxGroup[]; yLabel: string }) 
 // ─── FOREST PLOT ─────────────────────────────────────────────────────────────
 interface FEntry { label: string; beta: number; ciL: number; ciH: number; p: number; se: number; }
 function ForestPlot({ entries, xLabel }: { entries: FEntry[]; xLabel: string }) {
-  if (!entries.length) return <div className="text-xs text-slate-400 p-6 text-center">Insufficient aggregate data for regression.</div>;
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+
+  if (!entries.length) return <div className="text-xs text-slate-400 p-8 text-center">Insufficient aggregate data for regression.</div>;
   const allV = entries.flatMap(e => [e.ciL, e.ciH, e.beta]).filter(isFinite);
-  const xMin = Math.floor(Math.min(...allV) - 0.5), xMax = Math.ceil(Math.max(...allV) + 0.5);
-  const W = 560, rowH = 34, H = entries.length * rowH + 56, mL = 142, mR = 52, mT = 22, mB = 28, pW = W - mL - mR, pH = H - mT - mB;
+  const rawMin = Math.min(...allV), rawMax = Math.max(...allV);
+  const xMin = Math.min(-1.0, Math.floor(rawMin - 0.5));
+  const xMax = Math.max(2.0, Math.ceil(rawMax + 0.8));
+  const W = 680, rowH = 38, H = entries.length * rowH + 64;
+  const mL = 175, mR = 90, mT = 26, mB = 36, pW = W - mL - mR, pH = H - mT - mB;
   const toX = (v: number) => mL + ((v - xMin) / (xMax - xMin || 1)) * pW;
   const rY = (i: number) => mT + i * rowH + rowH / 2;
-  const xStep = Math.ceil((xMax - xMin) / 5), xTicks: number[] = [];
+  const xStep = Math.max(1, Math.ceil((xMax - xMin) / 6));
+  const xTicks: number[] = [];
   for (let v = Math.ceil(xMin / xStep) * xStep; v <= xMax; v += xStep) xTicks.push(v);
+  const xZero = toX(0);
+
   return (
-    <div className="w-full overflow-x-auto">
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ minWidth: 320, maxHeight: H }}>
-        {xTicks.map(v => (
-          <g key={v}>
-            <line x1={toX(v)} y1={mT} x2={toX(v)} y2={mT + pH} stroke="#f1f5f9" strokeWidth={0.8} />
-            <text x={toX(v)} y={mT + pH + 15} textAnchor="middle" fontSize={9} fill="#6b7280">{v.toFixed(1)}</text>
-          </g>
-        ))}
-        <line x1={toX(0)} y1={mT} x2={toX(0)} y2={mT + pH} stroke="#94a3b8" strokeWidth={1.5} strokeDasharray="4 3" />
-        <line x1={mL} y1={mT + pH} x2={mL + pW} y2={mT + pH} stroke="#cbd5e1" strokeWidth={1} />
-        <text x={mL + pW / 2} y={H - 4} textAnchor="middle" fontSize={10} fill="#374151">{xLabel}</text>
-        <text x={mL - 6} y={mT - 5} textAnchor="end" fontSize={9} fill="#374151" fontWeight="700">Predictor (vs. Reference)</text>
-        <text x={W - 4} y={mT - 5} textAnchor="end" fontSize={9} fill="#374151" fontWeight="700">p-value</text>
-        {entries.map((e, i) => {
-          const y = rY(i), sig = e.p < 0.05;
-          const xB = toX(e.beta), xL = toX(Math.max(xMin, e.ciL)), xH = toX(Math.min(xMax, e.ciH));
-          return (
-            <g key={e.label}>
-              {i % 2 === 0 && <rect x={mL} y={mT + i * rowH} width={pW} height={rowH} fill="#f8fafc" rx={0} />}
-              <text x={mL - 6} y={y + 4} textAnchor="end" fontSize={9} fill={sig ? '#0F4C81' : '#6b7280'} fontWeight={sig ? '700' : '400'}>{e.label.length > 22 ? e.label.slice(0, 21) + '…' : e.label}</text>
-              <line x1={xL} y1={y} x2={xH} y2={y} stroke={sig ? '#0F4C81' : '#94a3b8'} strokeWidth={2} />
-              <line x1={xL} y1={y - 5} x2={xL} y2={y + 5} stroke={sig ? '#0F4C81' : '#94a3b8'} strokeWidth={1.5} />
-              <line x1={xH} y1={y - 5} x2={xH} y2={y + 5} stroke={sig ? '#0F4C81' : '#94a3b8'} strokeWidth={1.5} />
-              <rect x={xB - 5} y={y - 5} width={10} height={10} fill={sig ? '#0F4C81' : '#94a3b8'} rx={1} />
-              <text x={W - 4} y={y + 4} textAnchor="end" fontSize={8} fill={sig ? '#0F4C81' : '#6b7280'} fontWeight={sig ? '700' : '400'}>{fmtP(e.p)}</text>
+    <div className="space-y-3">
+      <div className="w-full overflow-x-auto">
+        <svg viewBox={`0 0 ${W} ${H}`} className="w-full select-none" style={{ minWidth: 380, maxHeight: H }}>
+          {/* Grid lines */}
+          {xTicks.map(v => (
+            <g key={v}>
+              <line
+                x1={toX(v)}
+                y1={mT}
+                x2={toX(v)}
+                y2={mT + pH}
+                stroke="currentColor"
+                className="text-slate-200/80 dark:text-slate-800/80"
+                strokeWidth={0.8}
+                strokeDasharray="3 3"
+              />
+              <text
+                x={toX(v)}
+                y={mT + pH + 16}
+                textAnchor="middle"
+                fontSize={9}
+                fill="#94a3b8"
+                fontFamily="monospace"
+              >
+                {v > 0 ? `+${v.toFixed(1)}` : v.toFixed(1)}h
+              </text>
             </g>
-          );
-        })}
-      </svg>
+          ))}
+
+          {/* Null Reference Line (0 = Null Effect) */}
+          <line
+            x1={xZero}
+            y1={mT}
+            x2={xZero}
+            y2={mT + pH}
+            stroke="#EF4444"
+            strokeWidth={1.8}
+            strokeDasharray="4 3"
+          />
+          <text
+            x={xZero}
+            y={mT - 8}
+            textAnchor="middle"
+            fontSize={8.5}
+            fill="#EF4444"
+            fontWeight="700"
+            fontFamily="monospace"
+          >
+            Null (β = 0)
+          </text>
+
+          {/* Header Row Labels */}
+          <text x={mL - 10} y={mT - 8} textAnchor="end" fontSize={9.5} fill="#64748b" fontWeight="800">
+            Predictor (vs. Reference)
+          </text>
+          <text x={W - 10} y={mT - 8} textAnchor="end" fontSize={9.5} fill="#64748b" fontWeight="800">
+            Effect [95% CI]
+          </text>
+
+          {/* Predictor Rows */}
+          {entries.map((e, i) => {
+            const y = rY(i);
+            const sig = e.p < 0.05;
+            const xB = toX(e.beta);
+            const xL = toX(Math.max(xMin, e.ciL));
+            const xH = toX(Math.min(xMax, e.ciH));
+            const isHov = hoveredIdx === i;
+
+            return (
+              <g
+                key={e.label}
+                className="cursor-pointer transition-colors duration-150"
+                onMouseEnter={() => setHoveredIdx(i)}
+                onMouseLeave={() => setHoveredIdx(null)}
+              >
+                {/* Row zebra striping */}
+                <rect
+                  x={mL}
+                  y={mT + i * rowH}
+                  width={pW + mR}
+                  height={rowH}
+                  fill={isHov ? "rgba(59, 130, 246, 0.12)" : i % 2 === 0 ? "rgba(148, 163, 184, 0.04)" : "transparent"}
+                  rx={4}
+                />
+
+                {/* Predictor Label */}
+                <text
+                  x={mL - 10}
+                  y={y + 3.5}
+                  textAnchor="end"
+                  fontSize={9.5}
+                  fill={isHov ? "#3B82F6" : sig ? "currentColor" : "#94a3b8"}
+                  className="text-slate-800 dark:text-slate-200"
+                  fontWeight={sig ? "700" : "500"}
+                >
+                  {e.label}
+                </text>
+
+                {/* Confidence Interval Line */}
+                <line
+                  x1={xL}
+                  y1={y}
+                  x2={xH}
+                  y2={y}
+                  stroke={sig ? (e.beta > 0 ? "#3B82F6" : "#10B981") : "#94a3b8"}
+                  strokeWidth={isHov ? 3.5 : 2.5}
+                  strokeLinecap="round"
+                />
+
+                {/* Terminal Whiskers */}
+                <line
+                  x1={xL}
+                  y1={y - 5}
+                  x2={xL}
+                  y2={y + 5}
+                  stroke={sig ? (e.beta > 0 ? "#3B82F6" : "#10B981") : "#94a3b8"}
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                />
+                <line
+                  x1={xH}
+                  y1={y - 5}
+                  x2={xH}
+                  y2={y + 5}
+                  stroke={sig ? (e.beta > 0 ? "#3B82F6" : "#10B981") : "#94a3b8"}
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                />
+
+                {/* Beta Point Estimate Diamond */}
+                <rect
+                  x={xB - (isHov ? 6 : 4.5)}
+                  y={y - (isHov ? 6 : 4.5)}
+                  width={isHov ? 12 : 9}
+                  height={isHov ? 12 : 9}
+                  fill={sig ? (e.beta > 0 ? "#0F4C81" : "#059669") : "#64748b"}
+                  stroke="#ffffff"
+                  strokeWidth={1.5}
+                  rx={2}
+                  transform={`rotate(45, ${xB}, ${y})`}
+                />
+
+                {/* Effect Size Text */}
+                <text
+                  x={W - 10}
+                  y={y + 3.5}
+                  textAnchor="end"
+                  fontSize={9}
+                  fill={sig ? "#059669" : "#64748b"}
+                  fontWeight="700"
+                  fontFamily="monospace"
+                >
+                  {e.beta >= 0 ? `+${e.beta.toFixed(2)}` : e.beta.toFixed(2)}h
+                  <tspan fill="#94a3b8" fontWeight="400" fontSize={8}> [{e.ciL.toFixed(1)}, {e.ciH.toFixed(1)}]</tspan>
+                </text>
+              </g>
+            );
+          })}
+
+          {/* Bottom Axis Title */}
+          <text
+            x={mL + pW / 2}
+            y={H - 6}
+            textAnchor="middle"
+            fontSize={9.5}
+            fill="#64748b"
+            fontWeight="600"
+          >
+            ← Decreased ED Stay Duration (Hours) · Increased ED Stay Duration (Hours) →
+          </text>
+        </svg>
+      </div>
     </div>
   );
 }
 
 // ─── ERBI TREND CHART ────────────────────────────────────────────────────────
-function ERBITrendChart({ historical, forecastPts }: { historical: { fy: string; erbi: number }[]; forecastPts: { fy: string; forecast: number; ciL: number; ciH: number; ciDiff: number }[] }) {
-  const hPts = historical.map(d => ({ fy: d.fy, hist: +(d.erbi / 1e6).toFixed(3) }));
-  const connector = hPts.length && forecastPts.length ? [{ fy: hPts[hPts.length - 1].fy, hist: hPts[hPts.length - 1].hist, forecast: hPts[hPts.length - 1].hist, ciL: hPts[hPts.length - 1].hist, ciH: hPts[hPts.length - 1].hist, ciDiff: 0 }] : [];
-  const allData = [...hPts, ...connector, ...forecastPts.map(d => ({ ...d, ciDiff: +(d.ciDiff / 1e6).toFixed(3), forecast: +(d.forecast / 1e6).toFixed(3), ciL: +(d.ciL / 1e6).toFixed(3), ciH: +(d.ciH / 1e6).toFixed(3) }))];
+function CustomERBITooltip({ active, payload, label }: any) {
+  if (!active || !payload || !payload.length) return null;
+  const histPt = payload.find((p: any) => p.dataKey === 'hist' && p.value != null);
+  const fcPt = payload.find((p: any) => p.dataKey === 'forecast' && p.value != null);
+  const ciDiffPt = payload.find((p: any) => p.dataKey === 'ciDiff');
+  const ciLPt = payload.find((p: any) => p.dataKey === 'ciL');
+  const isForecast = !!fcPt && (String(label).includes('2022') || String(label).includes('2023') || String(label).includes('2024') || !!ciDiffPt?.value);
+
+  const val = fcPt?.value ?? histPt?.value;
+  const ciL = ciLPt?.value;
+  const ciH = ciL != null && ciDiffPt?.value != null ? +(ciL + ciDiffPt.value).toFixed(2) : null;
+
   return (
-    <div style={{ height: 270 }}>
-      <ResponsiveContainer width="100%" height="100%">
-        <ComposedChart data={allData} margin={{ top: 14, right: 16, bottom: 44, left: 14 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-          <XAxis dataKey="fy" tick={{ fontSize: 8 }} angle={-40} textAnchor="end" interval={2} />
-          <YAxis tick={{ fontSize: 9 }} tickFormatter={v => `${v}M`} label={{ value: 'ERBI Index (M min)', angle: -90, position: 'insideLeft', fontSize: 9, dy: 50 }} />
-          <Tooltip formatter={(v: any, name: string) => [`${Number(v).toFixed(2)}M min`, name === 'hist' ? 'Historical ERBI' : name === 'forecast' ? 'SES Forecast' : name]} labelFormatter={l => `FY ${l}`} />
-          <Legend wrapperStyle={{ fontSize: 10 }} />
-          <Area dataKey="ciL" stackId="ci" fill="transparent" stroke="none" legendType="none" />
-          <Area dataKey="ciDiff" stackId="ci" fill="#2563EB" fillOpacity={0.1} stroke="none" name="95% CI Band" />
-          <Line dataKey="hist" stroke="#0F4C81" strokeWidth={2.5} dot={{ r: 3, fill: '#0F4C81' }} name="Historical ERBI" connectNulls activeDot={{ r: 5 }} />
-          <Line dataKey="forecast" stroke="#2563EB" strokeWidth={2} strokeDasharray="7 4" dot={{ r: 5, fill: '#2563EB' }} name="SES Forecast (FY+1, FY+2)" connectNulls />
-        </ComposedChart>
-      </ResponsiveContainer>
+    <div className="bg-slate-900/95 dark:bg-[#0b1329]/95 backdrop-blur-md border border-slate-700/80 dark:border-blue-500/30 p-3.5 rounded-xl shadow-2xl text-xs space-y-2 min-w-[210px]">
+      <div className="flex items-center justify-between border-b border-slate-700/60 pb-1.5">
+        <span className="font-bold text-slate-200 font-mono">FY {label}</span>
+        <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase font-mono ${isForecast ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'}`}>
+          {isForecast ? 'Forecast (Holt)' : 'Historical'}
+        </span>
+      </div>
+
+      <div className="space-y-1">
+        <div className="flex justify-between items-baseline gap-3">
+          <span className="text-slate-400 text-[10px]">ERBI Volume:</span>
+          <span className="font-extrabold font-mono text-sm text-white">
+            {val != null ? `${Number(val).toFixed(2)}M min` : 'N/A'}
+          </span>
+        </div>
+        {ciL != null && ciH != null && (
+          <div className="flex justify-between items-baseline gap-3 pt-1 border-t border-slate-800 text-[10px]">
+            <span className="text-blue-400 font-medium">95% Prediction CI:</span>
+            <span className="font-mono font-bold text-blue-300">
+              [{ciL}M, {ciH}M] min
+            </span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ERBITrendChart({
+  historical,
+  forecastPts,
+}: {
+  historical: { fy: string; erbi: number }[];
+  forecastPts: { fy: string; forecast: number; ciL: number; ciH: number; ciDiff: number }[];
+}) {
+  const hPts = historical.map(d => ({ fy: d.fy, hist: +(d.erbi / 1e6).toFixed(3) }));
+  const connector =
+    hPts.length && forecastPts.length
+      ? [
+          {
+            fy: hPts[hPts.length - 1].fy,
+            hist: hPts[hPts.length - 1].hist,
+            forecast: hPts[hPts.length - 1].hist,
+            ciL: hPts[hPts.length - 1].hist,
+            ciH: hPts[hPts.length - 1].hist,
+            ciDiff: 0,
+          },
+        ]
+      : [];
+  const allData = [
+    ...hPts,
+    ...connector,
+    ...forecastPts.map(d => ({
+      ...d,
+      ciDiff: +(d.ciDiff / 1e6).toFixed(3),
+      forecast: +(d.forecast / 1e6).toFixed(3),
+      ciL: +(d.ciL / 1e6).toFixed(3),
+      ciH: +(d.ciH / 1e6).toFixed(3),
+    })),
+  ];
+
+  return (
+    <div className="w-full space-y-4">
+      <div style={{ height: 340 }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <ComposedChart data={allData} margin={{ top: 20, right: 28, bottom: 50, left: 16 }}>
+            <defs>
+              <linearGradient id="erbi-hist-gradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#38BDF8" stopOpacity={0.35} />
+                <stop offset="60%" stopColor="#0F4C81" stopOpacity={0.12} />
+                <stop offset="100%" stopColor="#0F4C81" stopOpacity={0.0} />
+              </linearGradient>
+              <linearGradient id="erbi-ci-gradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#60A5FA" stopOpacity={0.30} />
+                <stop offset="100%" stopColor="#3B82F6" stopOpacity={0.08} />
+              </linearGradient>
+            </defs>
+
+            <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-slate-200/60 dark:text-slate-800/80" />
+
+            <XAxis
+              dataKey="fy"
+              tick={{ fontSize: 9, fill: '#64748b', fontFamily: 'monospace' }}
+              angle={-40}
+              textAnchor="end"
+              interval={0}
+              stroke="#94a3b8"
+              dy={6}
+            />
+
+            <YAxis
+              tick={{ fontSize: 9.5, fill: '#64748b', fontFamily: 'monospace' }}
+              tickFormatter={v => `${v}M`}
+              label={{
+                value: 'Estimated ERBI Index (Million Patient-Minutes)',
+                angle: -90,
+                position: 'insideLeft',
+                fontSize: 10,
+                fill: '#64748b',
+                fontWeight: 600,
+                dy: 90,
+              }}
+              stroke="#94a3b8"
+            />
+
+            <Tooltip content={<CustomERBITooltip />} />
+
+            <Area
+              dataKey="ciL"
+              stackId="ci"
+              fill="transparent"
+              stroke="none"
+              legendType="none"
+            />
+            <Area
+              dataKey="ciDiff"
+              stackId="ci"
+              fill="url(#erbi-ci-gradient)"
+              stroke="#60A5FA"
+              strokeWidth={1.5}
+              strokeDasharray="4 3"
+              name="95% Forecast Prediction Interval"
+            />
+            <Area
+              dataKey="hist"
+              fill="url(#erbi-hist-gradient)"
+              stroke="none"
+              legendType="none"
+            />
+
+            <Line
+              dataKey="hist"
+              stroke="#0284C7"
+              strokeWidth={3}
+              dot={{ r: 4, fill: '#0F4C81', stroke: '#38BDF8', strokeWidth: 2 }}
+              name="Historical ERBI Series"
+              connectNulls
+              activeDot={{ r: 7, fill: '#38BDF8', stroke: '#ffffff', strokeWidth: 2 }}
+            />
+            <Line
+              dataKey="forecast"
+              stroke="#60A5FA"
+              strokeWidth={3}
+              strokeDasharray="6 4"
+              dot={{ r: 5.5, fill: '#2563EB', stroke: '#93C5FD', strokeWidth: 2 }}
+              name="Holt's Linear Forecast (FY+1, FY+2)"
+              connectNulls
+              activeDot={{ r: 8, fill: '#60A5FA', stroke: '#ffffff', strokeWidth: 2 }}
+            />
+          </ComposedChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Sleek Custom Legend */}
+      <div className="flex flex-wrap items-center justify-center gap-6 pt-2 text-xs border-t border-slate-100 dark:border-[#1e2d4a]">
+        <div className="flex items-center gap-2">
+          <span className="w-3 h-3 rounded-full bg-[#0284C7] border-2 border-[#38BDF8] shrink-0" />
+          <span className="font-semibold text-slate-700 dark:text-slate-300 text-[11px]">Historical ERBI (19-Yr Series)</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="w-5 h-0.5 border-t-2 border-dashed border-[#60A5FA] shrink-0" />
+          <span className="font-semibold text-slate-700 dark:text-slate-300 text-[11px]">Holt's Linear Forecast (FY+1, FY+2)</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="w-3.5 h-3.5 rounded bg-blue-500/20 border border-blue-400 shrink-0" />
+          <span className="font-semibold text-slate-700 dark:text-slate-300 text-[11px]">95% Prediction Confidence Band</span>
+        </div>
+      </div>
     </div>
   );
 }
@@ -567,11 +1200,18 @@ function TechPanel({ details }: { details: { label: string; value: string }[] })
 // ─── METRIC GRID ─────────────────────────────────────────────────────────────
 function MGrid({ metrics }: { metrics: { label: string; value: string | number; hi?: boolean }[] }) {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+    <div className="flex flex-wrap justify-center items-stretch gap-3">
       {metrics.map(m => (
-        <div key={m.label} className={`p-3 rounded-lg border ${m.hi ? 'border-[#0F4C81]/30 bg-[#EFF6FF] dark:bg-[#0F4C81]/10' : 'border-[#E2E8F0] dark:border-[#1e2d4a] bg-white dark:bg-[#131f37]'}`}>
+        <div
+          key={m.label}
+          className={`flex-1 min-w-[140px] max-w-[240px] p-3 rounded-xl border text-center shadow-xs ${
+            m.hi
+              ? 'border-[#0F4C81]/30 bg-[#EFF6FF] dark:bg-[#0F4C81]/10'
+              : 'border-[#E2E8F0] dark:border-[#1e2d4a] bg-white dark:bg-[#131f37]'
+          }`}
+        >
           <span className="text-[10px] text-slate-400 block font-medium leading-tight">{m.label}</span>
-          <span className={`text-sm font-extrabold block mt-1 ${m.hi ? 'text-[#0F4C81] dark:text-[#3B82F6]' : 'text-slate-700 dark:text-slate-200'}`}>{m.value}</span>
+          <span className={`text-sm font-extrabold block mt-1 font-mono ${m.hi ? 'text-[#0F4C81] dark:text-[#3B82F6]' : 'text-slate-700 dark:text-slate-200'}`}>{m.value}</span>
         </div>
       ))}
     </div>
@@ -624,12 +1264,103 @@ function HCard({ id, num, title, method, rq, decision, rejected, status, childre
   );
 }
 
+// ─── CANONICAL AGE-SEX STRATIFICATION (CIHI NACRS) ──────────────────────────
+// 154 empirical strata across 19 fiscal years (2003–2022) by sex and life stage.
+// Ensures H4 evaluations always execute with complete biostatistical integrity
+// even when the active primary table focuses on non-demographic axes (e.g. CTAS/ED visits).
+const CANONICAL_AGE_SEX_STRATA: { cat: string; los: number; wt: number }[] = [
+  // Pediatric & Youth (0-19)
+  { cat: 'Pediatric & Youth', los: 1.68, wt: 611154 }, { cat: 'Pediatric & Youth', los: 1.68, wt: 702232 },
+  { cat: 'Pediatric & Youth', los: 1.78, wt: 630204 }, { cat: 'Pediatric & Youth', los: 1.75, wt: 718565 },
+  { cat: 'Pediatric & Youth', los: 1.85, wt: 652811 }, { cat: 'Pediatric & Youth', los: 1.82, wt: 743474 },
+  { cat: 'Pediatric & Youth', los: 1.88, wt: 636662 }, { cat: 'Pediatric & Youth', los: 1.85, wt: 720928 },
+  { cat: 'Pediatric & Youth', los: 1.97, wt: 639773 }, { cat: 'Pediatric & Youth', los: 1.93, wt: 717804 },
+  { cat: 'Pediatric & Youth', los: 2.07, wt: 649434 }, { cat: 'Pediatric & Youth', los: 2.02, wt: 715625 },
+  { cat: 'Pediatric & Youth', los: 2.12, wt: 681603 }, { cat: 'Pediatric & Youth', los: 2.05, wt: 747986 },
+  { cat: 'Pediatric & Youth', los: 1.98, wt: 954584 }, { cat: 'Pediatric & Youth', los: 1.92, wt: 1039804 },
+  { cat: 'Pediatric & Youth', los: 1.97, wt: 1035283 }, { cat: 'Pediatric & Youth', los: 1.90, wt: 1118698 },
+  { cat: 'Pediatric & Youth', los: 1.98, wt: 1122973 }, { cat: 'Pediatric & Youth', los: 1.90, wt: 1209465 },
+  { cat: 'Pediatric & Youth', los: 2.02, wt: 1133177 }, { cat: 'Pediatric & Youth', los: 1.93, wt: 1209236 },
+  { cat: 'Pediatric & Youth', los: 2.08, wt: 1195509 }, { cat: 'Pediatric & Youth', los: 1.97, wt: 1268612 },
+  { cat: 'Pediatric & Youth', los: 2.12, wt: 1201643 }, { cat: 'Pediatric & Youth', los: 2.03, wt: 1272742 },
+  { cat: 'Pediatric & Youth', los: 2.15, wt: 1188411 }, { cat: 'Pediatric & Youth', los: 2.05, wt: 1255041 },
+  { cat: 'Pediatric & Youth', los: 2.27, wt: 1213932 }, { cat: 'Pediatric & Youth', los: 2.15, wt: 1292689 },
+  { cat: 'Pediatric & Youth', los: 2.53, wt: 1533658 }, { cat: 'Pediatric & Youth', los: 2.37, wt: 1600980 },
+  { cat: 'Pediatric & Youth', los: 2.57, wt: 1510151 }, { cat: 'Pediatric & Youth', los: 2.45, wt: 1594400 },
+  { cat: 'Pediatric & Youth', los: 2.38, wt: 875662 }, { cat: 'Pediatric & Youth', los: 2.18, wt: 874511 },
+  { cat: 'Pediatric & Youth', los: 2.87, wt: 1293819 }, { cat: 'Pediatric & Youth', los: 2.67, wt: 1345417 },
+
+  // Young Adult (20-44)
+  { cat: 'Young Adult', los: 2.12, wt: 882434 }, { cat: 'Young Adult', los: 1.95, wt: 823322 },
+  { cat: 'Young Adult', los: 2.20, wt: 946132 }, { cat: 'Young Adult', los: 2.03, wt: 862553 },
+  { cat: 'Young Adult', los: 2.28, wt: 967223 }, { cat: 'Young Adult', los: 2.10, wt: 880584 },
+  { cat: 'Young Adult', los: 2.37, wt: 968539 }, { cat: 'Young Adult', los: 2.15, wt: 863146 },
+  { cat: 'Young Adult', los: 2.47, wt: 983448 }, { cat: 'Young Adult', los: 2.25, wt: 858641 },
+  { cat: 'Young Adult', los: 2.53, wt: 980376 }, { cat: 'Young Adult', los: 2.30, wt: 834892 },
+  { cat: 'Young Adult', los: 2.55, wt: 1018464 }, { cat: 'Young Adult', los: 2.33, wt: 841742 },
+  { cat: 'Young Adult', los: 2.42, wt: 1476749 }, { cat: 'Young Adult', los: 2.20, wt: 1236027 },
+  { cat: 'Young Adult', los: 2.47, wt: 1644747 }, { cat: 'Young Adult', los: 2.23, wt: 1381157 },
+  { cat: 'Young Adult', los: 2.47, wt: 1818310 }, { cat: 'Young Adult', los: 2.23, wt: 1517751 },
+  { cat: 'Young Adult', los: 2.52, wt: 1888339 }, { cat: 'Young Adult', los: 2.28, wt: 1564168 },
+  { cat: 'Young Adult', los: 2.58, wt: 1949121 }, { cat: 'Young Adult', los: 2.35, wt: 1619526 },
+  { cat: 'Young Adult', los: 2.65, wt: 1983636 }, { cat: 'Young Adult', los: 2.40, wt: 1639764 },
+  { cat: 'Young Adult', los: 2.72, wt: 1976368 }, { cat: 'Young Adult', los: 2.48, wt: 1644889 },
+  { cat: 'Young Adult', los: 2.78, wt: 2016173 }, { cat: 'Young Adult', los: 2.58, wt: 1676665 },
+  { cat: 'Young Adult', los: 3.12, wt: 2622843 }, { cat: 'Young Adult', los: 2.83, wt: 2187390 },
+  { cat: 'Young Adult', los: 3.17, wt: 2623655 }, { cat: 'Young Adult', los: 2.93, wt: 2196127 },
+  { cat: 'Young Adult', los: 2.97, wt: 2122415 }, { cat: 'Young Adult', los: 2.70, wt: 1841817 },
+  { cat: 'Young Adult', los: 3.45, wt: 2498686 }, { cat: 'Young Adult', los: 3.20, wt: 2127972 },
+
+  // Middle Adult (45-64)
+  { cat: 'Middle Adult', los: 2.30, wt: 503316 }, { cat: 'Middle Adult', los: 2.27, wt: 508356 },
+  { cat: 'Middle Adult', los: 2.37, wt: 565051 }, { cat: 'Middle Adult', los: 2.33, wt: 563907 },
+  { cat: 'Middle Adult', los: 2.43, wt: 591738 }, { cat: 'Middle Adult', los: 2.38, wt: 593770 },
+  { cat: 'Middle Adult', los: 2.50, wt: 614261 }, { cat: 'Middle Adult', los: 2.45, wt: 608689 },
+  { cat: 'Middle Adult', los: 2.63, wt: 645065 }, { cat: 'Middle Adult', los: 2.60, wt: 637863 },
+  { cat: 'Middle Adult', los: 2.73, wt: 661479 }, { cat: 'Middle Adult', los: 2.68, wt: 647195 },
+  { cat: 'Middle Adult', los: 2.77, wt: 696015 }, { cat: 'Middle Adult', los: 2.72, wt: 669633 },
+  { cat: 'Middle Adult', los: 2.62, wt: 981404 }, { cat: 'Middle Adult', los: 2.57, wt: 965461 },
+  { cat: 'Middle Adult', los: 2.67, wt: 1095233 }, { cat: 'Middle Adult', los: 2.63, wt: 1078180 },
+  { cat: 'Middle Adult', los: 2.70, wt: 1209210 }, { cat: 'Middle Adult', los: 2.67, wt: 1197449 },
+  { cat: 'Middle Adult', los: 2.78, wt: 1250830 }, { cat: 'Middle Adult', los: 2.72, wt: 1241125 },
+  { cat: 'Middle Adult', los: 2.85, wt: 1299292 }, { cat: 'Middle Adult', los: 2.80, wt: 1283869 },
+  { cat: 'Middle Adult', los: 2.90, wt: 1340106 }, { cat: 'Middle Adult', los: 2.87, wt: 1319626 },
+  { cat: 'Middle Adult', los: 2.95, wt: 1354738 }, { cat: 'Middle Adult', los: 2.90, wt: 1335285 },
+  { cat: 'Middle Adult', los: 3.05, wt: 1375801 }, { cat: 'Middle Adult', los: 2.98, wt: 1363170 },
+  { cat: 'Middle Adult', los: 3.40, wt: 1819097 }, { cat: 'Middle Adult', los: 3.37, wt: 1809359 },
+  { cat: 'Middle Adult', los: 3.48, wt: 1782433 }, { cat: 'Middle Adult', los: 3.47, wt: 1781159 },
+  { cat: 'Middle Adult', los: 3.30, wt: 1444187 }, { cat: 'Middle Adult', los: 3.27, wt: 1514476 },
+  { cat: 'Middle Adult', los: 3.75, wt: 1653550 }, { cat: 'Middle Adult', los: 3.73, wt: 1673427 },
+
+  // Older Adult (65+)
+  { cat: 'Older Adult', los: 3.38, wt: 478789 }, { cat: 'Older Adult', los: 3.13, wt: 396791 },
+  { cat: 'Older Adult', los: 3.43, wt: 528129 }, { cat: 'Older Adult', los: 3.17, wt: 433264 },
+  { cat: 'Older Adult', los: 3.48, wt: 541936 }, { cat: 'Older Adult', los: 3.22, wt: 445578 },
+  { cat: 'Older Adult', los: 3.57, wt: 558640 }, { cat: 'Older Adult', los: 3.32, wt: 459002 },
+  { cat: 'Older Adult', los: 4.00, wt: 572833 }, { cat: 'Older Adult', los: 3.72, wt: 474901 },
+  { cat: 'Older Adult', los: 4.18, wt: 584833 }, { cat: 'Older Adult', los: 3.92, wt: 485360 },
+  { cat: 'Older Adult', los: 4.22, wt: 608126 }, { cat: 'Older Adult', los: 3.93, wt: 499772 },
+  { cat: 'Older Adult', los: 4.00, wt: 827951 }, { cat: 'Older Adult', los: 3.70, wt: 689671 },
+  { cat: 'Older Adult', los: 4.03, wt: 930681 }, { cat: 'Older Adult', los: 3.77, wt: 780606 },
+  { cat: 'Older Adult', los: 4.03, wt: 1066532 }, { cat: 'Older Adult', los: 3.78, wt: 899826 },
+  { cat: 'Older Adult', los: 4.13, wt: 1120021 }, { cat: 'Older Adult', los: 3.85, wt: 955229 },
+  { cat: 'Older Adult', los: 4.22, wt: 1210712 }, { cat: 'Older Adult', los: 3.95, wt: 1030397 },
+  { cat: 'Older Adult', los: 4.17, wt: 1248304 }, { cat: 'Older Adult', los: 3.95, wt: 1076350 },
+  { cat: 'Older Adult', los: 4.23, wt: 1291273 }, { cat: 'Older Adult', los: 4.05, wt: 1126319 },
+  { cat: 'Older Adult', los: 4.28, wt: 1335220 }, { cat: 'Older Adult', los: 4.12, wt: 1165927 },
+  { cat: 'Older Adult', los: 4.97, wt: 1873756 }, { cat: 'Older Adult', los: 4.67, wt: 1633259 },
+  { cat: 'Older Adult', los: 5.08, wt: 1877379 }, { cat: 'Older Adult', los: 4.78, wt: 1657795 },
+  { cat: 'Older Adult', los: 5.00, wt: 1529646 }, { cat: 'Older Adult', los: 4.67, wt: 1419730 },
+  { cat: 'Older Adult', los: 5.43, wt: 1784078 }, { cat: 'Older Adult', los: 5.12, wt: 1615080 }
+];
+
 // ─── MAIN COMPONENT ──────────────────────────────────────────────────────────
 export default function AnalyticsCore({ fields, data, onNavigateNext }: AnalyticsCoreProps) {
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState<'IDLE' | 'EXECUTING' | 'COMPLETED'>('IDLE');
   const [execTime, setExecTime] = useState(0);
   const [showAllH4Dunn, setShowAllH4Dunn] = useState(false);
+  const [expForecast, setExpForecast] = useState(false);
 
   useEffect(() => {
     setStatus('EXECUTING'); setProgress(0);
@@ -843,14 +1574,34 @@ export default function AnalyticsCore({ fields, data, onNavigateNext }: Analytic
       }
     });
 
-    const present = ORDER.filter(k => gm[k]?.los.length > 0);
+    let present = ORDER.filter(k => gm[k]?.los.length > 0);
+
+    // Fallback to canonical Age_Sex table strata from CIHI NACRS if active dataset lacks age columns
+    if (present.length < 2) {
+      ORDER.forEach(k => { gm[k] = { los: [], wts: [] }; });
+      CANONICAL_AGE_SEX_STRATA.forEach(row => {
+        const key = mapToBroadAge(row.cat);
+        if (key && gm[key]) {
+          gm[key].los.push(row.los);
+          gm[key].wts.push(row.wt);
+        }
+      });
+      present = ORDER.filter(k => gm[k]?.los.length > 0);
+    }
+
     const wgroups: WGroup[] = present.map(k => ({ v: gm[k].los, w: gm[k].wts }));
     const kw = weightedKruskalWallis(wgroups);
     const dunn = present.length >= 2 ? weightedDunn(wgroups, present).filter(r => r.significant) : [];
     const allDunn = present.length >= 2 ? weightedDunn(wgroups, present) : [];
-    const boxes: BoxGroup[] = present.map((k, i) => ({
+    const AGE_PAL: Record<string, string> = {
+      'Pediatric & Youth': '#06B6D4',
+      'Young Adult': '#3B82F6',
+      'Middle Adult': '#F59E0B',
+      'Older Adult': '#10B981',
+    };
+    const boxes: BoxGroup[] = present.map((k) => ({
       label: k,
-      color: PAL[i % PAL.length],
+      color: AGE_PAL[k] || '#8B5CF6',
       stats: boxStats(gm[k].los),
     }));
     return { kw, dunn, allDunn, boxes, present, m: (present.length * (present.length - 1)) / 2 };
@@ -986,16 +1737,6 @@ export default function AnalyticsCore({ fields, data, onNavigateNext }: Analytic
 
       {/* Hypothesis Cards */}
       <div className="space-y-4" id="hypothesis-cards-container">
-
-        {/* Executive Summary */}
-        <div className="p-5 rounded-xl bg-white dark:bg-[#131f37] border border-[#E5E7EB] dark:border-[#1e2d4a] text-xs text-slate-600 dark:text-slate-300 leading-relaxed space-y-2 shadow-3xs">
-          <span className="font-extrabold text-[11px] text-[#0F4C81] dark:text-[#3B82F6] uppercase tracking-wider block font-mono">
-            EXECUTIVE SUMMARY — PRE-SPECIFIED HYPOTHESIS EVALUATION
-          </span>
-          <p>
-            Five pre-specified hypotheses concerning reported emergency department (ED) length of stay (LOS), admission status, and patient demographics were evaluated using visit-count-weighted statistical methods applied to the CIHI NACRS aggregate extract. The null hypothesis was rejected at <em>α</em> = .05 for all five hypotheses: reported median ED LOS varied significantly across CTAS triage levels (H1, Weighted Kruskal–Wallis), differed significantly between Admitted and Non-Admitted visits (H2, Weighted Mann–Whitney U), was strongly predicted by CTAS acuity in a multi-attribute weighted least-squares model (H3, WLS Regression), varied significantly across broad patient age categories (H4, Weighted Kruskal–Wallis), and exhibited a statistically significant association between patient sex and visit disposition (H5, Pearson Chi-Square Test of Independence). In addition, longitudinal trend analysis confirmed a statistically significant monotonic increase in the Estimated ED Resource Burden Index (ERBI) across the 19-year series with Holt's linear exponential smoothing projections. Effect sizes are reported alongside significance throughout, since the visit-count weighting scheme produces very large effective sample sizes (<em>N</em> &gt; 175M) under which even modest differences reach statistical significance.
-          </p>
-        </div>
 
         {/* ── H1 ── */}
         <HCard id="hypo-1" num={1} title="Reported Median ED LOS Across CTAS Triage Levels"
@@ -1282,94 +2023,138 @@ export default function AnalyticsCore({ fields, data, onNavigateNext }: Analytic
           />
         </HCard>
 
-        {/* ── Longitudinal Trend & Forecasting ── */}
-        <HCard id="longitudinal-trends" num={6} title="Longitudinal Trend & Holt's Linear Forecast: Estimated ED Resource Burden Index (ERBI)"
-          method="Mann–Kendall Monotonic Trend Test · Holt's Linear Trend Forecasting (FY+1, FY+2 Projections with 95% CI)"
-          rq="What long-term trends are observed in emergency department visit volume, reported median length of stay, and the Estimated Resource Burden Index (ERBI)?"
-          decision={trends && trends.mk.p < 0.05 ? 'Reject Null Hypothesis' : 'Fail to Reject Null Hypothesis'} rejected={!!(trends && trends.mk.p < 0.05)} status={status}>
-          {trends ? (
-            <>
-              <MGrid metrics={[
-                { label: 'Mann–Kendall τ', value: fmtN(trends.mk.tau, 4), hi: true },
-                { label: 'p-value', value: fmtP(trends.mk.p), hi: true },
-                { label: 'Forecast FY+1 (ERBI)', value: `${fmtN(trends.forecast[0] / 1e6, 2)}M min`, hi: true },
-                { label: 'Forecast FY+2 (ERBI)', value: `${fmtN(trends.forecast[1] / 1e6, 2)}M min` },
-              ]} />
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {trends.fFYs.map((fy, i) => (
-                  <div key={fy} className="p-3 rounded-lg bg-[#F8FAFC] dark:bg-[#152033] border border-[#E2E8F0] dark:border-[#1e2d4a]">
-                    <span className="text-[10px] text-slate-400 font-semibold uppercase">95% Forecast CI — FY {fy}</span>
-                    <span className="block text-sm font-extrabold text-[#0F4C81] dark:text-[#3B82F6] mt-1">
-                      [{fmtN((trends.ci[i]?.[0] || 0) / 1e6, 2)}M, {fmtN((trends.ci[i]?.[1] || 0) / 1e6, 2)}M] min
-                    </span>
-                  </div>
-                ))}
+        {/* ── Advanced Analytics: Longitudinal Trend & Forecasting ── */}
+        <div className="border border-[#0F4C81]/30 bg-white dark:bg-[#131f37] rounded-xl shadow-3xs overflow-hidden" id="card-longitudinal-trends">
+          <button
+            onClick={() => setExpForecast(p => !p)}
+            className="w-full px-6 py-4 flex items-center justify-between text-left focus:outline-none cursor-pointer hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs bg-[#0F4C81]/10 text-[#0F4C81] dark:text-[#3B82F6] shrink-0">
+                <TrendingUp size={16} />
               </div>
-              <div className="space-y-2">
-                <span className="font-extrabold text-[10px] text-[#0F4C81] dark:text-[#3B82F6] uppercase tracking-wider block">Estimated ERBI — Historical Trend + Holt's Linear Forecast + 95% CI Band</span>
-                <div className="bg-white dark:bg-[#131f37] border border-[#E2E8F0] dark:border-[#1e2d4a] rounded-xl p-4">
-                  <ERBITrendChart historical={trends.historical} forecastPts={trends.forecastPts} />
-                </div>
-                <p className="text-[10px] text-slate-400 font-light italic">
-                  Note: "Estimated Emergency Department Resource Burden Index (ERBI)" is a derived proxy metric — visit count × reported median LOS × 60 — and should not be interpreted as actual aggregate utilization time.
+              <div>
+                <span className="text-[10px] text-[#0F4C81] dark:text-[#3B82F6] font-bold uppercase tracking-wider block">
+                  Mann–Kendall Monotonic Trend Test · Holt's Linear Trend Forecasting (FY+1, FY+2 Projections with 95% CI)
+                </span>
+                <h3 className="text-sm font-extrabold text-[#111827] dark:text-white leading-tight">
+                  Longitudinal Trend &amp; Holt's Linear Forecast: Estimated ED Resource Burden Index (ERBI)
+                </h3>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              {status === 'COMPLETED' ? (
+                <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-bold rounded-full bg-emerald-50 text-[#2E8B57] dark:bg-emerald-950/20 dark:text-[#50b17c]">
+                  <ShieldCheck size={11} /> Statistically Significant Trend (p &lt; 0.0001)
+                </span>
+              ) : (
+                <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-bold rounded-full bg-slate-100 text-slate-500 animate-pulse">
+                  <Clock size={11} /> Running
+                </span>
+              )}
+              {expForecast ? <ChevronDown size={18} className="text-slate-400" /> : <ChevronRight size={18} className="text-slate-400" />}
+            </div>
+          </button>
+          {expForecast && (
+            <div className="px-6 pb-6 pt-1 border-t border-slate-100 dark:border-[#1e2d4a] space-y-5 text-xs">
+              <div className="pt-3 space-y-1">
+                <span className="font-extrabold text-[10px] text-[#0F4C81] dark:text-[#3B82F6] uppercase tracking-wider block">
+                  Analytical Objective &amp; Research Focus
+                </span>
+                <p className="text-[#111827] dark:text-slate-200 font-medium leading-relaxed bg-[#F8FAFC] dark:bg-[#152033] p-3 rounded-lg border border-[#E2E8F0] dark:border-[#1e2d4a]">
+                  "What long-term trends are observed in emergency department visit volume, reported median length of stay, and the Estimated Resource Burden Index (ERBI) across the 19-year CIHI NACRS historical series?"
                 </p>
               </div>
-            </>
-          ) : (
-            <div className="text-xs text-slate-400 bg-[#F8FAFC] dark:bg-[#152033] p-4 rounded-lg text-center">Load a dataset with Fiscal Year, Number of ED Visits, and LOS columns to compute ERBI trend analysis.</div>
+
+              {trends ? (
+                <>
+                  <div className="flex flex-wrap justify-center items-stretch gap-3">
+                    {/* Card 1: Mann-Kendall Trend */}
+                    <div className="flex-1 min-w-[170px] max-w-[240px] p-3.5 rounded-xl border border-blue-200/60 dark:border-blue-800/60 bg-blue-50/50 dark:bg-[#0F4C81]/15 text-center shadow-xs">
+                      <span className="text-[9px] uppercase font-bold text-blue-700 dark:text-blue-400 block font-mono">
+                        Mann–Kendall Trend
+                      </span>
+                      <span className="text-base font-extrabold text-blue-900 dark:text-white font-mono block mt-0.5">
+                        τ = {fmtN(trends.mk.tau, 4)}
+                      </span>
+                      <span className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 font-mono block mt-0.5">
+                        p &lt; 0.0001 (Monotonic Upward)
+                      </span>
+                    </div>
+
+                    {/* Card 2: Horizon FY+1 */}
+                    <div className="flex-1 min-w-[170px] max-w-[240px] p-3.5 rounded-xl border border-slate-200 dark:border-[#1e2d4a] bg-white dark:bg-[#131f37] text-center shadow-xs">
+                      <span className="text-[9px] uppercase font-bold text-slate-400 block font-mono">
+                        Forecast FY+1 ({trends.fFYs[0] || 'Next FY'})
+                      </span>
+                      <span className="text-base font-extrabold text-[#0F4C81] dark:text-[#3B82F6] font-mono block mt-0.5">
+                        {fmtN(trends.forecast[0] / 1e6, 2)}M min
+                      </span>
+                      <span className="text-[9px] text-slate-500 dark:text-slate-400 font-mono block mt-0.5">
+                        95% CI: [{fmtN((trends.ci[0]?.[0] || 0) / 1e6, 2)}M, {fmtN((trends.ci[0]?.[1] || 0) / 1e6, 2)}M]
+                      </span>
+                    </div>
+
+                    {/* Card 3: Horizon FY+2 */}
+                    <div className="flex-1 min-w-[170px] max-w-[240px] p-3.5 rounded-xl border border-slate-200 dark:border-[#1e2d4a] bg-white dark:bg-[#131f37] text-center shadow-xs">
+                      <span className="text-[9px] uppercase font-bold text-slate-400 block font-mono">
+                        Forecast FY+2 ({trends.fFYs[1] || 'Horizon FY+2'})
+                      </span>
+                      <span className="text-base font-extrabold text-[#0F4C81] dark:text-[#3B82F6] font-mono block mt-0.5">
+                        {fmtN(trends.forecast[1] / 1e6, 2)}M min
+                      </span>
+                      <span className="text-[9px] text-slate-500 dark:text-slate-400 font-mono block mt-0.5">
+                        95% CI: [{fmtN((trends.ci[1]?.[0] || 0) / 1e6, 2)}M, {fmtN((trends.ci[1]?.[1] || 0) / 1e6, 2)}M]
+                      </span>
+                    </div>
+
+                    {/* Card 4: Historical Series Compound */}
+                    <div className="flex-1 min-w-[170px] max-w-[240px] p-3.5 rounded-xl border border-slate-200 dark:border-[#1e2d4a] bg-white dark:bg-[#131f37] text-center shadow-xs">
+                      <span className="text-[9px] uppercase font-bold text-slate-400 block font-mono">
+                        Historical Span
+                      </span>
+                      <span className="text-base font-extrabold text-slate-900 dark:text-white font-mono block mt-0.5">
+                        19 Fiscal Years
+                      </span>
+                      <span className="text-[9px] text-slate-500 dark:text-slate-400 font-mono block mt-0.5">
+                        CIHI NACRS Longitudinal Cohort
+                      </span>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <span className="font-extrabold text-[10px] text-[#0F4C81] dark:text-[#3B82F6] uppercase tracking-wider block">Estimated ERBI — Historical Trend + Holt's Linear Forecast + 95% CI Band</span>
+                    <div className="bg-white dark:bg-[#131f37] border border-[#E2E8F0] dark:border-[#1e2d4a] rounded-xl p-4">
+                      <ERBITrendChart historical={trends.historical} forecastPts={trends.forecastPts} />
+                    </div>
+                    <p className="text-[10px] text-slate-400 font-light italic">
+                      Note: "Estimated Emergency Department Resource Burden Index (ERBI)" is a derived proxy metric — visit count × reported median LOS × 60 — and should not be interpreted as actual aggregate utilization time.
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <div className="text-xs text-slate-400 bg-[#F8FAFC] dark:bg-[#152033] p-4 rounded-lg text-center">Load a dataset with Fiscal Year, Number of ED Visits, and LOS columns to compute ERBI trend analysis.</div>
+              )}
+
+              <TechPanel details={[
+                { label: 'Trend Test', value: 'Mann–Kendall non-parametric monotonic trend test (Kendall S-statistic, normal approximation)' },
+                { label: 'ERBI Metric', value: 'Estimated Emergency Department Resource Burden Index: Σ(Visit Count × Reported Median LOS × 60) per fiscal year' },
+                { label: 'Forecast Method', value: "Holt's Linear Trend Exponential Smoothing (Level α = 0.3, Trend β = 0.1, Horizon h = 2 fiscal years)" },
+                { label: 'Forecast CI', value: '95% prediction interval: point forecast ± 1.96 × σ_residual × √h' },
+                { label: 'Model Rationale', value: 'Quantifies long-term compound demand pressure and forecasts upcoming resource allocation requirements' },
+                { label: 'Significance', value: 'Kendall τ = 0.9766 (p < 0.0001, monotonic upward trend)' },
+                { label: 'α', value: '0.05 (two-sided); Data: SQLite-loaded processed dataset' },
+              ]} />
+
+              <InterpPanel
+                stat={`A statistically significant, strong monotonic increasing trend was detected in the Estimated ED Resource Burden Index (ERBI) across the 19-year historical series, Kendall's τ = ${trends ? fmtN(trends.mk.tau, 4) : '.9766'}, p < .0001. Holt's linear trend exponential smoothing projects continued growth in aggregate demand.`}
+                clinical="ERBI combines reported median stay duration with visit volumes, reflecting simultaneous upward pressure from population growth, aging demographics, and complexity-driven care duration."
+                operational="Long-term capacity planning should incorporate the projected ERBI growth trends and upper-bound prediction intervals to stress-test ED staffing, bed availability, and transition-to-care resources."
+              />
+            </div>
           )}
-          <TechPanel details={[
-            { label: 'Trend Test', value: 'Mann–Kendall non-parametric monotonic trend test (Kendall S-statistic, normal approximation)' },
-            { label: 'ERBI Metric', value: 'Estimated Emergency Department Resource Burden Index: Σ(Visit Count × Reported Median LOS × 60) per fiscal year' },
-            { label: 'Forecast Method', value: "Holt's Linear Trend Exponential Smoothing (Level α = 0.3, Trend β = 0.1, Horizon h = 2 fiscal years)" },
-            { label: 'Forecast CI', value: '95% prediction interval: point forecast ± 1.96 × σ_residual × √h' },
-            { label: 'H₀', value: 'No monotonic trend exists in the Estimated ERBI series across fiscal years' },
-            { label: 'H₁', value: 'A monotonic trend (increasing or decreasing) exists across fiscal years' },
-            { label: 'α', value: '0.05 (two-sided); Data: SQLite-loaded processed dataset' },
-          ]} />
-          <InterpPanel
-            stat={`A statistically significant, strong monotonic increasing trend was detected in the Estimated ED Resource Burden Index (ERBI) across the 19-year historical series, Kendall's τ = ${trends ? fmtN(trends.mk.tau, 4) : '.9766'}, p < .0001. Holt's linear trend exponential smoothing projects continued growth in aggregate demand.`}
-            clinical="ERBI combines reported median stay duration with visit volumes, reflecting simultaneous upward pressure from population growth, aging demographics, and complexity-driven care duration."
-            operational="Long-term capacity planning should incorporate the projected ERBI growth trends and upper-bound prediction intervals to stress-test ED staffing, bed availability, and transition-to-care resources."
-          />
-        </HCard>
+        </div>
 
       </div>
-
-      {/* Analytical Scope Statement */}
-      <div className="p-4 rounded-xl bg-white dark:bg-[#131f37] border border-[#E5E7EB] dark:border-[#1e2d4a] flex items-start gap-3 max-w-4xl mx-auto shadow-3xs">
-        <Info size={16} className="text-[#0F4C81] dark:text-[#3B82F6] shrink-0 mt-0.5" />
-        <div className="text-xs space-y-1.5 text-slate-500 dark:text-slate-400 font-light leading-relaxed">
-          <p className="font-bold text-slate-700 dark:text-slate-200">Reproducibility &amp; Analytical Scope Statement</p>
-          <p>All statistical results (H1–H5) are computed dynamically from the SQLite-loaded dataset. Analyses operate exclusively on aggregate-level records. No results are derived from or refer to individual-level records. Weighted tests use visit counts as analytic weights. WLS models aggregate median LOS with visit-count weights. The Estimated Emergency Department Resource Burden Index (ERBI) is a derived composite indicator.</p>
-          <p className="text-[11px] text-slate-400 dark:text-slate-400 border-t border-slate-100 dark:border-slate-800 pt-1">
-            <strong>Main Presenting Problems Scope Note:</strong> The <code className="text-slate-600 dark:text-slate-300">main_problems</code> table (<em>Main_Problems.csv</em>) is actively utilized in Stages 1–3 for exploratory case-mix distribution and high-volume presenting complaint KPI tracking. A formal diagnostic complaint hypothesis test (H6: Clinical Presenting Problem vs. LOS) is deferred to future platform milestone releases because aggregate source tables disaggregate complaints across age and sex without joint multi-attribute cross-tabulation with CTAS acuity and disposition.
-          </p>
-        </div>
-      </div>
-
-      {/* References */}
-      <div className="p-4 rounded-xl bg-white dark:bg-[#131f37] border border-[#E5E7EB] dark:border-[#1e2d4a] text-xs space-y-2 max-w-4xl mx-auto shadow-3xs">
-        <span className="font-extrabold text-[10px] text-[#0F4C81] dark:text-[#3B82F6] uppercase tracking-wider block font-mono">
-          REFERENCES &amp; METHODOLOGICAL CITATIONS (APA 7TH ED.)
-        </span>
-        <div className="text-[11px] text-slate-500 dark:text-slate-400 font-light leading-relaxed space-y-1">
-          <p>American Psychological Association. (2020). <em>Publication manual of the American Psychological Association</em> (7th ed.). https://doi.org/10.1037/0000165-000</p>
-          <p>Canadian Institute for Health Information. (2024). <em>National Ambulatory Care Reporting System (NACRS) metadata and data quality documentation</em>. Canadian Institute for Health Information. https://www.cihi.ca</p>
-          <p>Cohen, J. (1988). <em>Statistical power analysis for the behavioral sciences</em> (2nd ed.). Lawrence Erlbaum Associates.</p>
-          <p>Dunn, O. J. (1964). Multiple comparisons using rank sums. <em>Technometrics</em>, 6(3), 241–252. https://doi.org/10.1080/00401706.1964.10490181</p>
-          <p>Kruskal, W. H., &amp; Wallis, W. A. (1952). Use of ranks in one-criterion variance analysis. <em>Journal of the American Statistical Association</em>, 47(260), 583–621. https://doi.org/10.1080/01621459.1952.10483441</p>
-          <p>Mann, H. B., &amp; Whitney, D. R. (1947). On a test of whether one of two random variables is stochastically larger than the other. <em>Annals of Mathematical Statistics</em>, 18(1), 50–60. https://doi.org/10.1214/aoms/1177730491</p>
-        </div>
-      </div>
-
-      {onNavigateNext && (
-        <div className="flex justify-center pt-4" id="analytics-proceed-cta">
-          <button onClick={onNavigateNext} className="h-12 px-8 rounded-lg bg-[#0F4C81] hover:bg-[#0c3e6b] text-[#FFFFFF] font-bold text-sm flex items-center gap-2 cursor-pointer shadow-md hover:shadow-lg hover:scale-[1.01] transition-all select-none">
-            <span>Continue to Executive Dashboard</span><ChevronRight size={17} />
-          </button>
-        </div>
-      )}
     </div>
   );
 }

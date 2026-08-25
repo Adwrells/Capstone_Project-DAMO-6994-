@@ -35,6 +35,10 @@ class ExcelDatasetService:
             raise FileNotFoundError(f"Workbook not found at relative path: {self.excel_path}")
         return self.excel_path
 
+    def get_excel_path(self) -> Path:
+        """Returns verified Path to the Excel workbook file."""
+        return self._verify_file()
+
     def load_all_sheets(self) -> Dict[str, pd.DataFrame]:
         """Loads all six worksheets from the target Excel workbook using Pandas."""
         path = self._verify_file()
