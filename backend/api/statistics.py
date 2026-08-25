@@ -31,6 +31,8 @@ except ImportError:
         def __init__(self, status_code: int, detail: str):
             self.status_code = status_code
             self.detail = detail
+    def Query(default: Any = None, *args: Any, **kwargs: Any) -> Any:  # noqa: N802
+        return default
     class BaseModel: pass
 
 from backend.analytics.descriptive import get_table_descriptive_metrics, calculate_five_number_summary, calculate_mean, calculate_std
@@ -54,7 +56,10 @@ router = APIRouter(prefix="/api/statistics", tags=["Statistics Engine"])
 
 @router.get("/summary")
 @router.post("/summary")
-async def get_summary_statistics(payload: Optional[Dict[str, Any]] = None, table_name: str = Query("ed_visits")) -> Dict[str, Any]:
+async def get_summary_statistics(
+    payload: Optional[Dict[str, Any]] = None,
+    table_name: Optional[str] = Query(default="ED_Visits"),
+) -> Dict[str, Any]:
     """Returns summary statistics, distributions, missing values, and outliers from SQLite."""
     if payload and "values" in payload:
         values = [float(v) for v in payload.get("values", []) if isinstance(v, (int, float)) and not math.isnan(float(v))]
@@ -71,7 +76,7 @@ async def get_summary_statistics(payload: Optional[Dict[str, Any]] = None, table
             "summary": summary
         }
 
-    res = get_table_descriptive_metrics(table_name)
+    res = get_table_descriptive_metrics(table_name or "ED_Visits")
     return {"success": True, "source": "SQLite Database", **res}
 
 
@@ -167,67 +172,69 @@ async def get_statistics_dashboard() -> Dict[str, Any]:
         h4 = run_h4_test()
         h5 = run_h5_test()
         erbi = compute_erbi_metrics()
+        dashboard_data = {
+            "H1_Triage_Difference": {
+                "hypothesis": "H1: LOS differs across CTAS Triage Levels",
+                "test": h1.get("test_name"),
+                "decision": h1.get("decision"),
+                "p_value": h1.get("p_value"),
+                "degrees_of_freedom": h1.get("degrees_of_freedom"),
+                "effect_size": h1.get("epsilon_squared"),
+                "effect_size_metric": "epsilon_squared",
+                "effect_size_magnitude": h1.get("effect_size_magnitude"),
+                "weighted_n": h1.get("weighted_n"),
+            },
+            "H2_Admission_Difference": {
+                "hypothesis": "H2: LOS differs between Admitted and Non-Admitted visits",
+                "test": h2.get("test_name"),
+                "decision": h2.get("decision"),
+                "p_value": h2.get("p_value"),
+                "effect_size": h2.get("rank_biserial"),
+                "effect_size_metric": "rank_biserial",
+                "weighted_n": h2.get("weighted_n"),
+            },
+            "H3_Urgency_WLS_Regression": {
+                "hypothesis": "H3: CTAS Urgency Score predicts LOS (WLS)",
+                "model": h3.get("regression_type"),
+                "r_squared": h3.get("r_squared"),
+                "slope": h3.get("slope"),
+                "decision": h3.get("decision"),
+                "p_value": h3.get("p_value_slope"),
+            },
+            "H4_Age_Group_Difference": {
+                "hypothesis": "H4: LOS differs across Broad Age Categories",
+                "test": h4.get("test_name"),
+                "decision": h4.get("decision"),
+                "p_value": h4.get("p_value"),
+                "degrees_of_freedom": h4.get("degrees_of_freedom"),
+                "effect_size": h4.get("epsilon_squared"),
+                "effect_size_metric": "epsilon_squared",
+                "effect_size_magnitude": h4.get("effect_size_magnitude"),
+                "weighted_n": h4.get("weighted_n"),
+            },
+            "H5_Sex_vs_Disposition": {
+                "hypothesis": "H5: Sex and Visit Disposition are associated (Chi-Square)",
+                "test": "Pearson Chi-Square Test of Independence",
+                "decision": h5.get("results", {}).get("decision"),
+                "p_value": h5.get("results", {}).get("p_value"),
+                "chi2_statistic": h5.get("results", {}).get("chi2_statistic"),
+                "degrees_of_freedom": h5.get("results", {}).get("degrees_of_freedom"),
+                "effect_size": h5.get("cramers_v"),
+                "effect_size_metric": "cramers_v",
+                "effect_size_magnitude": h5.get("effect_size_magnitude"),
+                "total_visits_analyzed": h5.get("total_visits_analyzed"),
+            },
+            "Resource_Burden": {
+                "overall_erbi": erbi.get("overall_erbi_score")
+            },
+        }
 
         return {
             "success": True,
             "source": "SQLite Database (healthcare.db)",
             "alpha": ALPHA,
-            "summary_dashboard": {
-                "H1_Triage_Difference": {
-                    "hypothesis": "H1: LOS differs across CTAS Triage Levels",
-                    "test": h1.get("test_name"),
-                    "decision": h1.get("decision"),
-                    "p_value": h1.get("p_value"),
-                    "degrees_of_freedom": h1.get("degrees_of_freedom"),
-                    "effect_size": h1.get("epsilon_squared"),
-                    "effect_size_metric": "epsilon_squared",
-                    "effect_size_magnitude": h1.get("effect_size_magnitude"),
-                    "weighted_n": h1.get("weighted_n"),
-                },
-                "H2_Admission_Difference": {
-                    "hypothesis": "H2: LOS differs between Admitted and Non-Admitted visits",
-                    "test": h2.get("test_name"),
-                    "decision": h2.get("decision"),
-                    "p_value": h2.get("p_value"),
-                    "effect_size": h2.get("rank_biserial"),
-                    "effect_size_metric": "rank_biserial",
-                    "weighted_n": h2.get("weighted_n"),
-                },
-                "H3_Urgency_WLS_Regression": {
-                    "hypothesis": "H3: CTAS Urgency Score predicts LOS (WLS)",
-                    "model": h3.get("regression_type"),
-                    "r_squared": h3.get("r_squared"),
-                    "slope": h3.get("slope"),
-                    "decision": h3.get("decision"),
-                    "p_value": h3.get("p_value_slope"),
-                },
-                "H4_Age_Group_Difference": {
-                    "hypothesis": "H4: LOS differs across Broad Age Categories",
-                    "test": h4.get("test_name"),
-                    "decision": h4.get("decision"),
-                    "p_value": h4.get("p_value"),
-                    "degrees_of_freedom": h4.get("degrees_of_freedom"),
-                    "effect_size": h4.get("epsilon_squared"),
-                    "effect_size_metric": "epsilon_squared",
-                    "effect_size_magnitude": h4.get("effect_size_magnitude"),
-                    "weighted_n": h4.get("weighted_n"),
-                },
-                "H5_Sex_vs_Disposition": {
-                    "hypothesis": "H5: Sex and Visit Disposition are associated (Chi-Square)",
-                    "test": "Pearson Chi-Square Test of Independence",
-                    "decision": h5.get("results", {}).get("decision"),
-                    "p_value": h5.get("results", {}).get("p_value"),
-                    "chi2_statistic": h5.get("results", {}).get("chi2_statistic"),
-                    "degrees_of_freedom": h5.get("results", {}).get("degrees_of_freedom"),
-                    "effect_size": h5.get("cramers_v"),
-                    "effect_size_metric": "cramers_v",
-                    "effect_size_magnitude": h5.get("effect_size_magnitude"),
-                    "total_visits_analyzed": h5.get("total_visits_analyzed"),
-                },
-                "Resource_Burden": {
-                    "overall_erbi": erbi.get("overall_erbi_score")
-                },
-            },
+            "dashboard": dashboard_data,
+            "summary_dashboard": dashboard_data,
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Dashboard error: {str(e)}")
