@@ -1,6 +1,7 @@
 import express from "express";
 import path from "path";
 import fs from "fs";
+import { spawn, execSync, ChildProcess } from "child_process";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, Type } from "@google/genai";
 import dotenv from "dotenv";
@@ -13,7 +14,7 @@ const BetterSQLite3 = _require("better-sqlite3");
 dotenv.config();
 
 const app = express();
-const PORT = 3000;
+const PORT = parseInt(process.env.PORT || "3000", 10);
 
 app.use(express.json({ limit: "100mb" }));
 app.use(express.urlencoded({ limit: "100mb", extended: true }));
@@ -408,10 +409,19 @@ function executeDuckDBQuery(datasetId: string, rows: any[], query: SQLQueryPaylo
 // ----------------------------------------------------
 
 // HEALTH & SYSTEM METRICS
-app.get("/api/health", (req, res) => {
+app.get("/api/health", async (req, res) => {
   const db = readDb();
+  let pythonStatus = "offline";
+  try {
+    const pyRes = await fetch(`${FASTAPI_URL}/api/health`, { signal: AbortSignal.timeout(1000) });
+    if (pyRes.ok) pythonStatus = "online";
+  } catch {}
+
   res.json({
     status: "healthy",
+    frontend: "online",
+    pythonBackend: pythonStatus,
+    server: "unified-express-vite",
     cache: cache.getStats(),
     registeredDatasets: db.datasets?.length || 0,
     jobsQueueLength: activeJobs.size,
@@ -423,45 +433,6 @@ app.get("/api/health", (req, res) => {
 app.post("/api/cache/clear", (req, res) => {
   cache.clearAll();
   res.json({ success: true, message: "Redis cache flushed." });
-});
-
-// ----------------------------------------------------
-// PYTHON ANALYTICS BACKEND PROXY
-// ----------------------------------------------------
-// Model diagnostics (overfitting / underfitting) are computed in the FastAPI backend so
-// the statistical logic lives in one place. Forward those routes rather than
-// reimplementing them here. Requires: python -m backend.main
-const PYTHON_API_URL = process.env.PYTHON_API_URL || "http://127.0.0.1:8000";
-
-// Routes handled by the Python backend rather than Express.
-const PYTHON_PROXY_PREFIXES = ["/api/model-diagnostics", "/api/user-datasets"];
-
-app.all(PYTHON_PROXY_PREFIXES.map(p => `${p}/*`).concat(PYTHON_PROXY_PREFIXES), async (req, res) => {
-  const target = `${PYTHON_API_URL}${req.originalUrl}`;
-  try {
-    // The session id must survive the hop. Without forwarding it the backend sees an
-    // unscoped request and returns every user's datasets, silently defeating isolation.
-    const forwarded: Record<string, string> = { "Content-Type": "application/json" };
-    const sessionId = req.headers["x-session-id"];
-    if (typeof sessionId === "string") forwarded["X-Session-Id"] = sessionId;
-
-    const upstream = await fetch(target, {
-      method: req.method,
-      headers: forwarded,
-      body: req.method === "GET" || req.method === "HEAD" ? undefined : JSON.stringify(req.body ?? {}),
-      signal: AbortSignal.timeout(60000)
-    });
-    res.status(upstream.status).json(await upstream.json());
-  } catch (err: any) {
-    const offline = err?.name === "TypeError" || err?.cause?.code === "ECONNREFUSED";
-    res.status(offline ? 503 : 500).json({
-      success: false,
-      status: offline ? "backend_offline" : "proxy_error",
-      message: offline
-        ? "Python analytics backend is not running. Start it with: python -m backend.main"
-        : `Model diagnostics proxy failed: ${err?.message || "unknown error"}`
-    });
-  }
 });
 
 // GET LIST OF DATASETS
@@ -2071,9 +2042,140 @@ Return strictly JSON matching the response schema.`;
 });
 
 // ----------------------------------------------------
-// FASTAPI REVERSE PROXY FOR ADVANCED ANALYTICS
+// FASTAPI REVERSE PROXY & SUBPROCESS LIFECYCLE MANAGEMENT
 // ----------------------------------------------------
 const FASTAPI_URL = process.env.API_URL || process.env.PYTHON_API_URL || `http://127.0.0.1:${process.env.API_PORT || 8000}`;
+let pythonSubprocess: ChildProcess | null = null;
+
+function findPythonExecutable(): string {
+  if (process.env.PYTHON_EXEC && fs.existsSync(process.env.PYTHON_EXEC)) {
+    return process.env.PYTHON_EXEC;
+  }
+  const isWindows = process.platform === "win32";
+  const candidates = isWindows
+    ? [
+        "python",
+        path.join(process.cwd(), ".venv", "Scripts", "python.exe"),
+        path.join(process.cwd(), "venv", "Scripts", "python.exe"),
+        "py",
+      ]
+    : [
+        "/opt/venv/bin/python",
+        path.join(process.cwd(), ".venv", "bin", "python"),
+        path.join(process.cwd(), "venv", "bin", "python"),
+        "python3",
+        "python",
+      ];
+
+  for (const candidate of candidates) {
+    try {
+      if (candidate.includes(path.sep) || candidate.startsWith("/")) {
+        if (!fs.existsSync(candidate)) continue;
+      }
+      execSync(`"${candidate}" -c "import pandas, fastapi, uvicorn"`, { stdio: "ignore", timeout: 3000 });
+      return candidate;
+    } catch {
+      continue;
+    }
+  }
+  return isWindows ? "python" : "python3";
+}
+
+async function isPortOpen(url: string): Promise<boolean> {
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(800) });
+    return res.ok || res.status === 404 || res.status === 200;
+  } catch {
+    return false;
+  }
+}
+
+async function ensurePythonBackendRunning(): Promise<void> {
+  const healthUrl = `${FASTAPI_URL}/api/health`;
+  const isAlreadyRunning = await isPortOpen(healthUrl);
+  if (isAlreadyRunning) {
+    console.log(`[Unified Server] Python analytics backend is already running at ${FASTAPI_URL}.`);
+    return;
+  }
+
+  const pythonCmd = findPythonExecutable();
+  console.log(`[Unified Server] Auto-starting Python analytics backend with ${pythonCmd}...`);
+
+  try {
+    pythonSubprocess = spawn(pythonCmd, ["-m", "backend.main"], {
+      cwd: process.cwd(),
+      env: {
+        ...process.env,
+        API_HOST: "127.0.0.1",
+        API_PORT: (process.env.API_PORT || "8000"),
+        PYTHONUNBUFFERED: "1",
+      },
+      stdio: ["ignore", "pipe", "pipe"],
+      shell: false,
+    });
+
+    pythonSubprocess.stdout?.on("data", (data) => {
+      const msg = data.toString().trim();
+      if (msg) console.log(`[FastAPI] ${msg}`);
+    });
+
+    pythonSubprocess.stderr?.on("data", (data) => {
+      const msg = data.toString().trim();
+      if (msg) console.error(`[FastAPI] ${msg}`);
+    });
+
+    pythonSubprocess.on("error", (err) => {
+      console.error(`[FastAPI Spawn Error] Failed to start Python backend:`, err.message);
+    });
+
+    pythonSubprocess.on("exit", (code, signal) => {
+      if (code !== null && code !== 0) {
+        console.warn(`[FastAPI] Python process exited with code ${code}, signal ${signal}`);
+      }
+    });
+
+    // Wait for the backend to become healthy
+    console.log("[Unified Server] Waiting for Python analytics backend to initialize...");
+    for (let i = 0; i < 30; i++) {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      if (await isPortOpen(healthUrl)) {
+        console.log(`[Unified Server] Python analytics backend ready on ${FASTAPI_URL}`);
+        return;
+      }
+    }
+    console.warn("[Unified Server] Python backend startup timed out; proxy will retry on demand.");
+  } catch (err: any) {
+    console.error("[Unified Server] Error launching Python backend:", err.message);
+  }
+}
+
+function cleanupChildProcesses() {
+  if (pythonSubprocess && !pythonSubprocess.killed) {
+    console.log("\n[Unified Server] Stopping Python analytics backend child process...");
+    try {
+      if (process.platform === "win32" && pythonSubprocess.pid) {
+        spawn("taskkill", ["/PID", pythonSubprocess.pid.toString(), "/T", "/F"]);
+      } else {
+        pythonSubprocess.kill("SIGTERM");
+      }
+    } catch {
+      // Ignore errors during process exit
+    }
+  }
+}
+
+process.on("SIGINT", () => {
+  cleanupChildProcesses();
+  process.exit(0);
+});
+process.on("SIGTERM", () => {
+  cleanupChildProcesses();
+  process.exit(0);
+});
+process.on("exit", () => {
+  cleanupChildProcesses();
+});
+
 const PROXIED_PREFIXES = [
   "/api/dashboard",
   "/api/statistics",
@@ -2083,7 +2185,7 @@ const PROXIED_PREFIXES = [
   "/api/insights",
   "/api/reports",
   "/api/dataset",
-  "/api/health",
+  "/api/upload",
 ];
 
 PROXIED_PREFIXES.forEach(prefix => {
@@ -2141,7 +2243,7 @@ PROXIED_PREFIXES.forEach(prefix => {
           success: false,
           status: offline ? "backend_offline" : "proxy_error",
           message: offline
-            ? "Python analytics backend is not reachable. Ensure FastAPI is running on port 8000."
+            ? "Python analytics backend is not reachable. Auto-starter will attempt recovery."
             : `Proxy failed: ${err?.message || "unknown error"}`
         });
       }
@@ -2151,6 +2253,9 @@ PROXIED_PREFIXES.forEach(prefix => {
 
 // Configure Vite integration for Full-Stack development / Production
 async function startServer() {
+  // Ensure the Python analytics backend is up and running
+  await ensurePythonBackendRunning();
+
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
       server: { 
@@ -2174,7 +2279,7 @@ async function startServer() {
   }
 
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`[Data Pilot Server] running securely on host 0.0.0.0, port ${PORT}`);
+    console.log(`[Healthcare Analytics Platform] Full-stack unified server running on http://localhost:${PORT}`);
   });
 }
 

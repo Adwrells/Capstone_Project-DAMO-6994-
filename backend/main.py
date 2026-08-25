@@ -77,6 +77,26 @@ async def health_check():
     return {"status": "ok"}
 
 
+# Mount production frontend static assets if built
+dist_dir = PROJECT_ROOT / "dist"
+if dist_dir.exists() and (dist_dir / "index.html").exists():
+    from fastapi.staticfiles import StaticFiles
+    from fastapi.responses import FileResponse
+
+    assets_dir = dist_dir / "assets"
+    if assets_dir.exists():
+        app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="assets")
+
+    @app.get("/{full_path:path}")
+    async def serve_spa_frontend(full_path: str):
+        if full_path.startswith("api/") or full_path in ("docs", "redoc", "openapi.json"):
+            return None
+        candidate = dist_dir / full_path
+        if candidate.is_file():
+            return FileResponse(str(candidate))
+        return FileResponse(str(dist_dir / "index.html"))
+
+
 if __name__ == "__main__":
     import uvicorn
 
@@ -85,3 +105,4 @@ if __name__ == "__main__":
     port = int(os.getenv("API_PORT", "8000"))
 
     uvicorn.run("backend.main:app", host=host, port=port, reload=True)
+
