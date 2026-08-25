@@ -248,9 +248,10 @@ def main():
         
     print("\n--- 4. Running Pytests ---")
     print("Checking tests...")
-    # Running pytest through the virtual environment's python.
-    # We set check=False so that if tests fail, we still have the option to start the app (you can change this to True if you want a strict block).
-    run_command([venv_python, "-m", "pytest"], check=False)
+    # Running pytest through the virtual environment's python with fallback to system python.
+    test_proc = subprocess.run([venv_python, "-m", "pytest"])
+    if test_proc.returncode != 0:
+        subprocess.run([sys.executable, "-m", "pytest"])
     
     print("\n--- 5. Freeing Ports ---")
     # server.ts is NOT hot-reloaded. A leftover process keeps serving old backend code
@@ -274,7 +275,15 @@ def main():
     # on a workstation it stays on loopback so the clinical dataset is not exposed to the LAN.
     api_env.setdefault("API_HOST", "0.0.0.0" if in_container() else "127.0.0.1")
     api_env.setdefault("API_PORT", str(API_PORT))
-    api_process = subprocess.Popen([venv_python, "-m", "backend.main"], env=api_env)
+    
+    # Try venv python first, fallback to sys.executable if needed
+    py_exec = venv_python
+    try:
+        subprocess.check_call([py_exec, "-c", "import pandas"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except Exception:
+        py_exec = sys.executable
+
+    api_process = subprocess.Popen([py_exec, "-m", "backend.main"], env=api_env)
     processes.append(("FastAPI", api_process))
 
     print("Starting Node/Vite server... (npm run dev)")
