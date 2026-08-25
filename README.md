@@ -171,6 +171,40 @@ would conflict on nearly every merge.
 The full specification, including layer contracts and conformance checks, is documented in
 [architecture.md](architecture.md).
 
+### Runtime topology
+
+The platform runs as **three** processes, not two:
+
+| Process | Entry point | Port | Role |
+| :--- | :--- | :--- | :--- |
+| React SPA | `index.html` → `frontend/src/main.tsx` | served by the process below | UI, client-side cleaning, Recharts visualizations |
+| Node server | `server.ts` (Express) | **3000** | Serves the SPA (Vite in middleware mode during dev, static `dist/` in production), owns the preload/upload dataset pipeline, and calls Gemini |
+| Python backend | `backend/main.py` (FastAPI) | **8000** | Hypothesis testing (H1–H5), model diagnostics, cleaned-dataset persistence, executive KPIs |
+
+`server.ts` is the single HTTP entry point a browser talks to. Most routes it answers
+directly in Node; two prefixes — `/api/model-diagnostics` and `/api/user-datasets` — it
+proxies verbatim to FastAPI (forwarding the `X-Session-Id` header so isolation still holds),
+returning a `backend_offline` status if that service isn't running rather than failing the
+whole request. The root `package.json` (`npm run dev` → `tsx server.ts`) is what actually
+runs the app; `frontend/package.json` duplicates the same UI dependencies for standalone
+`tsc`/`vite` tooling against the same `frontend/src/` tree, but the app itself is built and
+served from the repository root.
+
+Several names inside `server.ts` describe what a piece of infrastructure *emulates*, not
+what it *is* — worth knowing before assuming Postgres, Redis, or DuckDB are actually running:
+
+| Name used in code | What it actually is |
+| :--- | :--- |
+| "PostgreSQL Metadata Store" | A single JSON file, `uploads/metadata.db.json`, read/written whole on every access |
+| "Redis Cache" (`RedisCacheManager`) | An in-process `Map` with manual TTL expiry — cleared on server restart |
+| "DuckDB" query engine (`executeDuckDBQuery`) | Hand-written JS filter/group-by/aggregate over an in-memory array, no SQL engine involved |
+| "Parquet" files | Plain `JSON.stringify`d arrays under `uploads/parquet/` |
+| Forecasting "worker job" | A `setTimeout`-deferred async function on the same event loop, not a separate worker process or queue |
+
+None of this is a defect — it's a deliberately dependency-free simulation of a heavier BI
+stack for a capstone deployment — but the architecture should be read as "single Node
+process emulating these systems," not "these systems are deployed."
+
 ### Analytical layering
 
 The analytics core enforces a strict separation:
@@ -183,20 +217,29 @@ The analytics core enforces a strict separation:
 - `backend/services/` owns data access and business rules. API routers remain transport
   only, containing no SQL.
 
-### Two data paths
+### Three data paths
 
-The platform maintains two independent data flows, and the separation is deliberate.
+The platform maintains three independent data flows, backed by **two separate SQLite
+files**, and the separation is deliberate.
 
 **Path A — live session.** Cleaning executes client-side in the browser. Cleaned rows enter
 React state, which fans out synchronously to the explorer, statistical analysis, dashboard,
-insights and reporting pages. The cohort is also persisted to SQLite in its own isolated
-table (`user_dataset_<id>`) so it survives a refresh.
+insights and reporting pages. The cohort is also persisted via FastAPI to its own isolated
+table (`user_dataset_<id>`) in `backend/database/healthcare.db`, so it survives a refresh.
 
-**Path B — seeded store.** FastAPI analytics read the seeded tables, which are rebuilt
-offline from the cleaned master workbook by `load_csv.py`.
+**Path B — seeded store.** FastAPI analytics (H1–H5, KPIs, ERBI, forecasting) read the six
+seeded tables in that same `backend/database/healthcare.db`, which are rebuilt offline from
+the cleaned master workbook by `load_csv.py`. A user's upload never writes these tables —
+this is what keeps the H1–H5 cohort fixed and the figures reported in the capstone
+reproducible, regardless of platform use.
 
-A user's upload never writes the six seeded tables. This is what keeps the H1–H5 cohort
-fixed, and the figures reported in the capstone reproducible, regardless of platform use.
+**Path C — Node preload store.** `server.ts` independently ingests the five raw capstone
+CSVs (`ED_Visits`, `CTAS_Triage`, `Visit_Disposition`, `Main_Problems`, `Demographics`) via
+`better-sqlite3` into a *second*, gitignored database at `uploads/healthcare_analytics.db`
+the first time `/api/preload-datasets` is called, then serves subsequent requests straight
+from SQLite. This is the store behind the Dataset Explorer's sheet browser
+(`/api/dataset/:sheet`, `/api/dataset/statistics/:sheet`) and is entirely separate from
+Path A/B's Python-side database — the two never share a connection or a file.
 
 ### Concurrent users
 
@@ -213,6 +256,25 @@ own table with no cross-contamination, and the seeded cohort was unchanged.
 > than defending against a determined caller. Genuine confidentiality for clinical data
 > requires authenticated identity and transport security.
 
+### AI assistance (Gemini)
+
+Three routes in `server.ts` call the Gemini API (`gemini-3.5-flash`, via `@google/genai`)
+with a lazily-initialized client (`getGeminiClient()`) that only activates when
+`GEMINI_API_KEY` is set in the environment:
+
+| Route | Purpose |
+| :--- | :--- |
+| `POST /api/smart-query` | Turns a natural-language question into structured column filters |
+| `POST /api/assistant/chart-builder` | Turns a natural-language chart request into a chart config (type, axes, aggregation, color) |
+| `POST /api/analyze-dataset` | Generates an executive-style dataset summary, KPI cards, findings, and recommendations |
+
+Every route wraps its Gemini call in a `try/catch` and falls back to a deterministic,
+keyword-matched heuristic (and, for `/api/analyze-dataset`, a set of pre-written
+domain-specific analyses — healthcare, SaaS, marketing, retail) when the client is absent or
+the call fails, returning `isFallback: true` so the caller can distinguish a genuine model
+response from the offline heuristic. This is why the platform's AI-assisted features work
+with no API key configured, just with generic rather than data-specific output.
+
 ---
 
 ## The Five Hypotheses
@@ -226,11 +288,32 @@ defaults to non-parametric methods rather than assuming normality.
 | **H2** | Does LOS differ between admitted and non-admitted visits? | Weighted Mann-Whitney U |
 | **H3** | Does CTAS urgency score predict LOS? | Weighted Least Squares regression |
 | **H4** | Does LOS differ across patient age groups? | Weighted Kruskal-Wallis with Dunn post-hoc |
-| **H5** | Is patient sex associated with visit disposition? | Chi-square test of independence, visit-weighted contingency table |
+| **H5** | Is ED visit volume trending over time, and what resource burden does it represent? | Mann-Kendall trend test + Sen's slope, Simple Exponential Smoothing forecast, and the ERBI composite index |
 
-Each hypothesis has a handler in `backend/analytics/hypothesis/`, a matching test suite, and
-a companion notebook in `backend/hypothesis testing/` (`H1_testing.ipynb` … `H5_testing.ipynb`)
-that derives the result independently and checks it against the running API for agreement.
+> **Correction (this audit):** H5 was previously documented here as a chi-square test of
+> patient sex vs. visit disposition. That test *is* implemented — `backend/analytics/statistics/chi_square.py`
+> and `backend/analytics/hypothesis/H5.py` — but it is exercised only by `tests/test_h5.py`;
+> no live route calls it. What `GET /statistics/h5` actually returns, and what
+> `AnalyticsCore.tsx` labels "H5" in the running UI (`// H5: ERBI Trend + Holt's Linear Trend
+> Forecasting`), is the trend/forecast/ERBI combination now shown above. See
+> `BACKEND_STATISTICS_NOTES.md` §14 for the full live-vs-test-only breakdown of every
+> hypothesis handler.
+
+Each hypothesis has a *reference* handler in `backend/analytics/hypothesis/` (`H1.py`–`H5.py`)
+that is exercised by its matching test suite and by a companion notebook in
+`backend/hypothesis testing/` (`H1_testing.ipynb` … `H5_testing.ipynb`), each of which derives
+the result independently and checks it against the underlying statistics engine for agreement.
+For H1/H2/H4, the **live API** path is a second, separate implementation —
+`hypothesis_testing.py`'s own `run_h1_test`/`run_h2_test`/`run_h4_test` — which calls the same
+`backend/analytics/statistics/weighted.py` primitives directly, so its numbers agree with the
+`hypothesis/H*.py` reference handler even though it's not the same function. For H3, the live
+path is `backend/analytics/regression.py::run_h3_regression()` (true visit-weighted WLS),
+distinct from the unweighted OLS in `hypothesis/H3.py`. None of `/api/statistics/*` is actually
+reachable from the browser in the running app, though: `server.ts` only proxies
+`/api/model-diagnostics/*` and `/api/user-datasets/*` to FastAPI (see
+[Runtime topology](#runtime-topology)), and nothing in `frontend/src` calls `/api/statistics/*`
+either — the H1–H5 results a user actually sees come entirely from the client-side
+TypeScript mirror in `AnalyticsCore.tsx`, described next.
 
 ### Every row is an aggregate, not an observation
 
@@ -446,31 +529,144 @@ python -m pytest tests
 | `test_architecture_services.py` | 2 | Service orchestration |
 | `test_database.py` | 1 | SQLite connection lifecycle |
 
+### Frontend tests (Vitest)
+
+The frontend had no test suite until this pass. A minimal one now exists — deliberately
+small, meant as a starting point rather than coverage of the whole UI:
+
+```bash
+npm run test
+```
+
+| File | Covers |
+| :--- | :--- |
+| `frontend/src/utils/biEngine.test.ts` | `buildSemanticModel()`'s Dimension/Measure classification, `calculateAdvancedStats()`'s mean/median/count (incl. the empty-input case), `calculateLinearRegression()`'s slope/intercept/R² against an exact linear series |
+| `frontend/src/components/layout/Layout.test.tsx` | A render smoke test — `Layout` mounts and renders its children |
+
+Configured in `vitest.config.ts` (kept separate from `vite.config.ts`, whose dev-server
+settings are tuned for this environment and shouldn't be touched by test tooling), using
+`jsdom` + React Testing Library. One environment-specific note: the default `forks` worker
+pool fails to spawn on this checkout because the repo path contains spaces — `pool: 'threads'`
+is set explicitly to work around that; drop it if you move the repo to a space-free path and
+prefer the default.
+
 ---
 
 ## Project Structure
 
 ```
-├── frontend/src/          React application — pages, components, services, utilities
+├── index.html              SPA entry point, loads /frontend/src/main.tsx
+├── frontend/src/           React application — pages, components, services, utilities
+├── server.ts               Express server (port 3000) — SPA host, dataset preload/upload
+│                           pipeline, Node-side SQLite ingestion, Gemini AI routes; proxies
+│                           /api/model-diagnostics and /api/user-datasets to FastAPI
 ├── backend/
-│   ├── api/               FastAPI routers (transport only)
+│   ├── api/                FastAPI routers (transport only)
 │   ├── analytics/
-│   │   ├── statistics/    Pure mathematical routines
-│   │   ├── hypothesis/    H1–H5 business handlers
-│   │   ├── dashboard/     KPI and ERBI computation
-│   │   └── forecasting/   Exponential smoothing
-│   ├── services/          Business logic and data access
-│   ├── database/          Schema, connection manager, loader, seeded database
-│   └── hypothesis testing/  H1–H5 notebooks, each verified against the running API
+│   │   ├── statistics/     Pure mathematical routines
+│   │   ├── hypothesis/     H1–H5 business handlers
+│   │   ├── dashboard/      KPI and ERBI computation
+│   │   └── forecasting/    Exponential smoothing
+│   ├── services/           Business logic and data access
+│   ├── database/           Schema, connection manager, loader, seeded database
+│   │                       (healthcare.db — Path A/B, committed)
+│   └── hypothesis testing/ H1–H5 notebooks, each verified against the running API
 ├── data/
-│   ├── Explorer Dataset/  Raw CSV exports, cleaning notebook, and cleaned/ output
-│   └── cleaned dataset/   Master workbook (all six datasets as sheets)
-├── docs/                  Capstone documentation
-├── tests/                 Automated test suites
-├── server.ts              Express server
-├── Dockerfile             Container image — Node 20 with Python 3
-└── launch.py              One-shot bootstrap
+│   ├── Explorer Dataset/   Raw CSV exports, cleaning notebook, and cleaned/ output
+│   └── cleaned dataset/    Master workbook (all six datasets as sheets)
+├── uploads/                Node-side state (gitignored): healthcare_analytics.db (Path C),
+│                           metadata.db.json, parquet/, exports, logs
+├── docs/                   Capstone documentation
+├── tests/                  Automated test suites
+├── Dockerfile              Container image — Node 20 with Python 3
+└── launch.py               One-shot bootstrap
 ```
+
+### File-by-file reference
+
+**Root**
+
+| File | What it does |
+| :--- | :--- |
+| `index.html` | The SPA's HTML shell. Mounts React at `#root` and loads `frontend/src/main.tsx` as a module script — the only HTML page in the app. |
+| `server.ts` | Express app entry point (see [Runtime topology](#runtime-topology) above). |
+| `vite.config.ts` | Vite build config for the root app — React + Tailwind v4 plugins, the `@` path alias, and an HMR toggle disabled via `DISABLE_HMR` during agent-driven edits. |
+| `tsconfig.json` | TypeScript compiler options shared by `server.ts` and `frontend/src/`. |
+| `package.json` / `package-lock.json` | Root Node manifest. `npm run dev` (`tsx server.ts`), `build`, and `start` are what actually run the app — this is the manifest that matters at runtime. |
+| `requirements.txt` | Python dependency manifest for the FastAPI backend (see `PIPELINE_MODULES_REPORT.md` for the full breakdown). |
+| `pyrightconfig.json` | Pyright type-checker config for the Python backend — points it at `.venv` and adds `backend/` to the search path. |
+| `vitest.config.ts` | Vitest config for the (new, minimal) frontend test suite — `jsdom` environment, React plugin, `pool: 'threads'` to work around a Windows spawn issue with spaces in the repo path. Deliberately separate from `vite.config.ts`. |
+| `docker-compose.yml` | Single-service compose file wrapping the `Dockerfile` image, exposing ports 3000 and 8000. |
+| `Dockerfile` | Container image definition — Node 20 base plus a Python 3 virtualenv (see [Docker Deployment](#docker-deployment) below). |
+| `launch.py` | One-shot local bootstrap: installs Node/Python dependencies, verifies the analytical database, frees stale ports, runs the test suite as a smoke check, then starts both servers. |
+| `architecture.md` | The full architecture specification — layer contracts and conformance checks referenced throughout this README. |
+| `DASHBOARD_ROADMAP.md` | A planning/roadmap document for dashboard engineering work — describes target state and grading goals, not necessarily what's implemented today. |
+| `hypothesis_testing_analysis.md` | A generated status snapshot from a hypothesis-testing pipeline run (H1–H5 telemetry). |
+| `alerts.md` | Not documentation — a cached GitHub API error response ("Code scanning is not enabled…") left over from an earlier command. Safe to delete. |
+| `scratch_verify_data.py` | An ad-hoc, standalone script that recomputes H1 directly against `scipy` (`friedmanchisquare`, `wilcoxon`, `kendalltau`, `theilslopes`) as an independent cross-check — outside the main pipeline, not imported by it. |
+
+**Backend — `backend/api/` (FastAPI routers, transport only)**
+
+> ⚠️ Of these 10 routers, `server.ts` proxies only two to the browser —
+> `model_diagnostics.py` and `user_datasets.py` (`PYTHON_PROXY_PREFIXES` at `server.ts:437`).
+> The rest are real, tested, and reachable only by calling FastAPI directly on port 8000 —
+> nothing in the deployed app's request path reaches them, and (checked directly)
+> `ExecutiveDashboard.tsx`, `ConsultantInsights.tsx`, and `ExportReports.tsx` make **no**
+> `/api/*` calls at all, computing everything client-side instead. Full breakdown, including
+> the same finding for the hypothesis-testing engine, in `PIPELINE_MODULES_REPORT.md` §3–4
+> and `BACKEND_STATISTICS_NOTES.md` §14.
+
+| File | What it does |
+| :--- | :--- |
+| `dashboard.py` | Executive KPI endpoints, computed directly from SQLite tables. Not called by `ExecutiveDashboard.tsx` (see caveat above). |
+| `statistics.py` | Statistical analysis endpoints (incl. `/statistics/methods`). Not called by `AnalyticsCore.tsx`. |
+| `insights.py` | Strategic recommendations (`get_strategic_recommendations`, `get_insights_summary`). Not called by `ConsultantInsights.tsx`. |
+| `reports.py` | A stub — one endpoint, `GET /export-summary`, returning a hardcoded `format_options` list. Not a real report generator and not called by `ExportReports.tsx`, which does its own client-side print-to-PDF. |
+| `model_diagnostics.py` | Overfitting/underfitting diagnostics for the post-cleaning dataset. **Genuinely reachable** — proxied. |
+| `dataset_explorer_api.py` | Excel worksheets, dataset rows, and statistical summaries for the explorer. |
+| `upload.py` | Dataset ingestion and upload handling. |
+| `datasets.py` | Dataset management endpoints. |
+| `user_datasets.py` | Session-isolated persistence for datasets a user has cleaned (see the concurrency note above). **Genuinely reachable** — proxied. |
+| `architecture.py` | Pipeline-overview endpoint. Its only caller, `ArchitecturePipelineCard.tsx`, is itself never rendered by any page — dead on both ends. |
+
+**Backend — `backend/services/` (business logic and data access)**
+
+| File | What it does |
+| :--- | :--- |
+| `dashboard_service.py` | `DashboardService` — executive KPI queries and dataset metadata summaries. |
+| `analytics_service.py` | `AnalyticsService` — decouples API controllers from DB queries and the ERBI engine; also reports pipeline-stage readiness. |
+| `insights_service.py` | `InsightsService` — outlier and volume-based recommendation detection. |
+| `preprocessing_service.py` | Orchestrates cleaning, feature engineering, and validation for the API layer. |
+| `dataset_service.py` | Generic dataset access layer. |
+| `user_dataset_service.py` | Persists a user's cleaned dataset into its own isolated SQLite table. |
+| `model_diagnostics_service.py` | Fits a train/test split and scores over/underfitting for the Fit Diagnostics panel. |
+| `excel_service.py` | Reads the master Excel workbook via pandas/openpyxl for the Dataset Explorer. |
+
+**Frontend — `frontend/src/pages/`**
+
+| File | What it does |
+| :--- | :--- |
+| `ExecutiveDashboard/ExecutiveDashboard.tsx` | KPI cards, 8 filters, and 9 switchable charts over the seeded ED data — computed entirely client-side (no `/api/*` calls in this file; not fed by `dashboard_service.py`). |
+| `DatasetExplorer/DataExplorer.tsx` | Dataset Explorer — loads the master workbook dynamically, all worksheets selectable, no hardcoded data. `DatasetExplorer.tsx` is a thin route wrapper that re-exports it. |
+| `PrepQualityEngine/DataCleaning.tsx` | The data preparation & quality engine — 7-step cleaning workflow, 5 validation dimensions, feature engineering. `PrepQualityEngine.tsx` re-exports it as the routed page. |
+| `PrepQualityEngine/FitDiagnostics.tsx` | Renders inside `DataCleaning` — visualizes the post-cleaning over/underfitting assessment. Genuinely backed by FastAPI, via the proxied `/api/model-diagnostics/*`. |
+| `StatisticalAnalysis/AnalyticsCore.tsx` | The H1–H5 hypothesis-testing UI. **This is where the real numbers come from** — a full client-side TypeScript mirror of the weighted statistics engine, not a caller of `/api/statistics/*` (which isn't proxied). `StatisticalAnalysis.tsx` re-exports it. |
+| `StrategicInsights/ConsultantInsights.tsx` | Strategic recommendations page — computed client-side, no `/api/*` calls; **not** backed by `insights_service.py` despite the naming similarity. `StrategicInsights.tsx` re-exports it. |
+| `Reports/ExportReports.tsx` | Report export page — triggers the browser's print-to-PDF engine over already-rendered charts, no backend call of any kind. `Reports.tsx` re-exports it. |
+| `AboutProject/AboutProject.tsx` | The capstone "about this project" summary page. |
+
+**Frontend — `frontend/src/utils/` and `frontend/src/services/`**
+
+| File | What it does |
+| :--- | :--- |
+| `utils/types.ts` | Shared TypeScript types/interfaces used across pages (`KPIItem`, `CustomVisualization`, `DatasetStats`, etc.). |
+| `utils/biEngine.ts` | Builds the semantic model (`buildSemanticModel`, `SemanticField`) consumed by the dashboard and chart builder. |
+| `utils/mockDatasets.ts` | Sample/preloaded dataset definitions offered in the upload UI. |
+| `utils/printToPdf.ts` | Wraps the browser print engine for the PDF report export. |
+| `services/apiService.ts` | A generic HTTP client (`fetchHealth`, `fetchDatasetsList`, `fetchDashboardKPIs`, `fetchDatasetSheets`/`SheetData`/`SheetStats`) against `/api`. **Dead code** — no other file in the frontend references any of its exports. |
+| `services/architectureService.ts` | Fetches `/api/architecture/pipeline` for `ArchitecturePipelineCard.tsx` — dead along with it (unreachable route, unrendered component). |
+| `services/modelDiagnosticsService.ts` | Client for the FastAPI model-diagnostics endpoints — **genuinely live**, via the proxied `/api/model-diagnostics/*`. |
+| `services/userDatasetService.ts` | Client for persisting/loading a user's cleaned dataset (`persistCleanedDataset`) — **genuinely live**, via the proxied `/api/user-datasets/*`. |
 
 ---
 
@@ -528,6 +724,112 @@ docker run -p 3000:3000 -v ${PWD}/uploads:/app/uploads healthcare-analytics
 > To include the analytics backend, run FastAPI alongside the container and point the server
 > at it with the `PYTHON_API_URL` environment variable, or extend the image with a process
 > manager that supervises both services.
+
+---
+
+## End-to-End Program Flow
+
+This section traces execution from process start to a rendered chart, naming the concrete
+module or library responsible for each step, so the architecture above can be read as a
+single continuous path rather than a set of independent layers.
+
+Startup begins with `launch.py` (or, in a container, `docker-compose.yml`/`Dockerfile`),
+which installs dependencies, verifies `backend/database/healthcare.db`, and then launches
+two independent OS processes. The first is `npm run dev`, which resolves to `tsx server.ts`:
+Node loads `dotenv` to populate `process.env` (`GEMINI_API_KEY`, `PYTHON_API_URL`), constructs
+an `express` app, and — because `NODE_ENV !== "production"` — calls Vite's `createServer` in
+middleware mode so the same Express process both answers API routes and streams the compiled
+React bundle. The second process is `python -m backend.main`, which builds a `fastapi`
+application, registers `pydantic` request/response models on every router in `backend/api/`,
+and starts `uvicorn` listening on port 8000; from this point the two processes communicate
+only when Express's `fetch`-based proxy forwards `/api/model-diagnostics/*` and
+`/api/user-datasets/*` verbatim, carrying the `X-Session-Id` header, to that Uvicorn socket.
+
+A browser request for `/` is served by Vite's middleware, which returns `index.html`; the
+`<script type="module" src="/frontend/src/main.tsx">` tag it contains triggers `react-dom`'s
+`createRoot` to mount `App.tsx`, which pulls in `react`'s `useState`/`useEffect`, `lucide-react`
+icons, and the `motion` animation library, and lays out the ten pages under Tailwind v4
+utility classes compiled by the `@tailwindcss/vite` plugin. `App.tsx` also imports
+`biEngine.ts` (`buildSemanticModel`) so every page shares one semantic view of whatever
+dataset is currently active in React state.
+
+Data enters the system through three independent code paths that never share a database
+connection. In the Node preload path, `GET /api/preload-datasets` in `server.ts` uses the
+`xlsx` (SheetJS) library, loaded via a Node `createRequire` shim, to parse the five raw
+capstone CSV/XLSX sources; each worksheet is written through `better-sqlite3` into
+`uploads/healthcare_analytics.db`, with column types inferred by hand-written heuristics
+(`inferColumnType`) rather than a schema file, and subsequent calls read straight back from
+that SQLite connection. In the user-upload path, `DatasetUpload.tsx` posts raw rows to
+`POST /api/datasets`, which `server.ts` writes as JSON through Node's `fs` module into
+`uploads/original/` and `uploads/parquet/` (a JSON file standing in for a columnar format)
+and registers in the single `uploads/metadata.db.json` file that the code refers to, in
+comments only, as a "PostgreSQL metadata store." In the seeded path, `backend/database/load_csv.py`
+runs offline against Python's `csv`/`sqlite3` standard-library modules and
+`backend/database/schema.sql` to populate the six seeded tables inside
+`backend/database/healthcare.db` — the fixed cohort every hypothesis test reads from.
+
+Cleaning happens client-side first: `DataCleaning.tsx` runs deduplication, imputation, and
+CTAS/age-group normalisation directly in the browser over the in-memory dataset, then calls
+`persistCleanedDataset()` in `userDatasetService.ts`, which `POST`s to `/api/user-datasets`.
+Express's proxy hands that request to FastAPI, where the `user_datasets.py` router (guarded
+by the `X-Session-Id` isolation header) calls `user_dataset_service.py`, which uses Python's
+`re` module to sanitize column identifiers before writing a session-scoped `user_dataset_<id>`
+table through `backend/database/database_manager.py`'s `sqlite3` connection. A parallel,
+schema-validation-only version of this pipeline exists for programmatic/offline use:
+`backend/services/preprocessing_service.py` composes `backend/preprocessing/cleaning.py` and
+`feature_engineering.py` (both `pandas`/`numpy`) with `backend/analytics/preprocessing/validation.py`
+(pure `typing`, no data-science dependency) to dedupe, impute, derive fiscal year and CTAS
+urgency score, and validate schema/null ratios before a record ever reaches SQLite.
+
+**Correction (later audit pass):** the two paragraphs originally here described statistical
+analysis, the dashboard, and insights as calling into the FastAPI routers below. That's what
+the Python code is *built* to do, and it's real and tested — but a direct check found
+**zero `fetch()` calls to any `/api/*` endpoint** in `AnalyticsCore.tsx`, `ExecutiveDashboard.tsx`,
+or `ConsultantInsights.tsx`, and `server.ts` proxies only `/api/model-diagnostics/*` and
+`/api/user-datasets/*` to FastAPI — `/api/statistics/*`, `/api/dashboard/*`, and
+`/api/insights/*` are not reachable from the browser at all. So here is what actually runs:
+
+Statistical analysis (H1–H5), the Executive Dashboard's KPIs, and the Strategic Insights
+recommendations are computed **entirely client-side**, in TypeScript, from data already
+sitting in React state. `AnalyticsCore.tsx` contains its own `weightedKruskalWallis()`,
+`weightedMannWhitneyU()`, `weightedDunn()`, `wls()`, and `chiSqP()` — a from-scratch mirror of
+the math in `backend/analytics/statistics/weighted.py` close enough to agree bit-for-bit on
+the seeded cohort, but a separate implementation, not a network call into it.
+`ExecutiveDashboard.tsx` and `ConsultantInsights.tsx` work the same way. The Python-side
+`backend/analytics/hypothesis/H1.py`–`H5.py` handlers, `dashboard_service.py`,
+`analytics_service.py`, and `insights_service.py` are real, correct, and covered by
+`pytest` — they are just never in the request path a deployed user actually exercises. Full
+detail, including the specific discovery that `GET /statistics/h5` computes something
+different from what `hypothesis/H5.py` implements, is in `BACKEND_STATISTICS_NOTES.md` §14
+and `PIPELINE_MODULES_REPORT.md` §3–4.
+
+Model-fit diagnostics are the genuine exception: `FitDiagnostics.tsx` calls
+`modelDiagnosticsService.ts`, which Express **does** forward to FastAPI's `model_diagnostics.py`
+router and `model_diagnostics_service.py`, where Python's `random` module drives the
+train/test split and `math` computes the polynomial fit metrics behind the learning/complexity
+curves — this one genuinely round-trips through the Python backend, because
+`/api/model-diagnostics/*` is one of the two proxied prefixes.
+
+Two natural-language features run entirely inside `server.ts`: `CustomChartBuilder.tsx`'s
+chart assistant and the smart-query box each `POST` to a route that calls
+`getGeminiClient()` — a lazily-constructed `@google/genai` `GoogleGenAI` client, active only
+when `GEMINI_API_KEY` is set — requesting structured JSON from `gemini-3.5-flash` against an
+explicit `responseSchema`. `/api/analyze-dataset` follows the same pattern for the AI-generated
+executive summary. Every one of these calls is wrapped in `try/catch`: on a missing key or a
+failed request, the route falls back to a deterministic, keyword-matched heuristic (with
+canned domain-specific analyses for healthcare/SaaS/marketing/retail data), so the UI always
+receives a response, flagged `isFallback: true` when it didn't come from the model. Expensive
+results — Gemini analyses and DuckDB-style query/statistics computations from
+`executeDuckDBQuery` — pass through `RedisCacheManager`, an in-process `Map` with manual TTL
+eviction, before being returned.
+
+Finally, `ExportReports.tsx` calls `printToPdf.ts`, which invokes the browser's native print
+engine against the already-rendered `recharts` SVG output — producing a genuine vector PDF
+with no server round trip, `html-to-image`/`jszip` used only for image/archive export
+variants elsewhere in the UI. On the Python side, the loop closes with `pytest` (291 tests
+across 20 suites) exercising every module named above, and `graphify update .` re-extracting
+this project's own AST into `graphify-out/graph.json` after each commit, so the architecture
+documented here stays checkable against the code that actually produced it.
 
 ---
 
