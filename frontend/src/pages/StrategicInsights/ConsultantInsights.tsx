@@ -257,29 +257,29 @@ export default function ConsultantInsights({ isLoading }: ConsultantInsightsProp
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-5 gap-3.5 text-xs font-mono">
                 <div className="p-3 bg-[#F8FAFC] dark:bg-[#152033] rounded-lg border border-slate-200 dark:border-[#1e2d4a] text-center">
-                  <span className="text-[10px] text-slate-400 block font-bold mb-1">H1: Welch T-Test</span>
+                  <span className="text-[10px] text-slate-400 block font-bold mb-1">H1: Kruskal–Wallis</span>
                   <span className="text-[#2E8B57] font-bold">REJECTED H0</span>
-                  <p className="text-[10px] text-slate-400 mt-1">Pandemic LOS is statistically elevated.</p>
+                  <p className="text-[10px] text-slate-400 mt-1">Stay times vary strongly across CTAS acuity tiers.</p>
                 </div>
                 <div className="p-3 bg-[#F8FAFC] dark:bg-[#152033] rounded-lg border border-slate-200 dark:border-[#1e2d4a] text-center">
-                  <span className="text-[10px] text-slate-400 block font-bold mb-1">H2: One-way ANOVA</span>
+                  <span className="text-[10px] text-slate-400 block font-bold mb-1">H2: Mann–Whitney U</span>
                   <span className="text-[#2E8B57] font-bold">REJECTED H0</span>
-                  <p className="text-[10px] text-slate-400 mt-1">Stay times vary strongly by CTAS levels.</p>
+                  <p className="text-[10px] text-slate-400 mt-1">Admitted visits have significantly longer ED stays.</p>
                 </div>
                 <div className="p-3 bg-[#F8FAFC] dark:bg-[#152033] rounded-lg border border-slate-200 dark:border-[#1e2d4a] text-center">
                   <span className="text-[10px] text-slate-400 block font-bold mb-1">H3: WLS Regression</span>
                   <span className="text-[#2E8B57] font-bold">REJECTED H0</span>
-                  <p className="text-[10px] text-slate-400 mt-1">Cost is driven by age and triage rank.</p>
+                  <p className="text-[10px] text-slate-400 mt-1">CTAS urgency score is a significant predictor of LOS.</p>
                 </div>
                 <div className="p-3 bg-[#F8FAFC] dark:bg-[#152033] rounded-lg border border-slate-200 dark:border-[#1e2d4a] text-center">
-                  <span className="text-[10px] text-slate-400 block font-bold mb-1">H4: Correlation</span>
+                  <span className="text-[10px] text-slate-400 block font-bold mb-1">H4: Kruskal–Wallis</span>
                   <span className="text-[#2E8B57] font-bold">REJECTED H0</span>
-                  <p className="text-[10px] text-slate-400 mt-1">Total minutes are coupled with direct cost.</p>
+                  <p className="text-[10px] text-slate-400 mt-1">Older adults experience substantially prolonged stay.</p>
                 </div>
                 <div className="p-3 bg-[#F8FAFC] dark:bg-[#152033] rounded-lg border border-slate-200 dark:border-[#1e2d4a] text-center">
-                  <span className="text-[10px] text-slate-400 block font-bold mb-1">H5: ARIMA & K-Means</span>
+                  <span className="text-[10px] text-slate-400 block font-bold mb-1">H5: Chi-Square</span>
                   <span className="text-[#2E8B57] font-bold">REJECTED H0</span>
-                  <p className="text-[10px] text-slate-400 mt-1">Centroids are separate; inflows rise.</p>
+                  <p className="text-[10px] text-slate-400 mt-1">Sex &amp; disposition associated with negligible effect size.</p>
                 </div>
               </div>
             </div>

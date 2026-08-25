@@ -1144,6 +1144,51 @@ function loadExplorerSheetsData() {
   return sheets;
 }
 
+// REST API: GET /api/dataset/download/raw-xlsx
+app.get("/api/dataset/download/raw-xlsx", (_req, res) => {
+  try {
+    const xlsxPath = getExplorerXlsxPath();
+    if (!xlsxPath || !fs.existsSync(xlsxPath)) {
+      res.status(404).json({ success: false, error: "Master Excel workbook not found on server." });
+      return;
+    }
+    const filename = path.basename(xlsxPath) || "Explanatory_and_Predictive_ED_Analytics_Dataset.xlsx";
+    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+    res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    fs.createReadStream(xlsxPath).pipe(res);
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// REST API: GET /api/dataset/download/csv/:sheet
+app.get("/api/dataset/download/csv/:sheet", (req, res) => {
+  const sheetKey = req.params.sheet;
+  try {
+    const sheets = loadExplorerSheetsData();
+    const match = sheets.find(s => s.key === sheetKey);
+    if (!match) {
+      res.status(404).json({ success: false, error: `Worksheet '${sheetKey}' not found.` });
+      return;
+    }
+    const headers = match.fields.map((f: any) => f.name).join(",");
+    const rows = match.data.map((r: any) =>
+      match.fields.map((f: any) => {
+        const v = String(r[f.name] ?? "");
+        return v.includes(",") || v.includes('"') || v.includes("\n")
+          ? `"${v.replace(/"/g, '""')}"`
+          : v;
+      }).join(",")
+    );
+    const csv = [headers, ...rows].join("\n");
+    res.setHeader("Content-Disposition", `attachment; filename="${sheetKey}_export.csv"`);
+    res.setHeader("Content-Type", "text/csv; charset=utf-8");
+    res.send(csv);
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // REST API: GET /api/dataset/sheets
 app.get("/api/dataset/sheets", (_req, res) => {
   try {
@@ -1157,7 +1202,7 @@ app.get("/api/dataset/sheets", (_req, res) => {
 // REST API: GET /api/dataset/:sheet
 app.get("/api/dataset/:sheet", (req, res, next) => {
   const sheetKey = req.params.sheet;
-  if (sheetKey === "sheets" || sheetKey === "statistics") return next();
+  if (sheetKey === "sheets" || sheetKey === "statistics" || sheetKey === "download") return next();
   try {
     const sheets = loadExplorerSheetsData();
     const match = sheets.find(s => s.key === sheetKey);
@@ -2023,6 +2068,46 @@ Return strictly JSON matching the response schema.`;
       warning: "Operating via deterministic business analyst intelligence."
     });
   }
+});
+
+// ----------------------------------------------------
+// FASTAPI REVERSE PROXY FOR ADVANCED ANALYTICS
+// ----------------------------------------------------
+const FASTAPI_URL = process.env.API_URL || `http://127.0.0.1:${process.env.API_PORT || 8000}`;
+const PROXIED_PREFIXES = [
+  "/api/dashboard",
+  "/api/statistics",
+  "/api/model-diagnostics",
+  "/api/architecture",
+  "/api/user-datasets",
+  "/api/insights",
+  "/api/reports",
+];
+
+PROXIED_PREFIXES.forEach(prefix => {
+  app.use(prefix, async (req, res, next) => {
+    try {
+      const targetUrl = `${FASTAPI_URL}${req.originalUrl}`;
+      const options: RequestInit = {
+        method: req.method,
+        headers: {
+          "Content-Type": (req.headers["content-type"] as string) || "application/json",
+          "Accept": "application/json",
+        },
+      };
+      if (req.method !== "GET" && req.method !== "HEAD" && req.body) {
+        options.body = typeof req.body === "string" ? req.body : JSON.stringify(req.body);
+      }
+      const response = await fetch(targetUrl, options);
+      const data = await response.text();
+      res.status(response.status);
+      res.set("Content-Type", response.headers.get("content-type") || "application/json");
+      res.send(data);
+    } catch (err: any) {
+      console.error(`[API Proxy Error] ${prefix} -> FastAPI (${FASTAPI_URL}):`, err.message);
+      next();
+    }
+  });
 });
 
 // Configure Vite integration for Full-Stack development / Production

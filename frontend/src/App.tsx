@@ -339,7 +339,7 @@ export default function App() {
       >
         {/* Brand Header */}
         <div className="h-16 px-4 flex items-center justify-between border-b border-slate-800 shrink-0">
-          <div className="flex items-center gap-3 overflow-hidden cursor-pointer" onClick={resetPlatform}>
+          <div className="flex items-center gap-3 overflow-hidden select-none cursor-default">
             <div className="w-9 h-9 rounded-xl bg-[#2563EB] flex items-center justify-center text-white shrink-0 shadow-sm">
               <Activity size={20} strokeWidth={2.5} />
             </div>
@@ -352,7 +352,7 @@ export default function App() {
           </div>
           <button
             onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
             title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
           >
             <Menu size={18} />
@@ -375,31 +375,30 @@ export default function App() {
           </div>
         </div>
 
-        {/* Navigation Menu Links */}
-        <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto" aria-label="Workflow stages">
-          {STAGES.map((stage, idx) => {
+        {/* Navigation Stage Indicators (Display-only, non-clickable) */}
+        <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto pointer-events-none select-none" aria-label="Workflow stages">
+          {STAGES.map((stage) => {
             const Icon = stage.icon;
             const isActive = stage.key === currentSection;
-            const isDisabled = idx > 1 && !datasetName;
 
             return (
-              <button
+              <div
                 key={stage.key}
-                disabled={isDisabled}
-                onClick={() => setCurrentSection(stage.key)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all duration-150 group relative ${isActive
+                role="status"
+                aria-current={isActive ? 'page' : undefined}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all duration-150 relative cursor-default ${isActive
                   ? 'bg-[#2563EB] text-white shadow-md font-semibold'
-                  : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/70'
-                  } ${isDisabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}
+                  : 'text-slate-400 opacity-60'
+                  }`}
               >
-                <Icon size={19} className={isActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-200'} />
+                <Icon size={19} className={isActive ? 'text-white' : 'text-slate-400'} />
                 {!isSidebarCollapsed && (
                   <span className="truncate text-left flex-1">{stage.label}</span>
                 )}
                 {!isSidebarCollapsed && isActive && (
                   <span className="w-1.5 h-1.5 rounded-full bg-white shrink-0 animate-pulse" />
                 )}
-              </button>
+              </div>
             );
           })}
         </nav>
@@ -423,33 +422,69 @@ export default function App() {
       {/* RIGHT MAIN CONTENT AREA */}
       <div className="flex-1 flex flex-col min-w-0 min-h-screen">
 
-        {/* STICKY TOP NAVIGATION NAVBAR (#FFFFFF) */}
-        <header role="banner" className="h-16 bg-white dark:bg-[#111827] border-b border-[#E2E8F0] dark:border-[#1F2937] px-8 flex items-center justify-between sticky top-0 z-30 shadow-xs">
+        {/* STICKY TOP STAGE NAVIGATION NAVBAR */}
+        <header role="banner" className="h-16 bg-white dark:bg-[#111827] border-b border-[#E2E8F0] dark:border-[#1F2937] px-6 sm:px-8 flex items-center justify-between sticky top-0 z-30 shadow-xs shrink-0">
 
-          {/* Breadcrumb Navigation */}
-          <div className="flex items-center gap-2 text-sm text-[#475569] dark:text-[#94A3B8]">
-            <span className="font-medium">Healthcare Analytics</span>
-            <ChevronRight size={14} className="text-[#94A3B8]" />
-            <span className="font-semibold text-[#0F172A] dark:text-white">{STAGES[currentIndex].label}</span>
+          {/* Left: Back Button */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handlePreviousStage}
+              disabled={currentIndex === 0}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border text-xs font-semibold transition-all shadow-xs ${
+                currentIndex === 0
+                  ? 'opacity-40 cursor-not-allowed border-slate-200 dark:border-slate-800 text-slate-400 bg-slate-50 dark:bg-slate-900/50'
+                  : 'cursor-pointer border-[#E2E8F0] dark:border-[#1F2937] text-slate-700 dark:text-slate-200 bg-white dark:bg-[#1E293B] hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-300'
+              }`}
+            >
+              <ChevronLeft size={15} />
+              <span>Back: {currentIndex > 0 ? STAGES[currentIndex - 1].label : 'Start'}</span>
+            </button>
           </div>
 
-          {/* Status & User Toolbar */}
-          <div className="flex items-center gap-4">
-
-            {/* Status Pill */}
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-[#F0FDF4] dark:bg-emerald-950/30 border border-[#DCFCE7] dark:border-emerald-900/50 text-[#16A34A] dark:text-emerald-400 text-xs font-semibold">
-              <span className="w-2 h-2 rounded-full bg-[#16A34A] dark:bg-emerald-400 animate-pulse" />
-              <span>STATUS: {getCurrentStatus()}</span>
+          {/* Center: Stage Number & Title + Status Pill */}
+          <div className="flex items-center gap-3">
+            <div className="text-xs font-medium text-[#475569] dark:text-[#94A3B8]">
+              Stage {currentIndex + 1} of {STAGES.length} –{' '}
+              <span className="font-bold text-[#0F172A] dark:text-white">
+                {STAGES[currentIndex].label}
+              </span>
             </div>
 
+            <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#F0FDF4] dark:bg-emerald-950/30 border border-[#DCFCE7] dark:border-emerald-900/50 text-[#16A34A] dark:text-emerald-400 text-[10px] font-bold">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#16A34A] dark:bg-emerald-400 animate-pulse" />
+              <span>STATUS: {getCurrentStatus()}</span>
+            </div>
+          </div>
+
+          {/* Right: Theme Toggle & Next Button */}
+          <div className="flex items-center gap-3">
             {/* Dark Mode Toggle */}
             <button
               onClick={() => setIsDarkMode(!isDarkMode)}
-              className="p-2 rounded-lg border border-[#E2E8F0] dark:border-[#1F2937] text-[#475569] dark:text-[#CBD5E1] hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B] transition-colors"
+              className="p-1.5 rounded-lg border border-[#E2E8F0] dark:border-[#1F2937] text-[#475569] dark:text-[#CBD5E1] hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B] transition-colors cursor-pointer"
               title="Toggle Light/Dark Theme"
             >
-              {isDarkMode ? <Sun size={18} className="text-amber-400" /> : <Moon size={18} />}
+              {isDarkMode ? <Sun size={16} className="text-amber-400" /> : <Moon size={16} />}
             </button>
+
+            {/* Next Stage Action */}
+            {currentIndex < STAGES.length - 1 ? (
+              <button
+                onClick={handleNextStage}
+                disabled={currentIndex === 1 && !datasetName}
+                className={`flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-bold text-white bg-[#2563EB] hover:bg-blue-700 shadow-sm transition-all ${
+                  currentIndex === 1 && !datasetName ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer hover:shadow'
+                }`}
+              >
+                <span>Next: {STAGES[currentIndex + 1].label}</span>
+                <ChevronRight size={15} />
+              </button>
+            ) : (
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/50 text-emerald-700 dark:text-emerald-400 text-xs font-bold shadow-xs">
+                <CheckCircle2 size={15} />
+                <span>Pipeline Verified</span>
+              </div>
+            )}
           </div>
         </header>
 
@@ -529,10 +564,7 @@ export default function App() {
           datasetName={datasetName}
           fields={fields}
           data={cleanedData}
-          aiKPIs={aiAnalysis ? aiAnalysis.kpis : null}
-          customCharts={customCharts}
-          onAddChart={handleAddChart}
-          onRemoveChart={handleRemoveChart}
+          onNavigateToAnalytics={() => setCurrentSection('analytics')}
           isDarkMode={isDarkMode}
           setIsDarkMode={setIsDarkMode}
         />
@@ -586,38 +618,6 @@ export default function App() {
       </div>
     )}
   </main>
-
-        {/* BOTTOM STAGE NAVIGATION CONTROL BAR */}
-        <div className="border-t border-[#E2E8F0] dark:border-[#1F2937] bg-white dark:bg-[#111827] px-8 py-4 flex items-center justify-between shrink-0">
-          <button
-            onClick={handlePreviousStage}
-            disabled={currentIndex === 0}
-            className={`btn-secondary text-sm ${currentIndex === 0 ? 'opacity-40 cursor-not-allowed' : ''}`}
-          >
-            <ChevronLeft size={16} />
-            <span>Back: {currentIndex > 0 ? STAGES[currentIndex - 1].label : 'Start'}</span>
-          </button>
-
-          <div className="text-xs font-medium text-[#475569] dark:text-[#94A3B8]">
-            Stage {currentIndex + 1} of {STAGES.length} – <span className="font-semibold text-[#0F172A] dark:text-white">{STAGES[currentIndex].label}</span>
-          </div>
-
-          {currentIndex < STAGES.length - 1 ? (
-            <button
-              onClick={handleNextStage}
-              disabled={currentIndex === 1 && !datasetName}
-              className={`btn-primary text-sm ${currentIndex === 1 && !datasetName ? 'opacity-40 cursor-not-allowed' : ''}`}
-            >
-              <span>Next: {STAGES[currentIndex + 1].label}</span>
-              <ChevronRight size={16} />
-            </button>
-          ) : (
-            <div className="badge badge-success text-xs font-semibold">
-              <CheckCircle2 size={14} />
-              <span>Pipeline Verified</span>
-            </div>
-          )}
-        </div>
 
         {/* FOOTER */}
         <footer className="border-t border-[#E2E8F0] dark:border-[#1F2937] bg-white dark:bg-[#111827] py-4 text-center text-xs text-[#94A3B8]">
