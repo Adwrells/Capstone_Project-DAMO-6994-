@@ -5,7 +5,7 @@ import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, Type } from "@google/genai";
 import dotenv from "dotenv";
 import { createRequire } from "module";
-const _require = typeof require !== "undefined" ? require : createRequire(typeof import.meta !== "undefined" && import.meta.url ? import.meta.url : "file://" + __filename);
+const _require = typeof require !== "undefined" ? require : createRequire(import.meta.url);
 const XLSX = _require("xlsx") as typeof import("xlsx");
 const BetterSQLite3 = _require("better-sqlite3");
 
@@ -2073,7 +2073,7 @@ Return strictly JSON matching the response schema.`;
 // ----------------------------------------------------
 // FASTAPI REVERSE PROXY FOR ADVANCED ANALYTICS
 // ----------------------------------------------------
-const FASTAPI_URL = process.env.API_URL || `http://127.0.0.1:${process.env.API_PORT || 8000}`;
+const FASTAPI_URL = process.env.API_URL || process.env.PYTHON_API_URL || `http://127.0.0.1:${process.env.API_PORT || 8000}`;
 const PROXIED_PREFIXES = [
   "/api/dashboard",
   "/api/statistics",
@@ -2082,30 +2082,69 @@ const PROXIED_PREFIXES = [
   "/api/user-datasets",
   "/api/insights",
   "/api/reports",
+  "/api/dataset",
+  "/api/health",
 ];
 
 PROXIED_PREFIXES.forEach(prefix => {
   app.use(prefix, async (req, res, next) => {
     try {
       const targetUrl = `${FASTAPI_URL}${req.originalUrl}`;
+      const forwardedHeaders: Record<string, string> = {
+        "Accept": (req.headers["accept"] as string) || "application/json",
+      };
+      if (req.headers["content-type"]) {
+        forwardedHeaders["Content-Type"] = req.headers["content-type"] as string;
+      }
+      const sessionId = req.headers["x-session-id"];
+      if (typeof sessionId === "string") {
+        forwardedHeaders["X-Session-Id"] = sessionId;
+      }
+
       const options: RequestInit = {
         method: req.method,
-        headers: {
-          "Content-Type": (req.headers["content-type"] as string) || "application/json",
-          "Accept": "application/json",
-        },
+        headers: forwardedHeaders,
+        signal: AbortSignal.timeout(60000),
       };
+
       if (req.method !== "GET" && req.method !== "HEAD" && req.body) {
         options.body = typeof req.body === "string" ? req.body : JSON.stringify(req.body);
+        if (!forwardedHeaders["Content-Type"]) {
+          forwardedHeaders["Content-Type"] = "application/json";
+        }
       }
+
       const response = await fetch(targetUrl, options);
-      const data = await response.text();
+      const contentType = response.headers.get("content-type") || "";
       res.status(response.status);
-      res.set("Content-Type", response.headers.get("content-type") || "application/json");
-      res.send(data);
+
+      if (contentType) {
+        res.set("Content-Type", contentType);
+      }
+      const contentDisposition = response.headers.get("content-disposition");
+      if (contentDisposition) {
+        res.set("Content-Disposition", contentDisposition);
+      }
+
+      if (contentType.includes("application/json")) {
+        const data = await response.json();
+        res.json(data);
+      } else {
+        const arrayBuf = await response.arrayBuffer();
+        res.send(Buffer.from(arrayBuf));
+      }
     } catch (err: any) {
       console.error(`[API Proxy Error] ${prefix} -> FastAPI (${FASTAPI_URL}):`, err.message);
-      next();
+      const offline = err?.name === "TypeError" || err?.cause?.code === "ECONNREFUSED";
+      if (!res.headersSent) {
+        res.status(offline ? 503 : 500).json({
+          success: false,
+          status: offline ? "backend_offline" : "proxy_error",
+          message: offline
+            ? "Python analytics backend is not reachable. Ensure FastAPI is running on port 8000."
+            : `Proxy failed: ${err?.message || "unknown error"}`
+        });
+      }
     }
   });
 });
