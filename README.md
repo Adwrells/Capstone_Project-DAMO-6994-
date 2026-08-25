@@ -131,15 +131,15 @@ The package is `graphifyy` (two y's); the command it installs is `graphify`.
 uv tool install --upgrade graphifyy
 ```
 
-`pip install graphifyy` works if you do not have `uv`. Then check that the command resolves
-on PATH, because the `PreToolUse` hooks in `.claude/settings.json` call it by bare name:
+`pip install graphifyy` works without `uv`. Then check that the command resolves on PATH,
+because the `PreToolUse` hooks in `.claude/settings.json` call it by bare name:
 
 ```bash
 graphify --version
 ```
 
 Until it resolves, those hooks fail on every Bash, Grep, Read and Glob call in Claude Code.
-If the command is not found, add your tool directory (`uv tool dir`, or pipx's
+If the command is not found, add the relevant tool directory (`uv tool dir`, or pipx's
 `~/.local/bin`) to PATH and reopen the terminal.
 
 Build the graph once by typing `/graphify .` at the **Claude Code prompt**, from the repo
@@ -547,8 +547,8 @@ Configured in `vitest.config.ts` (kept separate from `vite.config.ts`, whose dev
 settings are tuned for this environment and shouldn't be touched by test tooling), using
 `jsdom` + React Testing Library. One environment-specific note: the default `forks` worker
 pool fails to spawn on this checkout because the repo path contains spaces — `pool: 'threads'`
-is set explicitly to work around that; drop it if you move the repo to a space-free path and
-prefer the default.
+is set explicitly to work around that; it can be dropped if the repo is moved to a
+space-free path and the default pool is preferred.
 
 ---
 
