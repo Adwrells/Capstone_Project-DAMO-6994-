@@ -84,15 +84,23 @@ The **Healthcare Analytics Platform** is a full-stack, enterprise-grade clinical
 
 ## 3. Current Architecture Breakdown
 
-### 3.1 Frontend Architecture (`src/` & `frontend/`)
+### 3.1 Frontend Architecture (`frontend/src/`)
 - **Framework**: React 18 with Vite fast build tooling and TypeScript static typing.
 - **UI & Layout**: Tailwind CSS for responsive styling; Lucide React for consistent clinical iconography.
 - **Data Visualization**: Recharts engine rendering interactive line graphs, stacked bar charts, scatter plots, and volume heatmaps.
-- **Component Taxonomy**:
-  - `components/dashboard/`: `ExecutiveDashboard.tsx`, `AnalyticsEngine.tsx` (KPI cards, ERBI resource burden, macro summaries).
-  - `components/explorer/`: `DataExplorer.tsx`, `AnalyticsCore.tsx` (Tabular preview, data dictionary, summary stats, top-N problem analysis).
-  - `components/upload/`: `DatasetUpload.tsx` (CSV file drag-and-drop ingestion & validation wizard).
-  - `components/shared/`: `DataCleaning.tsx`, `AboutProject.tsx`, `ConsultantInsights.tsx`, `CustomChartBuilder.tsx`, `ExportReports.tsx`.
+- **Module & Component Taxonomy**:
+  - `pages/`:
+    - `ExecutiveDashboard/`: Executive KPIs, patient volume trends, ERBI resource burden, hypothesis evidence hub.
+    - `StatisticalAnalysis/`: `AnalyticsCore.tsx`, `AnalyticsEngine.tsx` for granular analytical breakdowns.
+    - `StrategicInsights/`: `ConsultantInsights.tsx` clinical and operational recommendations.
+    - `PrepQualityEngine/`: `DataCleaning.tsx`, `FitDiagnostics.tsx` for data hygiene and ML model fit validation.
+    - `DatasetExplorer/`: `DataExplorer.tsx` tabular browsing, summary metrics, and custom visual charts.
+    - `Reports/`: `ExportReports.tsx` PDF executive summaries, audit logs, and CSV data exports.
+    - `AboutProject/`: Academic capstone specifications, data limitations, and clinical problem statement.
+  - `components/`: Modular reusable UI components (`cards/MetricCard.tsx`, `charts/CustomChartBuilder.tsx`, `tables/DataTable.tsx`, `common/DatasetUpload.tsx`, `architecture/ArchitecturePipelineCard.tsx`).
+  - `services/`: Typed API client interfaces (`apiService.ts`, `architectureService.ts`, `modelDiagnosticsService.ts`, `userDatasetService.ts`).
+  - `utils/`: Centralized business utilities (`formatters.ts`, `biEngine.ts`, `printToPdf.ts`, `mockDatasets.ts`).
+  - `types/`: Canonical domain contracts and schemas (`types/domain.ts`, `types/index.ts`).
 
 ### 3.2 Backend Service Architecture (`backend/`)
 - **Framework**: FastAPI high-performance ASGI server with Pydantic schema validation.
