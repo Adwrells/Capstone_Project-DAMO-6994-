@@ -38,6 +38,15 @@ htmlcov/
 # Local working notes on data/statistics defects — not for distribution.
 MEMORY.md
 
+# Local module/library audit report generated from graphify — not for distribution.
+PIPELINE_MODULES_REPORT.md
+
+# Local backend-statistics study notes — not for distribution.
+BACKEND_STATISTICS_NOTES.md
+
+# Local dashboard engineering roadmap — not for distribution.
+DASHBOARD_ROADMAP.md
+
 # ─── Claude Code ────────────────────────────────────────────────────────
 # CLAUDE.md, .claude/CLAUDE.md, .claude/settings.json and .claude/skills/ are
 # COMMITTED ON PURPOSE so the graphify setup and project instructions reach the
