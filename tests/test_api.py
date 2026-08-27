@@ -77,6 +77,20 @@ class TestAPIEndpoints(unittest.TestCase):
         self.assertIn("boundariesNotProven", res)
         self.assertIn("decisionBoundaries", res)
 
+    def test_custom_dataset_export_direct(self):
+        from backend.api.dataset_explorer_api import download_custom_export
+        # Test XLSX export
+        xlsx_res = asyncio.run(download_custom_export(sheets="ED_Visits,CTAS_Triage", format="xlsx"))
+        self.assertIsNotNone(xlsx_res)
+
+        # Test single-sheet CSV export
+        csv_single = asyncio.run(download_custom_export(sheets="ED_Visits", format="csv"))
+        self.assertIsNotNone(csv_single)
+
+        # Test multi-sheet CSV ZIP export
+        csv_zip = asyncio.run(download_custom_export(sheets="all", format="csv"))
+        self.assertIsNotNone(csv_zip)
+
 
 if __name__ == "__main__":
     unittest.main()
