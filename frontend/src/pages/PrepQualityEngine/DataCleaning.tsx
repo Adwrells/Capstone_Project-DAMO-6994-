@@ -1214,6 +1214,58 @@ export default function DataCleaning({
         </div>
       )}
 
+      {/* ── 12. STAGE 2 TRANSITION & PROCEED ACTION ─────────────────────────── */}
+      <div className={`p-6 rounded-3xl border shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all ${
+        pipelineState === 'completed'
+          ? 'bg-emerald-500/10 dark:bg-emerald-950/30 border-emerald-500/30'
+          : 'bg-slate-50 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800'
+      }`}>
+        <div className="space-y-1">
+          <span className="text-[10px] font-bold uppercase tracking-wider font-mono block text-indigo-600 dark:text-indigo-400">
+            Stage 2 · Validation Status
+          </span>
+          {pipelineState === 'completed' ? (
+            <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-300 font-bold text-sm">
+              <CheckCircle2 size={18} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+              <span>Data preparation pipeline completed. Analytical datasets are verified and cached.</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400 text-xs font-medium">
+              <Lock size={16} className="text-amber-500 shrink-0" />
+              <span>Please run the <strong>Automated Data Preparation &amp; Validation Pipeline</strong> above before advancing to Stage 3.</span>
+            </div>
+          )}
+        </div>
+
+        <div>
+          {pipelineState === 'completed' ? (
+            <button
+              onClick={onNavigateNext}
+              className="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-bold text-sm shadow-md hover:shadow-lg transition flex items-center gap-2 cursor-pointer"
+            >
+              <span>Proceed to Stage 3: Dataset Explorer</span>
+              <ArrowRight size={16} />
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                const el = document.getElementById('run-prep-pipeline-btn');
+                if (el) {
+                  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  el.focus();
+                } else {
+                  executePipeline();
+                }
+              }}
+              className="px-5 py-2.5 rounded-2xl bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs transition flex items-center gap-2 cursor-pointer"
+            >
+              <PlaySquare size={14} />
+              <span>Go to Pipeline Execution Control</span>
+            </button>
+          )}
+        </div>
+      </div>
+
     </div>
   );
 }
