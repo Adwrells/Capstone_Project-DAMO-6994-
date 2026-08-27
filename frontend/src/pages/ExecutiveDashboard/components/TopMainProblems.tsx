@@ -41,16 +41,18 @@ export default function TopMainProblems({ isDarkMode }: TopMainProblemsProps) {
         dark ? 'bg-[#131f37] border-[#1e2d4a]' : 'bg-white border-slate-200'
       }`}
     >
-      <div>
+      <div className="space-y-1">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div>
-            <span className="text-[9px] font-extrabold uppercase tracking-widest text-[#0F4C81] dark:text-[#3B82F6] block">
+            <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#0F4C81] dark:text-[#3B82F6] block">
               Clinical Profiling · Primary Visual
             </span>
-            <h3 className={`text-sm font-extrabold ${dark ? 'text-white' : 'text-slate-900'}`}>
+            <h3 className={`text-base font-extrabold ${dark ? 'text-white' : 'text-slate-900'}`}>
               Top Main Presenting Problems
             </h3>
-            <p className="text-[10px] text-slate-400">Chief diagnostic complaints ranked by volume and stay duration</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-light">
+              Ranked by aggregate ED visit volume with reported median stay duration context
+            </p>
           </div>
 
           {/* Metric Switcher */}
@@ -80,17 +82,17 @@ export default function TopMainProblems({ isDarkMode }: TopMainProblemsProps) {
           </div>
         </div>
 
-        <div style={{ height: 230 }} className="mt-2">
+        <div style={{ height: 215 }} className="pt-2">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={sortedData}
               layout="vertical"
-              margin={{ top: 10, right: 65, bottom: 25, left: 135 }}
+              margin={{ top: 5, right: 65, bottom: 25, left: 145 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-slate-200/60 dark:text-slate-800/80" />
               <XAxis
                 type="number"
-                tick={{ fontSize: 9, fill: '#64748b', fontFamily: 'monospace' }}
+                tick={{ fontSize: 9.5, fill: '#64748b', fontFamily: 'monospace' }}
                 tickFormatter={v => (metric === 'visits' ? `${v}M` : `${v}h`)}
                 stroke="#94a3b8"
                 height={35}
@@ -99,7 +101,7 @@ export default function TopMainProblems({ isDarkMode }: TopMainProblemsProps) {
                   position: 'insideBottom',
                   offset: -10,
                   fill: dark ? '#94a3b8' : '#475569',
-                  fontSize: 9.5,
+                  fontSize: 10,
                   fontWeight: 700,
                   fontFamily: 'monospace'
                 }}
@@ -107,16 +109,16 @@ export default function TopMainProblems({ isDarkMode }: TopMainProblemsProps) {
               <YAxis
                 type="category"
                 dataKey="problem"
-                tick={{ fontSize: 9, fill: '#64748b', fontWeight: 600 }}
+                tick={{ fontSize: 9.5, fill: '#64748b', fontWeight: 600 }}
                 stroke="#94a3b8"
-                width={125}
+                width={135}
                 label={{
                   value: 'Chief Presenting Problem',
                   angle: -90,
                   position: 'insideLeft',
                   offset: -10,
                   fill: dark ? '#94a3b8' : '#475569',
-                  fontSize: 9.5,
+                  fontSize: 10,
                   fontWeight: 700,
                   fontFamily: 'monospace'
                 }}
@@ -124,8 +126,8 @@ export default function TopMainProblems({ isDarkMode }: TopMainProblemsProps) {
               <Tooltip
                 formatter={(val: any, _name: string, item: any) => [
                   metric === 'visits'
-                    ? `${fmtK(item.payload.visits)} visits (${item.payload.los_hours}h stay)`
-                    : `${item.payload.los_hours} hrs (${item.payload.los_min} min)`,
+                    ? `${fmtK(item.payload.visits)} visits (${item.payload.los_hours} h stay)`
+                    : `${item.payload.los_hours} h (${item.payload.los_min} min · ${fmtK(item.payload.visits)} visits)`,
                   item.payload.problem,
                 ]}
                 contentStyle={{
@@ -141,12 +143,12 @@ export default function TopMainProblems({ isDarkMode }: TopMainProblemsProps) {
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
                 <LabelList
-                  dataKey={metric === 'visits' ? 'visits_m' : 'los_hours'}
+                  dataKey={metric === 'visits' ? 'visits' : 'los_hours'}
                   position="right"
                   offset={8}
-                  formatter={(v: any) => metric === 'visits' ? `${Number(v).toFixed(1)}M` : `${Number(v).toFixed(2)} hrs`}
+                  formatter={(v: any) => metric === 'visits' ? fmtK(Number(v)) : `${Number(v).toFixed(2)} h`}
                   fill={dark ? '#E2E8F0' : '#1E293B'}
-                  fontSize={9.5}
+                  fontSize={10}
                   fontWeight={700}
                   fontFamily="monospace"
                 />
@@ -156,13 +158,13 @@ export default function TopMainProblems({ isDarkMode }: TopMainProblemsProps) {
         </div>
       </div>
 
-      {/* Clinical Context Footnote */}
-      <div className={`p-2.5 rounded-xl border text-[10px] leading-relaxed flex items-start gap-2 ${
+      {/* Two-Part Insight Callout */}
+      <div className={`p-2.5 rounded-xl border text-[10.5px] leading-relaxed flex items-start gap-2 ${
         dark ? 'bg-[#152033] border-[#1e2d4a] text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-600'
       }`}>
         <Stethoscope size={13} className="text-[#0F4C81] dark:text-[#3B82F6] shrink-0 mt-0.5" />
         <span>
-          <strong>Volume vs Complexity:</strong> <strong>Trauma</strong> accounts for highest arrival volume (31.5M visits), whereas <strong>Acute Myocardial Infarction</strong> demands the longest median emergency department stay duration (4.98 hrs).
+          <strong>Highest Volume:</strong> <strong>Trauma (31.5M visits)</strong> and <strong>Falls (10.0M visits)</strong> dominate ED intake · <strong>Longest Stay:</strong> <strong>Acute Myocardial Infarction (4.98 h)</strong> demands the longest median stay duration.
         </span>
       </div>
     </div>

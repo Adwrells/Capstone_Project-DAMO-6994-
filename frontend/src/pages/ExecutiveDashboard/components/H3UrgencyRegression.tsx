@@ -62,23 +62,23 @@ export default function H3UrgencyRegression({ isDarkMode }: H3UrgencyRegressionP
         dark ? 'bg-[#131f37] border-[#1e2d4a]' : 'bg-white border-slate-200'
       }`}
     >
-      <div>
+      <div className="space-y-1">
         <div className="flex items-center justify-between">
-          <div>
-            <span className="text-[9px] font-extrabold uppercase tracking-widest text-[#0F4C81] dark:text-[#3B82F6] block">
-              Hypothesis H3 · Primary Visual
-            </span>
-            <h3 className={`text-sm font-extrabold ${dark ? 'text-white' : 'text-slate-900'}`}>
-              CTAS Urgency Predicting LOS (WLS Regression)
-            </h3>
-            <p className="text-[10px] text-slate-400">Bubble Size = ED Visit Volume · WLS Line Overlay</p>
-          </div>
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+          <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#0F4C81] dark:text-[#3B82F6] block">
+            Hypothesis H3 · Primary Visual
+          </span>
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9.5px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
             <ShieldCheck size={11} /> Reject H₀ (p &lt; 0.0001)
           </span>
         </div>
+        <h3 className={`text-base font-extrabold ${dark ? 'text-white' : 'text-slate-900'}`}>
+          CTAS Urgency Predicting Reported LOS (WLS Regression)
+        </h3>
+        <p className="text-xs text-slate-500 dark:text-slate-400 font-light">
+          Weighted Least Squares regression · Bubble area is proportional to aggregate ED visit volume
+        </p>
 
-        <div style={{ height: 230 }} className="mt-2">
+        <div style={{ height: 215 }} className="pt-2">
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart
               data={SCATTER_BUBBLE_DATA}
@@ -91,7 +91,7 @@ export default function H3UrgencyRegression({ isDarkMode }: H3UrgencyRegressionP
                 name="Urgency Score"
                 domain={[0.5, 5.5]}
                 ticks={[1, 2, 3, 4, 5]}
-                tickFormatter={v => `L${v}`}
+                tickFormatter={v => `CTAS ${v}`}
                 tick={{ fontSize: 9.5, fill: '#64748b', fontFamily: 'monospace' }}
                 stroke="#94a3b8"
                 height={40}
@@ -99,7 +99,7 @@ export default function H3UrgencyRegression({ isDarkMode }: H3UrgencyRegressionP
                   value: 'CTAS Urgency Score (1 = Resuscitation → 5 = Non-Urgent)',
                   position: 'insideBottom',
                   offset: -10,
-                  fontSize: 9.5,
+                  fontSize: 10,
                   fill: dark ? '#94a3b8' : '#475569',
                   fontWeight: 700,
                   fontFamily: 'monospace'
@@ -109,7 +109,7 @@ export default function H3UrgencyRegression({ isDarkMode }: H3UrgencyRegressionP
                 type="number"
                 dataKey="los_hours"
                 name="Length of Stay"
-                domain={[0, 6]}
+                domain={[0, 7]}
                 tick={{ fontSize: 9.5, fill: '#64748b', fontFamily: 'monospace' }}
                 tickFormatter={v => `${v}h`}
                 stroke="#94a3b8"
@@ -119,13 +119,13 @@ export default function H3UrgencyRegression({ isDarkMode }: H3UrgencyRegressionP
                   angle: -90,
                   position: 'insideLeft',
                   offset: 0,
-                  fontSize: 9.5,
+                  fontSize: 10,
                   fill: dark ? '#94a3b8' : '#475569',
                   fontWeight: 700,
                   fontFamily: 'monospace'
                 }}
               />
-              <ZAxis type="number" dataKey="visits" range={[80, 500]} />
+              <ZAxis type="number" dataKey="visits" range={[100, 600]} />
               <Tooltip content={<CustomScatterTooltip />} />
               <Line
                 type="linear"
@@ -147,9 +147,9 @@ export default function H3UrgencyRegression({ isDarkMode }: H3UrgencyRegressionP
                   dataKey="los_hours"
                   position="top"
                   offset={10}
-                  formatter={(v: any) => `${Number(v).toFixed(2)}h`}
+                  formatter={(v: any) => `${Number(v).toFixed(2)} h`}
                   fill={dark ? '#38BDF8' : '#0284C7'}
-                  fontSize={9.5}
+                  fontSize={10}
                   fontWeight={700}
                   fontFamily="monospace"
                 />
@@ -159,22 +159,31 @@ export default function H3UrgencyRegression({ isDarkMode }: H3UrgencyRegressionP
         </div>
       </div>
 
+      {/* Analytical Takeaway Note */}
+      <div className={`px-3 py-1.5 rounded-lg border text-[10.5px] leading-relaxed ${
+        dark ? 'bg-[#152033]/60 border-[#1e2d4a] text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-600'
+      }`}>
+        <span>
+          <strong>Analytical Interpretation:</strong> CTAS urgency is a statistically significant aggregate explanatory variable (<em>R² = 0.316, p &lt; 0.0001</em>); substantial LOS variation remains unexplained by urgency alone.
+        </span>
+      </div>
+
       {/* Compact Evidence Panel */}
-      <div className="pt-2.5 border-t border-slate-100 dark:border-[#1e2d4a] grid grid-cols-4 gap-2 text-center text-[10px]">
+      <div className="pt-2 border-t border-slate-100 dark:border-[#1e2d4a] grid grid-cols-4 gap-2 text-center text-[10px]">
         <div className="p-1.5 rounded-lg bg-slate-50 dark:bg-[#182640]">
-          <span className="text-slate-400 block text-[8px] font-bold uppercase">Slope (β)</span>
-          <span className="font-mono font-bold text-slate-800 dark:text-slate-200">-1.94h/score</span>
+          <span className="text-slate-400 block text-[8.5px] font-bold uppercase">Slope (β)</span>
+          <span className="font-mono font-bold text-slate-800 dark:text-slate-200">-1.94 h/tier</span>
         </div>
         <div className="p-1.5 rounded-lg bg-slate-50 dark:bg-[#182640]">
-          <span className="text-slate-400 block text-[8px] font-bold uppercase">R-Squared</span>
+          <span className="text-slate-400 block text-[8.5px] font-bold uppercase">R-Squared</span>
           <span className="font-mono font-bold text-blue-600 dark:text-blue-400">R² = 0.316</span>
         </div>
         <div className="p-1.5 rounded-lg bg-slate-50 dark:bg-[#182640]">
-          <span className="text-slate-400 block text-[8px] font-bold uppercase">95% CI</span>
-          <span className="font-mono font-bold text-purple-600 dark:text-purple-400">[-127m, -105m]</span>
+          <span className="text-slate-400 block text-[8.5px] font-bold uppercase">95% CI</span>
+          <span className="font-mono font-bold text-purple-600 dark:text-purple-400">[-2.12h, -1.75h]</span>
         </div>
         <div className="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/40">
-          <span className="text-emerald-600 dark:text-emerald-400 block text-[8px] font-bold uppercase">Decision</span>
+          <span className="text-emerald-600 dark:text-emerald-400 block text-[8.5px] font-bold uppercase">Decision</span>
           <span className="font-bold text-emerald-700 dark:text-emerald-300">Reject H₀</span>
         </div>
       </div>

@@ -50,57 +50,63 @@ function CustomLOSTooltip({ active, payload, label }: any) {
 export default function LOSTrend({ data, isDarkMode }: LOSTrendProps) {
   const dark = isDarkMode;
 
+  const firstVal = Number(data[0]?.los_hours) || 0;
+  const latestVal = Number(data[data.length - 1]?.los_hours) || 0;
+  const maxVal = Math.max(...data.map(d => Number(d.los_hours) || 0));
+
   return (
     <div
-      className={`rounded-2xl border p-5 shadow-xs space-y-3 transition-colors ${
+      className={`rounded-2xl border p-5 shadow-xs space-y-3.5 transition-colors flex flex-col justify-between ${
         dark ? 'bg-[#131f37] border-[#1e2d4a]' : 'bg-white border-slate-200'
       }`}
     >
-      <div className="flex items-center justify-between">
-        <div>
-          <span className="text-[9px] font-extrabold uppercase tracking-widest text-[#0F4C81] dark:text-[#3B82F6] block">
+      <div className="space-y-1">
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#0F4C81] dark:text-[#3B82F6] block">
             System Overview · Visual B
           </span>
-          <h3 className={`text-sm font-extrabold ${dark ? 'text-white' : 'text-slate-900'}`}>
-            Reported Median LOS by Fiscal Year
-          </h3>
-          <p className="text-[10px] text-slate-400">Longitudinal duration trend with CIHI 6.0h benchmark threshold</p>
+          <span
+            className={`text-[9.5px] font-mono font-bold px-2.5 py-0.5 rounded-md border ${
+              dark ? 'bg-[#182640] border-[#1e2d4a] text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-600'
+            }`}
+          >
+            Units: Duration (Hours)
+          </span>
         </div>
-        <span
-          className={`text-[9px] font-mono font-bold px-2.5 py-1 rounded-md border ${
-            dark ? 'bg-[#182640] border-[#1e2d4a] text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-600'
-          }`}
-        >
-          Units: Hours
-        </span>
+        <h3 className={`text-base font-extrabold ${dark ? 'text-white' : 'text-slate-900'}`}>
+          Reported Median LOS by Fiscal Year
+        </h3>
+        <p className="text-xs text-slate-500 dark:text-slate-400 font-light">
+          19-year duration trajectory plotted against the approved CIHI 6.0h aggregate reference threshold
+        </p>
       </div>
 
-      <div style={{ height: 260 }}>
+      <div style={{ height: 230 }} className="my-1">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data} margin={{ top: 22, right: 20, bottom: 25, left: 15 }}>
+          <LineChart data={data} margin={{ top: 20, right: 25, bottom: 25, left: 15 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-slate-200/60 dark:text-slate-800/80" />
             <XAxis
               dataKey="fiscal_year"
-              tick={{ fontSize: 9, fill: '#64748b', fontFamily: 'monospace' }}
-              angle={-35}
+              tick={{ fontSize: 9.5, fill: '#64748b', fontFamily: 'monospace' }}
+              angle={-25}
               textAnchor="end"
               interval={1}
               stroke="#94a3b8"
-              height={45}
+              height={42}
               label={{
-                value: 'Fiscal Year (2003/04 - 2021/22)',
+                value: 'Fiscal Year (2003/04 – 2021/22)',
                 position: 'insideBottom',
-                offset: -12,
+                offset: -10,
                 fill: dark ? '#94a3b8' : '#475569',
-                fontSize: 9.5,
+                fontSize: 10,
                 fontWeight: 700,
                 fontFamily: 'monospace'
               }}
             />
             <YAxis
-              tick={{ fontSize: 9, fill: '#64748b', fontFamily: 'monospace' }}
+              tick={{ fontSize: 9.5, fill: '#64748b', fontFamily: 'monospace' }}
               tickFormatter={v => `${v}h`}
-              domain={[0, 'auto']}
+              domain={[0, 7]}
               stroke="#94a3b8"
               width={55}
               label={{
@@ -109,7 +115,7 @@ export default function LOSTrend({ data, isDarkMode }: LOSTrendProps) {
                 position: 'insideLeft',
                 offset: 0,
                 fill: dark ? '#94a3b8' : '#475569',
-                fontSize: 9.5,
+                fontSize: 10,
                 fontWeight: 700,
                 fontFamily: 'monospace'
               }}
@@ -121,10 +127,10 @@ export default function LOSTrend({ data, isDarkMode }: LOSTrendProps) {
               strokeDasharray="4 4"
               strokeWidth={1.5}
               label={{
-                value: 'CIHI Benchmark (6.0h)',
+                value: 'Reference Threshold: 6.0 h (CIHI Indicator)',
                 position: 'top',
                 fill: '#EF4444',
-                fontSize: 9,
+                fontSize: 9.5,
                 fontWeight: 700,
               }}
             />
@@ -133,22 +139,52 @@ export default function LOSTrend({ data, isDarkMode }: LOSTrendProps) {
               dataKey="los_hours"
               stroke="#F59E0B"
               strokeWidth={3}
-              dot={{ r: 3.5, fill: '#F59E0B', stroke: '#fff', strokeWidth: 1.5 }}
+              dot={(props: any) => {
+                const { cx, cy, index, value } = props;
+                const isMilestone = index === 0 || index === data.length - 1 || value === maxVal;
+                return (
+                  <circle
+                    key={`dot-${index}`}
+                    cx={cx}
+                    cy={cy}
+                    r={isMilestone ? 4.5 : 2.5}
+                    fill={isMilestone ? '#F59E0B' : '#FBBF24'}
+                    stroke="#fff"
+                    strokeWidth={1.5}
+                  />
+                );
+              }}
               activeDot={{ r: 6, fill: '#D97706', stroke: '#fff', strokeWidth: 2 }}
             >
               <LabelList
                 dataKey="los_hours"
                 position="top"
-                offset={6}
-                formatter={(v: any) => `${Number(v).toFixed(2)}h`}
+                offset={8}
+                formatter={(v: any) => {
+                  const num = Number(v);
+                  if (num === firstVal || num === latestVal) {
+                    return `${num.toFixed(2)} h`;
+                  }
+                  return '';
+                }}
                 fill={dark ? '#FCD34D' : '#D97706'}
-                fontSize={8}
+                fontSize={10.5}
                 fontWeight={700}
                 fontFamily="monospace"
               />
             </Line>
           </LineChart>
         </ResponsiveContainer>
+      </div>
+
+      {/* Key Analytical Annotation */}
+      <div className={`p-2.5 rounded-xl border text-[11px] leading-relaxed flex items-start gap-2 ${
+        dark ? 'bg-[#152033] border-[#1e2d4a] text-slate-300' : 'bg-amber-50/60 border-amber-100 text-slate-700'
+      }`}>
+        <span className="text-amber-600 dark:text-amber-400 font-bold shrink-0">⏱️ Benchmark Status:</span>
+        <span>
+          <strong>Latest Reported Median LOS:</strong> <strong>4.17 h</strong> in FY 2021-22 (+51.6% growth from 2.75 h in 2003-04; the aggregate departmental cohort remains within the 6.0 h reference threshold).
+        </span>
       </div>
     </div>
   );

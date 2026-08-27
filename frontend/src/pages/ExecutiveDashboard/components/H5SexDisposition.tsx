@@ -72,23 +72,28 @@ export default function H5SexDisposition({ isDarkMode }: H5SexDispositionProps) 
         dark ? 'bg-[#131f37] border-[#1e2d4a]' : 'bg-white border-slate-200'
       }`}
     >
-      <div>
-        <div className="flex items-center justify-between">
-          <div>
-            <span className="text-[9px] font-extrabold uppercase tracking-widest text-[#0F4C81] dark:text-[#3B82F6] block">
-              Hypothesis H5 · Primary Visual
-            </span>
-            <h3 className={`text-sm font-extrabold ${dark ? 'text-white' : 'text-slate-900'}`}>
-              Patient Sex vs Visit Disposition (100% Stacked Proportions)
-            </h3>
-            <p className="text-[10px] text-slate-400">Comparing Inpatient Admission Proportions between Female and Male cohorts</p>
-          </div>
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
-            <ShieldCheck size={11} /> Reject H₀ (p &lt; 0.0001)
+      <div className="space-y-1">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#0F4C81] dark:text-[#3B82F6] block">
+            Hypothesis H5 · Primary Visual
           </span>
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9.5px] font-bold bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+              <ShieldCheck size={11} /> p &lt; 0.0001 · Negligible Practical Effect (V = 0.010)
+            </span>
+            <span className="px-2 py-0.5 rounded-md text-[9px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+              Priority: Monitor
+            </span>
+          </div>
         </div>
+        <h3 className={`text-base font-extrabold ${dark ? 'text-white' : 'text-slate-900'}`}>
+          Patient Sex vs Visit Disposition (100% Stacked Proportions)
+        </h3>
+        <p className="text-xs text-slate-500 dark:text-slate-400 font-light">
+          Comparative inpatient admission proportions between Female and Male clinical cohorts across 175.76M encounters
+        </p>
 
-        <div style={{ height: 180 }} className="mt-2">
+        <div style={{ height: 175 }} className="pt-2">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={SEX_DISP_STACKED_DATA}
@@ -99,7 +104,7 @@ export default function H5SexDisposition({ isDarkMode }: H5SexDispositionProps) 
               <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-slate-200/60 dark:text-slate-800/80" />
               <XAxis
                 type="number"
-                tick={{ fontSize: 9, fill: '#64748b', fontFamily: 'monospace' }}
+                tick={{ fontSize: 9.5, fill: '#64748b', fontFamily: 'monospace' }}
                 tickFormatter={v => `${Math.round(v * 100)}%`}
                 stroke="#94a3b8"
                 domain={[0, 1]}
@@ -109,7 +114,7 @@ export default function H5SexDisposition({ isDarkMode }: H5SexDispositionProps) 
                   position: 'insideBottom',
                   offset: -10,
                   fill: dark ? '#94a3b8' : '#475569',
-                  fontSize: 9.5,
+                  fontSize: 10,
                   fontWeight: 700,
                   fontFamily: 'monospace'
                 }}
@@ -126,7 +131,7 @@ export default function H5SexDisposition({ isDarkMode }: H5SexDispositionProps) 
                   position: 'insideLeft',
                   offset: -10,
                   fill: dark ? '#94a3b8' : '#475569',
-                  fontSize: 9.5,
+                  fontSize: 10,
                   fontWeight: 700,
                   fontFamily: 'monospace'
                 }}
@@ -138,7 +143,7 @@ export default function H5SexDisposition({ isDarkMode }: H5SexDispositionProps) 
                   position="center"
                   formatter={(v: any) => `${Number(v).toFixed(1)}%`}
                   fill="#ffffff"
-                  fontSize={10}
+                  fontSize={10.5}
                   fontWeight={700}
                   fontFamily="monospace"
                 />
@@ -149,7 +154,7 @@ export default function H5SexDisposition({ isDarkMode }: H5SexDispositionProps) 
                   position="center"
                   formatter={(v: any) => `${Number(v).toFixed(1)}%`}
                   fill="#ffffff"
-                  fontSize={10}
+                  fontSize={10.5}
                   fontWeight={700}
                   fontFamily="monospace"
                 />
@@ -159,7 +164,7 @@ export default function H5SexDisposition({ isDarkMode }: H5SexDispositionProps) 
         </div>
 
         {/* Legend */}
-        <div className="flex items-center justify-center gap-6 text-[11px] font-medium text-slate-500 dark:text-slate-400">
+        <div className="flex items-center justify-center gap-6 text-[11px] font-medium text-slate-500 dark:text-slate-400 pt-1">
           <div className="flex items-center gap-2">
             <span className="w-3 h-3 rounded-sm bg-[#10B981]" />
             <span>Non-Admitted Discharges (~90%)</span>
@@ -171,23 +176,32 @@ export default function H5SexDisposition({ isDarkMode }: H5SexDispositionProps) 
         </div>
       </div>
 
+      {/* Analytical Callout Note */}
+      <div className={`px-3 py-1.5 rounded-lg border text-[10.5px] leading-relaxed ${
+        dark ? 'bg-[#152033]/60 border-[#1e2d4a] text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-600'
+      }`}>
+        <span>
+          <strong>Practical Assessment:</strong> Difference in admitted proportion is only <strong>+0.61 percentage points</strong> (9.95% Female vs 10.56% Male). Statistical detectability is driven by the massive sample size (N = 175.76M); operational effect is negligible.
+        </span>
+      </div>
+
       {/* Compact Evidence Panel */}
-      <div className="pt-2.5 border-t border-slate-100 dark:border-[#1e2d4a] grid grid-cols-4 gap-2 text-center text-[10px]">
+      <div className="pt-2 border-t border-slate-100 dark:border-[#1e2d4a] grid grid-cols-4 gap-2 text-center text-[10px]">
         <div className="p-1.5 rounded-lg bg-slate-50 dark:bg-[#182640]">
-          <span className="text-slate-400 block text-[8px] font-bold uppercase">Method</span>
+          <span className="text-slate-400 block text-[8.5px] font-bold uppercase">Method</span>
           <span className="font-bold text-slate-800 dark:text-slate-200 truncate">Pearson Chi-Square</span>
         </div>
         <div className="p-1.5 rounded-lg bg-slate-50 dark:bg-[#182640]">
-          <span className="text-slate-400 block text-[8px] font-bold uppercase">Chi-Square (χ²)</span>
+          <span className="text-slate-400 block text-[8.5px] font-bold uppercase">Chi-Square (χ²)</span>
           <span className="font-mono font-bold text-blue-600 dark:text-blue-400">χ² = 18,165</span>
         </div>
         <div className="p-1.5 rounded-lg bg-slate-50 dark:bg-[#182640]">
-          <span className="text-slate-400 block text-[8px] font-bold uppercase">Cramér's V</span>
+          <span className="text-slate-400 block text-[8.5px] font-bold uppercase">Cramér's V</span>
           <span className="font-mono font-bold text-amber-500">V = 0.010 (Negligible)</span>
         </div>
-        <div className="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/40">
-          <span className="text-emerald-600 dark:text-emerald-400 block text-[8px] font-bold uppercase">Decision</span>
-          <span className="font-bold text-emerald-700 dark:text-emerald-300">Reject H₀</span>
+        <div className="p-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40">
+          <span className="text-amber-600 dark:text-amber-400 block text-[8.5px] font-bold uppercase">Decision</span>
+          <span className="font-bold text-amber-700 dark:text-amber-300">Reject H₀ (Negligible)</span>
         </div>
       </div>
     </div>
