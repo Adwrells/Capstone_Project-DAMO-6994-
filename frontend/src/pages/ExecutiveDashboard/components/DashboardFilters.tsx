@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Filter, RefreshCw, X, ChevronDown, Check } from 'lucide-react';
+import { Filter, RefreshCw, X, ChevronDown, Check, PlusCircle } from 'lucide-react';
 import { FilterState } from './types';
 
 interface DashboardFiltersProps {
@@ -13,6 +13,7 @@ interface DashboardFiltersProps {
   filters: FilterState;
   onFilterChange: (key: keyof FilterState, values: string[]) => void;
   onResetFilters: () => void;
+  onCreateVisual?: () => void;
   isDarkMode: boolean;
 }
 
@@ -115,6 +116,7 @@ export default function DashboardFilters({
   filters,
   onFilterChange,
   onResetFilters,
+  onCreateVisual,
   isDarkMode,
 }: DashboardFiltersProps) {
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
@@ -207,16 +209,29 @@ export default function DashboardFilters({
           </div>
         </div>
 
-        {/* Reset Filters Action */}
-        {totalActive > 0 && (
-          <button
-            type="button"
-            onClick={onResetFilters}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-xl border text-[10px] font-bold text-rose-500 border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/20 hover:bg-rose-100 dark:hover:bg-rose-900/40 cursor-pointer transition shrink-0"
-          >
-            <RefreshCw size={11} /> Reset Filters
-          </button>
-        )}
+        {/* Actions: Create Visual & Reset Filters */}
+        <div className="flex items-center gap-2 shrink-0">
+          {onCreateVisual && (
+            <button
+              type="button"
+              onClick={onCreateVisual}
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border text-[11px] font-bold bg-[#0F4C81] hover:bg-[#0c3e6b] dark:bg-[#3B82F6] dark:hover:bg-[#2563eb] text-white border-transparent shadow-2xs hover:shadow-xs cursor-pointer transition shrink-0 select-none"
+            >
+              <PlusCircle size={13} className="shrink-0" />
+              <span>Create Visual</span>
+            </button>
+          )}
+
+          {totalActive > 0 && (
+            <button
+              type="button"
+              onClick={onResetFilters}
+              className="flex items-center gap-1 px-3 py-1.5 rounded-xl border text-[10px] font-bold text-rose-500 border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/20 hover:bg-rose-100 dark:hover:bg-rose-900/40 cursor-pointer transition shrink-0"
+            >
+              <RefreshCw size={11} /> Reset Filters
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Active Filter Tags */}

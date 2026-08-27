@@ -577,6 +577,9 @@ export default function App() {
           datasetName={datasetName}
           fields={fields}
           data={cleanedData}
+          customCharts={customCharts}
+          onAddChart={handleAddChart}
+          onRemoveChart={handleRemoveChart}
           onNavigateToAnalytics={() => setCurrentSection('analytics')}
           isDarkMode={isDarkMode}
           setIsDarkMode={setIsDarkMode}
