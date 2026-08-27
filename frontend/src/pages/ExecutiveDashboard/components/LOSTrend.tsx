@@ -8,6 +8,7 @@ import {
   CartesianGrid,
   Tooltip,
   ReferenceLine,
+  LabelList,
 } from 'recharts';
 import { TrendDataPoint } from './types';
 import { fmtHours, fmtMinutes } from './formatters';
@@ -76,7 +77,7 @@ export default function LOSTrend({ data, isDarkMode }: LOSTrendProps) {
 
       <div style={{ height: 260 }}>
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data} margin={{ top: 15, right: 20, bottom: 35, left: 10 }}>
+          <LineChart data={data} margin={{ top: 22, right: 20, bottom: 35, left: 10 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-slate-200/60 dark:text-slate-800/80" />
             <XAxis
               dataKey="fiscal_year"
@@ -113,7 +114,18 @@ export default function LOSTrend({ data, isDarkMode }: LOSTrendProps) {
               strokeWidth={3}
               dot={{ r: 3.5, fill: '#F59E0B', stroke: '#fff', strokeWidth: 1.5 }}
               activeDot={{ r: 6, fill: '#D97706', stroke: '#fff', strokeWidth: 2 }}
-            />
+            >
+              <LabelList
+                dataKey="los_hours"
+                position="top"
+                offset={6}
+                formatter={(v: any) => `${Number(v).toFixed(2)}h`}
+                fill={dark ? '#FCD34D' : '#D97706'}
+                fontSize={8}
+                fontWeight={700}
+                fontFamily="monospace"
+              />
+            </Line>
           </LineChart>
         </ResponsiveContainer>
       </div>

@@ -8,6 +8,7 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
+  LabelList,
 } from 'recharts';
 import { ShieldCheck } from 'lucide-react';
 import { fmtPct, fmtP } from './formatters';
@@ -111,8 +112,28 @@ export default function H5SexDisposition({ isDarkMode }: H5SexDispositionProps) 
                 width={55}
               />
               <Tooltip content={<CustomH5Tooltip />} />
-              <Bar dataKey="Non-Admitted" stackId="a" fill="#10B981" barSize={24} name="Non-Admitted (%)" />
-              <Bar dataKey="Admitted" stackId="a" fill="#EF4444" barSize={24} name="Admitted Inpatient (%)" />
+              <Bar dataKey="Non-Admitted" stackId="a" fill="#10B981" barSize={24} name="Non-Admitted (%)">
+                <LabelList
+                  dataKey="Non-Admitted"
+                  position="center"
+                  formatter={(v: any) => `${Number(v).toFixed(1)}%`}
+                  fill="#ffffff"
+                  fontSize={10}
+                  fontWeight={700}
+                  fontFamily="monospace"
+                />
+              </Bar>
+              <Bar dataKey="Admitted" stackId="a" fill="#EF4444" barSize={24} name="Admitted Inpatient (%)">
+                <LabelList
+                  dataKey="Admitted"
+                  position="center"
+                  formatter={(v: any) => `${Number(v).toFixed(1)}%`}
+                  fill="#ffffff"
+                  fontSize={10}
+                  fontWeight={700}
+                  fontFamily="monospace"
+                />
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>

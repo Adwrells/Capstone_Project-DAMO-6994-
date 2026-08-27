@@ -51,12 +51,6 @@
 - **$H_1$:** At least one CTAS level has a different reported median ED LOS
 - **$\alpha$:** $0.05$ (two-sided); **Data:** SQLite-loaded processed dataset
 
-- **Statistical Finding:**  
-  The weighted Kruskal–Wallis test yields $H = 126,276,098.896$ ($\text{df} = 2$, $p < 0.0001$). Effect size $\varepsilon^2 = 0.2848$ characterises the proportion of rank-variance explained by CTAS grouping. 3 of 3 pairwise comparisons remain significant after Bonferroni correction.
-- **Clinical Workflow Context:**  
-  Aggregate ED visit records exhibit a systematic gradient in reported median LOS across CTAS triage categories. Higher-acuity triage groups are associated with longer reported median stays at the aggregate level, consistent with the clinical intensity those categories represent across the full dataset.
-- **Operational Implication:**  
-  Triage-stratified aggregate LOS estimates support resource allocation modelling. Capacity planning frameworks can apply CTAS-specific LOS benchmarks to project hourly ED occupancy demand and align staffing levels with expected case-mix distributions across fiscal periods.
 
 ---
 
@@ -89,12 +83,6 @@
 - **$H_1$:** The distributions differ (two-sided; direction not assumed a priori)
 - **$\alpha$:** $0.05$; **Data:** SQLite-loaded processed dataset
 
-- **Statistical Finding:**  
-  Weighted Mann–Whitney $U = 905,919,210,631,107.0$ ($p < 0.0001$, $r_b = 0.0042$, median difference = $0.100\text{ hrs}$). The null hypothesis is rejected at $\alpha = 0.05$, indicating a statistically significant difference in the rank-distribution of reported median ED LOS between the two periods. No directional assumption was made a priori.
-- **Clinical Workflow Context:**  
-  The comparison is conducted at the aggregate fiscal-year record level. Any observed difference in rank-distribution reflects changes in aggregate reporting patterns across the two time periods, not changes in individual-level care experiences. Both periods are compared as whole fiscal-year aggregate units.
-- **Operational Implication:**  
-  Aggregate LOS reporting differences across fiscal periods can inform retrospective capacity review and prospective contingency modelling. Understanding whether specific fiscal periods were associated with systematically different aggregate LOS distributions supports surge-preparedness planning without making assumptions about causal mechanisms.
 
 ---
 
@@ -140,12 +128,6 @@
 - **Interpretation Unit:** Aggregate age-group records only — no individual-level inference
 - **Data Source:** SQLite-loaded processed dataset
 
-- **Statistical Finding:**  
-  The WLS model explains 88.0% of weighted variance ($\text{Adj. } R^2 = 0.8800$) in reported aggregate median ED LOS. Significant predictors ($p < 0.05$) appear as solid squares in the forest plot and are highlighted in the coefficient table.
-- **Clinical Workflow Context:**  
-  The WLS regression operates on aggregate records where each observation represents a combination of age group, triage level, and disposition. Beta coefficients quantify the average difference in reported aggregate median LOS associated with each predictor category relative to its reference, holding other predictors constant — interpreted at the aggregate stratum level only.
-- **Operational Implication:**  
-  Aggregate-level predictor coefficients can inform capacity planning by identifying which combinations of triage level, age group, and disposition are associated with systematically higher reported median LOS. These estimates can weight demand forecasts according to expected case-mix compositions in future fiscal periods.
 
 ---
 
@@ -193,12 +175,6 @@
 - **$H_1$:** At least one disposition category has a different reported median ED LOS
 - **$\alpha$:** $0.05$; **Data:** SQLite-loaded processed dataset
 
-- **Statistical Finding:**  
-  The weighted Kruskal–Wallis test yields $H = 76,181,576.530$ ($\text{df} = 5$, $p < 0.0001$), $\varepsilon^2 = 0.1706$. 15 pairwise comparisons remain significant after Bonferroni correction.
-- **Clinical Workflow Context:**  
-  Aggregate records stratified by disposition category exhibit systematic differences in reported median ED LOS. These aggregate-level patterns reflect the differing care processes, resource requirements, and bed-management pathways associated with each disposition outcome across the full dataset.
-- **Operational Implication:**  
-  Disposition-stratified aggregate LOS estimates provide a quantitative basis for patient-flow modelling. Planners can use the distribution of disposition outcomes combined with category-specific median LOS to project total ED occupancy and identify disposition pathways where process redesign would yield the greatest throughput improvement.
 
 ---
 
@@ -230,12 +206,6 @@
 - **$H_1$:** A monotonic trend (increasing or decreasing) exists across fiscal years
 - **$\alpha$:** $0.05$ (two-sided); **Data:** SQLite-loaded processed dataset
 
-- **Statistical Finding:**  
-  Mann–Kendall $\tau = 0.9766$ ($p < 0.0001$, trend: increasing). A statistically significant monotonic increasing trend is detected in the ERBI series across fiscal years. SES projects FY+1 $\approx 6592.41\text{M min}$ and FY+2 $\approx 6592.41\text{M min}$, with 95% CIs shown on the chart.
-- **Clinical Workflow Context:**  
-  The Estimated Emergency Department Resource Burden Index (ERBI) aggregates reported median LOS and visit volume into a single fiscal-year metric. Changes over time reflect combined shifts in both aggregate visit volume and reported median duration per visit across the full dataset.
-- **Operational Implication:**  
-  SES-based projections of the ERBI metric provide a baseline for near-term capacity planning. The 95% prediction intervals widen over time to reflect forecast uncertainty, serving as an exploratory indicator for prospective resource allocation.
 
 ---
 
