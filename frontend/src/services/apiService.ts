@@ -131,8 +131,17 @@ export async function fetchSummaryStatistics(tableName: string = 'ED_Visits', pa
  * Fetches strategic consultant recommendations and bottleneck analysis.
  */
 export async function fetchInsights(): Promise<any> {
-  const response = await fetch(`${API_BASE_URL}/insights`);
+  const response = await fetch(`${API_BASE_URL}/insights/recommendations`);
   if (!response.ok) throw new Error(`Failed to fetch consultant insights (${response.status})`);
+  return response.json();
+}
+
+/**
+ * Fetches the synthesized Stage 6 Strategic Decision Support insights payload.
+ */
+export async function fetchStrategicInsights(): Promise<any> {
+  const response = await fetch(`${API_BASE_URL}/insights/strategic`);
+  if (!response.ok) throw new Error(`Failed to fetch strategic insights synthesis (${response.status})`);
   return response.json();
 }
 

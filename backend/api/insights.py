@@ -20,10 +20,41 @@ except ImportError:
 
 try:
     from backend.services.insights_service import DATA_SOURCE, insights_service
+    from backend.services.strategic_synthesis_service import strategic_synthesis_service
 except ImportError:
     from services.insights_service import DATA_SOURCE, insights_service
+    from services.strategic_synthesis_service import strategic_synthesis_service
 
 router = APIRouter(prefix="/api/insights", tags=["Insights"])
+
+
+@router.get("/strategic")
+async def get_strategic_insights() -> Dict[str, Any]:
+    """
+    GET /api/insights/strategic
+
+    Stage 6 Decision-Support endpoint. Synthesises all completed H1–H5 hypothesis
+    results, WLS regression, Mann-Kendall trend, SES forecast, and ERBI metrics
+    into a single structured payload following the StrategicInsight data contract.
+
+    Returns:
+      - keyInsights (4 cards: H1, H2, H3, TREND)
+      - evidenceMatrix (H1–H5 full rows)
+      - recommendations (3 priority recommendations)
+      - roadmap (3 horizons)
+      - decisionBoundaries (mandatory limitations)
+
+    All numerical values are dynamic from the completed analysis.
+    No hardcoded estimates or unsupported benefits are generated.
+    """
+    try:
+        payload = strategic_synthesis_service.synthesise()
+        return {"success": True, **payload}
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Strategic synthesis failed: {str(e)}"
+        )
 
 
 @router.get("/recommendations")

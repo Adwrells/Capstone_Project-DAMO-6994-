@@ -15,6 +15,7 @@ from backend.api.statistics import (
     get_statistics_dashboard,
 )
 from backend.api.dashboard import get_dashboard_kpis, get_dashboard_summary
+from backend.api.insights import get_strategic_insights
 
 
 class TestAPIEndpoints(unittest.TestCase):
@@ -63,6 +64,16 @@ class TestAPIEndpoints(unittest.TestCase):
         self.assertTrue(summary["success"])
         self.assertIn("tables", summary)
 
+    def test_strategic_insights_synthesis_direct(self):
+        res = asyncio.run(get_strategic_insights())
+        self.assertTrue(res["success"])
+        self.assertEqual(len(res["keyInsights"]), 4)
+        self.assertEqual(len(res["evidenceMatrix"]), 5)
+        self.assertEqual(len(res["recommendations"]), 3)
+        self.assertIn("roadmap", res)
+        self.assertIn("decisionBoundaries", res)
+
 
 if __name__ == "__main__":
     unittest.main()
+
