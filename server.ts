@@ -2253,8 +2253,14 @@ PROXIED_PREFIXES.forEach(prefix => {
 
 // Configure Vite integration for Full-Stack development / Production
 async function startServer() {
-  // Ensure the Python analytics backend is up and running
-  await ensurePythonBackendRunning();
+  // When launched via launch.py, MANAGED_BY_LAUNCHER=1 is set and the Python
+  // backend is already running (managed externally). Skip the auto-start to
+  // prevent two conflicting uvicorn processes on the same port.
+  if (process.env.MANAGED_BY_LAUNCHER === "1") {
+    console.log("[Unified Server] Managed by launch.py — skipping Python auto-start (FastAPI already running).");
+  } else {
+    await ensurePythonBackendRunning();
+  }
 
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
