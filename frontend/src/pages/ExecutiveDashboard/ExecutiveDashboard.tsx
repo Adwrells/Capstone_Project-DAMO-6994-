@@ -31,8 +31,10 @@ import TopMainProblems from './components/TopMainProblems';
 import ResourceBurdenTrend from './components/ResourceBurdenTrend';
 import HypothesisEvidenceHub from './components/HypothesisEvidenceHub';
 import DescriptiveStatsTable from './components/DescriptiveStatsTable';
+import CustomChartBuilder from '../../components/charts/CustomChartBuilder';
 import { DashboardKPIs, TrendDataPoint, FilterState } from './components/types';
 import { KPIItem, CustomVisualization } from '../../utils/types';
+import { Sparkles, X, PlusCircle } from 'lucide-react';
 
 interface ExecutiveDashboardProps {
   datasetName: string;
@@ -74,6 +76,9 @@ export default function ExecutiveDashboard({
   datasetName,
   fields,
   data,
+  customCharts,
+  onAddChart,
+  onRemoveChart,
   onNavigateToAnalytics,
   isDarkMode = false,
   setIsDarkMode,
@@ -84,6 +89,27 @@ export default function ExecutiveDashboard({
   const [backendKPIs, setBackendKPIs] = useState<DashboardKPIs | null>(null);
   const [trendSeries, setTrendSeries] = useState<TrendDataPoint[]>(DEFAULT_TREND_SERIES);
   const [isLoading, setIsLoading] = useState(false);
+
+  // ── Visual Studio / Custom Chart Builder State ─────────────────────────────
+  const [isVisualBuilderOpen, setIsVisualBuilderOpen] = useState(false);
+  const [localCustomCharts, setLocalCustomCharts] = useState<CustomVisualization[]>(customCharts || []);
+
+  useEffect(() => {
+    if (customCharts) {
+      setLocalCustomCharts(customCharts);
+    }
+  }, [customCharts]);
+
+  const handleAddCustomChart = (chart: CustomVisualization) => {
+    setLocalCustomCharts(prev => [...prev, chart]);
+    onAddChart?.(chart);
+    setIsVisualBuilderOpen(false);
+  };
+
+  const handleRemoveCustomChart = (id: string) => {
+    setLocalCustomCharts(prev => prev.filter(c => c.id !== id));
+    onRemoveChart?.(id);
+  };
 
   // ── Central Filter State ───────────────────────────────────────────────────
   const [filters, setFilters] = useState<FilterState>({
@@ -233,6 +259,7 @@ export default function ExecutiveDashboard({
         filters={filters}
         onFilterChange={handleFilterChange}
         onResetFilters={handleResetFilters}
+        onCreateVisual={() => setIsVisualBuilderOpen(true)}
         isDarkMode={dark}
       />
 
@@ -316,6 +343,57 @@ export default function ExecutiveDashboard({
         fields={fields}
         isDarkMode={dark}
       />
+
+      {/* ══ VISUAL BUILDER MODAL ═════════════════════════════════════════════ */}
+      {isVisualBuilderOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/75 backdrop-blur-md overflow-y-auto animate-in fade-in duration-150"
+          onClick={() => setIsVisualBuilderOpen(false)}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            className={`relative w-full max-w-6xl max-h-[92vh] flex flex-col rounded-3xl border shadow-2xl overflow-hidden transition-colors ${
+              dark ? 'bg-[#0F172A] border-[#1e2d4a] text-slate-100' : 'bg-white border-slate-200 text-slate-900'
+            }`}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-[#1e2d4a] shrink-0 bg-slate-50/50 dark:bg-[#131f37]/50">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-[#0F4C81] to-[#3B82F6] flex items-center justify-center text-white shadow-xs">
+                  <Sparkles size={17} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-extrabold leading-tight text-slate-900 dark:text-white">
+                    Interactive Visual Studio &amp; AI Chart Designer
+                  </h3>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 font-light">
+                    Build custom aggregated charts, analytics overlays, and cross-cuts from active dataset records.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsVisualBuilderOpen(false)}
+                className="w-8 h-8 rounded-xl flex items-center justify-center border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-rose-500 hover:border-rose-300 dark:hover:border-rose-800 cursor-pointer transition"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+              <CustomChartBuilder
+                fields={fields}
+                data={filteredData.length ? filteredData : data}
+                customCharts={localCustomCharts}
+                onAddChart={handleAddCustomChart}
+                onRemoveChart={handleRemoveCustomChart}
+                isDarkMode={dark}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Footer Provenance */}
       <p className={`text-center text-[10px] font-mono py-2 ${dark ? 'text-slate-600' : 'text-slate-400'}`}>
