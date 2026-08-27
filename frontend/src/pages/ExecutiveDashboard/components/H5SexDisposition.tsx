@@ -68,7 +68,7 @@ export default function H5SexDisposition({ isDarkMode }: H5SexDispositionProps) 
 
   return (
     <div
-      className={`rounded-2xl border p-5 shadow-xs space-y-3.5 transition-colors flex flex-col justify-between ${
+      className={`rounded-2xl border p-6 shadow-xs space-y-4 transition-colors flex flex-col justify-between h-full ${
         dark ? 'bg-[#131f37] border-[#1e2d4a]' : 'bg-white border-slate-200'
       }`}
     >
@@ -93,28 +93,28 @@ export default function H5SexDisposition({ isDarkMode }: H5SexDispositionProps) 
           Comparative inpatient admission proportions between Female and Male clinical cohorts across 175.76M encounters
         </p>
 
-        <div style={{ height: 175 }} className="pt-2">
+        <div className="h-[190px] pt-2 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={SEX_DISP_STACKED_DATA}
               layout="vertical"
-              margin={{ top: 10, right: 30, bottom: 25, left: 75 }}
+              margin={{ top: 10, right: 30, bottom: 30, left: 10 }}
               stackOffset="expand"
             >
               <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-slate-200/60 dark:text-slate-800/80" />
               <XAxis
                 type="number"
-                tick={{ fontSize: 9.5, fill: '#64748b', fontFamily: 'monospace' }}
+                tick={{ fontSize: 10, fill: dark ? '#94a3b8' : '#64748b', fontFamily: 'monospace' }}
                 tickFormatter={v => `${Math.round(v * 100)}%`}
                 stroke="#94a3b8"
                 domain={[0, 1]}
-                height={35}
+                height={38}
                 label={{
                   value: 'Visit Disposition Proportion (%)',
                   position: 'insideBottom',
-                  offset: -10,
+                  offset: -12,
                   fill: dark ? '#94a3b8' : '#475569',
-                  fontSize: 10,
+                  fontSize: 11,
                   fontWeight: 700,
                   fontFamily: 'monospace'
                 }}
@@ -122,39 +122,29 @@ export default function H5SexDisposition({ isDarkMode }: H5SexDispositionProps) 
               <YAxis
                 type="category"
                 dataKey="short"
-                tick={{ fontSize: 10, fill: '#64748b', fontWeight: 600 }}
+                tick={{ fontSize: 11, fill: dark ? '#cbd5e1' : '#475569', fontWeight: 600 }}
                 stroke="#94a3b8"
-                width={65}
-                label={{
-                  value: 'Patient Sex',
-                  angle: -90,
-                  position: 'insideLeft',
-                  offset: -10,
-                  fill: dark ? '#94a3b8' : '#475569',
-                  fontSize: 10,
-                  fontWeight: 700,
-                  fontFamily: 'monospace'
-                }}
+                width={80}
               />
               <Tooltip content={<CustomH5Tooltip />} />
-              <Bar dataKey="Non-Admitted" stackId="a" fill="#10B981" barSize={24} name="Non-Admitted (%)">
+              <Bar dataKey="Non-Admitted" stackId="a" fill="#10B981" barSize={26} name="Non-Admitted (%)">
                 <LabelList
                   dataKey="Non-Admitted"
                   position="center"
                   formatter={(v: any) => `${Number(v).toFixed(1)}%`}
                   fill="#ffffff"
-                  fontSize={10.5}
+                  fontSize={11}
                   fontWeight={700}
                   fontFamily="monospace"
                 />
               </Bar>
-              <Bar dataKey="Admitted" stackId="a" fill="#EF4444" barSize={24} name="Admitted Inpatient (%)">
+              <Bar dataKey="Admitted" stackId="a" fill="#EF4444" barSize={26} name="Admitted Inpatient (%)">
                 <LabelList
                   dataKey="Admitted"
                   position="center"
                   formatter={(v: any) => `${Number(v).toFixed(1)}%`}
                   fill="#ffffff"
-                  fontSize={10.5}
+                  fontSize={11}
                   fontWeight={700}
                   fontFamily="monospace"
                 />
@@ -177,7 +167,7 @@ export default function H5SexDisposition({ isDarkMode }: H5SexDispositionProps) 
       </div>
 
       {/* Analytical Callout Note */}
-      <div className={`px-3 py-1.5 rounded-lg border text-[10.5px] leading-relaxed ${
+      <div className={`px-3 py-2 rounded-xl border text-[11px] leading-relaxed ${
         dark ? 'bg-[#152033]/60 border-[#1e2d4a] text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-600'
       }`}>
         <span>
@@ -200,7 +190,7 @@ export default function H5SexDisposition({ isDarkMode }: H5SexDispositionProps) 
           <span className="font-mono font-bold text-amber-500">V = 0.010 (Negligible)</span>
         </div>
         <div className="p-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40">
-          <span className="text-amber-600 dark:text-amber-400 block text-[8.5px] font-bold uppercase">Decision</span>
+          <span className="text-emerald-600 dark:text-emerald-400 block text-[8.5px] font-bold uppercase">Decision</span>
           <span className="font-bold text-amber-700 dark:text-amber-300">Reject H₀ (Negligible)</span>
         </div>
       </div>

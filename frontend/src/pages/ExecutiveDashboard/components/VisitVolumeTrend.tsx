@@ -48,7 +48,7 @@ export default function VisitVolumeTrend({ data, isDarkMode }: VisitVolumeTrendP
 
   return (
     <div
-      className={`rounded-2xl border p-5 shadow-xs space-y-3.5 transition-colors flex flex-col justify-between ${
+      className={`rounded-2xl border p-6 shadow-xs space-y-4 transition-colors flex flex-col justify-between h-full ${
         dark ? 'bg-[#131f37] border-[#1e2d4a]' : 'bg-white border-slate-200'
       }`}
     >
@@ -73,9 +73,9 @@ export default function VisitVolumeTrend({ data, isDarkMode }: VisitVolumeTrendP
         </p>
       </div>
 
-      <div style={{ height: 230 }} className="my-1">
+      <div className="h-[235px] my-1 w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data} margin={{ top: 20, right: 25, bottom: 25, left: 15 }}>
+          <AreaChart data={data} margin={{ top: 15, right: 30, bottom: 35, left: 15 }}>
             <defs>
               <linearGradient id="vol-gradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#0F4C81" stopOpacity={0.4} />
@@ -85,34 +85,35 @@ export default function VisitVolumeTrend({ data, isDarkMode }: VisitVolumeTrendP
             <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-slate-200/60 dark:text-slate-800/80" />
             <XAxis
               dataKey="fiscal_year"
-              tick={{ fontSize: 9.5, fill: '#64748b', fontFamily: 'monospace' }}
+              tick={{ fontSize: 10, fill: dark ? '#94a3b8' : '#64748b', fontFamily: 'monospace', dy: 2 }}
               angle={-25}
               textAnchor="end"
               interval={1}
               stroke="#94a3b8"
-              height={42}
+              height={50}
               label={{
                 value: 'Fiscal Year (2003/04 – 2021/22)',
                 position: 'insideBottom',
-                offset: -10,
+                offset: -16,
                 fill: dark ? '#94a3b8' : '#475569',
-                fontSize: 10,
+                fontSize: 11,
                 fontWeight: 700,
                 fontFamily: 'monospace'
               }}
             />
             <YAxis
-              tick={{ fontSize: 9.5, fill: '#64748b', fontFamily: 'monospace' }}
+              tick={{ fontSize: 10, fill: dark ? '#94a3b8' : '#64748b', fontFamily: 'monospace' }}
               tickFormatter={v => fmtK(v)}
               stroke="#94a3b8"
-              width={62}
+              width={65}
               label={{
-                value: 'Total ED Visits',
+                value: 'Total ED Visits (Count)',
                 angle: -90,
                 position: 'insideLeft',
-                offset: 0,
+                offset: 12,
+                style: { textAnchor: 'middle' },
                 fill: dark ? '#94a3b8' : '#475569',
-                fontSize: 10,
+                fontSize: 11,
                 fontWeight: 700,
                 fontFamily: 'monospace'
               }}

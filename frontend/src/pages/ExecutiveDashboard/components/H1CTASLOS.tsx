@@ -30,7 +30,7 @@ export default function H1CTASLOS({ isDarkMode }: H1CTASLOSProps) {
 
   return (
     <div
-      className={`rounded-2xl border p-5 shadow-xs space-y-3.5 transition-colors flex flex-col justify-between ${
+      className={`rounded-2xl border p-6 shadow-xs space-y-4 transition-colors flex flex-col justify-between h-full ${
         dark ? 'bg-[#131f37] border-[#1e2d4a]' : 'bg-white border-slate-200'
       }`}
     >
@@ -50,27 +50,27 @@ export default function H1CTASLOS({ isDarkMode }: H1CTASLOSProps) {
           Non-linear duration gradient across clinical acuity tiers (CTAS I Resuscitation → CTAS V Non-Urgent)
         </p>
 
-        <div style={{ height: 215 }} className="pt-2">
+        <div className="h-[235px] pt-2 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={CTAS_ORDERED_DATA}
               layout="vertical"
-              margin={{ top: 5, right: 65, bottom: 25, left: 85 }}
+              margin={{ top: 10, right: 75, bottom: 30, left: 10 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-slate-200/60 dark:text-slate-800/80" />
               <XAxis
                 type="number"
-                tick={{ fontSize: 9.5, fill: '#64748b', fontFamily: 'monospace' }}
+                tick={{ fontSize: 10, fill: dark ? '#94a3b8' : '#64748b', fontFamily: 'monospace' }}
                 tickFormatter={v => `${v}h`}
                 stroke="#94a3b8"
-                domain={[0, 6]}
-                height={35}
+                domain={[0, 5.8]}
+                height={40}
                 label={{
-                  value: 'Reported Median LOS (h)',
+                  value: 'Reported Median Length of Stay (Hours)',
                   position: 'insideBottom',
-                  offset: -10,
+                  offset: -12,
                   fill: dark ? '#94a3b8' : '#475569',
-                  fontSize: 10,
+                  fontSize: 11,
                   fontWeight: 700,
                   fontFamily: 'monospace'
                 }}
@@ -78,19 +78,9 @@ export default function H1CTASLOS({ isDarkMode }: H1CTASLOSProps) {
               <YAxis
                 type="category"
                 dataKey="short"
-                tick={{ fontSize: 10, fill: '#64748b', fontWeight: 600 }}
+                tick={{ fontSize: 11, fill: dark ? '#cbd5e1' : '#475569', fontWeight: 600 }}
                 stroke="#94a3b8"
-                width={75}
-                label={{
-                  value: 'CTAS Triage Level',
-                  angle: -90,
-                  position: 'insideLeft',
-                  offset: -10,
-                  fill: dark ? '#94a3b8' : '#475569',
-                  fontSize: 10,
-                  fontWeight: 700,
-                  fontFamily: 'monospace'
-                }}
+                width={85}
               />
               <Tooltip
                 formatter={(val: any, _name: string, item: any) => [
@@ -105,7 +95,7 @@ export default function H1CTASLOS({ isDarkMode }: H1CTASLOSProps) {
                   fontSize: '11px',
                 }}
               />
-              <Bar dataKey="los_hours" radius={[0, 6, 6, 0]} barSize={20}>
+              <Bar dataKey="los_hours" radius={[0, 6, 6, 0]} barSize={22}>
                 {CTAS_ORDERED_DATA.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
@@ -115,7 +105,7 @@ export default function H1CTASLOS({ isDarkMode }: H1CTASLOSProps) {
                   offset={8}
                   formatter={(v: any) => `${Number(v).toFixed(2)} h`}
                   fill={dark ? '#E2E8F0' : '#1E293B'}
-                  fontSize={10}
+                  fontSize={10.5}
                   fontWeight={700}
                   fontFamily="monospace"
                 />
@@ -126,7 +116,7 @@ export default function H1CTASLOS({ isDarkMode }: H1CTASLOSProps) {
       </div>
 
       {/* Analytical Takeaway Note */}
-      <div className={`px-3 py-1.5 rounded-lg border text-[10.5px] leading-relaxed ${
+      <div className={`px-3 py-2 rounded-xl border text-[11px] leading-relaxed ${
         dark ? 'bg-[#152033]/60 border-[#1e2d4a] text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-600'
       }`}>
         <span>
