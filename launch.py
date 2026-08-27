@@ -248,10 +248,22 @@ def main():
         
     print("\n--- 4. Running Pytests ---")
     print("Checking tests...")
-    # Running pytest through the virtual environment's python with fallback to system python.
-    test_proc = subprocess.run([venv_python, "-m", "pytest"])
-    if test_proc.returncode != 0:
-        subprocess.run([sys.executable, "-m", "pytest"])
+    # Quick import-check to detect broken venv packages (e.g. bad anyio install)
+    # before running the full suite so we don't block startup with a noisy crash.
+    import_check = subprocess.run(
+        [venv_python, "-c", "import anyio, pytest"],
+        capture_output=True, text=True
+    )
+    if import_check.returncode != 0:
+        print("  WARNING: venv import check failed (likely broken anyio/pytest).")
+        print("  Skipping venv pytest. Trying system Python...")
+        sys_test = subprocess.run([sys.executable, "-m", "pytest", "--tb=short"], check=False)
+        if sys_test.returncode != 0:
+            print(f"  WARNING: pytest exited with code {sys_test.returncode}. Continuing startup.")
+    else:
+        test_proc = subprocess.run([venv_python, "-m", "pytest", "--tb=short"], check=False)
+        if test_proc.returncode != 0:
+            print(f"  WARNING: pytest exited with code {test_proc.returncode}. Continuing startup.")
     
     print("\n--- 5. Freeing Ports ---")
     # server.ts is NOT hot-reloaded. A leftover process keeps serving old backend code
@@ -286,23 +298,48 @@ def main():
     api_process = subprocess.Popen([py_exec, "-m", "backend.main"], env=api_env)
     processes.append(("FastAPI", api_process))
 
+    # Wait for FastAPI to be ready before starting Node (avoids the race where
+    # server.ts's ensurePythonBackendRunning() can't detect the port quickly
+    # enough and launches a second conflicting uvicorn process).
+    print("Waiting for FastAPI to become ready on port 8000...")
+    for _ in range(40):
+        time.sleep(0.5)
+        if port_in_use(API_PORT):
+            print(f"  FastAPI is up on http://localhost:{API_PORT}")
+            break
+    else:
+        print(f"  WARNING: FastAPI did not open port {API_PORT} within 20s.")
+        print("  The UI will start, but analytics features may be unavailable.")
+
     print("Starting Node/Vite server... (npm run dev)")
-    server_process = subprocess.Popen(["npm", "run", "dev"], shell=is_windows)
+    # MANAGED_BY_LAUNCHER=1 tells server.ts to skip its own Python auto-starter;
+    # launch.py already owns the FastAPI process and manages its lifecycle.
+    # PYTHON_EXEC lets server.ts use the correct venv Python if it ever needs
+    # to do anything Python-related (e.g. inline scripts, future features).
+    node_env = os.environ.copy()
+    node_env["MANAGED_BY_LAUNCHER"] = "1"
+    node_env["PYTHON_EXEC"] = py_exec
+    server_process = subprocess.Popen(["npm", "run", "dev"], shell=is_windows, env=node_env)
     processes.append(("Node/Vite", server_process))
 
-    print("Waiting for the servers to start...")
-    for _ in range(20):
+    print("Waiting for Node/Vite server to start...")
+    for _ in range(30):
         time.sleep(0.5)
         if port_in_use(NODE_PORT):
             break
     else:
-        print("  WARNING: port 3000 did not open within 10s. Check the output above.")
+        print("  WARNING: port 3000 did not open within 15s. Check the output above.")
 
-    if port_in_use(API_PORT):
-        print(f"  FastAPI is up on http://localhost:{API_PORT}")
-    else:
-        print(f"  WARNING: FastAPI did not open port {API_PORT}.")
-        print("  The UI will work, but model diagnostics and dataset persistence will report offline.")
+    # Final status summary
+    node_ok  = port_in_use(NODE_PORT)
+    api_ok   = port_in_use(API_PORT)
+    print("")
+    print("  ┌────────────────────────────────────────────┐")
+    print(f"  │  Node/Vite  http://localhost:{NODE_PORT}         {'✓ UP' if node_ok else '✗ DOWN'}  │")
+    print(f"  │  FastAPI    http://localhost:{API_PORT}         {'✓ UP' if api_ok  else '✗ DOWN'}  │")
+    print("  └────────────────────────────────────────────┘")
+    if not api_ok:
+        print("  WARNING: FastAPI is down. Analytics, ML, and statistics features will be unavailable.")
 
     url = f"http://localhost:{NODE_PORT}"
     if in_container() or os.getenv("NO_BROWSER"):
