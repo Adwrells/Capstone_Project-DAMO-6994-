@@ -73,7 +73,7 @@ export default function ResourceBurdenTrend({ isDarkMode }: ResourceBurdenTrendP
 
   return (
     <div
-      className={`rounded-2xl border p-5 shadow-xs space-y-3.5 transition-colors flex flex-col justify-between ${
+      className={`rounded-2xl border p-6 shadow-xs space-y-4 transition-colors flex flex-col justify-between h-full ${
         dark ? 'bg-[#131f37] border-[#1e2d4a]' : 'bg-white border-slate-200'
       }`}
     >
@@ -95,9 +95,9 @@ export default function ResourceBurdenTrend({ isDarkMode }: ResourceBurdenTrendP
           </span>
         </div>
 
-        <div style={{ height: 230 }} className="pt-2">
+        <div className="h-[235px] pt-2 w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={ERBI_LONGITUDINAL_DATA} margin={{ top: 20, right: 30, bottom: 25, left: 15 }}>
+            <ComposedChart data={ERBI_LONGITUDINAL_DATA} margin={{ top: 15, right: 35, bottom: 35, left: 15 }}>
               <defs>
                 <linearGradient id="erbi-grad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#0F4C81" stopOpacity={0.35} />
@@ -107,32 +107,33 @@ export default function ResourceBurdenTrend({ isDarkMode }: ResourceBurdenTrendP
               <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-slate-200/60 dark:text-slate-800/80" />
               <XAxis
                 dataKey="fy"
-                tick={{ fontSize: 9.5, fill: '#64748b', fontFamily: 'monospace' }}
+                tick={{ fontSize: 10, fill: dark ? '#94a3b8' : '#64748b', fontFamily: 'monospace', dy: 2 }}
                 stroke="#94a3b8"
-                height={40}
+                height={50}
                 label={{
                   value: 'Fiscal Year (19-Yr Observed Series + 2-Yr Holt Forecast)',
                   position: 'insideBottom',
-                  offset: -10,
+                  offset: -16,
                   fill: dark ? '#94a3b8' : '#475569',
-                  fontSize: 10,
+                  fontSize: 11,
                   fontWeight: 700,
                   fontFamily: 'monospace'
                 }}
               />
               <YAxis
-                tick={{ fontSize: 9.5, fill: '#64748b', fontFamily: 'monospace' }}
+                tick={{ fontSize: 10, fill: dark ? '#94a3b8' : '#64748b', fontFamily: 'monospace' }}
                 tickFormatter={v => `${v}`}
                 domain={[0, 12]}
                 stroke="#94a3b8"
-                width={55}
+                width={60}
                 label={{
                   value: 'ERBI Index Score',
                   angle: -90,
                   position: 'insideLeft',
-                  offset: 0,
+                  offset: 12,
+                  style: { textAnchor: 'middle' },
                   fill: dark ? '#94a3b8' : '#475569',
-                  fontSize: 10,
+                  fontSize: 11,
                   fontWeight: 700,
                   fontFamily: 'monospace'
                 }}
@@ -191,7 +192,7 @@ export default function ResourceBurdenTrend({ isDarkMode }: ResourceBurdenTrendP
                     return '';
                   }}
                   fill={dark ? '#93C5FD' : '#0F4C81'}
-                  fontSize={10}
+                  fontSize={10.5}
                   fontWeight={700}
                   fontFamily="monospace"
                 />
@@ -211,7 +212,7 @@ export default function ResourceBurdenTrend({ isDarkMode }: ResourceBurdenTrendP
                   position="top"
                   offset={8}
                   fill={dark ? '#60A5FA' : '#2563EB'}
-                  fontSize={10}
+                  fontSize={10.5}
                   fontWeight={700}
                   fontFamily="monospace"
                 />
@@ -234,7 +235,7 @@ export default function ResourceBurdenTrend({ isDarkMode }: ResourceBurdenTrendP
       </div>
 
       {/* Analytical & Methodological Callout */}
-      <div className={`p-2.5 rounded-xl border text-[10.5px] leading-relaxed flex items-start gap-2 ${
+      <div className={`p-2.5 rounded-xl border text-[11px] leading-relaxed flex items-start gap-2 ${
         dark ? 'bg-[#152033] border-[#1e2d4a] text-slate-300' : 'bg-blue-50/60 border-blue-100 text-slate-700'
       }`}>
         <TrendingUp size={13} className="text-[#0F4C81] dark:text-[#3B82F6] shrink-0 mt-0.5" />

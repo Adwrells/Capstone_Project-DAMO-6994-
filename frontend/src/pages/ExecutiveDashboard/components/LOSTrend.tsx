@@ -56,7 +56,7 @@ export default function LOSTrend({ data, isDarkMode }: LOSTrendProps) {
 
   return (
     <div
-      className={`rounded-2xl border p-5 shadow-xs space-y-3.5 transition-colors flex flex-col justify-between ${
+      className={`rounded-2xl border p-6 shadow-xs space-y-4 transition-colors flex flex-col justify-between h-full ${
         dark ? 'bg-[#131f37] border-[#1e2d4a]' : 'bg-white border-slate-200'
       }`}
     >
@@ -81,41 +81,42 @@ export default function LOSTrend({ data, isDarkMode }: LOSTrendProps) {
         </p>
       </div>
 
-      <div style={{ height: 230 }} className="my-1">
+      <div className="h-[235px] my-1 w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data} margin={{ top: 20, right: 25, bottom: 25, left: 15 }}>
+          <LineChart data={data} margin={{ top: 15, right: 30, bottom: 35, left: 15 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-slate-200/60 dark:text-slate-800/80" />
             <XAxis
               dataKey="fiscal_year"
-              tick={{ fontSize: 9.5, fill: '#64748b', fontFamily: 'monospace' }}
+              tick={{ fontSize: 10, fill: dark ? '#94a3b8' : '#64748b', fontFamily: 'monospace', dy: 2 }}
               angle={-25}
               textAnchor="end"
               interval={1}
               stroke="#94a3b8"
-              height={42}
+              height={50}
               label={{
                 value: 'Fiscal Year (2003/04 – 2021/22)',
                 position: 'insideBottom',
-                offset: -10,
+                offset: -16,
                 fill: dark ? '#94a3b8' : '#475569',
-                fontSize: 10,
+                fontSize: 11,
                 fontWeight: 700,
                 fontFamily: 'monospace'
               }}
             />
             <YAxis
-              tick={{ fontSize: 9.5, fill: '#64748b', fontFamily: 'monospace' }}
+              tick={{ fontSize: 10, fill: dark ? '#94a3b8' : '#64748b', fontFamily: 'monospace' }}
               tickFormatter={v => `${v}h`}
               domain={[0, 7]}
               stroke="#94a3b8"
-              width={55}
+              width={60}
               label={{
                 value: 'Reported Median LOS (Hours)',
                 angle: -90,
                 position: 'insideLeft',
-                offset: 0,
+                offset: 12,
+                style: { textAnchor: 'middle' },
                 fill: dark ? '#94a3b8' : '#475569',
-                fontSize: 10,
+                fontSize: 11,
                 fontWeight: 700,
                 fontFamily: 'monospace'
               }}
