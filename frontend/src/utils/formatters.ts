@@ -92,6 +92,28 @@ export function fmtP(p: number | null | undefined): string {
 export const formatPValue = fmtP;
 
 /**
+ * Formats clinical duration in hours with short 'h' suffix (e.g. 4.60 h).
+ */
+export function fmtHoursShort(hours: number | null | undefined, dp: number = 2): string {
+  if (hours === null || hours === undefined || !Number.isFinite(Number(hours))) return '—';
+  return `${Number(hours).toFixed(dp)} h`;
+}
+
+/**
+ * Formats large test statistics with clean exponential or unit prefixes (e.g. 1.26 × 10⁸ or 2.69 × 10¹²).
+ */
+export function fmtStat(val: number | null | undefined, dp: number = 2): string {
+  if (val === null || val === undefined || !Number.isFinite(Number(val))) return '—';
+  const num = Number(val);
+  const abs = Math.abs(num);
+  if (abs >= 1e12) return `${(num / 1e12).toFixed(dp)} × 10¹²`;
+  if (abs >= 1e8) return `${(num / 1e8).toFixed(dp)} × 10⁸`;
+  if (abs >= 1e6) return `${(num / 1e6).toFixed(dp)}M`;
+  if (abs >= 1e3) return `${(num / 1e3).toFixed(dp)}k`;
+  return num.toLocaleString('en-US', { maximumFractionDigits: dp });
+}
+
+/**
  * Standardizes fiscal year labels (e.g. "2022-2023" -> "FY 2022-23").
  */
 export function formatFiscalYear(fy: string | null | undefined): string {

@@ -85,7 +85,7 @@ export default function ResourceBurdenByCTAS({ isDarkMode }: ResourceBurdenByCTA
             <BarChart
               data={BURDEN_RANKED_DATA}
               layout="vertical"
-              margin={{ top: 10, right: 85, bottom: 10, left: 110 }}
+              margin={{ top: 10, right: 85, bottom: 25, left: 130 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-slate-200/60 dark:text-slate-800/80" />
               <XAxis
@@ -94,13 +94,33 @@ export default function ResourceBurdenByCTAS({ isDarkMode }: ResourceBurdenByCTA
                 tickFormatter={v => `${v}M`}
                 stroke="#94a3b8"
                 domain={[0, 880]}
+                height={35}
+                label={{
+                  value: 'Resource Burden (Million Patient-Hours)',
+                  position: 'insideBottom',
+                  offset: -10,
+                  fill: dark ? '#94a3b8' : '#475569',
+                  fontSize: 9.5,
+                  fontWeight: 700,
+                  fontFamily: 'monospace'
+                }}
               />
               <YAxis
                 type="category"
                 dataKey="short"
                 tick={{ fontSize: 9.5, fill: '#64748b', fontWeight: 600 }}
                 stroke="#94a3b8"
-                width={105}
+                width={120}
+                label={{
+                  value: 'Triage Acuity Level',
+                  angle: -90,
+                  position: 'insideLeft',
+                  offset: -10,
+                  fill: dark ? '#94a3b8' : '#475569',
+                  fontSize: 9.5,
+                  fontWeight: 700,
+                  fontFamily: 'monospace'
+                }}
               />
               <Tooltip content={<CustomBurdenTooltip />} />
               <Bar dataKey="burden_hours" radius={[0, 6, 6, 0]} barSize={20}>

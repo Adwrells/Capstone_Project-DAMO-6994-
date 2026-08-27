@@ -54,7 +54,7 @@ export default function H4AgeLOS({ isDarkMode }: H4AgeLOSProps) {
             <BarChart
               data={AGE_ORDERED_DATA}
               layout="vertical"
-              margin={{ top: 10, right: 65, bottom: 10, left: 75 }}
+              margin={{ top: 10, right: 65, bottom: 25, left: 85 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-slate-200/60 dark:text-slate-800/80" />
               <XAxis
@@ -63,13 +63,33 @@ export default function H4AgeLOS({ isDarkMode }: H4AgeLOSProps) {
                 tickFormatter={v => `${v}h`}
                 stroke="#94a3b8"
                 domain={[0, 5.2]}
+                height={35}
+                label={{
+                  value: 'Reported Median Length of Stay (Hours)',
+                  position: 'insideBottom',
+                  offset: -10,
+                  fill: dark ? '#94a3b8' : '#475569',
+                  fontSize: 9.5,
+                  fontWeight: 700,
+                  fontFamily: 'monospace'
+                }}
               />
               <YAxis
                 type="category"
                 dataKey="short"
                 tick={{ fontSize: 9.5, fill: '#64748b', fontWeight: 600 }}
                 stroke="#94a3b8"
-                width={70}
+                width={75}
+                label={{
+                  value: 'Age Demographic Cohort',
+                  angle: -90,
+                  position: 'insideLeft',
+                  offset: -10,
+                  fill: dark ? '#94a3b8' : '#475569',
+                  fontSize: 9.5,
+                  fontWeight: 700,
+                  fontFamily: 'monospace'
+                }}
               />
               <Tooltip
                 formatter={(val: any, _name: string, item: any) => [
