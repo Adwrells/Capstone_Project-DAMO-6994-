@@ -7,12 +7,13 @@ import React, { useState, useMemo, useRef } from 'react';
 import { 
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   LineChart, Line, AreaChart, Area, PieChart, Pie, Cell, ComposedChart,
-  RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ReferenceLine
+  RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ReferenceLine, LabelList
 } from 'recharts';
 import { 
   PlusCircle, Trash2, Settings, Sliders, Sparkles, Bot, TrendingUp, Info, 
   HelpCircle, CheckCircle, RefreshCw, Eye, Download, FileSpreadsheet, 
-  Layout, Type, Activity, AlertTriangle, ArrowRight, Table2
+  Layout, Type, Activity, AlertTriangle, ArrowRight, Table2, Stethoscope,
+  HeartPulse, Clock, Users, Building2, Layers, Check
 } from 'lucide-react';
 import { CustomVisualization, AggregationOption } from '../../utils/types';
 
@@ -25,6 +26,170 @@ interface CustomChartBuilderProps {
   isDarkMode?: boolean;
 }
 
+export interface ClinicalRecommendation {
+  id: string;
+  badge: string;
+  badgeBg: string;
+  badgeText: string;
+  badgeBorder: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  dimCandidates: string[];
+  measureCandidates: string[];
+  type: CustomVisualization['type'];
+  aggregation: AggregationOption;
+  showDataLabels: boolean;
+  enableTrendLine: boolean;
+  unitFormat: CustomVisualization['unitFormat'];
+  topN: number;
+  insightTip: string;
+  hypothesisRef: string;
+}
+
+export const CLINICAL_RECOMMENDATIONS: ClinicalRecommendation[] = [
+  {
+    id: 'h1-ctas-los',
+    badge: 'Hypothesis 1',
+    badgeBg: 'bg-amber-50 dark:bg-amber-950/50',
+    badgeText: 'text-amber-700 dark:text-amber-400',
+    badgeBorder: 'border-amber-200 dark:border-amber-800/60',
+    title: 'CTAS Acuity Triage vs. Mean Length of Stay',
+    subtitle: 'Mean stay duration (minutes/hours) across CTAS acuity levels (CTAS I–V)',
+    description: 'Evaluates H1 non-linear triage dynamics where CTAS II & III experience prolonged stays.',
+    dimCandidates: ['triage_level', 'ctas_level', 'ctas', 'acuity'],
+    measureCandidates: ['median_length_of_stay_min', 'los_hours', 'los_min', 'length_of_stay'],
+    type: 'Column',
+    aggregation: 'Average',
+    showDataLabels: true,
+    enableTrendLine: false,
+    unitFormat: 'auto',
+    topN: 8,
+    insightTip: 'Reveals the non-linear triage curve where CTAS II (Emergent) and CTAS III (Urgent) cases require intensive diagnostic investigation before admission.',
+    hypothesisRef: 'H1: CTAS Acuity vs LOS'
+  },
+  {
+    id: 'longitudinal-volume',
+    badge: 'Longitudinal Trend',
+    badgeBg: 'bg-blue-50 dark:bg-blue-950/50',
+    badgeText: 'text-blue-700 dark:text-blue-400',
+    badgeBorder: 'border-blue-200 dark:border-blue-800/60',
+    title: '19-Year Longitudinal ED Visit Volume Surge',
+    subtitle: 'Total annual patient intake volume across Canadian emergency departments',
+    description: 'Tracks long-term secular growth in patient intake and system demand (+131.6%).',
+    dimCandidates: ['fiscal_year', 'year'],
+    measureCandidates: ['ed_visits', 'total_visits', 'visits'],
+    type: 'Line',
+    aggregation: 'Sum',
+    showDataLabels: true,
+    enableTrendLine: true,
+    unitFormat: 'thousands',
+    topN: 0,
+    insightTip: 'Demonstrates steady annual volume growth (Mann-Kendall upward trend, p < 0.0001) culminating in over 2.89M annual emergency presentations.',
+    hypothesisRef: 'System Volume Progression'
+  },
+  {
+    id: 'h2-disposition-los',
+    badge: 'Hypothesis 2',
+    badgeBg: 'bg-rose-50 dark:bg-rose-950/50',
+    badgeText: 'text-rose-700 dark:text-rose-400',
+    badgeBorder: 'border-rose-200 dark:border-rose-800/60',
+    title: 'Admitted vs. Non-Admitted Stay Duration Disparity',
+    subtitle: 'Length of stay comparison between admitted inpatients and discharged cases',
+    description: 'Measures boarding delay and inpatient access block in Canadian emergency facilities.',
+    dimCandidates: ['visit_disposition', 'disposition'],
+    measureCandidates: ['median_length_of_stay_min', 'los_hours', 'los_min', 'length_of_stay'],
+    type: 'Bar',
+    aggregation: 'Average',
+    showDataLabels: true,
+    enableTrendLine: false,
+    unitFormat: 'auto',
+    topN: 8,
+    insightTip: 'Admitted inpatients average 10.60 hrs (~4.2x longer than discharged cases at 2.50 hrs) due to hospital bed shortages and access block.',
+    hypothesisRef: 'H2: Admission vs LOS'
+  },
+  {
+    id: 'h4-age-los',
+    badge: 'Hypothesis 4',
+    badgeBg: 'bg-purple-50 dark:bg-purple-950/50',
+    badgeText: 'text-purple-700 dark:text-purple-400',
+    badgeBorder: 'border-purple-200 dark:border-purple-800/60',
+    title: 'Age Demographic Cohort vs. Stay Duration Gradient',
+    subtitle: 'Pediatric, adult, and geriatric stay duration progression in emergency departments',
+    description: 'Quantifies multimorbidity and physiological vulnerability effects on stay duration.',
+    dimCandidates: ['age_group', 'age'],
+    measureCandidates: ['median_length_of_stay_min', 'los_hours', 'los_min', 'length_of_stay'],
+    type: 'Column',
+    aggregation: 'Average',
+    showDataLabels: true,
+    enableTrendLine: false,
+    unitFormat: 'auto',
+    topN: 8,
+    insightTip: 'Shows progressive monotonic rise in stay duration from pediatric (2.05 hrs) to geriatric 75+ (4.17 hrs, +103.4% longer) driven by complex chronic conditions.',
+    hypothesisRef: 'H4: Age vs LOS'
+  },
+  {
+    id: 'erbi-acuity-share',
+    badge: 'Resource Burden',
+    badgeBg: 'bg-emerald-50 dark:bg-emerald-950/50',
+    badgeText: 'text-emerald-700 dark:text-emerald-400',
+    badgeBorder: 'border-emerald-200 dark:border-emerald-800/60',
+    title: 'Estimated Resource Burden Share by CTAS Acuity',
+    subtitle: 'Aggregate acuity-hours volume distribution across Canadian emergency triage tiers',
+    description: 'Identifies the clinical acuity tiers that consume the largest share of departmental resources.',
+    dimCandidates: ['triage_level', 'ctas_level', 'ctas'],
+    measureCandidates: ['ed_visits', 'total_visits', 'burden_hours', 'erbi_score'],
+    type: 'Donut',
+    aggregation: 'Sum',
+    showDataLabels: true,
+    enableTrendLine: false,
+    unitFormat: 'auto',
+    topN: 8,
+    insightTip: 'CTAS III (Urgent) accounts for 52.3% of all departmental resource consumption (766.7M patient-hours), making it the primary system operational bottleneck.',
+    hypothesisRef: 'Operational Resource Modeling'
+  },
+  {
+    id: 'clinical-problems',
+    badge: 'Clinical Profiling',
+    badgeBg: 'bg-cyan-50 dark:bg-cyan-950/50',
+    badgeText: 'text-cyan-700 dark:text-cyan-400',
+    badgeBorder: 'border-cyan-200 dark:border-cyan-800/60',
+    title: 'Chief Presenting Complaints by Patient Volume',
+    subtitle: 'Diagnostic intake categories ranked by aggregate ED visit frequency',
+    description: 'Pinpoints primary diagnostic categories driving volume demand across Canadian facilities.',
+    dimCandidates: ['main_problem', 'problem', 'diagnosis'],
+    measureCandidates: ['ed_visits', 'total_visits', 'visits'],
+    type: 'Bar',
+    aggregation: 'Sum',
+    showDataLabels: true,
+    enableTrendLine: false,
+    unitFormat: 'thousands',
+    topN: 8,
+    insightTip: 'Trauma (31.5M visits) and Unintentional Falls (10.0M visits) dominate emergency encounters, requiring rapid-access orthopaedic imaging pathways.',
+    hypothesisRef: 'Diagnostic Volume Ranking'
+  },
+  {
+    id: 'h5-sex-volume',
+    badge: 'Hypothesis 5',
+    badgeBg: 'bg-indigo-50 dark:bg-indigo-950/50',
+    badgeText: 'text-indigo-700 dark:text-indigo-400',
+    badgeBorder: 'border-indigo-200 dark:border-indigo-800/60',
+    title: 'Patient Sex Demographic Volume Distribution',
+    subtitle: 'Comparative volume split between female and male patients',
+    description: 'Evaluates gender balance in presentation and disposition routing.',
+    dimCandidates: ['sex', 'gender'],
+    measureCandidates: ['ed_visits', 'total_visits', 'visits'],
+    type: 'Pie',
+    aggregation: 'Sum',
+    showDataLabels: true,
+    enableTrendLine: false,
+    unitFormat: 'auto',
+    topN: 8,
+    insightTip: 'Male vs Female intake volume is closely balanced (50.8% vs 49.2%) with similar admission rates (10.6% vs 10.0%), confirming equitable clinical routing.',
+    hypothesisRef: 'H5: Sex vs Disposition'
+  }
+];
+
 export default function CustomChartBuilder({ 
   fields, 
   data, 
@@ -34,23 +199,24 @@ export default function CustomChartBuilder({
   isDarkMode = false
 }: CustomChartBuilderProps) {
   // Config state for the creator chart form
-  const [title, setTitle] = useState('Revenue and Performance Analytics');
-  const [subtitle, setSubtitle] = useState('Sector performance and dimensional contribution breakdown');
-  const [description, setDescription] = useState('An automated strategic cross-cut aggregation of the raw dataset records.');
+  const [title, setTitle] = useState('CTAS Acuity Triage vs. Mean Length of Stay');
+  const [subtitle, setSubtitle] = useState('Mean stay duration (minutes/hours) across CTAS acuity levels (CTAS I–V)');
+  const [description, setDescription] = useState('Evaluates H1 non-linear triage dynamics where CTAS II & III experience prolonged stays.');
   const [type, setType] = useState<CustomVisualization['type']>('Column');
   const [xAxis, setXAxis] = useState('');
   const [yAxis, setYAxis] = useState('');
-  const [aggregation, setAggregation] = useState<AggregationOption>('Sum');
+  const [aggregation, setAggregation] = useState<AggregationOption>('Average');
+  const [activePresetId, setActivePresetId] = useState<string | null>('h1-ctas-los');
   
   // Advanced Formatting state
   const [showGridlines, setShowGridlines] = useState(true);
   const [showLegend, setShowLegend] = useState(true);
   const [legendPosition, setLegendPosition] = useState<CustomVisualization['legendPosition']>('bottom');
-  const [showDataLabels, setShowDataLabels] = useState(false);
+  const [showDataLabels, setShowDataLabels] = useState(true);
   const [xAxisLabelRotation, setXAxisLabelRotation] = useState(0);
   const [unitFormat, setUnitFormat] = useState<CustomVisualization['unitFormat']>('auto');
   const [logScale, setLogScale] = useState(false);
-  const [chartColor, setChartColor] = useState('#4f46e5');
+  const [chartColor, setChartColor] = useState('#0F4C81');
   const [fontSize, setFontSize] = useState(10);
   const [fontFamily, setFontFamily] = useState('sans');
   const [topN, setTopN] = useState<number>(8);
@@ -73,22 +239,88 @@ export default function CustomChartBuilder({
   const [activeConfigTab, setActiveConfigTab] = useState<'basics' | 'formatting' | 'overlays' | 'chat'>('basics');
 
   const THEME_COLORS = [
-    '#4f46e5', '#10b981', '#3b82f6', '#f59e0b', '#ec4899', 
-    '#8b5cf6', '#06b6d4', '#14b8a6', '#f43f5e', '#6366f1'
+    '#0F4C81', '#3B82F6', '#10B981', '#F59E0B', '#EF4444', 
+    '#8B5CF6', '#06B6D4', '#EC4899', '#14B8A6', '#6366F1'
   ];
 
   const numericColumns = fields.filter(f => f.type === 'numeric');
   const allColumns = fields.map(f => f.name);
 
-  // Initialize form defaults once fields are available
+  // Helper to find best column match
+  const resolveField = (candidates: string[], typePref?: 'categorical' | 'numeric') => {
+    for (const cand of candidates) {
+      const match = fields.find(f => 
+        f.name.toLowerCase() === cand.toLowerCase() || 
+        f.name.toLowerCase().includes(cand.toLowerCase())
+      );
+      if (match && (!typePref || match.type === typePref)) {
+        return match.name;
+      }
+    }
+    return null;
+  };
+
+  // Initialize form defaults with smart healthcare defaults (never select flat year identifiers)
   React.useEffect(() => {
     if (fields.length > 0) {
-      const cat = fields.find(f => f.type === 'categorical' || f.type === 'text')?.name || fields[0].name;
-      const num = fields.find(f => f.type === 'numeric')?.name || fields[0].name;
-      setXAxis(cat);
-      setYAxis(num);
+      // Find best categorical dimension
+      const defaultDim = resolveField(['triage_level', 'ctas_level', 'ctas', 'age_group', 'visit_disposition', 'main_problem', 'fiscal_year', 'sex'], 'categorical')
+        || fields.find(f => f.type === 'categorical' || f.type === 'text')?.name 
+        || fields[0].name;
+
+      // Find best clinical numeric measure (skip index, year start/end, row IDs)
+      const defaultMeasure = resolveField(['median_length_of_stay_min', 'los_hours', 'ed_visits', 'total_visits', 'burden_hours', 'erbi_score'], 'numeric')
+        || fields.filter(f => f.type === 'numeric' && !f.name.toLowerCase().includes('year') && !f.name.toLowerCase().includes('start') && !f.name.toLowerCase().includes('id'))[0]?.name
+        || numericColumns[0]?.name 
+        || fields[0].name;
+
+      setXAxis(defaultDim);
+      setYAxis(defaultMeasure);
+
+      const isDuration = defaultMeasure.toLowerCase().includes('los') || defaultMeasure.toLowerCase().includes('stay') || defaultMeasure.toLowerCase().includes('min');
+      setAggregation(isDuration ? 'Average' : 'Sum');
     }
   }, [fields]);
+
+  // Apply a curated 1-click clinical recommendation
+  const handleApplyPreset = (rec: ClinicalRecommendation) => {
+    setActivePresetId(rec.id);
+    
+    // Resolve matching dimension
+    let matchedDim = resolveField(rec.dimCandidates);
+    if (!matchedDim) {
+      matchedDim = fields.find(f => f.type === 'categorical' || f.type === 'text')?.name || fields[0]?.name || '';
+    }
+
+    // Resolve matching measure
+    let matchedMeasure = resolveField(rec.measureCandidates, 'numeric');
+    if (!matchedMeasure) {
+      const validNums = fields.filter(f => f.type === 'numeric' && !f.name.toLowerCase().includes('year') && !f.name.toLowerCase().includes('start') && !f.name.toLowerCase().includes('id'));
+      matchedMeasure = validNums[0]?.name || numericColumns[0]?.name || fields[0]?.name || '';
+    }
+
+    setTitle(rec.title);
+    setSubtitle(rec.subtitle);
+    setDescription(rec.description);
+    setXAxis(matchedDim);
+    setYAxis(matchedMeasure);
+    setType(rec.type);
+    setAggregation(rec.aggregation);
+    setShowDataLabels(rec.showDataLabels);
+    setEnableTrendLine(rec.enableTrendLine);
+    setUnitFormat(rec.unitFormat);
+    setTopN(rec.topN);
+    setDrillCategory(null);
+    setChatFeedback(`✨ Applied insightful recommendation: ${rec.title}`);
+    setTimeout(() => setChatFeedback(null), 5000);
+  };
+
+  // Measure quality warning check
+  const isQuestionableMeasure = useMemo(() => {
+    if (!yAxis) return false;
+    const lower = yAxis.toLowerCase();
+    return lower.includes('year_start') || lower.includes('year_end') || lower.includes('fiscal_year_') || lower.includes('row_id') || lower === 'id';
+  }, [yAxis]);
 
   // AI Recommendation Engine
   const aiRecommendation = useMemo(() => {
@@ -111,36 +343,36 @@ export default function CustomChartBuilder({
     if (xField.type === 'date' || xAxis.toLowerCase().includes('date') || xAxis.toLowerCase().includes('year') || xAxis.toLowerCase().includes('month')) {
       recommendedType = 'Line';
       confidence = 98;
-      businessReason = 'Chronological progression trends are best understood via progressive continuous paths.';
-      statisticalReason = 'Preserves logical temporal order, emphasizing sequential variance over discrete distributions.';
+      businessReason = 'Chronological progression trends are best understood via continuous line/area trajectories.';
+      statisticalReason = 'Preserves temporal ordering and highlights secular variance across fiscal cycles.';
       alternative = 'Area';
       altConfidence = 92;
     } else if (uniqueValues > 12) {
       recommendedType = 'Bar';
       confidence = 94;
-      businessReason = 'High category count requires a horizontal format to guarantee layout text eligibility.';
-      statisticalReason = 'Horizontal distribution permits long categorical labels without visual overlapping or truncation.';
+      businessReason = 'High category count requires a horizontal format to prevent axis label clipping and truncation.';
+      statisticalReason = 'Horizontal distribution permits long categorical labels without visual overlapping.';
       alternative = 'Treemap';
       altConfidence = 87;
     } else if (uniqueValues <= 4 && uniqueValues > 1) {
       recommendedType = 'Donut';
       confidence = 90;
-      businessReason = 'Low category count is perfect for highlighting market share or composition ratios.';
-      statisticalReason = 'Emphasizes Part-to-Whole distributions for high-contrast visual segment assessments.';
+      businessReason = 'Low category count is optimal for composition share and proportional breakdown.';
+      statisticalReason = 'Emphasizes Part-to-Whole ratios for high-contrast segment assessment.';
       alternative = 'Column';
       altConfidence = 85;
     } else if (xAxis.toLowerCase().includes('rate') || yAxis.toLowerCase().includes('percentage') || yAxis.toLowerCase().includes('margin')) {
       recommendedType = 'Area';
       confidence = 88;
-      businessReason = 'Proportional variances or accumulated volume indices benefit from filled area visual weights.';
+      businessReason = 'Proportional variances benefit from continuous shaded visual weights.';
       statisticalReason = 'Establishes continuous volume boundaries, emphasizing absolute cumulative value differences.';
       alternative = 'Line';
       altConfidence = 84;
     } else {
       recommendedType = 'Column';
       confidence = 89;
-      businessReason = 'Standard discrete variables benefit from vertical comparative structures.';
-      statisticalReason = 'Enforces strong vertical alignments, allowing rapid comparison of height offsets across segments.';
+      businessReason = 'Discrete categories benefit from vertical column alignments for direct height comparison.';
+      statisticalReason = 'Enforces baseline alignment, allowing rapid comparison of magnitude offsets across cohorts.';
       alternative = 'Bar';
       altConfidence = 82;
     }
@@ -780,8 +1012,93 @@ export default function CustomChartBuilder({
   };
 
   return (
-    <div className="space-y-8 text-left font-sans" id="custom-visualization-builder-section">
+    <div className="space-y-6 text-left font-sans" id="custom-visualization-builder-section">
       
+      {/* ══ CURATED CLINICAL & OPERATIONAL RECOMMENDATIONS ═══════════════════ */}
+      <div
+        className={`rounded-2xl border p-4 sm:p-5 shadow-xs transition-colors space-y-3.5 ${
+          isDarkMode ? 'bg-[#101b30] border-[#1e2d4a]' : 'bg-gradient-to-r from-blue-50/70 via-indigo-50/50 to-slate-50 border-blue-200/80'
+        }`}
+      >
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#0F4C81] to-[#3B82F6] flex items-center justify-center text-white shadow-2xs">
+              <Sparkles size={16} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[9px] font-extrabold uppercase tracking-widest text-[#0F4C81] dark:text-[#3B82F6]">
+                  AI Analytical Guidance
+                </span>
+                <span className="px-1.5 py-0.2 rounded-full text-[8px] font-extrabold bg-blue-100 dark:bg-blue-950 text-[#0F4C81] dark:text-[#3B82F6] border border-blue-200 dark:border-blue-800">
+                  7 Curated Presets
+                </span>
+              </div>
+              <h3 className={`text-sm font-extrabold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+                Recommended Insightful Visuals for Healthcare &amp; Emergency Operations
+              </h3>
+            </div>
+          </div>
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 font-light max-w-md hidden md:block">
+            Click any recommendation below to automatically configure domain-accurate axes, optimal aggregations, and clinical chart layouts.
+          </p>
+        </div>
+
+        {/* Preset Cards Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5">
+          {CLINICAL_RECOMMENDATIONS.map(rec => {
+            const isSelected = activePresetId === rec.id;
+            return (
+              <div
+                key={rec.id}
+                onClick={() => handleApplyPreset(rec)}
+                className={`group p-3 rounded-xl border text-left cursor-pointer transition-all flex flex-col justify-between space-y-2 hover:shadow-md hover:scale-[1.01] ${
+                  isSelected
+                    ? isDarkMode
+                      ? 'bg-[#15233e] border-[#3B82F6] ring-1 ring-[#3B82F6]/50'
+                      : 'bg-white border-[#0F4C81] ring-1 ring-[#0F4C81]/30 shadow-xs'
+                    : isDarkMode
+                    ? 'bg-[#131f37] border-[#1e2d4a] hover:border-slate-700 text-slate-300'
+                    : 'bg-white/90 border-slate-200 hover:border-blue-300 text-slate-700'
+                }`}
+              >
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between gap-1.5">
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[8.5px] font-bold border ${rec.badgeBg} ${rec.badgeText} ${rec.badgeBorder}`}>
+                      {rec.badge}
+                    </span>
+                    <span className="text-[8.5px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                      {rec.type} · {rec.aggregation}
+                    </span>
+                  </div>
+
+                  <h4 className={`text-xs font-bold leading-snug line-clamp-1 group-hover:text-[#0F4C81] dark:group-hover:text-[#3B82F6] transition-colors ${
+                    isDarkMode ? 'text-slate-100' : 'text-slate-900'
+                  }`}>
+                    {rec.title}
+                  </h4>
+
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 font-light line-clamp-2 leading-relaxed">
+                    {rec.insightTip}
+                  </p>
+                </div>
+
+                <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[9.5px]">
+                  <span className="text-slate-400 font-mono text-[8.5px] truncate">
+                    {rec.hypothesisRef}
+                  </span>
+                  <span className={`inline-flex items-center gap-1 font-bold ${
+                    isSelected ? 'text-[#0F4C81] dark:text-[#3B82F6]' : 'text-slate-500 group-hover:text-[#0F4C81] dark:group-hover:text-[#3B82F6]'
+                  }`}>
+                    {isSelected ? '✓ Active' : 'Apply'} <ArrowRight size={10} />
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
       {/* 1. VISUALIZATION ACTION HUB */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
@@ -793,11 +1110,11 @@ export default function CustomChartBuilder({
           <div className="pb-3 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
             <div>
               <h3 className="text-sm font-extrabold text-slate-800 dark:text-white uppercase tracking-widest font-mono flex items-center gap-1.5">
-                <Sliders size={14} className="text-indigo-600" />
+                <Sliders size={14} className="text-indigo-600 dark:text-indigo-400" />
                 Custom Visual Studio
               </h3>
               <p className="text-[10px] text-slate-500 font-light mt-0.5">
-                Assemble Power BI quality analytical segments with AI overlays.
+                Assemble high-fidelity clinical and operational visuals with AI overlays.
               </p>
             </div>
             {/* AI Assistant Mode Indicator */}
@@ -811,7 +1128,7 @@ export default function CustomChartBuilder({
             <button 
               onClick={() => setActiveConfigTab('basics')} 
               className={`pb-2 pr-3 border-b-2 cursor-pointer transition-all ${
-                activeConfigTab === 'basics' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-400'
+                activeConfigTab === 'basics' ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-slate-400'
               }`}
             >
               1. Basics
@@ -819,15 +1136,15 @@ export default function CustomChartBuilder({
             <button 
               onClick={() => setActiveConfigTab('formatting')} 
               className={`pb-2 px-3 border-b-2 cursor-pointer transition-all ${
-                activeConfigTab === 'formatting' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-400'
+                activeConfigTab === 'formatting' ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-slate-400'
               }`}
             >
-              2. Axis & Formatting
+              2. Axis &amp; Formatting
             </button>
             <button 
               onClick={() => setActiveConfigTab('overlays')} 
               className={`pb-2 px-3 border-b-2 cursor-pointer transition-all ${
-                activeConfigTab === 'overlays' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-400'
+                activeConfigTab === 'overlays' ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-slate-400'
               }`}
             >
               3. Overlays
@@ -835,7 +1152,7 @@ export default function CustomChartBuilder({
             <button 
               onClick={() => setActiveConfigTab('chat')} 
               className={`pb-2 pl-3 border-b-2 cursor-pointer transition-all flex items-center gap-1 ${
-                activeConfigTab === 'chat' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-400'
+                activeConfigTab === 'chat' ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-slate-400'
               }`}
             >
               <Sparkles size={11} className="text-amber-500 animate-pulse" /> Conversational
@@ -845,6 +1162,29 @@ export default function CustomChartBuilder({
           {/* Tab Content Basin */}
           {activeConfigTab === 'basics' && (
             <div className="space-y-3 pt-1 text-left text-xs">
+              
+              {/* Quick Preset Selector */}
+              <div className="space-y-1">
+                <label className="text-[9px] font-bold font-mono text-slate-400 block uppercase tracking-wider">
+                  QUICK CLINICAL TEMPLATES
+                </label>
+                <select
+                  value={activePresetId || ''}
+                  onChange={(e) => {
+                    const found = CLINICAL_RECOMMENDATIONS.find(r => r.id === e.target.value);
+                    if (found) handleApplyPreset(found);
+                  }}
+                  className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white rounded-lg p-2 cursor-pointer font-medium text-xs"
+                >
+                  <option value="" disabled>Select a recommended template...</option>
+                  {CLINICAL_RECOMMENDATIONS.map(rec => (
+                    <option key={rec.id} value={rec.id}>
+                      [{rec.badge}] {rec.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               {/* Title Form inputs */}
               <div className="space-y-1">
                 <label className="text-[9px] font-bold font-mono text-slate-400 block uppercase tracking-wider">CHART TITLE</label>
@@ -853,6 +1193,17 @@ export default function CustomChartBuilder({
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-indigo-500 font-medium"
+                />
+              </div>
+
+              {/* Subtitle Form inputs */}
+              <div className="space-y-1">
+                <label className="text-[9px] font-bold font-mono text-slate-400 block uppercase tracking-wider">SUBTITLE / CLINICAL SCOPE</label>
+                <input
+                  type="text"
+                  value={subtitle}
+                  onChange={(e) => setSubtitle(e.target.value)}
+                  className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-indigo-500 font-light text-[11px]"
                 />
               </div>
 
@@ -884,7 +1235,7 @@ export default function CustomChartBuilder({
                   <select
                     value={xAxis}
                     onChange={(e) => setXAxis(e.target.value)}
-                    className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white rounded-lg p-2 cursor-pointer font-medium"
+                    className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white rounded-lg p-2 cursor-pointer font-medium text-xs"
                   >
                     {allColumns.map(col => (
                       <option key={col} value={col}>{col}</option>
@@ -897,7 +1248,7 @@ export default function CustomChartBuilder({
                   <select
                     value={yAxis}
                     onChange={(e) => setYAxis(e.target.value)}
-                    className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white rounded-lg p-2 cursor-pointer font-medium"
+                    className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white rounded-lg p-2 cursor-pointer font-medium text-xs"
                   >
                     {numericColumns.map(col => (
                       <option key={col.name} value={col.name}>{col.name}</option>
@@ -905,6 +1256,41 @@ export default function CustomChartBuilder({
                   </select>
                 </div>
               </div>
+
+              {/* Non-Insightful Measure Warning Box */}
+              {isQuestionableMeasure && (
+                <div className="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-300 text-[10px] space-y-1.5">
+                  <div className="flex items-center gap-1.5 font-bold">
+                    <AlertTriangle size={12} className="text-amber-600 shrink-0" />
+                    <span>Non-Insightful Measure Warning</span>
+                  </div>
+                  <p className="font-light text-[9.5px] leading-relaxed">
+                    <strong>"{yAxis}"</strong> appears to be a calendar year or index identifier. Aggregating it produces flat horizontal sums without clinical meaning.
+                  </p>
+                  <div className="flex items-center gap-2 pt-1 flex-wrap">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const v = resolveField(['ed_visits', 'total_visits', 'visits'], 'numeric');
+                        if (v) { setYAxis(v); setAggregation('Sum'); }
+                      }}
+                      className="px-2 py-1 rounded bg-amber-600 hover:bg-amber-700 text-white font-bold text-[9px] cursor-pointer"
+                    >
+                      Switch to ED Visits (Volume)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const v = resolveField(['median_length_of_stay_min', 'los_hours', 'los_min'], 'numeric');
+                        if (v) { setYAxis(v); setAggregation('Average'); }
+                      }}
+                      className="px-2 py-1 rounded bg-amber-600 hover:bg-amber-700 text-white font-bold text-[9px] cursor-pointer"
+                    >
+                      Switch to Length of Stay (Average)
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* Aggregation & Top N filters */}
               <div className="grid grid-cols-2 gap-3 text-left">
@@ -949,7 +1335,7 @@ export default function CustomChartBuilder({
                       showGridlines ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-950/40 dark:border-indigo-800 dark:text-indigo-300' : 'bg-transparent border-slate-200 text-slate-500 dark:border-slate-700'
                     }`}
                   >
-                    {showGridlines ? '✓ Gridlines On' : 'Gridlines Off'}
+                    {showGridlines ? '✓ Visible Gridlines' : 'Hidden Gridlines'}
                   </button>
                 </div>
 
@@ -961,22 +1347,21 @@ export default function CustomChartBuilder({
                       showDataLabels ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-950/40 dark:border-indigo-800 dark:text-indigo-300' : 'bg-transparent border-slate-200 text-slate-500 dark:border-slate-700'
                     }`}
                   >
-                    {showDataLabels ? '✓ Labels On' : 'Labels Off'}
+                    {showDataLabels ? '✓ Data Labels On' : 'Data Labels Off'}
                   </button>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3 text-left">
-                {/* Label rotation and formatting prefix */}
+                {/* X-axis rotation & Number formats */}
                 <div className="space-y-1">
-                  <label className="text-[9px] font-bold font-mono text-slate-400 block uppercase">LABEL ROTATION</label>
+                  <label className="text-[9px] font-bold font-mono text-slate-400 block uppercase">X-AXIS LABEL ROTATION</label>
                   <select
                     value={xAxisLabelRotation}
                     onChange={(e) => setXAxisLabelRotation(Number(e.target.value))}
                     className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white rounded-lg p-2 cursor-pointer font-medium"
                   >
-                    <option value={0}>0° Horizontal</option>
-                    <option value={30}>30° Angle</option>
+                    <option value={0}>Horizontal (0°)</option>
                     <option value={45}>45° Angle</option>
                     <option value={90}>90° Vertical</option>
                   </select>
@@ -1149,7 +1534,7 @@ export default function CustomChartBuilder({
           <button
             onClick={handleCreateVisual}
             id="add-saved-chart-btn"
-            className="w-full py-3 px-4 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 cursor-pointer transition shadow-3xs flex items-center justify-center gap-1.5"
+            className="w-full py-3 px-4 rounded-xl text-xs font-bold text-white bg-[#0F4C81] hover:bg-[#0c3e6b] dark:bg-[#3B82F6] dark:hover:bg-[#2563eb] cursor-pointer transition shadow-3xs flex items-center justify-center gap-1.5"
           >
             <PlusCircle size={14} /> Commit Visual to Dashboard Row
           </button>
@@ -1161,19 +1546,29 @@ export default function CustomChartBuilder({
           isDarkMode ? 'border-slate-800 bg-slate-900/60' : 'border-slate-200 bg-white'
         }`} id="studio-live-preview-panel">
           
-          <div className="pb-3 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center text-xs">
+          <div className="pb-3 border-b border-slate-100 dark:border-slate-800 flex justify-between items-start text-xs flex-wrap gap-2">
             <div>
-              <span className="font-mono text-[9px] text-indigo-600 font-extrabold uppercase tracking-widest block">High-Fidelity Canvas</span>
-              <h4 className="text-sm font-extrabold text-slate-800 dark:text-white flex items-center gap-1.5 font-sans">
+              <span className="font-mono text-[9px] text-[#0F4C81] dark:text-[#3B82F6] font-extrabold uppercase tracking-widest block">
+                High-Fidelity Canvas · Live Preview
+              </span>
+              <h4 className="text-sm font-extrabold text-slate-800 dark:text-white font-sans mt-0.5">
                 {title}
               </h4>
+              {subtitle && (
+                <p className="text-[10px] text-slate-400 font-light mt-0.5">
+                  {subtitle}
+                </p>
+              )}
             </div>
             
             {/* Visual Action Controls */}
-            <div className="flex gap-2">
+            <div className="flex items-center gap-2">
+              <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                {xAxis} × {yAxis} ({aggregation})
+              </span>
               <button 
                 onClick={exportVisualCSV}
-                className="p-1.5 text-slate-500 hover:text-indigo-600 dark:text-slate-400 rounded-lg border hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer flex items-center gap-1 text-[10px]"
+                className="p-1.5 text-slate-500 hover:text-indigo-600 dark:text-slate-400 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer flex items-center gap-1 text-[10px] font-medium"
                 title="Export this preview data as CSV"
               >
                 <Download size={11} /> CSV
@@ -1182,7 +1577,7 @@ export default function CustomChartBuilder({
           </div>
 
           {/* Core Visualization Stage */}
-          <div className="h-[260px] my-4 flex items-center justify-center text-xs">
+          <div className="h-[270px] my-3 flex items-center justify-center text-xs">
             {livePreviewData.length === 0 ? (
               <div className="text-slate-400 font-mono italic">Specify axes parameters to trigger preview coordinate compilation.</div>
             ) : (
@@ -1191,49 +1586,65 @@ export default function CustomChartBuilder({
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
                   {type === 'Column' ? (
-                    <ComposedChart data={mergedChartData} margin={{ left: -10, right: 10, top: 10 }}>
+                    <ComposedChart data={mergedChartData} margin={{ left: -10, right: 15, top: 15, bottom: 5 }}>
                       {showGridlines && <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#334155' : '#f1f5f9'} />}
                       <XAxis dataKey="name" stroke={isDarkMode ? '#94a3b8' : '#475569'} fontSize={fontSize} angle={xAxisLabelRotation} textAnchor={xAxisLabelRotation > 0 ? 'start' : 'middle'} height={xAxisLabelRotation > 0 ? 50 : 30} />
                       <YAxis stroke={isDarkMode ? '#94a3b8' : '#475569'} fontSize={fontSize} tickFormatter={formatYValue} domain={logScale ? ['auto', 'auto'] : undefined} scale={logScale ? 'log' : 'auto'} />
                       <Tooltip formatter={(value: any) => [formatYValue(Number(value)), yAxis]} contentStyle={{ backgroundColor: isDarkMode ? '#1e293b' : '#ffffff', border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0', borderRadius: '8px' }} />
                       {showLegend && <Legend verticalAlign={(legendPosition === 'top' || legendPosition === 'bottom') ? legendPosition : 'bottom'} align={(legendPosition === 'left' || legendPosition === 'right') ? legendPosition : 'center'} height={36} />}
-                      <Bar dataKey="value" fill={chartColor} radius={[2, 2, 0, 0]} onClick={(data) => data && setDrillCategory(data.name)} className="cursor-pointer" />
+                      <Bar dataKey="value" fill={chartColor} radius={[3, 3, 0, 0]} onClick={(data) => data && setDrillCategory(data.name)} className="cursor-pointer">
+                        {showDataLabels && (
+                          <LabelList dataKey="value" position="top" offset={6} formatter={(v: any) => formatYValue(Number(v))} fill={isDarkMode ? '#E2E8F0' : '#1E293B'} fontSize={8.5} fontWeight={700} fontFamily="monospace" />
+                        )}
+                      </Bar>
                       {enableTrendLine && <Line type="monotone" dataKey="trendValue" stroke="#f43f5e" strokeWidth={2} dot={false} strokeDasharray="4 4" name="Regression Trend" />}
                       {enableMovingAverage && <Line type="monotone" dataKey="maValue" stroke="#3b82f6" strokeWidth={2} dot={false} name="3-Period Moving Avg" />}
                       {targetValue !== undefined && <ReferenceLine y={targetValue} stroke="#ea580c" strokeDasharray="3 3" label={{ value: 'TARGET THRESHOLD', fill: '#ea580c', fontSize: 8 }} />}
                     </ComposedChart>
                   ) : type === 'Bar' ? (
-                    <ComposedChart data={mergedChartData} layout="vertical" margin={{ left: 10, right: 10, top: 10 }}>
+                    <ComposedChart data={mergedChartData} layout="vertical" margin={{ left: 10, right: 40, top: 10, bottom: 5 }}>
                       {showGridlines && <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#334155' : '#f1f5f9'} />}
                       <XAxis type="number" stroke={isDarkMode ? '#94a3b8' : '#475569'} fontSize={fontSize} tickFormatter={formatYValue} />
-                      <YAxis dataKey="name" type="category" stroke={isDarkMode ? '#94a3b8' : '#475569'} fontSize={fontSize} width={65} />
+                      <YAxis dataKey="name" type="category" stroke={isDarkMode ? '#94a3b8' : '#475569'} fontSize={fontSize} width={80} />
                       <Tooltip formatter={(value: any) => [formatYValue(Number(value)), yAxis]} contentStyle={{ backgroundColor: isDarkMode ? '#1e293b' : '#ffffff', border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0', borderRadius: '8px' }} />
                       {showLegend && <Legend verticalAlign={(legendPosition === 'top' || legendPosition === 'bottom') ? legendPosition : 'bottom'} align={(legendPosition === 'left' || legendPosition === 'right') ? legendPosition : 'center'} height={36} />}
-                      <Bar dataKey="value" fill={chartColor} radius={[0, 2, 2, 0]} onClick={(data) => data && setDrillCategory(data.name)} className="cursor-pointer" />
+                      <Bar dataKey="value" fill={chartColor} radius={[0, 3, 3, 0]} onClick={(data) => data && setDrillCategory(data.name)} className="cursor-pointer">
+                        {showDataLabels && (
+                          <LabelList dataKey="value" position="right" offset={6} formatter={(v: any) => formatYValue(Number(v))} fill={isDarkMode ? '#E2E8F0' : '#1E293B'} fontSize={8.5} fontWeight={700} fontFamily="monospace" />
+                        )}
+                      </Bar>
                       {enableTrendLine && <Line type="monotone" dataKey="trendValue" stroke="#f43f5e" strokeWidth={2} dot={false} strokeDasharray="4 4" name="Regression Trend" />}
                       {enableMovingAverage && <Line type="monotone" dataKey="maValue" stroke="#3b82f6" strokeWidth={2} dot={false} name="3-Period Moving Avg" />}
                       {targetValue !== undefined && <ReferenceLine x={targetValue} stroke="#ea580c" strokeDasharray="3 3" label={{ value: 'TARGET', fill: '#ea580c', fontSize: 8, position: 'insideTop' }} />}
                     </ComposedChart>
                   ) : type === 'Line' ? (
-                    <ComposedChart data={mergedChartData} margin={{ left: -10, right: 10, top: 10 }}>
+                    <ComposedChart data={mergedChartData} margin={{ left: -10, right: 15, top: 15, bottom: 5 }}>
                       {showGridlines && <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#334155' : '#f1f5f9'} />}
                       <XAxis dataKey="name" stroke={isDarkMode ? '#94a3b8' : '#475569'} fontSize={fontSize} angle={xAxisLabelRotation} textAnchor={xAxisLabelRotation > 0 ? 'start' : 'middle'} height={xAxisLabelRotation > 0 ? 50 : 30} />
                       <YAxis stroke={isDarkMode ? '#94a3b8' : '#475569'} fontSize={fontSize} tickFormatter={formatYValue} />
                       <Tooltip formatter={(value: any) => [formatYValue(Number(value)), yAxis]} contentStyle={{ backgroundColor: isDarkMode ? '#1e293b' : '#ffffff', border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0', borderRadius: '8px' }} />
                       {showLegend && <Legend verticalAlign={(legendPosition === 'top' || legendPosition === 'bottom') ? legendPosition : 'bottom'} align={(legendPosition === 'left' || legendPosition === 'right') ? legendPosition : 'center'} height={36} />}
-                      <Line type="monotone" dataKey="value" stroke={chartColor} strokeWidth={2.5} dot={{ r: 3 }} onClick={(data) => data && setDrillCategory(data.name)} className="cursor-pointer" />
+                      <Line type="monotone" dataKey="value" stroke={chartColor} strokeWidth={2.5} dot={{ r: 3.5, fill: chartColor }} onClick={(data) => data && setDrillCategory(data.name)} className="cursor-pointer">
+                        {showDataLabels && (
+                          <LabelList dataKey="value" position="top" offset={6} formatter={(v: any) => formatYValue(Number(v))} fill={isDarkMode ? '#E2E8F0' : '#1E293B'} fontSize={8.5} fontWeight={700} fontFamily="monospace" />
+                        )}
+                      </Line>
                       {enableTrendLine && <Line type="monotone" dataKey="trendValue" stroke="#f43f5e" strokeWidth={2} dot={false} strokeDasharray="4 4" name="Regression Trend" />}
                       {enableMovingAverage && <Line type="monotone" dataKey="maValue" stroke="#3b82f6" strokeWidth={2} dot={false} name="3-Period Moving Avg" />}
                       {targetValue !== undefined && <ReferenceLine y={targetValue} stroke="#ea580c" strokeDasharray="3 3" label={{ value: 'TARGET THRESHOLD', fill: '#ea580c', fontSize: 8 }} />}
                     </ComposedChart>
                   ) : type === 'Area' ? (
-                    <ComposedChart data={mergedChartData} margin={{ left: -10, right: 10, top: 10 }}>
+                    <ComposedChart data={mergedChartData} margin={{ left: -10, right: 15, top: 15, bottom: 5 }}>
                       {showGridlines && <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#334155' : '#f1f5f9'} />}
                       <XAxis dataKey="name" stroke={isDarkMode ? '#94a3b8' : '#475569'} fontSize={fontSize} angle={xAxisLabelRotation} textAnchor={xAxisLabelRotation > 0 ? 'start' : 'middle'} height={xAxisLabelRotation > 0 ? 50 : 30} />
                       <YAxis stroke={isDarkMode ? '#94a3b8' : '#475569'} fontSize={fontSize} tickFormatter={formatYValue} />
                       <Tooltip formatter={(value: any) => [formatYValue(Number(value)), yAxis]} contentStyle={{ backgroundColor: isDarkMode ? '#1e293b' : '#ffffff', border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0', borderRadius: '8px' }} />
                       {showLegend && <Legend verticalAlign={(legendPosition === 'top' || legendPosition === 'bottom') ? legendPosition : 'bottom'} align={(legendPosition === 'left' || legendPosition === 'right') ? legendPosition : 'center'} height={36} />}
-                      <Area type="monotone" dataKey="value" stroke={chartColor} fill={chartColor} fillOpacity={0.15} onClick={(data) => data && setDrillCategory(data.name)} className="cursor-pointer" />
+                      <Area type="monotone" dataKey="value" stroke={chartColor} fill={chartColor} fillOpacity={0.18} onClick={(data) => data && setDrillCategory(data.name)} className="cursor-pointer">
+                        {showDataLabels && (
+                          <LabelList dataKey="value" position="top" offset={6} formatter={(v: any) => formatYValue(Number(v))} fill={isDarkMode ? '#E2E8F0' : '#1E293B'} fontSize={8.5} fontWeight={700} fontFamily="monospace" />
+                        )}
+                      </Area>
                       {enableTrendLine && <Line type="monotone" dataKey="trendValue" stroke="#f43f5e" strokeWidth={2} dot={false} strokeDasharray="4 4" name="Regression Trend" />}
                       {enableMovingAverage && <Line type="monotone" dataKey="maValue" stroke="#3b82f6" strokeWidth={2} dot={false} name="3-Period Moving Avg" />}
                       {targetValue !== undefined && <ReferenceLine y={targetValue} stroke="#ea580c" strokeDasharray="3 3" label={{ value: 'TARGET THRESHOLD', fill: '#ea580c', fontSize: 8 }} />}
