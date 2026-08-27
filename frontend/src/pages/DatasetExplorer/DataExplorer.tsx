@@ -7,11 +7,11 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
-  Database, ChevronDown, RefreshCw, Download, Search, TrendingUp,
+  Database, ChevronDown, RefreshCw, Search, TrendingUp,
   BarChart2, AlertTriangle, Grid, BookOpen, Filter, ArrowUpDown,
   ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Info, Zap, Activity,
-  Eye, FileSpreadsheet, CheckCircle2, XCircle, Check, FileText,
-  ArrowRight, Loader2, X, Layers
+  Eye, FileSpreadsheet, CheckCircle2, XCircle, FileText,
+  Loader2, X, Layers
 } from 'lucide-react';
 import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -443,12 +443,7 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
   const [activeSheet, setActiveSheet] = useState<string>('');
   const [sheetDropOpen, setSheetDropOpen] = useState(false);
 
-  /* download dialog state (two-step: 1. sheets selection, 2. format selection) */
-  const [downloadModalOpen, setDownloadModalOpen] = useState(false);
-  const [downloadStep, setDownloadStep] = useState<1 | 2>(1);
-  const [selectedDownloadSheets, setSelectedDownloadSheets] = useState<string[]>([]);
-  const [downloadFormat, setDownloadFormat] = useState<'xlsx' | 'csv'>('xlsx');
-  const [isDownloading, setIsDownloading] = useState(false);
+
 
   /* data state */
   const [sheetData, setSheetData] = useState<SheetData | null>(null);
@@ -746,73 +741,6 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
     else { setSortCol(col); setSortDir('asc'); }
   }, [sortCol]);
 
-  /* ── Download Handlers & Multi-step Export Logic ── */
-  const isAllSheetsSelected = useMemo(() => {
-    return sheets.length > 0 && sheets.every(s => selectedDownloadSheets.includes(s));
-  }, [sheets, selectedDownloadSheets]);
-
-  const toggleAllSheets = useCallback(() => {
-    if (isAllSheetsSelected) {
-      setSelectedDownloadSheets([]);
-    } else {
-      setSelectedDownloadSheets([...sheets]);
-    }
-  }, [isAllSheetsSelected, sheets]);
-
-  const toggleSheet = useCallback((sheetName: string) => {
-    setSelectedDownloadSheets(prev =>
-      prev.includes(sheetName)
-        ? prev.filter(s => s !== sheetName)
-        : [...prev, sheetName]
-    );
-  }, []);
-
-  const openDownloadModal = useCallback((preferredSheet?: string) => {
-    setDownloadStep(1);
-    if (selectedDownloadSheets.length === 0 && sheets.length > 0) {
-      setSelectedDownloadSheets(preferredSheet ? [preferredSheet] : [...sheets]);
-    }
-    setDownloadModalOpen(true);
-  }, [selectedDownloadSheets, sheets]);
-
-  const handleExecuteDownload = useCallback(async () => {
-    if (selectedDownloadSheets.length === 0) return;
-    setIsDownloading(true);
-
-    try {
-      const isAll = isAllSheetsSelected || selectedDownloadSheets.length === sheets.length;
-      const sheetsParam = isAll ? 'all' : selectedDownloadSheets.join(',');
-      const url = `/api/dataset/download/export?sheets=${encodeURIComponent(sheetsParam)}&format=${downloadFormat}`;
-
-      const link = document.createElement('a');
-      link.href = url;
-      if (downloadFormat === 'xlsx') {
-        link.download = isAll
-          ? 'Explanatory_and_Predictive_ED_Analytics_Dataset.xlsx'
-          : 'Selected_ED_Analytics_Sheets.xlsx';
-      } else {
-        link.download = selectedDownloadSheets.length === 1
-          ? `${selectedDownloadSheets[0]}_export.csv`
-          : isAll
-            ? 'ED_Analytics_All_Worksheets_CSV.zip'
-            : 'ED_Analytics_Selected_Sheets_CSV.zip';
-      }
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      setDownloadModalOpen(false);
-    } catch (err) {
-      console.error('Download execution failed:', err);
-    } finally {
-      setIsDownloading(false);
-    }
-  }, [selectedDownloadSheets, isAllSheetsSelected, sheets, downloadFormat]);
-
-  const exportCSV = useCallback(() => {
-    openDownloadModal(activeSheet);
-  }, [openDownloadModal, activeSheet]);
-
   /* ── Tabs config ── */
   const TABS: { key: Tab; label: string; icon: React.ElementType }[] = [
     { key: 'summary',      label: 'Summary',       icon: Activity },
@@ -906,17 +834,6 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
 
           {/* Action buttons (right-aligned) */}
           <div className="ml-auto flex items-center gap-2">
-            {/* Download Button triggering Multi-Step Export Dialog */}
-            <button
-              onClick={() => openDownloadModal()}
-              className="p-2 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#2563EB] hover:border-[#2563EB] hover:bg-blue-50/50 dark:hover:bg-blue-950/30 transition-colors cursor-pointer flex items-center justify-center gap-1.5 text-xs font-semibold"
-              title="Download Entire Workbook or Specific Worksheets (XLSX / CSV)"
-              aria-label="Download dataset export"
-            >
-              <Download size={15} />
-              <span className="hidden sm:inline">Download</span>
-            </button>
-
             {/* Refresh */}
             <button
               onClick={() => { const s = activeSheet; setActiveSheet(''); setTimeout(() => setActiveSheet(s), 50); }}
@@ -1109,9 +1026,6 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
                 <span className="text-xs text-[var(--text-secondary)] shrink-0">
                   {tableRows.length.toLocaleString()} of {sheetData.rows_count.toLocaleString()} rows
                 </span>
-                <button onClick={exportCSV} className="btn-secondary text-xs gap-1.5 px-3 h-9 shrink-0">
-                  <Download size={13} /> Export CSV
-                </button>
               </div>
 
               {/* Table */}
@@ -1215,285 +1129,7 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
         </div>
       )}
 
-      {/* ── MULTI-STEP DATASET DOWNLOAD DIALOG (STEP 1: SHEETS, STEP 2: FORMAT) ── */}
-      {downloadModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-fade-in font-sans">
-          <div className="bg-white dark:bg-[#111c30] border border-slate-200 dark:border-slate-800 rounded-3xl max-w-lg w-full shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-scale-up">
-            
-            {/* Modal Header */}
-            <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-900/50">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
-                  <Download size={20} />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900/60 text-blue-800 dark:text-blue-200">
-                      Step {downloadStep} of 2
-                    </span>
-                    <span className="text-[10px] font-mono text-slate-400">
-                      {downloadStep === 1 ? 'Worksheet Selection' : 'Format Selection'}
-                    </span>
-                  </div>
-                  <h3 className="text-base font-bold text-slate-900 dark:text-white leading-tight mt-0.5">
-                    {downloadStep === 1 ? 'Select Worksheets to Download' : 'Choose Export File Format'}
-                  </h3>
-                </div>
-              </div>
-              <button
-                onClick={() => setDownloadModalOpen(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-              >
-                <X size={18} />
-              </button>
-            </div>
 
-            {/* Modal Body */}
-            <div className="p-5 sm:p-6 overflow-y-auto space-y-4 flex-1">
-              {downloadStep === 1 ? (
-                /* ── STEP 1: SHEET SELECTION (ENTIRE WORKBOOK + INDIVIDUAL SHEETS) ── */
-                <div className="space-y-3.5">
-                  <p className="text-xs text-slate-600 dark:text-slate-300 font-light leading-relaxed">
-                    Select the entire master workbook or pick individual worksheets to include in your export.
-                  </p>
-
-                  {/* Option 1: Entire Master Workbook Checkbox Card */}
-                  <div
-                    onClick={toggleAllSheets}
-                    className={`p-3.5 rounded-2xl border-2 transition cursor-pointer flex items-center justify-between ${
-                      isAllSheetsSelected
-                        ? 'border-blue-600 bg-blue-50/70 dark:border-blue-500 dark:bg-blue-950/30'
-                        : 'border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/30 hover:border-slate-300 dark:hover:border-slate-600'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`w-5 h-5 rounded-lg border flex items-center justify-center transition-colors ${
-                        isAllSheetsSelected
-                          ? 'bg-blue-600 border-blue-600 text-white'
-                          : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800'
-                      }`}>
-                        {isAllSheetsSelected && <Check size={14} className="stroke-[3]" />}
-                      </div>
-                      <div>
-                        <span className="font-bold text-xs text-slate-900 dark:text-white block">
-                          Entire Master Workbook (All {sheets.length} Worksheets)
-                        </span>
-                        <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-light">
-                          Full historical ED dataset across all clinical and flow dimensions
-                        </span>
-                      </div>
-                    </div>
-                    <span className="text-[9px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-blue-500/10 text-blue-600 dark:text-blue-400 shrink-0">
-                      Master Package
-                    </span>
-                  </div>
-
-                  {/* Divider */}
-                  <div className="flex items-center justify-between pt-1">
-                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
-                      Or Select Individual Worksheets ({selectedDownloadSheets.length} of {sheets.length} Selected)
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => setSelectedDownloadSheets([...sheets])}
-                        className="text-[10px] font-semibold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
-                      >
-                        Select All
-                      </button>
-                      <span className="text-slate-300 dark:text-slate-600">·</span>
-                      <button
-                        onClick={() => setSelectedDownloadSheets([])}
-                        className="text-[10px] font-semibold text-slate-500 hover:underline cursor-pointer"
-                      >
-                        Clear All
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Individual Sheets List */}
-                  <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
-                    {sheets.map((sName) => {
-                      const isSelected = selectedDownloadSheets.includes(sName);
-                      return (
-                        <div
-                          key={sName}
-                          onClick={() => toggleSheet(sName)}
-                          className={`p-3 rounded-xl border transition cursor-pointer flex items-center justify-between ${
-                            isSelected
-                              ? 'border-indigo-400 dark:border-indigo-600 bg-indigo-50/40 dark:bg-indigo-950/20'
-                              : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/40'
-                          }`}
-                        >
-                          <div className="flex items-center gap-3 min-w-0">
-                            <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors shrink-0 ${
-                              isSelected
-                                ? 'bg-indigo-600 border-indigo-600 text-white'
-                                : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800'
-                            }`}>
-                              {isSelected && <Check size={12} className="stroke-[3]" />}
-                            </div>
-                            <div className="truncate">
-                              <span className="font-semibold text-xs text-slate-900 dark:text-white block truncate">
-                                {sName}
-                              </span>
-                              <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate block font-light">
-                                {FALLBACK_SHEET_DATA[sName]?.label || 'Analytical worksheet'}
-                              </span>
-                            </div>
-                          </div>
-
-                          {sName === activeSheet && (
-                            <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shrink-0 ml-2">
-                              Active View
-                            </span>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              ) : (
-                /* ── STEP 2: FORMAT SELECTION (XLSX VS CSV) ── */
-                <div className="space-y-4">
-                  <p className="text-xs text-slate-600 dark:text-slate-300 font-light leading-relaxed">
-                    Select your preferred file style. Downloads will be packaged with all {selectedDownloadSheets.length} selected worksheet(s).
-                  </p>
-
-                  <div className="grid grid-cols-1 gap-3">
-                    
-                    {/* Format Option 1: Microsoft Excel (.xlsx) */}
-                    <div
-                      onClick={() => setDownloadFormat('xlsx')}
-                      className={`p-4 rounded-2xl border-2 transition cursor-pointer flex items-start gap-3.5 ${
-                        downloadFormat === 'xlsx'
-                          ? 'border-emerald-600 bg-emerald-50/70 dark:border-emerald-500 dark:bg-emerald-950/30'
-                          : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-white dark:bg-slate-900/40'
-                      }`}
-                    >
-                      <div className="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 flex items-center justify-center shrink-0 mt-0.5">
-                        <FileSpreadsheet size={22} />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <span className="font-bold text-xs text-slate-900 dark:text-white">
-                            Microsoft Excel (.xlsx)
-                          </span>
-                          <span className="text-[9px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200">
-                            Multi-Tab Workbook
-                          </span>
-                        </div>
-                        <p className="text-[11px] text-slate-600 dark:text-slate-300 font-light mt-1 leading-relaxed">
-                          {selectedDownloadSheets.length === sheets.length
-                            ? 'Downloads the complete master workbook with all worksheets formatted in native Excel tabs.'
-                            : `Creates a multi-tab Excel workbook containing the ${selectedDownloadSheets.length} selected worksheet(s).`}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Format Option 2: Comma-Separated Values (.csv / .zip) */}
-                    <div
-                      onClick={() => setDownloadFormat('csv')}
-                      className={`p-4 rounded-2xl border-2 transition cursor-pointer flex items-start gap-3.5 ${
-                        downloadFormat === 'csv'
-                          ? 'border-blue-600 bg-blue-50/70 dark:border-blue-500 dark:bg-blue-950/30'
-                          : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-white dark:bg-slate-900/40'
-                      }`}
-                    >
-                      <div className="w-10 h-10 rounded-xl bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30 flex items-center justify-center shrink-0 mt-0.5">
-                        <FileText size={22} />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <span className="font-bold text-xs text-slate-900 dark:text-white">
-                            Comma-Separated Values (.csv)
-                          </span>
-                          <span className="text-[9px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900/60 text-blue-800 dark:text-blue-200">
-                            {selectedDownloadSheets.length === 1 ? 'Direct .CSV' : 'ZIP Archive'}
-                          </span>
-                        </div>
-                        <p className="text-[11px] text-slate-600 dark:text-slate-300 font-light mt-1 leading-relaxed">
-                          {selectedDownloadSheets.length === 1
-                            ? `Exports ${selectedDownloadSheets[0]} directly as an individual standard CSV file.`
-                            : `Packages all ${selectedDownloadSheets.length} selected worksheets as individual CSV files in a clean .ZIP archive.`}
-                        </p>
-                      </div>
-                    </div>
-
-                  </div>
-
-                  {/* Summary Box */}
-                  <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 space-y-1.5">
-                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
-                      Export Package Summary:
-                    </span>
-                    <div className="flex flex-wrap gap-1">
-                      {selectedDownloadSheets.map(s => (
-                        <span key={s} className="text-[10px] font-mono px-2 py-0.5 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300">
-                          {s}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Modal Footer */}
-            <div className="p-4 sm:p-5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex items-center justify-between gap-3">
-              {downloadStep === 1 ? (
-                <>
-                  <button
-                    onClick={() => setDownloadModalOpen(false)}
-                    className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition cursor-pointer"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={() => setDownloadStep(2)}
-                    disabled={selectedDownloadSheets.length === 0}
-                    className={`px-5 py-2.5 rounded-xl text-xs font-bold text-white transition flex items-center gap-2 shadow-sm ${
-                      selectedDownloadSheets.length === 0
-                        ? 'bg-slate-400 dark:bg-slate-700 cursor-not-allowed opacity-50'
-                        : 'bg-blue-600 hover:bg-blue-700 active:scale-[0.99] cursor-pointer hover:shadow'
-                    }`}
-                  >
-                    <span>Next: Choose Format ({selectedDownloadSheets.length} Selected)</span>
-                    <ArrowRight size={14} />
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button
-                    onClick={() => setDownloadStep(1)}
-                    className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition flex items-center gap-1.5 cursor-pointer"
-                  >
-                    <ChevronLeft size={14} />
-                    <span>Back to Sheets</span>
-                  </button>
-                  <button
-                    onClick={handleExecuteDownload}
-                    disabled={isDownloading}
-                    className="px-6 py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] transition flex items-center gap-2 shadow-md hover:shadow-lg cursor-pointer"
-                  >
-                    {isDownloading ? (
-                      <>
-                        <Loader2 size={14} className="animate-spin" />
-                        <span>Generating Export...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Download size={14} />
-                        <span>Download ({downloadFormat.toUpperCase()})</span>
-                      </>
-                    )}
-                  </button>
-                </>
-              )}
-            </div>
-
-          </div>
-        </div>
-      )}
     </div>
   );
 }

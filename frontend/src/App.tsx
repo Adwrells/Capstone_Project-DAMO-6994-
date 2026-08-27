@@ -476,22 +476,35 @@ export default function App() {
 
             {/* Next Stage Action */}
             {currentIndex < STAGES.length - 1 ? (
-              <button
-                onClick={handleNextStage}
-                title={
-                  currentIndex === 1 && !cleaningSummary
-                    ? "Click to review required data validation steps before advancing."
-                    : undefined
-                }
-                className={`flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer ${
-                  currentIndex === 1 && !cleaningSummary
-                    ? 'bg-slate-400/80 hover:bg-slate-500 text-white dark:bg-slate-700 dark:hover:bg-slate-600 border border-slate-300 dark:border-slate-600'
-                    : 'text-white bg-[#2563EB] hover:bg-blue-700 hover:shadow'
-                }`}
-              >
-                <span>Next: {STAGES[currentIndex + 1].label}</span>
-                <ChevronRight size={15} />
-              </button>
+              (() => {
+                const needsValidation = currentIndex === 1 && !cleaningSummary;
+                return (
+                  <div className="relative group">
+                    <button
+                      onClick={needsValidation ? undefined : handleNextStage}
+                      disabled={needsValidation}
+                      aria-disabled={needsValidation}
+                      title={needsValidation ? 'Run the Data Preparation & Validation Pipeline on Stage 2 first' : undefined}
+                      className={`flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-bold transition-all shadow-sm ${
+                        needsValidation
+                          ? 'bg-slate-300 dark:bg-slate-700 text-slate-500 dark:text-slate-400 border border-slate-300 dark:border-slate-600 cursor-not-allowed opacity-70'
+                          : 'text-white bg-[#2563EB] hover:bg-blue-700 hover:shadow cursor-pointer'
+                      }`}
+                    >
+                      {needsValidation && <Layers size={13} className="shrink-0" />}
+                      <span>Next: {STAGES[currentIndex + 1].label}</span>
+                      <ChevronRight size={15} />
+                    </button>
+                    {needsValidation && (
+                      <div className="absolute right-0 top-full mt-2 z-50 w-64 px-3 py-2.5 rounded-xl bg-slate-900 dark:bg-slate-800 text-white text-[11px] font-medium shadow-xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-150 leading-relaxed">
+                        <span className="font-bold text-amber-400 block mb-1">⚠ Validation Required</span>
+                        Run the <span className="font-semibold text-indigo-300">Automated Data Preparation &amp; Validation Pipeline</span> on Stage 2 to unlock this step.
+                        <div className="absolute -top-1.5 right-6 w-3 h-3 bg-slate-900 dark:bg-slate-800 rotate-45" />
+                      </div>
+                    )}
+                  </div>
+                );
+              })()
             ) : (
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/50 text-emerald-700 dark:text-emerald-400 text-xs font-bold shadow-xs">
                 <CheckCircle2 size={15} />
