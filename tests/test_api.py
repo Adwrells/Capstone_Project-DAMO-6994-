@@ -69,8 +69,12 @@ class TestAPIEndpoints(unittest.TestCase):
         self.assertTrue(res["success"])
         self.assertEqual(len(res["keyInsights"]), 4)
         self.assertEqual(len(res["evidenceMatrix"]), 5)
-        self.assertEqual(len(res["recommendations"]), 3)
+        self.assertEqual(len(res["recommendations"]), 4)
+        self.assertEqual(len(res["dashboardInsights"]), 5)
+        self.assertEqual(len(res["executiveTakeaways"]), 4)
         self.assertIn("roadmap", res)
+        self.assertIn("boundariesSupports", res)
+        self.assertIn("boundariesNotProven", res)
         self.assertIn("decisionBoundaries", res)
 
 

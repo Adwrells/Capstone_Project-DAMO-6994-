@@ -907,7 +907,7 @@ class StrategicInsightsSynthesisService:
             },
         ]
 
-        return {
+        payload_dict = {
             "dataSource": "CIHI NACRS aggregate administrative health data (healthcare.db)",
             "alpha": ALPHA,
             "evidenceIndicators": evidence_indicators,
@@ -978,6 +978,12 @@ class StrategicInsightsSynthesisService:
                 ],
             },
         }
+
+        # Backwards-compatibility aliases for legacy consumer contracts & test suites
+        payload_dict["keyInsights"] = [h1, h2, h3, trend]
+        payload_dict["decisionBoundaries"] = payload_dict["boundariesNotProven"]
+
+        return payload_dict
 
 
 strategic_synthesis_service = StrategicInsightsSynthesisService()
