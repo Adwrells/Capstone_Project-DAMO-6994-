@@ -6,7 +6,7 @@ import React, { useState, useEffect } from 'react';
 import {
   Database, ShieldCheck, BarChart3, Presentation, Sparkles,
   RefreshCw, CheckCircle2, ChevronRight, ChevronLeft, HelpCircle, FileDown,
-  Menu, X, User, Moon, Sun, Activity, Layers
+  Menu, X, User, Moon, Sun, Activity, Layers, AlertTriangle, PlaySquare
 } from 'lucide-react';
 import DatasetUpload from './components/common/DatasetUpload';
 import DataCleaning from './pages/PrepQualityEngine/PrepQualityEngine';
@@ -76,6 +76,9 @@ export default function App() {
 
   // Modern Toast notification state
   const [notification, setNotification] = useState<{ text: string; type: 'info' | 'error' | 'success' } | null>(null);
+
+  // Validation warning modal state
+  const [showValidationWarningModal, setShowValidationWarningModal] = useState<boolean>(false);
 
   const datasetNameRef = React.useRef<string | null>(null);
   React.useEffect(() => { datasetNameRef.current = datasetName; }, [datasetName]);
@@ -314,11 +317,7 @@ export default function App() {
 
   const handleNextStage = () => {
     if (currentIndex === 1 && !cleaningSummary) {
-      setNotification({
-        text: "Please run the Automated Data Preparation & Validation Pipeline in Stage 2 to proceed.",
-        type: 'info'
-      });
-      setTimeout(() => setNotification(null), 5000);
+      setShowValidationWarningModal(true);
       return;
     }
     if (currentIndex < STAGES.length - 1) {
@@ -479,16 +478,15 @@ export default function App() {
             {currentIndex < STAGES.length - 1 ? (
               <button
                 onClick={handleNextStage}
-                disabled={currentIndex === 1 && !cleaningSummary}
                 title={
                   currentIndex === 1 && !cleaningSummary
-                    ? "Run the Automated Data Preparation & Validation Pipeline in Stage 2 to proceed."
+                    ? "Click to review required data validation steps before advancing."
                     : undefined
                 }
-                className={`flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-bold text-white bg-[#2563EB] hover:bg-blue-700 shadow-sm transition-all ${
+                className={`flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer ${
                   currentIndex === 1 && !cleaningSummary
-                    ? 'opacity-40 cursor-not-allowed'
-                    : 'cursor-pointer hover:shadow'
+                    ? 'bg-slate-400/80 hover:bg-slate-500 text-white dark:bg-slate-700 dark:hover:bg-slate-600 border border-slate-300 dark:border-slate-600'
+                    : 'text-white bg-[#2563EB] hover:bg-blue-700 hover:shadow'
                 }`}
               >
                 <span>Next: {STAGES[currentIndex + 1].label}</span>
@@ -648,6 +646,82 @@ export default function App() {
             {notification.text}
           </div>
           <button onClick={() => setNotification(null)} className="text-[#94A3B8] hover:text-[#0F172A] text-xs font-bold">✕</button>
+        </div>
+      )}
+
+      {/* ── STAGE 2 VALIDATION WARNING POP-UP MODAL ───────────────────────── */}
+      {showValidationWarningModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white dark:bg-[#111c30] border border-amber-300 dark:border-amber-700/80 rounded-3xl p-6 sm:p-7 max-w-lg w-full shadow-2xl space-y-5 text-left font-sans animate-scale-up">
+            
+            {/* Modal Header */}
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
+                  <AlertTriangle size={22} className="animate-pulse" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 block">
+                    Data Validation Required
+                  </span>
+                  <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+                    Run Preparation Pipeline First
+                  </h3>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowValidationWarningModal(false)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="space-y-3 text-xs sm:text-[13px] text-slate-600 dark:text-slate-300 leading-relaxed font-light">
+              <p>
+                You cannot advance to <strong className="font-semibold text-slate-800 dark:text-slate-100">Stage 3: Dataset Explorer</strong> without running the automated data preparation and quality validation pipeline.
+              </p>
+              <div className="p-3.5 rounded-xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-900/50 space-y-1.5 text-xs">
+                <span className="font-bold text-amber-900 dark:text-amber-200 block font-mono text-[11px] uppercase tracking-wider">
+                  Required Pipeline Operations:
+                </span>
+                <ul className="space-y-1 text-slate-700 dark:text-slate-300 list-disc list-inside text-[11px]">
+                  <li>Column schema standardization to snake_case</li>
+                  <li>Unit harmonization to Total ED-Minutes (TEM)</li>
+                  <li>Validation across 5 dimensions (Completeness, Consistency, Validity, Uniqueness, Coverage)</li>
+                  <li>Persistence and caching in SQLite analytical store</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="flex flex-col sm:flex-row items-center justify-end gap-3 pt-2">
+              <button
+                onClick={() => setShowValidationWarningModal(false)}
+                className="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold transition cursor-pointer"
+              >
+                Cancel / Stay on Stage 2
+              </button>
+              <button
+                onClick={() => {
+                  setShowValidationWarningModal(false);
+                  const el = document.getElementById('run-prep-pipeline-btn');
+                  if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    setTimeout(() => {
+                      (el as HTMLElement).click();
+                    }, 400);
+                  }
+                }}
+                className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white text-xs font-bold shadow-md hover:shadow-lg transition flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <PlaySquare size={15} />
+                <span>Run Data Validation Pipeline Now</span>
+              </button>
+            </div>
+
+          </div>
         </div>
       )}
 
