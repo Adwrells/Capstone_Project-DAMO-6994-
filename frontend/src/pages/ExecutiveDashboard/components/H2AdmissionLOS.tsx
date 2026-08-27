@@ -52,7 +52,7 @@ export default function H2AdmissionLOS({ isDarkMode }: H2AdmissionLOSProps) {
             <BarChart
               data={DISPOSITION_DATA}
               layout="vertical"
-              margin={{ top: 20, right: 75, bottom: 20, left: 75 }}
+              margin={{ top: 20, right: 75, bottom: 25, left: 85 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-slate-200/60 dark:text-slate-800/80" />
               <XAxis
@@ -61,13 +61,33 @@ export default function H2AdmissionLOS({ isDarkMode }: H2AdmissionLOSProps) {
                 tickFormatter={v => `${v}h`}
                 stroke="#94a3b8"
                 domain={[0, 13]}
+                height={35}
+                label={{
+                  value: 'Reported Median Length of Stay (Hours)',
+                  position: 'insideBottom',
+                  offset: -10,
+                  fill: dark ? '#94a3b8' : '#475569',
+                  fontSize: 9.5,
+                  fontWeight: 700,
+                  fontFamily: 'monospace'
+                }}
               />
               <YAxis
                 type="category"
                 dataKey="short"
                 tick={{ fontSize: 10, fill: '#64748b', fontWeight: 600 }}
                 stroke="#94a3b8"
-                width={70}
+                width={75}
+                label={{
+                  value: 'Admission Status',
+                  angle: -90,
+                  position: 'insideLeft',
+                  offset: -10,
+                  fill: dark ? '#94a3b8' : '#475569',
+                  fontSize: 9.5,
+                  fontWeight: 700,
+                  fontFamily: 'monospace'
+                }}
               />
               <Tooltip
                 formatter={(val: any, _name: string, item: any) => [

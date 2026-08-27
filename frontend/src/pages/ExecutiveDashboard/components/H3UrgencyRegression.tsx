@@ -82,7 +82,7 @@ export default function H3UrgencyRegression({ isDarkMode }: H3UrgencyRegressionP
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart
               data={SCATTER_BUBBLE_DATA}
-              margin={{ top: 15, right: 30, bottom: 25, left: 10 }}
+              margin={{ top: 15, right: 30, bottom: 25, left: 15 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-slate-200/60 dark:text-slate-800/80" />
               <XAxis
@@ -94,7 +94,16 @@ export default function H3UrgencyRegression({ isDarkMode }: H3UrgencyRegressionP
                 tickFormatter={v => `L${v}`}
                 tick={{ fontSize: 9.5, fill: '#64748b', fontFamily: 'monospace' }}
                 stroke="#94a3b8"
-                label={{ value: 'CTAS Urgency Score (1=Resuscitation → 5=Non-Urgent)', position: 'insideBottom', fontSize: 9, fill: '#64748b', dy: 18 }}
+                height={40}
+                label={{
+                  value: 'CTAS Urgency Score (1 = Resuscitation → 5 = Non-Urgent)',
+                  position: 'insideBottom',
+                  offset: -10,
+                  fontSize: 9.5,
+                  fill: dark ? '#94a3b8' : '#475569',
+                  fontWeight: 700,
+                  fontFamily: 'monospace'
+                }}
               />
               <YAxis
                 type="number"
@@ -104,6 +113,17 @@ export default function H3UrgencyRegression({ isDarkMode }: H3UrgencyRegressionP
                 tick={{ fontSize: 9.5, fill: '#64748b', fontFamily: 'monospace' }}
                 tickFormatter={v => `${v}h`}
                 stroke="#94a3b8"
+                width={55}
+                label={{
+                  value: 'Length of Stay (Hours)',
+                  angle: -90,
+                  position: 'insideLeft',
+                  offset: 0,
+                  fontSize: 9.5,
+                  fill: dark ? '#94a3b8' : '#475569',
+                  fontWeight: 700,
+                  fontFamily: 'monospace'
+                }}
               />
               <ZAxis type="number" dataKey="visits" range={[80, 500]} />
               <Tooltip content={<CustomScatterTooltip />} />

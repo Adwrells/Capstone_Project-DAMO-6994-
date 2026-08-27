@@ -69,7 +69,7 @@ export default function VisitVolumeTrend({ data, isDarkMode }: VisitVolumeTrendP
 
       <div style={{ height: 260 }}>
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data} margin={{ top: 22, right: 20, bottom: 35, left: 10 }}>
+          <AreaChart data={data} margin={{ top: 22, right: 20, bottom: 25, left: 15 }}>
             <defs>
               <linearGradient id="vol-gradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#0F4C81" stopOpacity={0.4} />
@@ -84,11 +84,32 @@ export default function VisitVolumeTrend({ data, isDarkMode }: VisitVolumeTrendP
               textAnchor="end"
               interval={1}
               stroke="#94a3b8"
+              height={45}
+              label={{
+                value: 'Fiscal Year (2003/04 - 2021/22)',
+                position: 'insideBottom',
+                offset: -12,
+                fill: dark ? '#94a3b8' : '#475569',
+                fontSize: 9.5,
+                fontWeight: 700,
+                fontFamily: 'monospace'
+              }}
             />
             <YAxis
               tick={{ fontSize: 9, fill: '#64748b', fontFamily: 'monospace' }}
               tickFormatter={v => fmtK(v)}
               stroke="#94a3b8"
+              width={60}
+              label={{
+                value: 'Total ED Visits (Count)',
+                angle: -90,
+                position: 'insideLeft',
+                offset: 0,
+                fill: dark ? '#94a3b8' : '#475569',
+                fontSize: 9.5,
+                fontWeight: 700,
+                fontFamily: 'monospace'
+              }}
             />
             <Tooltip content={<CustomVolumeTooltip />} />
             <Area

@@ -93,7 +93,7 @@ export default function ResourceBurdenTrend({ isDarkMode }: ResourceBurdenTrendP
 
       <div style={{ height: 230 }} className="mt-2">
         <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart data={ERBI_LONGITUDINAL_DATA} margin={{ top: 22, right: 30, bottom: 25, left: 10 }}>
+          <ComposedChart data={ERBI_LONGITUDINAL_DATA} margin={{ top: 22, right: 30, bottom: 25, left: 15 }}>
             <defs>
               <linearGradient id="erbi-grad" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#0F4C81" stopOpacity={0.35} />
@@ -105,12 +105,33 @@ export default function ResourceBurdenTrend({ isDarkMode }: ResourceBurdenTrendP
               dataKey="fy"
               tick={{ fontSize: 9, fill: '#64748b', fontFamily: 'monospace' }}
               stroke="#94a3b8"
+              height={40}
+              label={{
+                value: 'Fiscal Year (19-Yr Series + 2-Yr Holt Forecast)',
+                position: 'insideBottom',
+                offset: -10,
+                fill: dark ? '#94a3b8' : '#475569',
+                fontSize: 9.5,
+                fontWeight: 700,
+                fontFamily: 'monospace'
+              }}
             />
             <YAxis
               tick={{ fontSize: 9, fill: '#64748b', fontFamily: 'monospace' }}
               tickFormatter={v => `${v}`}
               domain={[0, 12]}
               stroke="#94a3b8"
+              width={55}
+              label={{
+                value: 'ERBI Index Score',
+                angle: -90,
+                position: 'insideLeft',
+                offset: 0,
+                fill: dark ? '#94a3b8' : '#475569',
+                fontSize: 9.5,
+                fontWeight: 700,
+                fontFamily: 'monospace'
+              }}
             />
             <Tooltip content={<CustomTrendTooltip />} />
             <Area

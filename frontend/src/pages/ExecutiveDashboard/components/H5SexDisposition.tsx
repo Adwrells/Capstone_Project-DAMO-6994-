@@ -93,7 +93,7 @@ export default function H5SexDisposition({ isDarkMode }: H5SexDispositionProps) 
             <BarChart
               data={SEX_DISP_STACKED_DATA}
               layout="vertical"
-              margin={{ top: 10, right: 30, bottom: 10, left: 60 }}
+              margin={{ top: 10, right: 30, bottom: 25, left: 75 }}
               stackOffset="expand"
             >
               <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-slate-200/60 dark:text-slate-800/80" />
@@ -103,13 +103,33 @@ export default function H5SexDisposition({ isDarkMode }: H5SexDispositionProps) 
                 tickFormatter={v => `${Math.round(v * 100)}%`}
                 stroke="#94a3b8"
                 domain={[0, 1]}
+                height={35}
+                label={{
+                  value: 'Visit Disposition Proportion (%)',
+                  position: 'insideBottom',
+                  offset: -10,
+                  fill: dark ? '#94a3b8' : '#475569',
+                  fontSize: 9.5,
+                  fontWeight: 700,
+                  fontFamily: 'monospace'
+                }}
               />
               <YAxis
                 type="category"
                 dataKey="short"
                 tick={{ fontSize: 10, fill: '#64748b', fontWeight: 600 }}
                 stroke="#94a3b8"
-                width={55}
+                width={65}
+                label={{
+                  value: 'Patient Sex',
+                  angle: -90,
+                  position: 'insideLeft',
+                  offset: -10,
+                  fill: dark ? '#94a3b8' : '#475569',
+                  fontSize: 9.5,
+                  fontWeight: 700,
+                  fontFamily: 'monospace'
+                }}
               />
               <Tooltip content={<CustomH5Tooltip />} />
               <Bar dataKey="Non-Admitted" stackId="a" fill="#10B981" barSize={24} name="Non-Admitted (%)">

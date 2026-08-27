@@ -77,7 +77,7 @@ export default function LOSTrend({ data, isDarkMode }: LOSTrendProps) {
 
       <div style={{ height: 260 }}>
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data} margin={{ top: 22, right: 20, bottom: 35, left: 10 }}>
+          <LineChart data={data} margin={{ top: 22, right: 20, bottom: 25, left: 15 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-slate-200/60 dark:text-slate-800/80" />
             <XAxis
               dataKey="fiscal_year"
@@ -86,12 +86,33 @@ export default function LOSTrend({ data, isDarkMode }: LOSTrendProps) {
               textAnchor="end"
               interval={1}
               stroke="#94a3b8"
+              height={45}
+              label={{
+                value: 'Fiscal Year (2003/04 - 2021/22)',
+                position: 'insideBottom',
+                offset: -12,
+                fill: dark ? '#94a3b8' : '#475569',
+                fontSize: 9.5,
+                fontWeight: 700,
+                fontFamily: 'monospace'
+              }}
             />
             <YAxis
               tick={{ fontSize: 9, fill: '#64748b', fontFamily: 'monospace' }}
               tickFormatter={v => `${v}h`}
               domain={[0, 'auto']}
               stroke="#94a3b8"
+              width={55}
+              label={{
+                value: 'Reported Median LOS (Hours)',
+                angle: -90,
+                position: 'insideLeft',
+                offset: 0,
+                fill: dark ? '#94a3b8' : '#475569',
+                fontSize: 9.5,
+                fontWeight: 700,
+                fontFamily: 'monospace'
+              }}
             />
             <Tooltip content={<CustomLOSTooltip />} />
             <ReferenceLine
