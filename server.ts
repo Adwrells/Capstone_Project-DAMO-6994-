@@ -2185,6 +2185,8 @@ const PROXIED_PREFIXES = [
   "/api/insights",
   "/api/reports",
   "/api/dataset",
+  "/api/datasets",
+  "/api/health",
   "/api/upload",
 ];
 

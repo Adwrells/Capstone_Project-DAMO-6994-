@@ -3,391 +3,972 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
-import { 
-  Sparkles, CheckCircle2, AlertTriangle, CornerDownRight, Zap, 
-  TrendingUp, FileText, ArrowUpRight, HelpCircle, Activity, LayoutGrid, Award
+import React, { useEffect, useState } from 'react';
+import {
+  AlertCircle,
+  TrendingUp,
+  Activity,
+  Layers,
+  ArrowRight,
+  Compass,
+  Calendar,
+  Info,
+  Scale,
+  RefreshCw,
+  Sliders,
+  Clock,
+  Sparkles,
+  Database,
+  Calculator,
+  Target,
+  FileCheck,
+  HelpCircle,
+  ShieldCheck,
+  CheckCircle2,
+  AlertTriangle,
+  LayoutDashboard,
+  Check,
+  FileSpreadsheet,
 } from 'lucide-react';
+import { fetchStrategicInsights } from '../../services/apiService';
+
+// Type Definitions conforming to Master Implementation Specification
+type EvidenceStrength =
+  | 'Strong'
+  | 'Moderate'
+  | 'Limited'
+  | 'Exploratory'
+  | 'Insufficient';
+
+type Priority = 'Critical' | 'High' | 'Medium' | 'Monitor';
+
+interface StrategicInsight {
+  id: string;
+  title: string;
+  sourceType: 'hypothesis' | 'regression' | 'trend' | 'forecast' | 'dashboard' | 'unavailable';
+  sourceIds: string[];
+  verifiedFinding: string;
+  finding?: string;
+  methodology: string;
+  method?: string;
+  metrics: {
+    pValue?: number | null;
+    effectSize?: number | null;
+    effectMagnitude?: string | null;
+    effectMetric?: string | null;
+    modelMetric?: number | null;
+    trendStatistic?: number | null;
+    trendDirection?: string | null;
+    sensSlope?: number | null;
+    slope?: number | null;
+    intercept?: number | null;
+    rejectNull?: boolean | null;
+    decision?: string | null;
+    erbiScore?: number | null;
+    weightedN?: number | null;
+    hStatistic?: number | null;
+    uStatistic?: number | null;
+    chi2?: number | null;
+    forecast?: any;
+  };
+  statisticalConclusion: string;
+  evidenceStrength: EvidenceStrength;
+  whyItMatters?: string;
+  practicalInterpretation: string;
+  strategicImplication: string;
+  recommendedAction: string;
+  priority: Priority;
+  practicalImportance: string;
+  decisionBoundary: string;
+  groupSummaries?: any[];
+}
+
+interface ScorecardItem {
+  id: string;
+  title: string;
+  tier: string;
+  priority: Priority;
+  evidence: string;
+  why: string;
+  action: string;
+}
+
+interface DashboardInsightItem {
+  letter: string;
+  title: string;
+  dashboardObservation: string;
+  analyticalValidation: string;
+  whyItMatters: string;
+  strategicConsideration: string;
+  evidenceLabel: string;
+  boundary: string;
+}
+
+interface ExecutiveTakeaway {
+  number: string;
+  title: string;
+  finding: string;
+  relevance: string;
+  evidence: string;
+}
+
+interface PriorityRecommendation {
+  id: string;
+  number: string;
+  title: string;
+  priority: Priority;
+  supportingSourceIds: string[];
+  strategicRationale: string;
+  planningInputs?: string[];
+  investigationDomains?: string[];
+  monitoringDimensions?: string[];
+  workflowSteps?: string[];
+  reportingStandards?: string[];
+  note?: string;
+  expectedStrategicValue: string;
+  decisionBoundary: string;
+}
+
+interface StrategicPayload {
+  dataSource: string;
+  alpha: number;
+  evidenceIndicators: {
+    evidenceSourcesCount: number;
+    hypothesesSynthesized: string;
+    modelTrendOutputsCount: string;
+    decisionScope: string;
+  };
+  executiveStatement: string;
+  executiveTakeaways: ExecutiveTakeaway[];
+  scorecardItems: ScorecardItem[];
+  dashboardInsights: DashboardInsightItem[];
+  statisticalValidation: StrategicInsight[];
+  evidenceMatrix: StrategicInsight[];
+  recommendations: PriorityRecommendation[];
+  boundariesSupports: string[];
+  boundariesNotProven: string[];
+  finalConclusion: string;
+  roadmap: {
+    immediate: string[];
+    mediumTerm: string[];
+    longTerm: string[];
+  };
+  synthesisErrors?: string[] | null;
+}
 
 interface ConsultantInsightsProps {
-  isLoading: boolean;
+  isLoading?: boolean;
 }
 
-interface StrategicRecommendation {
-  category: "Hospital" | "Policy" | "Future Research";
-  title: string;
-  priority: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
-  riskLevel: "LOW" | "MEDIUM" | "HIGH";
-  expectedImpact: "HIGH" | "MEDIUM" | "LOW";
-  recommendedAction: string;
-  expectedBenefit: string;
-}
+export default function ConsultantInsights({ isLoading: parentLoading }: ConsultantInsightsProps) {
+  const [data, setData] = useState<StrategicPayload | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedInsightFilter, setSelectedInsightFilter] = useState<'ALL' | 'H1' | 'H2' | 'H3' | 'H4' | 'H5'>('ALL');
+  const [showEvidenceTooltip, setShowEvidenceTooltip] = useState<boolean>(false);
 
-export default function ConsultantInsights({ isLoading }: ConsultantInsightsProps) {
-  const [activeTab, setActiveTab] = useState<'summary' | 'hospital' | 'policy' | 'research'>('summary');
-
-  // Predefined Recommendations matching Capstone specifications
-  const recommendations: StrategicRecommendation[] = [
-    // 1. Hospital Recommendations
-    {
-      category: "Hospital",
-      title: "Establish a Rapid Assessment Zone (RAZ) for Triage Diversion",
-      priority: "CRITICAL",
-      riskLevel: "MEDIUM",
-      expectedImpact: "HIGH",
-      recommendedAction: "Isolate CTAS Level 3 (Urgent) cases identified in our statistical bottleneck clusters. Deploy an independent Rapid Assessment Zone (RAZ) staffed by specialized Nurse Practitioners to fast-track non-complex, urgent clinical paths, routing them away from physical emergency waiting bays.",
-      expectedBenefit: "Reduces overall CTAS Level 3 stay times by an estimated 2.2 Hours, compressing ambulatory waiting room density and decreasing rates of patients leaving without being seen (LWBS)."
-    },
-    {
-      category: "Hospital",
-      title: "Integrate Electronic CDI Pre-Submission Billing Auditing",
-      priority: "HIGH",
-      riskLevel: "LOW",
-      expectedImpact: "HIGH",
-      recommendedAction: "Integrate a real-time clinical documentation improvement (CDI) computer-assisted auditing framework in the electronic health record (EHR) to flag and validate high-acuity CTAS 1/2 diagnostic codes prior to provincial funding submissions.",
-      expectedBenefit: "Recovers up to 15% in previously omitted or under-coded clinical overhead reimbursements, directly stabilizing hospital operational margins."
-    },
-    {
-      category: "Hospital",
-      title: "Geriatric Transition Liaison & Social Discharge Coordinator",
-      priority: "HIGH",
-      riskLevel: "HIGH",
-      expectedImpact: "HIGH",
-      recommendedAction: "Form a dedicated transitional social work liaison team with local long-term care and post-acute rehabilitation centers to coordinate secure geriatric discharge transport immediately upon ED stabilization.",
-      expectedBenefit: "Resolves extreme 12h+ geriatric boarding outliers, freeing active acute emergency beds and accelerating patient-flow cycle times."
-    },
-    // 2. Healthcare Policy Recommendations
-    {
-      category: "Policy",
-      title: "Transition to Activity-Based Acuity Funding (CIHI Standard)",
-      priority: "CRITICAL",
-      riskLevel: "HIGH",
-      expectedImpact: "HIGH",
-      recommendedAction: "Advocate for provincial ministries of health to transition global emergency block funding models into activity-based models indexed directly against NACRS-measured triage acuity and the canonical Emergency Department Resource Burden Index (ERBI).",
-      expectedBenefit: "Creates systemic incentives for hospitals to optimize throughput efficiency while ensuring high-complexity trauma hubs are fairly compensated."
-    },
-    {
-      category: "Policy",
-      title: "Standardize Multi-Provincial NACRS ETL Data Models",
-      priority: "MEDIUM",
-      riskLevel: "LOW",
-      expectedImpact: "MEDIUM",
-      recommendedAction: "Standardize clinical schemas and CTAS text strings at the national level (CIHI) to guarantee frictionless cross-provincial healthcare data interoperability, matching our engineered ETL engine rules.",
-      expectedBenefit: "Enables robust, longitudinal national study cohorts and facilitates automated, reproducible machine learning modeling of patient flow patterns across Canada."
-    },
-    // 3. Future Research Recommendations
-    {
-      category: "Future Research",
-      title: "Incorporate Machine Learning for Real-Time Nurse Roster Matching",
-      priority: "MEDIUM",
-      riskLevel: "LOW",
-      expectedImpact: "HIGH",
-      recommendedAction: "Expand the baseline Holt's linear exponential smoothing time-series models into dynamic, deep recurrent neural networks (LSTM) that ingest live local weather patterns, municipal transit feeds, and regional influenza trackers to predict patient influxes 48 hours in advance.",
-      expectedBenefit: "Enables precise predictive scheduling of nursing cohorts, curbing overtime costs by up to 18% while preventing active wait spikes before they occur."
-    },
-    {
-      category: "Future Research",
-      title: "Socio-Economic Determinants and Wait-Time Disparities",
-      priority: "LOW",
-      riskLevel: "LOW",
-      expectedImpact: "MEDIUM",
-      recommendedAction: "Conduct longitudinal studies linkage matching regional postal codes with the Canadian Marginalization Index to evaluate the impact of local primary care deficits on avoidable ED utilization.",
-      expectedBenefit: "Informs targeted regional public health funding in underserved neighborhoods to deflect chronic minor ailments away from emergency rooms."
+  const loadData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetchStrategicInsights();
+      if (res && res.success) {
+        setData(res);
+      } else {
+        throw new Error(res?.detail || res?.message || 'Failed to synthesize strategic insights');
+      }
+    } catch (err: any) {
+      console.error('[Strategic Insights Error]', err);
+      setError(err?.message || 'Unable to load strategic evidence synthesis.');
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
-  if (isLoading) {
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  if (loading || parentLoading) {
     return (
       <div className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-xl p-12 text-center flex flex-col items-center justify-center space-y-4 shadow-sm animate-pulse" id="insights-loading">
-        <Sparkles size={28} className="text-indigo-600 dark:text-indigo-400 animate-spin" />
-        <h4 className="text-slate-800 dark:text-white font-sans text-sm font-bold">Synthesizing McKinsey Strategic Action Priorities...</h4>
-        <p className="text-xs text-slate-500 max-w-sm font-light leading-relaxed">
-          Loading predefined clinical decisions, strategic roadmaps and policy guidelines.
+        <Sparkles size={28} className="text-[#0F4C81] dark:text-[#3B82F6] animate-spin" />
+        <h4 className="text-slate-800 dark:text-white font-sans text-sm font-bold">Synthesizing Strategic Decision Support Evidence...</h4>
+        <p className="text-xs text-slate-500 max-w-md font-light leading-relaxed">
+          Translating completed H1–H5 hypothesis tests, WLS regression, Mann-Kendall trend models, and dashboard metrics into evidence-based executive decision support.
         </p>
       </div>
     );
   }
 
+  if (error || !data) {
+    return (
+      <div className="border border-rose-200 dark:border-rose-900/40 bg-rose-50/40 dark:bg-rose-950/20 rounded-xl p-8 text-center space-y-4">
+        <AlertCircle size={32} className="text-rose-500 mx-auto" />
+        <h3 className="text-base font-bold text-rose-800 dark:text-rose-300">Unable to Load Strategic Evidence</h3>
+        <p className="text-xs text-slate-600 dark:text-slate-400 max-w-lg mx-auto">
+          {error || 'Unable to load the latest strategic evidence. Please review the underlying analysis results.'}
+        </p>
+        <button
+          onClick={loadData}
+          className="inline-flex items-center gap-2 px-4 py-2 bg-[#0F4C81] hover:bg-[#0c3c66] dark:bg-[#3B82F6] dark:hover:bg-[#2563eb] text-white text-xs font-semibold rounded-lg shadow-sm transition-colors cursor-pointer"
+        >
+          <RefreshCw size={14} />
+          Retry Evidence Synthesis
+        </button>
+      </div>
+    );
+  }
+
+  const {
+    evidenceIndicators,
+    executiveStatement,
+    executiveTakeaways,
+    scorecardItems,
+    dashboardInsights,
+    statisticalValidation,
+    evidenceMatrix,
+    recommendations,
+    boundariesSupports,
+    boundariesNotProven,
+    finalConclusion,
+    roadmap,
+  } = data;
+
+  const filteredMatrix = selectedInsightFilter === 'ALL'
+    ? evidenceMatrix
+    : evidenceMatrix.filter(item => item.id === selectedInsightFilter);
+
   return (
-    <div className="space-y-6 text-left animate-fade-in" id="strategic-insights-section">
+    <div className="space-y-10 text-left animate-fade-in pb-16 font-sans" id="strategic-insights-section">
       
-      {/* Page Header */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-xl p-6 shadow-xs">
-        <div>
-          <div className="flex items-center gap-2 text-[#0F4C81] dark:text-[#3B82F6] font-bold">
-            <span className="px-2.5 py-1 rounded-md bg-[#0F4C81]/10 dark:bg-[#3B82F6]/10 border border-[#0F4C81]/20 dark:border-[#3B82F6]/20 text-[10px] text-[#0F4C81] dark:text-[#3B82F6] font-semibold tracking-wider uppercase">EXECUTIVE ROADMAP</span>
-            <span className="text-xs text-slate-400 font-normal">Stage 6 Active</span>
+      {/* ========================================================================= */}
+      {/* SECTION 01 — EXECUTIVE DECISION SUMMARY                                   */}
+      {/* ========================================================================= */}
+      <div className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#131f37] rounded-xl p-6.5 shadow-xs space-y-6">
+        
+        {/* Header Block */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="px-2.5 py-1 rounded-md bg-[#0F4C81]/10 dark:bg-[#3B82F6]/10 border border-[#0F4C81]/20 dark:border-[#3B82F6]/20 text-[10px] text-[#0F4C81] dark:text-[#3B82F6] font-semibold tracking-wider uppercase font-mono">
+                STAGE 6 · STRATEGIC DECISION SUPPORT
+              </span>
+              <span className="text-xs text-slate-400 font-normal">Evidence-Bound Executive Synthesis</span>
+            </div>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white mt-1.5">
+              Strategic Insights &amp; Recommendations
+            </h1>
+            <p className="text-slate-600 dark:text-slate-400 text-xs font-light mt-1.5 max-w-3xl leading-relaxed">
+              This section translates completed aggregate emergency department analysis, dashboard evidence, statistical testing, explanatory modelling, and longitudinal trend analysis into evidence-informed planning considerations. Findings are interpreted within the scope of the available CIHI NACRS aggregate data and do not establish individual-level outcomes or causal mechanisms.
+            </p>
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-slate-800 dark:text-white mt-1">
-            Strategic Insights & Recommendations
-          </h2>
-          <p className="text-slate-500 dark:text-slate-400 text-xs font-light mt-0.5">
-            McKinsey-style executive intelligence suite. Strategic analysis, operational recommendations, and policy guidelines mapped directly from our mathematical cohort analysis.
+
+          <div className="flex items-center gap-2 self-start md:self-auto bg-slate-50 dark:bg-[#182640] px-3.5 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-[11px] font-mono text-slate-500 dark:text-slate-400 shrink-0">
+            <Scale size={14} className="text-[#0F4C81] dark:text-[#3B82F6]" />
+            <span>Scope: <strong className="text-slate-800 dark:text-slate-200">Aggregate-Level Planning</strong></span>
+          </div>
+        </div>
+
+        {/* 4 Compact Evidence Indicators */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5 text-xs font-mono">
+          <div className="p-3 bg-slate-50 dark:bg-[#182640]/70 rounded-lg border border-slate-200/80 dark:border-slate-700/60 flex items-center gap-3">
+            <Database size={18} className="text-[#0F4C81] dark:text-[#3B82F6] shrink-0" />
+            <div>
+              <span className="text-[10px] text-slate-400 block uppercase tracking-wider font-sans">Evidence Base</span>
+              <span className="font-bold text-slate-900 dark:text-white text-xs">{evidenceIndicators?.evidenceSourcesCount || 5} Data Tables &amp; Services</span>
+            </div>
+          </div>
+
+          <div className="p-3 bg-slate-50 dark:bg-[#182640]/70 rounded-lg border border-slate-200/80 dark:border-slate-700/60 flex items-center gap-3">
+            <FileCheck size={18} className="text-[#2E8B57] shrink-0" />
+            <div>
+              <span className="text-[10px] text-slate-400 block uppercase tracking-wider font-sans">Hypotheses Synthesized</span>
+              <span className="font-bold text-slate-900 dark:text-white text-xs">{evidenceIndicators?.hypothesesSynthesized || 'H1–H5'}</span>
+            </div>
+          </div>
+
+          <div className="p-3 bg-slate-50 dark:bg-[#182640]/70 rounded-lg border border-slate-200/80 dark:border-slate-700/60 flex items-center gap-3">
+            <Calculator size={18} className="text-indigo-600 dark:text-indigo-400 shrink-0" />
+            <div>
+              <span className="text-[10px] text-slate-400 block uppercase tracking-wider font-sans">Analytical Engines</span>
+              <span className="font-bold text-slate-900 dark:text-white text-xs">{evidenceIndicators?.modelTrendOutputsCount || '4 Evidence Streams'}</span>
+            </div>
+          </div>
+
+          <div className="p-3 bg-slate-50 dark:bg-[#182640]/70 rounded-lg border border-slate-200/80 dark:border-slate-700/60 flex items-center gap-3">
+            <Target size={18} className="text-amber-600 dark:text-amber-400 shrink-0" />
+            <div>
+              <span className="text-[10px] text-slate-400 block uppercase tracking-wider font-sans">Decision Scope</span>
+              <span className="font-bold text-slate-900 dark:text-white text-xs">{evidenceIndicators?.decisionScope || 'Aggregate-Level Planning'}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Executive Decision Statement (Prominent Callout) */}
+        <div className="p-4.5 rounded-xl bg-gradient-to-r from-[#0F4C81]/10 via-[#0F4C81]/5 to-transparent dark:from-[#3B82F6]/15 dark:via-[#3B82F6]/5 dark:to-transparent border-l-4 border-[#0F4C81] dark:border-[#3B82F6] border-y border-r border-slate-200/80 dark:border-slate-800 space-y-1.5">
+          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#0F4C81] dark:text-[#3B82F6] flex items-center gap-1.5">
+            <Sparkles size={13} />
+            Executive Decision Statement
+          </span>
+          <p className="text-xs text-slate-800 dark:text-slate-200 leading-relaxed font-normal">
+            {executiveStatement}
           </p>
         </div>
-      </div>
 
-      {/* Navigation tabs */}
-      <div className="flex flex-wrap border-b border-slate-200 dark:border-slate-800 gap-1">
-        <button
-          onClick={() => setActiveTab('summary')}
-          className={`py-2.5 px-4 text-xs font-bold transition-all border-b-2 cursor-pointer flex items-center gap-2 ${
-            activeTab === 'summary' ? 'border-[#0F4C81] text-[#0F4C81] dark:border-[#3B82F6] dark:text-[#3B82F6]' : 'border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
-          }`}
-        >
-          <FileText size={14} />
-          <span>Executive Summary & Bottlenecks</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('hospital')}
-          className={`py-2.5 px-4 text-xs font-bold transition-all border-b-2 cursor-pointer flex items-center gap-2 ${
-            activeTab === 'hospital' ? 'border-[#0F4C81] text-[#0F4C81] dark:border-[#3B82F6] dark:text-[#3B82F6]' : 'border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
-          }`}
-        >
-          <Activity size={14} />
-          <span>Hospital Recommendations</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('policy')}
-          className={`py-2.5 px-4 text-xs font-bold transition-all border-b-2 cursor-pointer flex items-center gap-2 ${
-            activeTab === 'policy' ? 'border-[#0F4C81] text-[#0F4C81] dark:border-[#3B82F6] dark:text-[#3B82F6]' : 'border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
-          }`}
-        >
-          <Award size={14} />
-          <span>Healthcare Policy Recommendations</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('research')}
-          className={`py-2.5 px-4 text-xs font-bold transition-all border-b-2 cursor-pointer flex items-center gap-2 ${
-            activeTab === 'research' ? 'border-[#0F4C81] text-[#0F4C81] dark:border-[#3B82F6] dark:text-[#3B82F6]' : 'border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
-          }`}
-        >
-          <TrendingUp size={14} />
-          <span>Future Research Framework</span>
-        </button>
-      </div>
-
-      {/* Tab Panels */}
-      <div className="space-y-6">
-        
-        {/* Tab 1: Executive Summary & Bottlenecks */}
-        {activeTab === 'summary' && (
-          <div className="space-y-6 animate-fade-in">
-            {/* Executive Summary Callout */}
-            <div className="border border-[#0F4C81]/20 dark:border-[#3B82F6]/20 bg-gradient-to-br from-[#0F4C81]/5 to-indigo-50/10 dark:from-[#3B82F6]/5 dark:to-transparent rounded-xl p-6 shadow-3xs">
-              <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#0F4C81] dark:text-[#3B82F6] block mb-2">
-                Executive Abstract & Clinical Thesis
-              </span>
-              <p className="text-sm font-bold text-slate-800 dark:text-white leading-relaxed">
-                "Our comprehensive evaluation of the CIHI NACRS Emergency Department cohort confirms that Length of Stay (LOS) is not a simple random distribution, but rather a structurally constrained clinical process. Systemic delays are highly concentrated in CTAS Level 3 'Urgent' cases and geriatric patient flows. By utilizing a multi-tier analytics solver, we have validated critical operational bottlenecks, enabling leadership to shift resources from reactive staffing models to proactive, predictive clinical pathways."
-              </p>
-            </div>
-
-            {/* Grid for Key Findings & Operational Bottlenecks */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              
-              {/* Key Findings */}
-              <div className="border border-[#E5E7EB] dark:border-[#1e2d4a] bg-white dark:bg-[#131f37] rounded-xl p-5 space-y-4">
-                <div className="flex items-center gap-2 border-b border-slate-100 dark:border-[#1e2d4a] pb-3">
-                  <LayoutGrid size={16} className="text-[#0F4C81] dark:text-[#3B82F6]" />
-                  <h3 className="text-sm font-extrabold text-[#111827] dark:text-white uppercase tracking-wider font-mono">
-                    Key Analytical Findings
-                  </h3>
+        {/* Four Executive Takeaway Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-1">
+          {executiveTakeaways.map((takeaway) => (
+            <div
+              key={takeaway.number}
+              className="p-4 rounded-xl bg-slate-50/70 dark:bg-[#182640]/40 border border-slate-200 dark:border-slate-700/60 space-y-2 flex flex-col justify-between"
+            >
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
+                    TAKEAWAY {takeaway.number}
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-400 font-bold">{takeaway.evidence}</span>
                 </div>
-                
-                <div className="space-y-3.5 text-xs text-slate-600 dark:text-slate-400">
-                  <div className="flex items-start gap-2.5">
-                    <CheckCircle2 size={14} className="text-[#2E8B57] mt-0.5 shrink-0" />
-                    <p className="font-light leading-relaxed">
-                      <strong className="font-semibold text-slate-800 dark:text-slate-200">Acuity Polarization:</strong> Triage categories accurately match care complexity. Extreme resuscitations (CTAS 1/2) yield very long baseline stays, while minor ailments (CTAS 5) are handled rapidly.
-                    </p>
-                  </div>
-                  <div className="flex items-start gap-2.5">
-                    <CheckCircle2 size={14} className="text-[#2E8B57] mt-0.5 shrink-0" />
-                    <p className="font-light leading-relaxed">
-                      <strong className="font-semibold text-slate-800 dark:text-slate-200">Pandemic Loading:</strong> Public health crises significantly lengthened ED boarding cycles, multiplying mean stay times by an average of 1.34x due to strict isolation workflows.
-                    </p>
-                  </div>
-                  <div className="flex items-start gap-2.5">
-                    <CheckCircle2 size={14} className="text-[#2E8B57] mt-0.5 shrink-0" />
-                    <p className="font-light leading-relaxed">
-                      <strong className="font-semibold text-slate-800 dark:text-slate-200">Cost-Wait Coupling:</strong> Pearson correlation modeling validates a strong positive linear coupling ($r \approx 0.88$) between total minutes in triage and hospital resource costs.
-                    </p>
-                  </div>
-                </div>
+                <h4 className="text-xs font-bold text-slate-900 dark:text-white leading-snug">
+                  {takeaway.title}
+                </h4>
+                <p className="text-[11px] text-slate-600 dark:text-slate-300 font-light leading-relaxed">
+                  {takeaway.finding}
+                </p>
               </div>
-
-              {/* Operational Bottlenecks */}
-              <div className="border border-[#E5E7EB] dark:border-[#1e2d4a] bg-white dark:bg-[#131f37] rounded-xl p-5 space-y-4">
-                <div className="flex items-center gap-2 border-b border-slate-100 dark:border-[#1e2d4a] pb-3">
-                  <AlertTriangle size={16} className="text-amber-500" />
-                  <h3 className="text-sm font-extrabold text-[#111827] dark:text-white uppercase tracking-wider font-mono">
-                    Operational Bottlenecks Identified
-                  </h3>
-                </div>
-                
-                <div className="space-y-3.5 text-xs text-slate-600 dark:text-slate-400">
-                  <div className="flex items-start gap-2.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0 mt-1.5" />
-                    <p className="font-light leading-relaxed">
-                      <strong className="font-semibold text-slate-800 dark:text-slate-200">CTAS Level 3 Overflow:</strong> Representing 42% of encounters, urgent cases wait disproportionately long compared to their severity index due to diagnostic queue congestion.
-                    </p>
-                  </div>
-                  <div className="flex items-start gap-2.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0 mt-1.5" />
-                    <p className="font-light leading-relaxed">
-                      <strong className="font-semibold text-slate-800 dark:text-slate-200">Geriatric Boarding blockages:</strong> High-severity elderly patients (65+) represent 65% of all extreme 12h+ boarding events, caused by delayed transfers to post-acute facilities.
-                    </p>
-                  </div>
-                  <div className="flex items-start gap-2.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0 mt-1.5" />
-                    <p className="font-light leading-relaxed">
-                      <strong className="font-semibold text-slate-800 dark:text-slate-200">Documentation Revenue Omission:</strong> Complex encounters result in high indirect administrative overheads that capture 15% less revenue due to incomplete medical coding.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-
-            {/* Hypothesis Outcomes Overview */}
-            <div className="border border-[#E5E7EB] dark:border-[#1e2d4a] bg-white dark:bg-[#131f37] rounded-xl p-5 space-y-4">
-              <h3 className="text-xs font-extrabold text-slate-700 dark:text-slate-200 uppercase tracking-wider font-mono">
-                Statistical Hypothesis Decisions Matrix
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-5 gap-3.5 text-xs font-mono">
-                <div className="p-3 bg-[#F8FAFC] dark:bg-[#152033] rounded-lg border border-slate-200 dark:border-[#1e2d4a] text-center">
-                  <span className="text-[10px] text-slate-400 block font-bold mb-1">H1: Kruskal–Wallis</span>
-                  <span className="text-[#2E8B57] font-bold">REJECTED H0</span>
-                  <p className="text-[10px] text-slate-400 mt-1">Stay times vary strongly across CTAS acuity tiers.</p>
-                </div>
-                <div className="p-3 bg-[#F8FAFC] dark:bg-[#152033] rounded-lg border border-slate-200 dark:border-[#1e2d4a] text-center">
-                  <span className="text-[10px] text-slate-400 block font-bold mb-1">H2: Mann–Whitney U</span>
-                  <span className="text-[#2E8B57] font-bold">REJECTED H0</span>
-                  <p className="text-[10px] text-slate-400 mt-1">Admitted visits have significantly longer ED stays.</p>
-                </div>
-                <div className="p-3 bg-[#F8FAFC] dark:bg-[#152033] rounded-lg border border-slate-200 dark:border-[#1e2d4a] text-center">
-                  <span className="text-[10px] text-slate-400 block font-bold mb-1">H3: WLS Regression</span>
-                  <span className="text-[#2E8B57] font-bold">REJECTED H0</span>
-                  <p className="text-[10px] text-slate-400 mt-1">CTAS urgency score is a significant predictor of LOS.</p>
-                </div>
-                <div className="p-3 bg-[#F8FAFC] dark:bg-[#152033] rounded-lg border border-slate-200 dark:border-[#1e2d4a] text-center">
-                  <span className="text-[10px] text-slate-400 block font-bold mb-1">H4: Kruskal–Wallis</span>
-                  <span className="text-[#2E8B57] font-bold">REJECTED H0</span>
-                  <p className="text-[10px] text-slate-400 mt-1">Older adults experience substantially prolonged stay.</p>
-                </div>
-                <div className="p-3 bg-[#F8FAFC] dark:bg-[#152033] rounded-lg border border-slate-200 dark:border-[#1e2d4a] text-center">
-                  <span className="text-[10px] text-slate-400 block font-bold mb-1">H5: Chi-Square</span>
-                  <span className="text-[#2E8B57] font-bold">REJECTED H0</span>
-                  <p className="text-[10px] text-slate-400 mt-1">Sex &amp; disposition associated with negligible effect size.</p>
-                </div>
+              <div className="pt-2 border-t border-slate-200/60 dark:border-slate-700/50 text-[10px] text-slate-500 dark:text-slate-400 font-light">
+                <strong className="font-semibold text-slate-700 dark:text-slate-200">Decision:</strong> {takeaway.relevance}
               </div>
             </div>
-          </div>
-        )}
-
-        {/* Tab 2: Hospital Recommendations */}
-        {activeTab === 'hospital' && (
-          <div className="space-y-4 animate-fade-in">
-            {recommendations.filter(r => r.category === "Hospital").map((rec, index) => (
-              <RecommendationCard key={index} rec={rec} />
-            ))}
-          </div>
-        )}
-
-        {/* Tab 3: Policy Recommendations */}
-        {activeTab === 'policy' && (
-          <div className="space-y-4 animate-fade-in">
-            {recommendations.filter(r => r.category === "Policy").map((rec, index) => (
-              <RecommendationCard key={index} rec={rec} />
-            ))}
-          </div>
-        )}
-
-        {/* Tab 4: Future Research */}
-        {activeTab === 'research' && (
-          <div className="space-y-4 animate-fade-in">
-            {recommendations.filter(r => r.category === "Future Research").map((rec, index) => (
-              <RecommendationCard key={index} rec={rec} />
-            ))}
-          </div>
-        )}
-
-      </div>
-
-    </div>
-  );
-}
-
-// Sub-component: RecommendationCard
-function RecommendationCard({ rec }: { rec: StrategicRecommendation; key?: any }) {
-  return (
-    <div className="border border-[#E5E7EB] dark:border-[#1e2d4a] bg-white dark:bg-[#131f37] rounded-xl overflow-hidden shadow-3xs hover:shadow-xs transition-shadow">
-      
-      {/* Card Header */}
-      <div className="px-6 py-4 bg-[#F9FAFB] dark:bg-[#152033] border-b border-[#E5E7EB] dark:border-[#1e2d4a] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-        <div className="flex items-center gap-2.5">
-          <div className="p-1.5 rounded-lg bg-[#0F4C81]/10 text-[#0F4C81] dark:text-[#3B82F6]">
-            <Zap size={14} />
-          </div>
-          <h3 className="font-extrabold text-[#111827] dark:text-white text-sm">
-            {rec.title}
-          </h3>
+          ))}
         </div>
-        
-        <div className="flex items-center gap-2">
-          <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-mono font-bold tracking-wider uppercase ${
-            rec.priority === "CRITICAL" 
-              ? 'bg-rose-50 text-rose-600 dark:bg-rose-950/20 dark:text-rose-400' 
-              : 'bg-amber-50 text-amber-600 dark:bg-amber-950/20 dark:text-amber-400'
-          }`}>
-            Priority: {rec.priority}
+
+      </div>
+
+      {/* ========================================================================= */}
+      {/* SECTION 02 — STRATEGIC PRIORITY SCORECARD                                 */}
+      {/* ========================================================================= */}
+      <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+          <div className="flex items-center gap-2">
+            <Sliders size={18} className="text-[#0F4C81] dark:text-[#3B82F6]" />
+            <h2 className="text-sm font-extrabold uppercase tracking-wider text-slate-800 dark:text-white font-mono">
+              02 · Strategic Priority Scorecard
+            </h2>
+          </div>
+          <span className="text-xs text-slate-400 font-light">
+            Answers: <em>What should decision-makers pay attention to first?</em>
           </span>
-          <span className="px-2.5 py-0.5 rounded-full text-[9px] font-mono font-bold tracking-wider text-slate-500 bg-slate-100 dark:bg-[#182640] dark:text-slate-400 uppercase">
-            Risk: {rec.riskLevel}
-          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {scorecardItems.map((item, idx) => {
+            const tierStyle = {
+              'CRITICAL / HIGH': 'border-amber-400 dark:border-amber-500/80 bg-amber-50/30 dark:bg-amber-950/20 text-amber-900 dark:text-amber-200',
+              'HIGH PRIORITY': 'border-blue-300 dark:border-blue-700 bg-blue-50/30 dark:bg-blue-950/20 text-blue-900 dark:text-blue-200',
+              'MONITOR': 'border-slate-300 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30 text-slate-700 dark:text-slate-300',
+            }[item.tier] || 'border-slate-200 bg-white text-slate-700';
+
+            const badgeBg = {
+              'CRITICAL / HIGH': 'bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-700',
+              'HIGH PRIORITY': 'bg-blue-100 dark:bg-blue-900/60 text-blue-800 dark:text-blue-300 border-blue-300 dark:border-blue-700',
+              'MONITOR': 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600',
+            }[item.tier] || 'bg-slate-100 text-slate-700';
+
+            return (
+              <div
+                key={item.id || idx}
+                className={`rounded-xl p-4.5 border shadow-3xs flex flex-col justify-between space-y-3 ${tierStyle}`}
+              >
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className={`px-2 py-0.5 rounded text-[9px] font-mono font-bold uppercase border ${badgeBg}`}>
+                      {item.tier}
+                    </span>
+                    <span className="text-[10px] font-mono text-slate-400 font-bold">{item.evidence}</span>
+                  </div>
+                  <h3 className="text-xs font-bold text-slate-900 dark:text-white leading-snug">
+                    {item.title}
+                  </h3>
+                  <div className="space-y-1 text-[11px] font-light leading-relaxed">
+                    <p><strong className="font-semibold text-slate-800 dark:text-slate-200">Why:</strong> {item.why}</p>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-slate-200/60 dark:border-slate-700/60 text-[11px] font-light leading-relaxed">
+                  <strong className="font-semibold text-slate-800 dark:text-slate-200 block text-[10px] uppercase font-mono tracking-wider">
+                    Action Direction:
+                  </strong>
+                  <span>{item.action}</span>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
-      {/* Card Body */}
-      <div className="p-6 space-y-4 text-xs leading-relaxed">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-stretch">
+      {/* ========================================================================= */}
+      {/* SECTION 03 — DASHBOARD INSIGHTS & EVIDENCE                                */}
+      {/* ========================================================================= */}
+      <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+          <div className="flex items-center gap-2">
+            <LayoutDashboard size={18} className="text-[#0F4C81] dark:text-[#3B82F6]" />
+            <h2 className="text-sm font-extrabold uppercase tracking-wider text-slate-800 dark:text-white font-mono">
+              03 · Dashboard Insights &amp; Evidence
+            </h2>
+          </div>
+          <span className="text-xs text-slate-400 font-light">
+            Directly connected to Stage 5 Executive Dashboard visuals &amp; SQLite data
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          {dashboardInsights.map((ins) => (
+            <div
+              key={ins.letter}
+              className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#131f37] rounded-xl p-5.5 shadow-3xs flex flex-col justify-between space-y-4"
+            >
+              <div className="space-y-3">
+                {/* Header */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-5 h-5 rounded-md bg-[#0F4C81] text-white dark:bg-[#3B82F6] flex items-center justify-center text-[10px] font-bold font-mono">
+                      {ins.letter}
+                    </span>
+                    <h3 className="text-xs font-bold text-slate-900 dark:text-white leading-snug">
+                      {ins.title}
+                    </h3>
+                  </div>
+                  <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-mono text-[9px] font-bold uppercase border border-slate-200 dark:border-slate-700">
+                    {ins.evidenceLabel}
+                  </span>
+                </div>
+
+                {/* What the Dashboard Shows */}
+                <div className="p-3 rounded-lg bg-slate-50 dark:bg-[#182640]/60 border border-slate-200/80 dark:border-slate-700/60 space-y-1">
+                  <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-slate-400 block flex items-center gap-1">
+                    <LayoutDashboard size={11} className="text-[#0F4C81] dark:text-[#3B82F6]" />
+                    What the Dashboard Shows
+                  </span>
+                  <p className="text-xs text-slate-700 dark:text-slate-300 font-light leading-relaxed">
+                    {ins.dashboardObservation}
+                  </p>
+                </div>
+
+                {/* What the Analysis Validates */}
+                <div className="p-3 rounded-lg bg-blue-50/40 dark:bg-blue-950/20 border border-blue-200/50 dark:border-blue-900/40 space-y-1">
+                  <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-[#0F4C81] dark:text-[#3B82F6] block flex items-center gap-1">
+                    <FileCheck size={11} />
+                    What the Analysis Validates
+                  </span>
+                  <p className="text-xs text-slate-800 dark:text-slate-200 font-light leading-relaxed font-mono">
+                    {ins.analyticalValidation}
+                  </p>
+                </div>
+
+                {/* Why It Matters */}
+                <div className="space-y-1 text-xs text-slate-600 dark:text-slate-300 font-light leading-relaxed">
+                  <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-slate-400 block">
+                    Why It Matters
+                  </span>
+                  <p>{ins.whyItMatters}</p>
+                </div>
+
+                {/* Strategic Consideration */}
+                <div className="space-y-1 text-xs text-slate-600 dark:text-slate-300 font-light leading-relaxed">
+                  <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-[#0F4C81] dark:text-[#3B82F6] block">
+                    Strategic Consideration
+                  </span>
+                  <p>{ins.strategicConsideration}</p>
+                </div>
+              </div>
+
+              {/* Boundary */}
+              <div className="pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-start gap-1.5 text-[10px] text-slate-400 font-mono">
+                <span className="text-amber-500 font-bold shrink-0">BOUNDARY:</span>
+                <span className="leading-tight font-sans font-light text-slate-500 dark:text-slate-400">{ins.boundary}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* SECTION 04 — STATISTICAL VALIDATION & ANALYTICAL INTERPRETATION           */}
+      {/* ========================================================================= */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Calculator size={18} className="text-[#0F4C81] dark:text-[#3B82F6]" />
+            <h2 className="text-sm font-extrabold uppercase tracking-wider text-slate-800 dark:text-white font-mono">
+              04 · Statistical Validation &amp; Analytical Interpretation
+            </h2>
+          </div>
+          <span className="text-xs text-slate-400 font-light font-mono">H1–H5 &amp; Longitudinal Models</span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {statisticalValidation.map((stat, sIdx) => (
+            <div
+              key={stat.id || sIdx}
+              className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#131f37] rounded-xl p-4.5 shadow-3xs flex flex-col justify-between space-y-3"
+            >
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="px-2 py-0.5 rounded bg-[#0F4C81] text-white dark:bg-[#3B82F6] font-mono text-[10px] font-bold">
+                    {stat.id}
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-400 font-bold">{stat.evidenceStrength} Evidence</span>
+                </div>
+                <h4 className="text-xs font-bold text-slate-900 dark:text-white leading-snug">
+                  {stat.title}
+                </h4>
+                <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400 space-y-0.5">
+                  <div><span className="text-slate-400 font-sans">Method:</span> {stat.methodology}</div>
+                  <div><span className="text-slate-400 font-sans">Decision:</span> <strong className="text-slate-800 dark:text-slate-200">{stat.statisticalConclusion}</strong></div>
+                </div>
+                <div className="p-2.5 bg-slate-50 dark:bg-[#182640]/50 rounded-lg border border-slate-200/60 dark:border-slate-700/50 space-y-1 text-xs font-light text-slate-700 dark:text-slate-300 leading-relaxed">
+                  <span className="text-[9px] font-mono font-bold uppercase text-slate-400 block">Practical Interpretation</span>
+                  <p>{stat.practicalInterpretation}</p>
+                </div>
+              </div>
+
+              <div className="pt-2 border-t border-slate-100 dark:border-slate-800 text-[10px] font-mono text-slate-400">
+                <span className="text-slate-700 dark:text-slate-300 font-sans font-light block leading-relaxed">
+                  <strong className="font-semibold text-slate-800 dark:text-slate-200">Relevance:</strong> {stat.strategicImplication}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* SECTION 05 — H1–H5 EVIDENCE-TO-ACTION MATRIX                              */}
+      {/* ========================================================================= */}
+      <div className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#131f37] rounded-xl p-6 shadow-xs space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <Layers size={18} className="text-[#0F4C81] dark:text-[#3B82F6]" />
+              <h2 className="text-sm font-extrabold uppercase tracking-wider text-slate-800 dark:text-white font-mono">
+                05 · H1–H5 Evidence-to-Action Matrix
+              </h2>
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setShowEvidenceTooltip(!showEvidenceTooltip)}
+                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer p-0.5"
+                  title="Evidence Strength Definition"
+                >
+                  <HelpCircle size={14} />
+                </button>
+                {showEvidenceTooltip && (
+                  <div className="absolute left-0 top-6 z-20 w-80 p-3 bg-slate-900 text-white rounded-lg shadow-xl text-[11px] font-sans font-light leading-relaxed border border-slate-700">
+                    <div className="font-bold text-slate-200 mb-1 flex items-center gap-1.5">
+                      <Info size={13} className="text-sky-400" />
+                      Evidence Strength Framework
+                    </div>
+                    Evidence strength reflects the combined interpretation of statistical support, effect magnitude, practical relevance, consistency with related findings, data coverage, and methodological limitations. Evidence strength is not determined by p-value alone.
+                  </div>
+                )}
+              </div>
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-light mt-0.5">
+              Comprehensive synthesis of all five approved hypothesis tests into actionable healthcare planning considerations.
+            </p>
+          </div>
+
+          {/* Filter Tabs */}
+          <div className="flex items-center gap-1 bg-slate-100 dark:bg-[#182640] p-1 rounded-lg border border-slate-200 dark:border-slate-700 self-start sm:self-auto">
+            {(['ALL', 'H1', 'H2', 'H3', 'H4', 'H5'] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setSelectedInsightFilter(tab)}
+                className={`px-2.5 py-1 rounded text-[10px] font-mono font-bold transition-all cursor-pointer ${
+                  selectedInsightFilter === tab
+                    ? 'bg-white dark:bg-[#0F4C81] text-[#0F4C81] dark:text-white shadow-xs'
+                    : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                }`}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Matrix Rows */}
+        <div className="space-y-4">
+          {filteredMatrix.map((item) => {
+            const strengthBadge = {
+              Strong: 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
+              Moderate: 'bg-sky-50 dark:bg-sky-950/30 text-sky-700 dark:text-sky-300 border-sky-200 dark:border-sky-800',
+              Limited: 'bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800',
+              Exploratory: 'bg-purple-50 dark:bg-purple-950/30 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800',
+              Insufficient: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-300 dark:border-slate-700',
+            }[item.evidenceStrength] || 'bg-slate-100 text-slate-600';
+
+            const priorityBadge = {
+              Critical: 'bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800',
+              High: 'bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800',
+              Medium: 'bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800',
+              Monitor: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700',
+            }[item.priority] || 'bg-slate-100 text-slate-600';
+
+            return (
+              <div
+                key={item.id}
+                className="border border-slate-200 dark:border-slate-800 bg-slate-50/40 dark:bg-[#182640]/30 rounded-xl p-4.5 space-y-3 text-xs"
+              >
+                {/* Row Top */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/80 dark:border-slate-700/60 pb-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <span className="px-2 py-0.5 rounded bg-[#0F4C81] dark:bg-[#3B82F6] text-white font-mono font-bold text-[11px]">
+                      {item.id}
+                    </span>
+                    <h4 className="font-bold text-slate-900 dark:text-white text-sm">
+                      {item.title}
+                    </h4>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`px-2 py-0.5 rounded text-[9px] font-mono font-bold uppercase border ${strengthBadge}`}>
+                      {item.evidenceStrength} Evidence
+                    </span>
+                    <span className={`px-2 py-0.5 rounded text-[9px] font-mono font-bold uppercase border ${priorityBadge}`}>
+                      Priority: {item.priority}
+                    </span>
+                  </div>
+                </div>
+
+                {/* 4 Columns */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5 pt-1">
+                  <div className="p-3 bg-white dark:bg-[#131f37] rounded-lg border border-slate-200 dark:border-slate-800 space-y-1">
+                    <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-slate-400 block">Verified Finding</span>
+                    <p className="text-[11px] text-slate-700 dark:text-slate-300 font-light leading-relaxed">{item.verifiedFinding || item.finding}</p>
+                    <div className="pt-2 text-[10px] font-mono text-slate-400">Method: {item.methodology}</div>
+                  </div>
+
+                  <div className="p-3 bg-white dark:bg-[#131f37] rounded-lg border border-slate-200 dark:border-slate-800 space-y-1">
+                    <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-slate-400 block">Practical Interpretation</span>
+                    <p className="text-[11px] text-slate-700 dark:text-slate-300 font-light leading-relaxed">{item.practicalInterpretation}</p>
+                  </div>
+
+                  <div className="p-3 bg-white dark:bg-[#131f37] rounded-lg border border-slate-200 dark:border-slate-800 space-y-1">
+                    <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-slate-400 block">Strategic Consideration</span>
+                    <p className="text-[11px] text-slate-700 dark:text-slate-300 font-light leading-relaxed">{item.strategicImplication}</p>
+                  </div>
+
+                  <div className="p-3 bg-white dark:bg-[#131f37] rounded-lg border border-slate-200 dark:border-slate-800 space-y-1">
+                    <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-[#0F4C81] dark:text-[#3B82F6] block">Recommended Action</span>
+                    <p className="text-[11px] text-slate-700 dark:text-slate-300 font-light leading-relaxed">{item.recommendedAction}</p>
+                  </div>
+                </div>
+
+                {/* Boundary */}
+                <div className="px-3 py-1.5 rounded bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-900/30 flex items-start gap-1.5 text-[10px] text-amber-900 dark:text-amber-300 font-mono">
+                  <span className="font-bold shrink-0">BOUNDARY:</span>
+                  <span className="font-sans font-light text-slate-600 dark:text-slate-400">{item.decisionBoundary}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* SECTION 06 — STRATEGIC RECOMMENDATIONS                                    */}
+      {/* ========================================================================= */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Target size={18} className="text-[#0F4C81] dark:text-[#3B82F6]" />
+            <h2 className="text-sm font-extrabold uppercase tracking-wider text-slate-800 dark:text-white font-mono">
+              06 · Strategic Recommendations
+            </h2>
+          </div>
+          <span className="text-xs text-slate-400 font-light">
+            Evidence-Based &amp; Proportionate Action Framework
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          {recommendations.map((rec) => {
+            const priorityBadge = {
+              Critical: 'bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800',
+              High: 'bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800',
+              Medium: 'bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800',
+              Monitor: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700',
+            }[rec.priority] || 'bg-slate-100 text-slate-600';
+
+            return (
+              <div
+                key={rec.id}
+                className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#131f37] rounded-xl p-5.5 shadow-3xs flex flex-col justify-between space-y-4"
+              >
+                <div className="space-y-3.5">
+                  {/* Top Header */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-md bg-[#0F4C81] text-white dark:bg-[#3B82F6] flex items-center justify-center text-xs font-bold font-mono">
+                        {rec.number}
+                      </span>
+                      <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider font-bold">
+                        Evidence: {rec.supportingSourceIds.join(' · ')}
+                      </span>
+                    </div>
+                    <span className={`px-2.5 py-0.5 rounded text-[9px] font-mono font-bold uppercase border ${priorityBadge}`}>
+                      Priority: {rec.priority}
+                    </span>
+                  </div>
+
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-white leading-snug">
+                    {rec.title}
+                  </h3>
+
+                  {/* Strategic Rationale */}
+                  <div className="text-xs text-slate-600 dark:text-slate-300 font-light leading-relaxed space-y-1">
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 block">
+                      Strategic Rationale
+                    </span>
+                    <p>{rec.strategicRationale}</p>
+                  </div>
+
+                  {/* Specific Inputs / Domains / Frameworks */}
+                  {rec.planningInputs && (
+                    <div className="p-3 rounded-lg bg-slate-50 dark:bg-[#182640]/60 border border-slate-200/80 dark:border-slate-700/60 space-y-1.5">
+                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#0F4C81] dark:text-[#3B82F6] block">
+                        Recommended Planning Inputs
+                      </span>
+                      <ul className="space-y-1 text-xs text-slate-700 dark:text-slate-300 font-light">
+                        {rec.planningInputs.map((inp, idx) => (
+                          <li key={idx} className="flex items-center gap-1.5">
+                            <span className="w-1 h-1 rounded-full bg-[#0F4C81] dark:bg-[#3B82F6]" />
+                            <span>{inp}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {rec.investigationDomains && (
+                    <div className="p-3 rounded-lg bg-slate-50 dark:bg-[#182640]/60 border border-slate-200/80 dark:border-slate-700/60 space-y-1.5">
+                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#0F4C81] dark:text-[#3B82F6] block">
+                        Candidate Review Domains
+                      </span>
+                      <ul className="space-y-1 text-xs text-slate-700 dark:text-slate-300 font-light">
+                        {rec.investigationDomains.map((dom, idx) => (
+                          <li key={idx} className="flex items-center gap-1.5">
+                            <span className="w-1 h-1 rounded-full bg-[#0F4C81] dark:bg-[#3B82F6]" />
+                            <span>{dom}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {rec.monitoringDimensions && (
+                    <div className="p-3 rounded-lg bg-slate-50 dark:bg-[#182640]/60 border border-slate-200/80 dark:border-slate-700/60 space-y-1.5">
+                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#0F4C81] dark:text-[#3B82F6] block">
+                        Continuous Monitoring Dimensions
+                      </span>
+                      <ul className="space-y-1 text-xs text-slate-700 dark:text-slate-300 font-light">
+                        {rec.monitoringDimensions.map((dim, idx) => (
+                          <li key={idx} className="flex items-center gap-1.5">
+                            <span className="w-1 h-1 rounded-full bg-[#0F4C81] dark:bg-[#3B82F6]" />
+                            <span>{dim}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {rec.reportingStandards && (
+                    <div className="p-3 rounded-lg bg-slate-50 dark:bg-[#182640]/60 border border-slate-200/80 dark:border-slate-700/60 space-y-1.5">
+                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#0F4C81] dark:text-[#3B82F6] block">
+                        Recommended Reporting Standards
+                      </span>
+                      <ul className="space-y-1 text-xs text-slate-700 dark:text-slate-300 font-light">
+                        {rec.reportingStandards.map((std, idx) => (
+                          <li key={idx} className="flex items-center gap-1.5">
+                            <span className="w-1 h-1 rounded-full bg-[#0F4C81] dark:bg-[#3B82F6]" />
+                            <span>{std}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Expected Strategic Value */}
+                  <div className="text-xs text-slate-600 dark:text-slate-300 font-light leading-relaxed pt-1">
+                    <strong className="text-slate-800 dark:text-slate-200 font-semibold block text-[11px]">
+                      Expected Strategic Value:
+                    </strong>
+                    <p>{rec.expectedStrategicValue}</p>
+                  </div>
+                </div>
+
+                {/* Governance Boundary */}
+                <div className="pt-2.5 border-t border-slate-100 dark:border-slate-800 text-[10px] font-mono text-slate-400">
+                  <span className="text-amber-500 font-bold block">GOVERNANCE BOUNDARY:</span>
+                  <span className="leading-tight font-sans font-light text-slate-500 dark:text-slate-400">{rec.decisionBoundary}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* SECTION 07 — STRATEGIC ROADMAP                                            */}
+      {/* ========================================================================= */}
+      <div className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#131f37] rounded-xl p-6 shadow-xs space-y-4">
+        <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
+          <Calendar size={18} className="text-[#0F4C81] dark:text-[#3B82F6]" />
+          <div>
+            <h2 className="text-xs font-extrabold uppercase tracking-wider text-slate-800 dark:text-white font-mono">
+              07 · Strategic Phased Roadmap
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-light">
+              Phased implementation horizons translating empirical findings into operational workflows. Future research is separated from immediate platform capabilities.
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           
-          {/* Action Column */}
-          <div className="md:col-span-8 space-y-1.5 text-slate-600 dark:text-slate-400">
-            <span className="text-[10px] font-mono font-extrabold text-slate-400 uppercase tracking-widest block">
-              Recommended Action & Clinical Context
-            </span>
-            <p className="font-light">
-              {rec.recommendedAction}
-            </p>
+          {/* Immediate */}
+          <div className="border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-[#182640]/40 rounded-xl p-4 space-y-2.5">
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700/60 pb-2">
+              <span className="text-[10px] font-mono font-extrabold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                IMMEDIATE · 0–3 MONTHS
+              </span>
+              <Clock size={13} className="text-emerald-600 dark:text-emerald-400" />
+            </div>
+            <div className="text-[11px] font-bold text-slate-800 dark:text-slate-200 font-sans">
+              Establish the Evidence Baseline
+            </div>
+            <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-300 font-light leading-relaxed">
+              {roadmap.immediate.map((step, sIdx) => (
+                <li key={sIdx} className="flex items-start gap-2">
+                  <ArrowRight size={13} className="text-emerald-600 dark:text-emerald-400 mt-0.5 shrink-0" />
+                  <span>{step}</span>
+                </li>
+              ))}
+            </ul>
           </div>
 
-          {/* Benefit Column */}
-          <div className="md:col-span-4 space-y-1.5 p-4 rounded-xl bg-emerald-50/20 dark:bg-[#152033]/40 border-l-3 border-[#2E8B57]">
-            <span className="text-[10px] font-mono font-extrabold text-[#2E8B57] uppercase tracking-widest block">
-              Expected Operational Benefit
-            </span>
-            <p className="text-slate-600 dark:text-slate-400 font-light font-mono text-[11px] leading-relaxed">
-              {rec.expectedBenefit}
+          {/* Medium Term */}
+          <div className="border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-[#182640]/40 rounded-xl p-4 space-y-2.5">
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700/60 pb-2">
+              <span className="text-[10px] font-mono font-extrabold uppercase tracking-wider px-2 py-0.5 rounded bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                MEDIUM TERM · 3–12 MONTHS
+              </span>
+              <TrendingUp size={13} className="text-blue-600 dark:text-blue-400" />
+            </div>
+            <div className="text-[11px] font-bold text-slate-800 dark:text-slate-200 font-sans">
+              Integrate Evidence Into Planning
+            </div>
+            <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-300 font-light leading-relaxed">
+              {roadmap.mediumTerm.map((step, sIdx) => (
+                <li key={sIdx} className="flex items-start gap-2">
+                  <ArrowRight size={13} className="text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
+                  <span>{step}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Long Term */}
+          <div className="border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-[#182640]/40 rounded-xl p-4 space-y-2.5">
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700/60 pb-2">
+              <span className="text-[10px] font-mono font-extrabold uppercase tracking-wider px-2 py-0.5 rounded bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
+                LONG TERM · FUTURE RESEARCH
+              </span>
+              <Compass size={13} className="text-purple-600 dark:text-purple-400" />
+            </div>
+            <div className="text-[11px] font-bold text-slate-800 dark:text-slate-200 font-sans">
+              Expand Analytical Capability Responsibly
+            </div>
+            <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-300 font-light leading-relaxed">
+              {roadmap.longTerm.map((step, sIdx) => (
+                <li key={sIdx} className="flex items-start gap-2">
+                  <ArrowRight size={13} className="text-purple-600 dark:text-purple-400 mt-0.5 shrink-0" />
+                  <span>{step}</span>
+                </li>
+              ))}
+            </ul>
+            <div className="pt-2 text-[9px] font-mono text-purple-600 dark:text-purple-400 uppercase font-bold border-t border-purple-200/40 dark:border-purple-900/40">
+              Future Research — Not Current Platform Capabilities
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* SECTION 08 — DECISION BOUNDARIES & INTERPRETATION LIMITS                  */}
+      {/* ========================================================================= */}
+      <div className="border-2 border-slate-300 dark:border-slate-700 bg-white dark:bg-[#131f37] rounded-xl p-6.5 shadow-xs space-y-5">
+        <div className="flex items-center gap-2.5 border-b border-slate-200 dark:border-slate-700 pb-3">
+          <ShieldCheck size={20} className="text-[#0F4C81] dark:text-[#3B82F6]" />
+          <div>
+            <h2 className="text-sm font-extrabold uppercase tracking-wider text-slate-900 dark:text-white font-mono">
+              08 · Decision Boundaries &amp; Interpretation Limits
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-light">
+              Explicit academic and governance boundaries defining confirmed analytical scope versus strict non-claims.
             </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          {/* Confirmed Analytical Scope (Checkmarks) */}
+          <div className="space-y-3 p-4.5 rounded-xl bg-emerald-50/40 dark:bg-emerald-950/20 border border-emerald-200/80 dark:border-emerald-800/60">
+            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
+              <CheckCircle2 size={15} className="text-emerald-600 dark:text-emerald-400" />
+              What the Analysis Supports
+            </span>
+            <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300 font-light leading-relaxed">
+              {boundariesSupports.map((item, bIdx) => (
+                <li key={bIdx} className="flex items-start gap-2">
+                  <span className="text-emerald-600 font-bold">✓</span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Strict Methodological Limits (Crosses) */}
+          <div className="space-y-3 p-4.5 rounded-xl bg-rose-50/40 dark:bg-rose-950/20 border border-rose-200/80 dark:border-rose-800/60">
+            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-rose-800 dark:text-rose-300 flex items-center gap-1.5">
+              <AlertCircle size={15} className="text-rose-600 dark:text-rose-400" />
+              What the Analysis Does Not Prove
+            </span>
+            <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300 font-light leading-relaxed">
+              {boundariesNotProven.map((item, bIdx) => (
+                <li key={bIdx} className="flex items-start gap-2">
+                  <span className="text-rose-600 font-bold">✕</span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
           </div>
 
         </div>
 
-        {/* Micro-metrics Row */}
-        <div className="pt-4 border-t border-slate-100 dark:border-[#1e2d4a] flex justify-between items-center text-[10px] font-mono text-slate-500 dark:text-slate-400">
-          <div className="flex items-center gap-1.5">
-            <TrendingUp size={12} className="text-[#0F4C81] dark:text-[#3B82F6]" />
-            <span>Expected Strategic Impact Level:</span>
-            <strong className="text-slate-800 dark:text-slate-200 uppercase">{rec.expectedImpact}</strong>
-          </div>
-          <div className="flex items-center gap-1">
-            <span>Framework Source:</span>
-            <span className="text-[#0F4C81] dark:text-[#3B82F6] font-bold uppercase tracking-wider">CIHI CAPSTONE v4.0</span>
-          </div>
+        {/* Final Strategic Conclusion */}
+        <div className="p-5 rounded-xl bg-slate-900 text-white dark:bg-[#0b1222] border border-slate-800 space-y-2 text-left">
+          <span className="text-[10px] font-mono font-extrabold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
+            <Sparkles size={14} />
+            Final Strategic Conclusion
+          </span>
+          <p className="text-xs text-slate-200 leading-relaxed font-light">
+            {finalConclusion}
+          </p>
         </div>
-
       </div>
 
     </div>

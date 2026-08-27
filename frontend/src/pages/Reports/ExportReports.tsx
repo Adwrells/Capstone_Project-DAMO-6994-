@@ -102,10 +102,13 @@ export default function ExportReports({
     if (includeStatistics) {
       text += `5. STATISTICAL & MODEL ESTIMATIONS\n`;
       text += `------------------------------------------------------------------------\n`;
-      text += `- WLS Regression Model: Adjusted R² = 0.8800; Emergent Acuity β = +1.405h, Inpatient Admission β = +6.02h vs Reference.\n`;
-      text += `- Pearson Chi-Square: χ²(1) = 18,164.97, p < 0.0001, Cramér's V = 0.0102 (N = 175,762,944 visits).\n`;
-      text += `- Longitudinal Trend: Mann-Kendall τ = 0.9766 (p < 0.0001); Holt's Linear Exponential Smoothing with 95% Forecast CI.\n`;
-      text += `- Canonical ERBI: Σ(CTAS Urgency × Median LOS Hours × Visits) / Σ(Visits).\n`;
+      text += `- H1 (CTAS Acuity): Weighted Kruskal-Wallis H(4) = 48.74, p < 0.001, ε² = 0.7251 (Large effect).\n`;
+      text += `- H2 (Disposition): Weighted Mann-Whitney U = 5.22e14, p < 0.001, rank-biserial rb = 0.9981 (Large effect).\n`;
+      text += `- H3 (WLS Model): Weighted Least Squares Linear Regression, R² = 0.3163 (31.63% model variation), slope = -116.60 min/unit (p < 0.001).\n`;
+      text += `- H4 (Age Demographics): Weighted Kruskal-Wallis H(3) = 111.45, p < 0.001, ε² = 0.7218 (Large effect; Older Adult median 250.0 min vs Pediatric 123.0 min).\n`;
+      text += `- H5 (Equity Association): Pearson Chi-Square χ²(1) = 18,164.97, p < 0.001, Cramér's V = 0.0102 (Negligible effect magnitude).\n`;
+      text += `- Longitudinal Trend: Mann-Kendall Z = 5.5977, p < 0.001, Sen's slope = 550,907 visits/year; SES 5-year forecast.\n`;
+      text += `- Derived Planning Context: Canonical ERBI = 8.33 acuity-weighted patient-hours per visit.\n`;
       text += `------------------------------------------------------------------------\n`;
     }
 
@@ -463,9 +466,9 @@ export default function ExportReports({
                 {/* Analytics Methodology */}
                 {includeMethodology && (
                   <div className="space-y-1.5 animate-fade-in">
-                    <h4 className="text-[10px] font-bold uppercase tracking-wider text-slate-400">3. Research Objectives & Methodology</h4>
+                    <h4 className="text-[10px] font-bold uppercase tracking-wider text-slate-400">3. Research Objectives &amp; Methodology</h4>
                     <p className="text-xs text-slate-700 leading-relaxed font-light">
-                      The core scientific framework maps five pre-specified hypotheses: (a) Evaluating median LOS variance across CTAS acuity tiers (Weighted Kruskal-Wallis, ε² = 0.4447), (b) Testing admission status disparity (Weighted Mann-Whitney U, rb = 0.9999), (c) Modeling multi-attribute stay duration determinants via Weighted Least Squares (WLS Adj. R² = 0.8800), (d) Measuring life-stage demographic variations (Weighted Kruskal-Wallis, ε² = 0.2863), and (e) Testing independence of Patient Sex and Visit Disposition (Pearson Chi-Square, χ² = 18,164.97, Cramér's V = 0.0102). In addition, longitudinal ERBI trends are modeled via Mann-Kendall tests and Holt's linear exponential smoothing.
+                      The core scientific framework maps five pre-specified hypotheses: (a) Evaluating median LOS variance across CTAS acuity tiers (Weighted Kruskal-Wallis, ε² = 0.7251), (b) Testing admission status disparity (Weighted Mann-Whitney U, rb = 0.9981), (c) Modeling multi-attribute stay duration determinants via Weighted Least Squares (WLS, R² = 0.3163), (d) Measuring life-stage demographic variations (Weighted Kruskal-Wallis, ε² = 0.7218), and (e) Testing independence of Patient Sex and Visit Disposition (Pearson Chi-Square, χ² = 18,164.97, Cramér's V = 0.0102). In addition, longitudinal trends are evaluated using the Mann-Kendall test (Z = 5.5977) and Simple Exponential Smoothing.
                     </p>
                   </div>
                 )}
@@ -473,9 +476,9 @@ export default function ExportReports({
                 {/* AI Insights */}
                 {includeAIInsights && (
                   <div className="space-y-1.5 animate-fade-in">
-                    <h4 className="text-[10px] font-bold uppercase tracking-wider text-slate-400">4. AI-Powered Decision Support Recommendations</h4>
+                    <h4 className="text-[10px] font-bold uppercase tracking-wider text-slate-400">4. Decision Support Recommendations</h4>
                     <p className="text-xs text-slate-700 leading-relaxed font-light italic bg-slate-50 p-3 rounded border border-slate-100">
-                      "{aiAnalysisText || "CTAS Level 2 (Emergent) visits exhibit the highest median stay duration (3.75h) due to comprehensive diagnostic workups. Inpatient admission is the dominant operational driver of prolonged ED stay, justifying admission-flow optimization."}"
+                      "{aiAnalysisText || "The completed analysis supports incorporating case-mix distributions into aggregate capacity planning rather than relying on visit volume alone. Admitted encounters follow distinct patient-flow patterns warranting separate examination of downstream coordination."}"
                     </p>
                   </div>
                 )}
@@ -483,9 +486,9 @@ export default function ExportReports({
                 {/* Statistics */}
                 {includeStatistics && (
                   <div className="space-y-1.5 animate-fade-in">
-                    <h4 className="text-[10px] font-bold uppercase tracking-wider text-slate-400">5. Statistical & Model Estimations</h4>
+                    <h4 className="text-[10px] font-bold uppercase tracking-wider text-slate-400">5. Statistical &amp; Model Estimations</h4>
                     <p className="text-xs text-slate-700 leading-relaxed font-light">
-                      Weighted Least Squares (WLS) regression estimates: <code className="font-mono bg-slate-100 px-1 rounded text-[#0F4C81] font-semibold">LOS = β₀ + β_CTAS + β_Age + β_Disp</code> (Adjusted R² = 0.8800). Longitudinal ERBI analysis registers a significant upward trend (Kendall's τ = 0.9766, p &lt; .0001) with Holt's linear forecasting predicting continuous multi-year capacity demand.
+                      Weighted Least Squares (WLS) regression estimates: <code className="font-mono bg-slate-100 px-1 rounded text-[#0F4C81] font-semibold">LOS = β₀ + β₁·UrgencyScore</code> (R² = 0.3163, p &lt; 0.001). Longitudinal visit analysis registers a statistically significant upward trend (Mann-Kendall Z = 5.5977, p &lt; 0.001) with Simple Exponential Smoothing projecting multi-year capacity planning intervals.
                     </p>
                   </div>
                 )}
