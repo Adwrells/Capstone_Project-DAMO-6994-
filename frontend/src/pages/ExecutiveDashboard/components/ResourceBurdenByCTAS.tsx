@@ -8,6 +8,7 @@ import {
   CartesianGrid,
   Tooltip,
   Cell,
+  LabelList,
 } from 'recharts';
 import { Zap, Info } from 'lucide-react';
 import { fmtK } from './formatters';
@@ -84,7 +85,7 @@ export default function ResourceBurdenByCTAS({ isDarkMode }: ResourceBurdenByCTA
             <BarChart
               data={BURDEN_RANKED_DATA}
               layout="vertical"
-              margin={{ top: 10, right: 40, bottom: 10, left: 110 }}
+              margin={{ top: 10, right: 85, bottom: 10, left: 110 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-slate-200/60 dark:text-slate-800/80" />
               <XAxis
@@ -92,6 +93,7 @@ export default function ResourceBurdenByCTAS({ isDarkMode }: ResourceBurdenByCTA
                 tick={{ fontSize: 9, fill: '#64748b', fontFamily: 'monospace' }}
                 tickFormatter={v => `${v}M`}
                 stroke="#94a3b8"
+                domain={[0, 880]}
               />
               <YAxis
                 type="category"
@@ -105,6 +107,16 @@ export default function ResourceBurdenByCTAS({ isDarkMode }: ResourceBurdenByCTA
                 {BURDEN_RANKED_DATA.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
+                <LabelList
+                  dataKey="burden_hours"
+                  position="right"
+                  offset={8}
+                  formatter={(v: any) => `${Number(v).toFixed(1)}M hrs`}
+                  fill={dark ? '#E2E8F0' : '#1E293B'}
+                  fontSize={9.5}
+                  fontWeight={700}
+                  fontFamily="monospace"
+                />
               </Bar>
             </BarChart>
           </ResponsiveContainer>

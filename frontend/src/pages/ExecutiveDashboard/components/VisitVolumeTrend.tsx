@@ -3,12 +3,11 @@ import {
   ResponsiveContainer,
   AreaChart,
   Area,
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
+  LabelList,
 } from 'recharts';
 import { TrendDataPoint } from './types';
 import { fmtK, fmtNum } from './formatters';
@@ -70,7 +69,7 @@ export default function VisitVolumeTrend({ data, isDarkMode }: VisitVolumeTrendP
 
       <div style={{ height: 260 }}>
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data} margin={{ top: 15, right: 20, bottom: 35, left: 10 }}>
+          <AreaChart data={data} margin={{ top: 22, right: 20, bottom: 35, left: 10 }}>
             <defs>
               <linearGradient id="vol-gradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#0F4C81" stopOpacity={0.4} />
@@ -100,7 +99,18 @@ export default function VisitVolumeTrend({ data, isDarkMode }: VisitVolumeTrendP
               fill="url(#vol-gradient)"
               dot={{ r: 3.5, fill: '#0F4C81', stroke: '#fff', strokeWidth: 1.5 }}
               activeDot={{ r: 6, fill: '#0284C7', stroke: '#fff', strokeWidth: 2 }}
-            />
+            >
+              <LabelList
+                dataKey="ed_visits"
+                position="top"
+                offset={6}
+                formatter={(v: any) => fmtK(Number(v))}
+                fill={dark ? '#93C5FD' : '#0F4C81'}
+                fontSize={8}
+                fontWeight={700}
+                fontFamily="monospace"
+              />
+            </Area>
           </AreaChart>
         </ResponsiveContainer>
       </div>

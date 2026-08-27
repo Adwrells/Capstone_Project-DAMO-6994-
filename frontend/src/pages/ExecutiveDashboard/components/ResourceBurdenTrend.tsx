@@ -8,6 +8,7 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
+  LabelList,
 } from 'recharts';
 import { TrendingUp, ShieldCheck } from 'lucide-react';
 import { fmtK } from './formatters';
@@ -18,18 +19,18 @@ interface ResourceBurdenTrendProps {
 
 // 19-Year historical ERBI points + 2-year forecast
 const ERBI_LONGITUDINAL_DATA = [
-  { fy: '2003-04', hist: 4.21, forecast: null, ci_low: null, ci_high: null },
-  { fy: '2005-06', hist: 4.85, forecast: null, ci_low: null, ci_high: null },
-  { fy: '2007-08', hist: 5.32, forecast: null, ci_low: null, ci_high: null },
-  { fy: '2009-10', hist: 5.98, forecast: null, ci_low: null, ci_high: null },
-  { fy: '2011-12', hist: 6.45, forecast: null, ci_low: null, ci_high: null },
-  { fy: '2013-14', hist: 6.92, forecast: null, ci_low: null, ci_high: null },
-  { fy: '2015-16', hist: 7.41, forecast: null, ci_low: null, ci_high: null },
-  { fy: '2017-18', hist: 7.89, forecast: null, ci_low: null, ci_high: null },
-  { fy: '2019-20', hist: 8.24, forecast: null, ci_low: null, ci_high: null },
-  { fy: '2021-22', hist: 8.33, forecast: 8.33, ci_low: 8.33, ci_high: 8.33 },
-  { fy: '2022-23 (F)', hist: null, forecast: 8.65, ci_low: 7.45, ci_high: 9.85 },
-  { fy: '2023-24 (F)', hist: null, forecast: 8.98, ci_low: 7.10, ci_high: 10.86 },
+  { fy: '2003-04', hist: 4.21, forecast: null, forecast_label: null, ci_low: null, ci_high: null },
+  { fy: '2005-06', hist: 4.85, forecast: null, forecast_label: null, ci_low: null, ci_high: null },
+  { fy: '2007-08', hist: 5.32, forecast: null, forecast_label: null, ci_low: null, ci_high: null },
+  { fy: '2009-10', hist: 5.98, forecast: null, forecast_label: null, ci_low: null, ci_high: null },
+  { fy: '2011-12', hist: 6.45, forecast: null, forecast_label: null, ci_low: null, ci_high: null },
+  { fy: '2013-14', hist: 6.92, forecast: null, forecast_label: null, ci_low: null, ci_high: null },
+  { fy: '2015-16', hist: 7.41, forecast: null, forecast_label: null, ci_low: null, ci_high: null },
+  { fy: '2017-18', hist: 7.89, forecast: null, forecast_label: null, ci_low: null, ci_high: null },
+  { fy: '2019-20', hist: 8.24, forecast: null, forecast_label: null, ci_low: null, ci_high: null },
+  { fy: '2021-22', hist: 8.33, forecast: 8.33, forecast_label: null, ci_low: 8.33, ci_high: 8.33 },
+  { fy: '2022-23 (F)', hist: null, forecast: 8.65, forecast_label: '8.65 (F)', ci_low: 7.45, ci_high: 9.85 },
+  { fy: '2023-24 (F)', hist: null, forecast: 8.98, forecast_label: '8.98 (F)', ci_low: 7.10, ci_high: 10.86 },
 ];
 
 function CustomTrendTooltip({ active, payload, label }: any) {
@@ -92,7 +93,7 @@ export default function ResourceBurdenTrend({ isDarkMode }: ResourceBurdenTrendP
 
       <div style={{ height: 230 }} className="mt-2">
         <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart data={ERBI_LONGITUDINAL_DATA} margin={{ top: 15, right: 30, bottom: 25, left: 10 }}>
+          <ComposedChart data={ERBI_LONGITUDINAL_DATA} margin={{ top: 22, right: 30, bottom: 25, left: 10 }}>
             <defs>
               <linearGradient id="erbi-grad" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#0F4C81" stopOpacity={0.35} />
@@ -126,7 +127,18 @@ export default function ResourceBurdenTrend({ isDarkMode }: ResourceBurdenTrendP
               dot={{ r: 3.5, fill: '#0F4C81', stroke: '#fff', strokeWidth: 1.5 }}
               name="Historical ERBI"
               connectNulls
-            />
+            >
+              <LabelList
+                dataKey="hist"
+                position="top"
+                offset={6}
+                formatter={(v: any) => v != null ? `${Number(v).toFixed(2)}` : ''}
+                fill={dark ? '#93C5FD' : '#0F4C81'}
+                fontSize={8}
+                fontWeight={700}
+                fontFamily="monospace"
+              />
+            </Line>
             <Line
               type="monotone"
               dataKey="forecast"
@@ -136,7 +148,17 @@ export default function ResourceBurdenTrend({ isDarkMode }: ResourceBurdenTrendP
               dot={{ r: 4.5, fill: '#3B82F6', stroke: '#93C5FD', strokeWidth: 1.5 }}
               name="Holt Forecast"
               connectNulls
-            />
+            >
+              <LabelList
+                dataKey="forecast_label"
+                position="top"
+                offset={6}
+                fill={dark ? '#60A5FA' : '#2563EB'}
+                fontSize={8}
+                fontWeight={700}
+                fontFamily="monospace"
+              />
+            </Line>
           </ComposedChart>
         </ResponsiveContainer>
       </div>

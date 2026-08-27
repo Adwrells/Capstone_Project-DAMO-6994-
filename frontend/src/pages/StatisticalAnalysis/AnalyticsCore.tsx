@@ -1218,22 +1218,6 @@ function MGrid({ metrics }: { metrics: { label: string; value: string | number; 
   );
 }
 
-// ─── INTERPRETATION PANEL ────────────────────────────────────────────────────
-function InterpPanel({ stat, clinical, operational }: { stat: string; clinical: string; operational: string }) {
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-slate-100 dark:border-[#1e2d4a] pt-4">
-      {[{ title: 'Statistical Finding', color: '#0F4C81', border: 'border-[#0F4C81]', bg: 'bg-indigo-50/20 dark:bg-[#152033]/40', text: stat },
-      { title: 'Clinical Workflow Context', color: '#2E8B57', border: 'border-[#2E8B57]', bg: 'bg-emerald-50/20 dark:bg-[#152033]/40', text: clinical },
-      { title: 'Operational Implication', color: '#D97706', border: 'border-amber-500', bg: 'bg-amber-50/20 dark:bg-[#152033]/40', text: operational }
-      ].map(p => (
-        <div key={p.title} className={`p-3.5 ${p.bg} border-l-[3px] ${p.border} rounded-r-lg`}>
-          <span className={`font-extrabold text-[10px] uppercase tracking-wider block mb-1`} style={{ color: p.color }}>{p.title}</span>
-          <p className="text-slate-600 dark:text-slate-400 leading-relaxed font-light text-xs">{p.text}</p>
-        </div>
-      ))}
-    </div>
-  );
-}
 
 // ─── HYPOTHESIS CARD WRAPPER ─────────────────────────────────────────────────
 function HCard({ id, num, title, method, rq, decision, rejected, status, children }: { id: string; num: number; title: string; method: string; rq: string; decision: string; rejected: boolean; status: 'IDLE' | 'EXECUTING' | 'COMPLETED'; children: React.ReactNode }) {
@@ -1792,11 +1776,7 @@ export default function AnalyticsCore({ fields, data, onNavigateNext }: Analytic
             { label: 'H₁', value: 'At least one CTAS level has a different reported median ED LOS' },
             { label: 'α', value: '0.05 (two-sided); Data: SQLite-loaded processed dataset' },
           ]} />
-          <InterpPanel
-            stat={`A weighted Kruskal–Wallis test indicated a statistically significant difference in reported median ED LOS across CTAS triage levels, H(${h1.kw.df}) = ${fmtN(h1.kw.h, 3)}, p < .0001, ε² = ${fmtN(h1.kw.eps2, 4)} — a large effect by conventional benchmarks for rank-based ANOVA (small ≈ .01, medium ≈ .06, large ≥ .14). All significant pairwise contrasts remained significant following Bonferroni correction (${h1.dunn.length} of ${h1.m} comparisons).`}
-            clinical="Reported LOS does not increase monotonically with acuity: Emergent-triage visits show the longest reported Mdn stay (3.75 hr), exceeding both Resuscitation (Mdn = 3.30 hr) and Urgent (Mdn = 2.80 hr) visits. This pattern is clinically plausible — Resuscitation-level patients are typically stabilized and rapidly disposed to critical care or the operating room, truncating ED boarding time, whereas Emergent-acuity patients more often undergo extended diagnostic workups while remaining in the ED prior to disposition."
-            operational="Triage-stratified LOS benchmarks — particularly the elevated Emergent-tier duration — can inform hourly occupancy models and staffing plans, with attention to workup-driven boarding time rather than treating acuity as a linear proxy for resource intensity."
-          />
+
         </HCard>
 
         {/* ── H2 ── */}
@@ -1832,11 +1812,7 @@ export default function AnalyticsCore({ fields, data, onNavigateNext }: Analytic
             { label: 'H₁', value: 'Reported median ED LOS differs significantly between admitted and non-admitted visits' },
             { label: 'α', value: '0.05; Data: SQLite-loaded processed dataset' },
           ]} />
-          <InterpPanel
-            stat={`A weighted Mann–Whitney U test indicated a statistically significant difference in reported median ED LOS between admitted and non-admitted visits, U = ${fmtN(h2.u.u, 1)}, p < .0001. Admitted patients experience substantially prolonged ED stay durations compared to non-admitted patients, with a large rank-biserial effect size (rᵦ = ${fmtN(h2.u.rb, 4)}) and a median duration gap of ${fmtN(Math.abs(h2.u.medDiff), 2)} hours.`}
-            clinical="Inpatient admission pathways require extensive stabilization, multi-specialty consultations, diagnostic imaging, and inpatient bed allocation, leading to prolonged ED boarding compared to rapid outpatient discharge."
-            operational="Inpatient bed readiness and streamlined admission transfer protocols represent critical levers for mitigating overall emergency department overcrowding and reducing extreme boarding times."
-          />
+
         </HCard>
 
         {/* ── H3 ── */}
@@ -1894,11 +1870,7 @@ export default function AnalyticsCore({ fields, data, onNavigateNext }: Analytic
             { label: 'Interpretation Unit', value: 'Aggregate strata records only — no individual-level inference' },
             { label: 'Data Source', value: 'SQLite-loaded processed dataset' },
           ]} />
-          <InterpPanel
-            stat={`The weighted least squares model explains a substantial share of weighted variance in reported aggregate median ED LOS, adjusted R² = ${h3 ? fmtN(h3.res.adjR2, 4) : '.8800'}. Relative to the reference stratum, emergent acuity and inpatient admission are independently associated with significant increases in expected length of stay (p < .0001).`}
-            clinical="Each coefficient quantifies the average difference in reported aggregate median LOS associated with a predictor category relative to its reference, holding the other modeled predictors constant."
-            operational="Disposition and high acuity together drive the majority of prolonged stay variance, confirming that interventions targeting admission flow and high-acuity workups yield maximal throughput impact."
-          />
+
         </HCard>
 
         {/* ── H4 ── */}
@@ -1972,11 +1944,7 @@ export default function AnalyticsCore({ fields, data, onNavigateNext }: Analytic
             { label: 'H₁', value: 'At least one age category has a different reported median ED LOS' },
             { label: 'α', value: '0.05; Data: SQLite-loaded processed dataset' },
           ]} />
-          <InterpPanel
-            stat={`The omnibus test indicated a statistically significant difference in reported median ED LOS across broad age categories, H(${h4.kw.df}) = ${fmtN(h4.kw.h, 3)}, p < .0001, ε² = ${fmtN(h4.kw.eps2, 4)}. Older Adult visits exhibit significantly longer reported stays than Pediatric and Young Adult cohorts.`}
-            clinical="Older adult patients frequently present with multi-morbidity, polypharmacy, and non-specific presentations requiring complex multidisciplinary evaluations, leading to longer ED stays."
-            operational="Specialized geriatric fast-tracking, comprehensive assessments, and dedicated transition-of-care teams can mitigate prolonged boarding times for older adult cohorts."
-          />
+
         </HCard>
 
         {/* ── H5 ── */}
@@ -2016,11 +1984,7 @@ export default function AnalyticsCore({ fields, data, onNavigateNext }: Analytic
             { label: 'H₁', value: 'Patient sex and visit disposition are statistically associated' },
             { label: 'α', value: '0.05; Data: SQLite-loaded visit_disposition table' },
           ]} />
-          <InterpPanel
-            stat={`The Pearson Chi-Square test was statistically significant, χ²(${h5.res.df}) = ${fmtN(h5.res.chi2, 2)}, p < .0001. However, the effect size is negligible, Cramér's V = ${fmtN(h5.res.cramersV, 4)}, indicating that while a minute difference in admission proportion exists across sexes (Female ~9.94% vs. Male ~10.56%), the statistical significance is driven by the massive aggregate sample size (N = ${h5.res.totalN.toLocaleString()} visits).`}
-            clinical="Admission decisions in the emergency department are primarily dictated by clinical acuity, hemodynamic stability, and diagnostic findings rather than patient sex."
-            operational="Capacity and admission-flow management models should focus on clinical severity and bed availability rather than sex-stratified admission targets."
-          />
+
         </HCard>
 
         {/* ── Advanced Analytics: Longitudinal Trend & Forecasting ── */}
@@ -2145,11 +2109,7 @@ export default function AnalyticsCore({ fields, data, onNavigateNext }: Analytic
                 { label: 'α', value: '0.05 (two-sided); Data: SQLite-loaded processed dataset' },
               ]} />
 
-              <InterpPanel
-                stat={`A statistically significant, strong monotonic increasing trend was detected in the Estimated ED Resource Burden Index (ERBI) across the 19-year historical series, Kendall's τ = ${trends ? fmtN(trends.mk.tau, 4) : '.9766'}, p < .0001. Holt's linear trend exponential smoothing projects continued growth in aggregate demand.`}
-                clinical="ERBI combines reported median stay duration with visit volumes, reflecting simultaneous upward pressure from population growth, aging demographics, and complexity-driven care duration."
-                operational="Long-term capacity planning should incorporate the projected ERBI growth trends and upper-bound prediction intervals to stress-test ED staffing, bed availability, and transition-to-care resources."
-              />
+
             </div>
           )}
         </div>

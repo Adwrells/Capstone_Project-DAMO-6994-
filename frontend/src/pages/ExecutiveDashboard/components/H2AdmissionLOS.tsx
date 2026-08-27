@@ -8,6 +8,7 @@ import {
   CartesianGrid,
   Tooltip,
   Cell,
+  LabelList,
 } from 'recharts';
 import { ShieldCheck } from 'lucide-react';
 import { fmtHours, fmtMinutes, fmtP } from './formatters';
@@ -51,7 +52,7 @@ export default function H2AdmissionLOS({ isDarkMode }: H2AdmissionLOSProps) {
             <BarChart
               data={DISPOSITION_DATA}
               layout="vertical"
-              margin={{ top: 20, right: 35, bottom: 20, left: 75 }}
+              margin={{ top: 20, right: 75, bottom: 20, left: 75 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-slate-200/60 dark:text-slate-800/80" />
               <XAxis
@@ -59,7 +60,7 @@ export default function H2AdmissionLOS({ isDarkMode }: H2AdmissionLOSProps) {
                 tick={{ fontSize: 9, fill: '#64748b', fontFamily: 'monospace' }}
                 tickFormatter={v => `${v}h`}
                 stroke="#94a3b8"
-                domain={[0, 12]}
+                domain={[0, 13]}
               />
               <YAxis
                 type="category"
@@ -85,6 +86,16 @@ export default function H2AdmissionLOS({ isDarkMode }: H2AdmissionLOSProps) {
                 {DISPOSITION_DATA.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
+                <LabelList
+                  dataKey="los_hours"
+                  position="right"
+                  offset={8}
+                  formatter={(v: any) => `${Number(v).toFixed(2)} hrs`}
+                  fill={dark ? '#E2E8F0' : '#1E293B'}
+                  fontSize={10}
+                  fontWeight={700}
+                  fontFamily="monospace"
+                />
               </Bar>
             </BarChart>
           </ResponsiveContainer>

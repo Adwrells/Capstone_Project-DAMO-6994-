@@ -8,6 +8,7 @@ import {
   CartesianGrid,
   Tooltip,
   Cell,
+  LabelList,
 } from 'recharts';
 import { Activity, Stethoscope } from 'lucide-react';
 import { fmtK, fmtHours } from './formatters';
@@ -84,7 +85,7 @@ export default function TopMainProblems({ isDarkMode }: TopMainProblemsProps) {
             <BarChart
               data={sortedData}
               layout="vertical"
-              margin={{ top: 10, right: 35, bottom: 10, left: 120 }}
+              margin={{ top: 10, right: 65, bottom: 10, left: 120 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-slate-200/60 dark:text-slate-800/80" />
               <XAxis
@@ -119,6 +120,16 @@ export default function TopMainProblems({ isDarkMode }: TopMainProblemsProps) {
                 {sortedData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
+                <LabelList
+                  dataKey={metric === 'visits' ? 'visits_m' : 'los_hours'}
+                  position="right"
+                  offset={8}
+                  formatter={(v: any) => metric === 'visits' ? `${Number(v).toFixed(1)}M` : `${Number(v).toFixed(2)} hrs`}
+                  fill={dark ? '#E2E8F0' : '#1E293B'}
+                  fontSize={9.5}
+                  fontWeight={700}
+                  fontFamily="monospace"
+                />
               </Bar>
             </BarChart>
           </ResponsiveContainer>

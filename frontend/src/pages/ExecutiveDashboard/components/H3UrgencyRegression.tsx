@@ -9,6 +9,7 @@ import {
   CartesianGrid,
   Tooltip,
   ZAxis,
+  LabelList,
 } from 'recharts';
 import { ShieldCheck } from 'lucide-react';
 import { fmtHours, fmtP } from './formatters';
@@ -121,7 +122,18 @@ export default function H3UrgencyRegression({ isDarkMode }: H3UrgencyRegressionP
                 fill="#0F4C81"
                 stroke="#38BDF8"
                 strokeWidth={1.5}
-              />
+              >
+                <LabelList
+                  dataKey="los_hours"
+                  position="top"
+                  offset={10}
+                  formatter={(v: any) => `${Number(v).toFixed(2)}h`}
+                  fill={dark ? '#38BDF8' : '#0284C7'}
+                  fontSize={9.5}
+                  fontWeight={700}
+                  fontFamily="monospace"
+                />
+              </Scatter>
             </ComposedChart>
           </ResponsiveContainer>
         </div>
