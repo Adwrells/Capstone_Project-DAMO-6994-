@@ -313,6 +313,14 @@ export default function App() {
   };
 
   const handleNextStage = () => {
+    if (currentIndex === 1 && !cleaningSummary) {
+      setNotification({
+        text: "Please run the Automated Data Preparation & Validation Pipeline in Stage 2 to proceed.",
+        type: 'info'
+      });
+      setTimeout(() => setNotification(null), 5000);
+      return;
+    }
     if (currentIndex < STAGES.length - 1) {
       setCurrentSection(STAGES[currentIndex + 1].key);
     }
@@ -471,9 +479,16 @@ export default function App() {
             {currentIndex < STAGES.length - 1 ? (
               <button
                 onClick={handleNextStage}
-                disabled={currentIndex === 1 && !datasetName}
+                disabled={currentIndex === 1 && !cleaningSummary}
+                title={
+                  currentIndex === 1 && !cleaningSummary
+                    ? "Run the Automated Data Preparation & Validation Pipeline in Stage 2 to proceed."
+                    : undefined
+                }
                 className={`flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-bold text-white bg-[#2563EB] hover:bg-blue-700 shadow-sm transition-all ${
-                  currentIndex === 1 && !datasetName ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer hover:shadow'
+                  currentIndex === 1 && !cleaningSummary
+                    ? 'opacity-40 cursor-not-allowed'
+                    : 'cursor-pointer hover:shadow'
                 }`}
               >
                 <span>Next: {STAGES[currentIndex + 1].label}</span>

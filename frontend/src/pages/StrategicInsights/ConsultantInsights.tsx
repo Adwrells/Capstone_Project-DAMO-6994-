@@ -1120,63 +1120,16 @@ export default function ConsultantInsights({ isLoading: parentLoading }: Consult
       </section>
 
       {/* ========================================================================= */}
-      {/* SECTION 08 — DECISION BOUNDARIES & INTERPRETATION LIMITS                  */}
+      {/* SECTION 08 — FINAL STRATEGIC CONCLUSION                                   */}
       {/* ========================================================================= */}
-      <section aria-labelledby="section-08-title" className="border-2 border-slate-300 dark:border-slate-700 bg-white dark:bg-[#111c30] rounded-2xl p-7 shadow-xs space-y-6">
-        <div className="flex items-center gap-2.5 border-b border-slate-200 dark:border-slate-700 pb-4">
-          <ShieldCheck size={22} className="text-[#0F4C81] dark:text-[#3B82F6]" />
-          <div>
-            <h2 id="section-08-title" className="text-sm font-extrabold uppercase tracking-wider text-slate-900 dark:text-white font-mono">
-              08 · Decision Boundaries &amp; Interpretation Limits
-            </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400 font-light">
-              Explicit academic and governance boundaries defining confirmed analytical scope versus strict non-claims.
-            </p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          
-          {/* Confirmed Analytical Scope (Checkmarks) */}
-          <div className="space-y-3.5 p-5 rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/90 dark:border-emerald-800/60">
-            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300 flex items-center gap-2">
-              <CheckCircle2 size={16} className="text-emerald-600 dark:text-emerald-400" />
-              What the Analysis Supports
+      <section aria-labelledby="section-08-title" className="space-y-4">
+        <div className="p-6 sm:p-7 rounded-2xl bg-slate-900 text-white dark:bg-[#0b1222] border border-slate-800 space-y-3 text-left shadow-lg">
+          <div className="flex items-center gap-2 text-sky-400">
+            <Sparkles size={16} />
+            <span id="section-08-title" className="text-xs font-mono font-extrabold uppercase tracking-wider">
+              08 · Final Strategic Conclusion
             </span>
-            <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300 font-light leading-relaxed">
-              {boundariesSupports.map((item, bIdx) => (
-                <li key={bIdx} className="flex items-start gap-2.5">
-                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">✓</span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
           </div>
-
-          {/* Strict Methodological Limits (Crosses) */}
-          <div className="space-y-3.5 p-5 rounded-2xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200/90 dark:border-rose-800/60">
-            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-rose-800 dark:text-rose-300 flex items-center gap-2">
-              <AlertCircle size={16} className="text-rose-600 dark:text-rose-400" />
-              What the Analysis Does Not Prove
-            </span>
-            <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300 font-light leading-relaxed">
-              {boundariesNotProven.map((item, bIdx) => (
-                <li key={bIdx} className="flex items-start gap-2.5">
-                  <span className="text-rose-600 dark:text-rose-400 font-bold">✕</span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-        </div>
-
-        {/* Final Strategic Conclusion (Prominently Highlighted) */}
-        <div className="p-6 rounded-2xl bg-slate-900 text-white dark:bg-[#0b1222] border border-slate-800 space-y-2.5 text-left shadow-lg">
-          <span className="text-[10px] font-mono font-extrabold uppercase tracking-wider text-sky-400 flex items-center gap-2">
-            <Sparkles size={15} />
-            Final Strategic Conclusion
-          </span>
           <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-light">
             {finalConclusion}
           </p>
