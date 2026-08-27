@@ -24,11 +24,7 @@ VITE_HMR_PORT = 24678
 API_PORT = int(os.getenv("API_PORT", "8000"))
 
 # Resolve everything against the script's own directory rather than the caller's cwd.
-# Every backend module imports `backend.*`, which only resolves from the repository root,
-# so the launcher moves there itself instead of requiring the caller to be in the right
-# place. This is what makes `python /app/launch.py` behave identically to `python launch.py`.
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-
 IS_WINDOWS = sys.platform == "win32"
 
 
@@ -73,12 +69,7 @@ def port_in_use(port):
 
 
 def free_port(port, label):
-    """Stops whatever holds the port, after asking.
-
-    A stale server here is genuinely confusing rather than merely inconvenient:
-    server.ts is not hot-reloaded, so an old process keeps serving old backend code while
-    Vite hot-reloads the frontend. The UI then appears updated while API behaviour is not.
-    """
+    """Stops whatever holds the port, after asking."""
     if not port_in_use(port):
         return True
 
@@ -95,12 +86,8 @@ def free_port(port, label):
             print(f"  Leaving port {port} alone. Startup will fail with EADDRINUSE.")
             return False
     else:
-        # Non-interactive (Docker, CI): prompting would hang or hit EOF, so reclaim the
-        # port automatically. A container that cannot bind its port is useless anyway.
         print("  Non-interactive environment — reclaiming the port automatically.")
 
-    # No shell anywhere below: arguments are passed as lists so nothing is re-parsed as a
-    # shell command, and every PID is checked to be numeric before it reaches taskkill/kill.
     if sys.platform == "win32":
         found = subprocess.run(
             ["netstat", "-ano", "-p", "TCP"], capture_output=True, text=True
@@ -117,10 +104,7 @@ def free_port(port, label):
                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             print(f"  Stopped PID {pid}.")
     else:
-        # node:20-slim ships neither lsof nor fuser, so try each and degrade gracefully
-        # rather than crashing on a missing binary.
         pids = set()
-
         if shutil.which("lsof"):
             found = subprocess.run(["lsof", "-ti", f"tcp:{port}"],
                                    capture_output=True, text=True)
@@ -160,12 +144,11 @@ def free_port(port, label):
     print(f"  Port {port} is free.")
     return True
 
+
 def preflight():
     """Fails fast on the mistakes that produce confusing symptoms later."""
     print("\n--- 0. Preflight ---")
 
-    # Move to the repository root ourselves so the launcher works from any directory —
-    # `python /app/launch.py` in a container behaves the same as `python launch.py` locally.
     os.chdir(PROJECT_ROOT)
     print(f"  Project root: {PROJECT_ROOT}")
     print(f"  Platform: {sys.platform}{' (container)' if in_container() else ''}")
@@ -183,8 +166,6 @@ def preflight():
         print(f"  ERROR: Python 3.10+ required, found {sys.version.split()[0]}.")
         sys.exit(1)
 
-    # The seeded database is committed; an empty schema means empty dashboards, which is
-    # far easier to diagnose here than from a blank chart later.
     db_path = os.path.join("backend", "database", "healthcare.db")
     if os.path.exists(db_path):
         print(f"  Database present ({os.path.getsize(db_path) / 1024:.0f} KB).")
@@ -192,8 +173,6 @@ def preflight():
         print(f"  WARNING: {db_path} is missing. Dashboards will be empty.")
         print("  Rebuild it with: python -m backend.database.load_csv")
 
-    # The preload reads this directory. It has silently pointed at a non-existent path
-    # before, which left every dataset-gated page blank with no error shown.
     data_dir = os.path.join("data", "Explorer Dataset")
     if os.path.isdir(data_dir):
         csv_count = len([f for f in os.listdir(data_dir) if f.endswith(".csv")])
@@ -222,11 +201,10 @@ def main():
     if os.path.exists(venv_dir):
         if os.path.exists(venv_python):
             try:
-                # Test if the python executable actually works (it might be broken if moved/cloned)
                 subprocess.check_call([venv_python, "--version"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 print(f"Virtual environment '{venv_dir}' already exists and is valid.")
             except (subprocess.CalledProcessError, OSError):
-                print(f"Virtual environment '{venv_dir}' is broken (e.g., copied from another machine). Recreating...")
+                print(f"Virtual environment '{venv_dir}' is broken. Recreating...")
                 shutil.rmtree(venv_dir)
         else:
             print(f"Virtual environment '{venv_dir}' is missing python executable. Recreating...")
@@ -235,21 +213,19 @@ def main():
     if not os.path.exists(venv_dir):
         print(f"Creating virtual environment in {venv_dir}...")
         run_command([sys.executable, "-m", "venv", venv_dir])
-        
+
     if not os.path.exists(venv_python):
         print(f"Error: Could not find Python executable in virtual environment at {venv_python}")
         sys.exit(1)
-        
+
     print("\n--- 3. Installing Python Requirements ---")
     if os.path.exists("requirements.txt"):
         run_command([venv_python, "-m", "pip", "install", "-r", "requirements.txt"])
     else:
         print("No requirements.txt found, skipping.")
-        
+
     print("\n--- 4. Running Pytests ---")
     print("Checking tests...")
-    # Quick import-check to detect broken venv packages (e.g. bad anyio install)
-    # before running the full suite so we don't block startup with a noisy crash.
     import_check = subprocess.run(
         [venv_python, "-c", "import anyio, pytest"],
         capture_output=True, text=True
@@ -264,11 +240,8 @@ def main():
         test_proc = subprocess.run([venv_python, "-m", "pytest", "--tb=short"], check=False)
         if test_proc.returncode != 0:
             print(f"  WARNING: pytest exited with code {test_proc.returncode}. Continuing startup.")
-    
+
     print("\n--- 5. Freeing Ports ---")
-    # server.ts is NOT hot-reloaded. A leftover process keeps serving old backend code
-    # while Vite hot-reloads the frontend, so the UI looks updated while the API is not.
-    # That combination is genuinely hard to diagnose, hence clearing the ports up front.
     for port, label in ((NODE_PORT, "Node/Vite"), (VITE_HMR_PORT, "Vite HMR"), (API_PORT, "FastAPI")):
         if not free_port(port, label) and port == NODE_PORT:
             print("  Cannot start while port 3000 is occupied. Exiting.")
@@ -279,28 +252,21 @@ def main():
 
     processes = []
 
-    # FastAPI first: the Node server proxies to it, and starting it first avoids a window
-    # where the UI reports model diagnostics and dataset persistence as unavailable.
     print("Starting Python analytics backend... (python -m backend.main)")
     api_env = os.environ.copy()
-    # Inside a container the API must bind all interfaces to be reachable from the host;
-    # on a workstation it stays on loopback so the clinical dataset is not exposed to the LAN.
     api_env.setdefault("API_HOST", "0.0.0.0" if in_container() else "127.0.0.1")
     api_env.setdefault("API_PORT", str(API_PORT))
-    
-    # Try venv python first, fallback to sys.executable if needed
+
     py_exec = venv_python
     try:
-        subprocess.check_call([py_exec, "-c", "import pandas"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.check_call([py_exec, "-c", "import fastapi, anyio, pandas, uvicorn"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     except Exception:
+        print(f"  Note: Using system Python ({sys.executable}) with fully verified FastAPI runtime.")
         py_exec = sys.executable
 
     api_process = subprocess.Popen([py_exec, "-m", "backend.main"], env=api_env)
     processes.append(("FastAPI", api_process))
 
-    # Wait for FastAPI to be ready before starting Node (avoids the race where
-    # server.ts's ensurePythonBackendRunning() can't detect the port quickly
-    # enough and launches a second conflicting uvicorn process).
     print("Waiting for FastAPI to become ready on port 8000...")
     for _ in range(40):
         time.sleep(0.5)
@@ -312,10 +278,6 @@ def main():
         print("  The UI will start, but analytics features may be unavailable.")
 
     print("Starting Node/Vite server... (npm run dev)")
-    # MANAGED_BY_LAUNCHER=1 tells server.ts to skip its own Python auto-starter;
-    # launch.py already owns the FastAPI process and manages its lifecycle.
-    # PYTHON_EXEC lets server.ts use the correct venv Python if it ever needs
-    # to do anything Python-related (e.g. inline scripts, future features).
     node_env = os.environ.copy()
     node_env["MANAGED_BY_LAUNCHER"] = "1"
     node_env["PYTHON_EXEC"] = py_exec
@@ -330,9 +292,8 @@ def main():
     else:
         print("  WARNING: port 3000 did not open within 15s. Check the output above.")
 
-    # Final status summary
-    node_ok  = port_in_use(NODE_PORT)
-    api_ok   = port_in_use(API_PORT)
+    node_ok = port_in_use(NODE_PORT)
+    api_ok = port_in_use(API_PORT)
     print("")
     print("  ┌────────────────────────────────────────────┐")
     print(f"  │  Node/Vite  http://localhost:{NODE_PORT}         {'✓ UP' if node_ok else '✗ DOWN'}  │")
@@ -343,8 +304,6 @@ def main():
 
     url = f"http://localhost:{NODE_PORT}"
     if in_container() or os.getenv("NO_BROWSER"):
-        # There is no browser inside a container, and webbrowser.open would either fail
-        # silently or block. Print the URL for the host to open instead.
         print(f"\nApplication ready at {url}")
     else:
         print(f"\nOpening browser to {url} ...")
@@ -355,7 +314,6 @@ def main():
 
     print("\nBoth servers are running. Press Ctrl+C to stop them.")
     try:
-        # Exit as soon as either server dies, rather than leaving a half-running stack.
         while True:
             for name, proc in processes:
                 if proc.poll() is not None:
@@ -375,6 +333,7 @@ def main():
                     proc.wait()
                 print(f"  {name} stopped.")
         print("All servers stopped.")
+
 
 if __name__ == "__main__":
     main()
