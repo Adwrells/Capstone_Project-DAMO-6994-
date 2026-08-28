@@ -433,8 +433,47 @@ app.post("/api/cache/clear", (req, res) => {
 // reimplementing them here. Requires: python -m backend.main
 const PYTHON_API_URL = process.env.PYTHON_API_URL || "http://127.0.0.1:8000";
 
+// Credentials for the FastAPI backend's single seeded account (backend/config/settings.py).
+// This proxy is a trusted server-to-server caller, not the browser — the browser never sees
+// this token, it only ever talks to Express.
+const PYTHON_API_USERNAME = process.env.AUTH_USERNAME || "admin";
+const PYTHON_API_PASSWORD = process.env.AUTH_PASSWORD || "changeme";
+
+let cachedToken: string | null = null;
+
+// FastAPI now requires a bearer token on every route except / and /api/health. Fetches one
+// via the seeded account and caches it; a 401 from the proxied call clears the cache so the
+// next request re-authenticates instead of retrying the same stale/expired token forever.
+async function getFastApiToken(): Promise<string | null> {
+  if (cachedToken) return cachedToken;
+  try {
+    const res = await fetch(`${PYTHON_API_URL}/api/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ username: PYTHON_API_USERNAME, password: PYTHON_API_PASSWORD }),
+      signal: AbortSignal.timeout(10000)
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    cachedToken = data.access_token ?? null;
+    return cachedToken;
+  } catch {
+    return null;
+  }
+}
+
 // Routes handled by the Python backend rather than Express.
-const PYTHON_PROXY_PREFIXES = ["/api/model-diagnostics", "/api/user-datasets"];
+// NOTE: deliberately excludes "/api/dataset" — server.ts already has native handlers for
+// /api/dataset/sheets, /api/dataset/:sheet and /api/dataset/statistics/:sheet (the Node-side
+// preload store, a different data source than FastAPI's). Adding it here would shadow those.
+const PYTHON_PROXY_PREFIXES = [
+  "/api/model-diagnostics",
+  "/api/user-datasets",
+  "/api/dashboard",
+  "/api/statistics",
+  "/api/insights",
+  "/api/reports",
+];
 
 app.all(PYTHON_PROXY_PREFIXES.map(p => `${p}/*`).concat(PYTHON_PROXY_PREFIXES), async (req, res) => {
   const target = `${PYTHON_API_URL}${req.originalUrl}`;
@@ -445,12 +484,32 @@ app.all(PYTHON_PROXY_PREFIXES.map(p => `${p}/*`).concat(PYTHON_PROXY_PREFIXES), 
     const sessionId = req.headers["x-session-id"];
     if (typeof sessionId === "string") forwarded["X-Session-Id"] = sessionId;
 
-    const upstream = await fetch(target, {
+    const token = await getFastApiToken();
+    if (token) forwarded["Authorization"] = `Bearer ${token}`;
+
+    let upstream = await fetch(target, {
       method: req.method,
       headers: forwarded,
       body: req.method === "GET" || req.method === "HEAD" ? undefined : JSON.stringify(req.body ?? {}),
       signal: AbortSignal.timeout(60000)
     });
+
+    if (upstream.status === 401) {
+      // Cached token expired or was invalidated (e.g. backend restart minted a new
+      // ephemeral SECRET_KEY) — get a fresh one and retry exactly once.
+      cachedToken = null;
+      const retryToken = await getFastApiToken();
+      if (retryToken) {
+        forwarded["Authorization"] = `Bearer ${retryToken}`;
+        upstream = await fetch(target, {
+          method: req.method,
+          headers: forwarded,
+          body: req.method === "GET" || req.method === "HEAD" ? undefined : JSON.stringify(req.body ?? {}),
+          signal: AbortSignal.timeout(60000)
+        });
+      }
+    }
+
     res.status(upstream.status).json(await upstream.json());
   } catch (err: any) {
     const offline = err?.name === "TypeError" || err?.cause?.code === "ECONNREFUSED";
