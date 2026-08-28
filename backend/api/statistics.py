@@ -52,7 +52,7 @@ router = APIRouter(prefix="/api/statistics", tags=["Statistics Engine"])
 
 @router.get("/summary")
 @router.post("/summary")
-async def get_summary_statistics(payload: Optional[Dict[str, Any]] = None, table_name: str = Query("ed_visits")) -> Dict[str, Any]:
+def get_summary_statistics(payload: Optional[Dict[str, Any]] = None, table_name: str = Query("ed_visits")) -> Dict[str, Any]:
     """Returns summary statistics, distributions, missing values, and outliers from SQLite."""
     if payload and "values" in payload:
         values = [float(v) for v in payload.get("values", []) if isinstance(v, (int, float)) and not math.isnan(float(v))]
@@ -74,7 +74,7 @@ async def get_summary_statistics(payload: Optional[Dict[str, Any]] = None, table
 
 
 @router.get("/h1")
-async def get_hypothesis_h1() -> Dict[str, Any]:
+def get_hypothesis_h1() -> Dict[str, Any]:
     """GET /statistics/h1: Weighted Kruskal-Wallis & Dunn Post-Hoc across CTAS Triage Levels."""
     try:
         res = run_h1_test()
@@ -84,7 +84,7 @@ async def get_hypothesis_h1() -> Dict[str, Any]:
 
 
 @router.get("/h2")
-async def get_hypothesis_h2() -> Dict[str, Any]:
+def get_hypothesis_h2() -> Dict[str, Any]:
     """GET /statistics/h2: Weighted Mann-Whitney U test for Visit Disposition (Admitted vs Discharged)."""
     try:
         res = run_h2_test()
@@ -94,7 +94,7 @@ async def get_hypothesis_h2() -> Dict[str, Any]:
 
 
 @router.get("/h3")
-async def get_hypothesis_h3() -> Dict[str, Any]:
+def get_hypothesis_h3() -> Dict[str, Any]:
     """GET /statistics/h3: Weighted Least Squares (WLS) linear regression for CTAS Urgency Score."""
     try:
         res = run_h3_regression()
@@ -104,7 +104,7 @@ async def get_hypothesis_h3() -> Dict[str, Any]:
 
 
 @router.get("/h4")
-async def get_hypothesis_h4() -> Dict[str, Any]:
+def get_hypothesis_h4() -> Dict[str, Any]:
     """GET /statistics/h4: Weighted Kruskal-Wallis & Dunn Post-Hoc across Age Groups."""
     try:
         res = run_h4_test()
@@ -114,7 +114,7 @@ async def get_hypothesis_h4() -> Dict[str, Any]:
 
 
 @router.get("/h5")
-async def get_hypothesis_h5() -> Dict[str, Any]:
+def get_hypothesis_h5() -> Dict[str, Any]:
     """GET /statistics/h5: Mann-Kendall Trend Test & Exponential Smoothing Forecast."""
     try:
         trend_res = run_ed_visits_trend_analysis()
@@ -132,7 +132,7 @@ async def get_hypothesis_h5() -> Dict[str, Any]:
 
 
 @router.get("/dashboard")
-async def get_statistics_dashboard() -> Dict[str, Any]:
+def get_statistics_dashboard() -> Dict[str, Any]:
     """GET /statistics/dashboard: Comprehensive summary of all statistical hypothesis testing results."""
     try:
         h1 = run_h1_test()
@@ -196,7 +196,7 @@ async def get_statistics_dashboard() -> Dict[str, Any]:
 
 
 @router.get("/methods")
-async def get_statistical_methods() -> Dict[str, Any]:
+def get_statistical_methods() -> Dict[str, Any]:
     """GET /statistics/methods: the algorithms actually executed by the engine.
 
     Read from the analytics modules rather than restated here, so this endpoint cannot
@@ -227,7 +227,7 @@ async def get_statistical_methods() -> Dict[str, Any]:
 
 
 @router.post("/regression")
-async def get_linear_regression(payload: Dict[str, Any]) -> Dict[str, Any]:
+def get_linear_regression(payload: Dict[str, Any]) -> Dict[str, Any]:
     """Computes OLS linear regression between two numeric arrays."""
     x_vals = [float(v) for v in payload.get("x", []) if isinstance(v, (int, float))]
     y_vals = [float(v) for v in payload.get("y", []) if isinstance(v, (int, float))]
@@ -238,7 +238,7 @@ async def get_linear_regression(payload: Dict[str, Any]) -> Dict[str, Any]:
 
 
 @router.post("/trend")
-async def compute_trend_analysis(payload: Dict[str, Any]) -> Dict[str, Any]:
+def compute_trend_analysis(payload: Dict[str, Any]) -> Dict[str, Any]:
     """Computes Mann-Kendall trend test over a time series."""
     values = [float(v) for v in payload.get("values", []) if isinstance(v, (int, float))]
     if len(values) < 3:

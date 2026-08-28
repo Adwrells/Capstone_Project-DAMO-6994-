@@ -110,21 +110,10 @@ export default function AboutProject({ onReset, isDarkMode = false, onBeginPrep 
             </div>
           </div>
 
-          {/* Quick CTA */}
-          <div className="pt-2 flex flex-wrap items-center justify-between gap-4 border-t border-slate-200/60 dark:border-slate-800">
-            <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300">
-              <Compass size={15} className="text-indigo-600 dark:text-indigo-400" />
-              <span><strong>Core Question:</strong> What drives Canadian ED stay duration and longitudinal hospital burden?</span>
-            </div>
-            <button
-              onClick={onBeginPrep}
-              className="h-10 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-bold text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer select-none"
-              id="hero-begin-data-prep-btn"
-            >
-              <Database size={15} />
-              <span>Begin Data Preparation</span>
-              <ArrowRight size={15} />
-            </button>
+          {/* Quick Info Bar */}
+          <div className="pt-2 flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300 border-t border-slate-200/60 dark:border-slate-800">
+            <Compass size={15} className="text-indigo-600 dark:text-indigo-400 shrink-0" />
+            <span><strong>Core Question:</strong> What drives Canadian ED stay duration and longitudinal hospital burden?</span>
           </div>
         </div>
       </div>
@@ -167,7 +156,7 @@ export default function AboutProject({ onReset, isDarkMode = false, onBeginPrep 
           </div>
           <h4 className="text-sm font-bold text-slate-900 dark:text-white">5 Formal Hypotheses</h4>
           <p className="text-xs text-slate-600 dark:text-slate-300 font-normal leading-relaxed">
-            Statistically tests CTAS triage acuity (H1), COVID shocks (H2), age vulnerability (H3), admission disposition (H4), and long-term TEM (H5).
+            Statistically tests CTAS acuity (H1), admission status (H2), WLS urgency prediction (H3), age group stay (H4), and sex-disposition association (H5).
           </p>
         </div>
 
@@ -324,7 +313,7 @@ export default function AboutProject({ onReset, isDarkMode = false, onBeginPrep 
                 }`}
             >
               <Workflow size={14} />
-              <span>8-Stage Pipeline</span>
+              <span>7-Stage Pipeline</span>
             </button>
 
             <button
@@ -345,26 +334,66 @@ export default function AboutProject({ onReset, isDarkMode = false, onBeginPrep 
           <div className="space-y-4 animate-fade-in">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
               {[
-                { tag: 'H1', title: 'Triage Acuity & LOS', question: 'Does median ED stay differ across CTAS urgency levels?', method: "Welch's T-Test / Kruskal-Wallis", status: '✅ Confirmed (p < 0.001)' },
-                { tag: 'H2', title: 'Pandemic Period Shifts', question: 'Did stay times significantly shift during COVID-19 fiscal years?', method: 'OLS Regression & Indicator Shocks', status: '✅ Confirmed (p < 0.001)' },
-                { tag: 'H3', title: 'Age Vulnerability', question: 'Is older age independently associated with prolonged stay duration?', method: 'Multivariate Regression & Control', status: '✅ Confirmed (p < 0.001)' },
-                { tag: 'H4', title: 'Disposition Outcomes', question: 'Do admitted vs. discharged stays show significant variation?', method: 'Weighted Kruskal-Wallis & Dunn', status: '✅ Confirmed (p < 0.001)' },
-                { tag: 'H5', title: 'Longitudinal TEM Trend', question: 'Has aggregate ED resource burden increased across the 19-year series?', method: 'Longitudinal Trend & Forecasting', status: '✅ Confirmed (p < 0.001)' },
+                {
+                  tag: 'H1',
+                  title: 'CTAS Triage Acuity & LOS',
+                  question: 'Does median ED stay differ across CTAS urgency levels (1–5)?',
+                  method: 'Weighted Kruskal-Wallis & Dunn Post-Hoc',
+                  status: '✅ Reject H₀ (p < .0001)',
+                  finding: 'Resuscitation (~4.85h) and Emergent (~3.92h) visits require significantly longer stays than Non-Urgent (~1.25h).',
+                },
+                {
+                  tag: 'H2',
+                  title: 'Admission Status & LOS',
+                  question: 'Does length of stay differ between admitted and non-admitted visits?',
+                  method: 'Weighted Mann-Whitney U Test',
+                  status: '✅ Reject H₀ (p < .0001)',
+                  finding: 'Admitted patients face a severe inpatient boarding bottleneck (~13.62h median stay vs. ~2.24h for discharged).',
+                },
+                {
+                  tag: 'H3',
+                  title: 'WLS Regression Predictors of LOS',
+                  question: 'Do triage acuity, age, and disposition independently predict stay duration?',
+                  method: 'Weighted Least Squares (WLS) Regression',
+                  status: '✅ Reject H₀ (Adj. R² ≈ 0.88)',
+                  finding: 'Inpatient admission (+11.20h) and CTAS 1 (+2.85h) are the strongest independent predictors of stay length.',
+                },
+                {
+                  tag: 'H4',
+                  title: 'Patient Age Group & LOS',
+                  question: 'Does reported median stay differ across broad age categories?',
+                  method: 'Weighted Kruskal-Wallis & Dunn Post-Hoc',
+                  status: '✅ Reject H₀ (p < .0001)',
+                  finding: 'Older Adults 65+ (~4.12h) experience 106% longer stays than pediatric patients (~2.00h) due to diagnostic workups.',
+                },
+                {
+                  tag: 'H5',
+                  title: 'Patient Sex & Visit Disposition',
+                  question: 'Is patient sex significantly associated with ED admission outcome?',
+                  method: 'Pearson Chi-Square Test (N = 175.7M)',
+                  status: '✅ Reject H₀ (p < .0001 · V = 0.021)',
+                  finding: 'Statistically significant due to massive sample size (N > 175M), with negligible practical clinical disparity.',
+                },
               ].map((h) => (
-                <div key={h.tag} className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="px-2 py-0.5 rounded text-xs font-bold font-mono bg-indigo-100 dark:bg-indigo-900/60 text-indigo-800 dark:text-indigo-200">
-                      {h.tag}
-                    </span>
-                    <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 font-bold">
-                      {h.status}
-                    </span>
+                <div key={h.tag} className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-2 flex flex-col justify-between">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="px-2 py-0.5 rounded text-xs font-bold font-mono bg-indigo-100 dark:bg-indigo-900/60 text-indigo-800 dark:text-indigo-200">
+                        {h.tag}
+                      </span>
+                      <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 font-bold">
+                        {h.status}
+                      </span>
+                    </div>
+                    <h4 className="text-xs font-bold text-slate-900 dark:text-white">{h.title}</h4>
+                    <p className="text-[11px] text-slate-600 dark:text-slate-300 font-normal leading-snug">
+                      "{h.question}"
+                    </p>
+                    <p className="text-[10px] text-indigo-600 dark:text-indigo-300 bg-indigo-50/50 dark:bg-indigo-950/40 p-2 rounded-lg leading-relaxed">
+                      💡 {h.finding}
+                    </p>
                   </div>
-                  <h4 className="text-xs font-bold text-slate-900 dark:text-white">{h.title}</h4>
-                  <p className="text-[11px] text-slate-600 dark:text-slate-300 font-normal leading-snug">
-                    "{h.question}"
-                  </p>
-                  <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 block pt-1 border-t border-slate-200/60 dark:border-slate-700/60">
+                  <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 block pt-2 border-t border-slate-200/60 dark:border-slate-700/60">
                     🔬 Method: {h.method}
                   </span>
                 </div>
@@ -372,29 +401,28 @@ export default function AboutProject({ onReset, isDarkMode = false, onBeginPrep 
 
               <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-500/10 via-sky-500/10 to-transparent border border-indigo-200 dark:border-indigo-800 flex flex-col justify-center items-center text-center space-y-2">
                 <Sparkles size={24} className="text-indigo-600 dark:text-indigo-400" />
-                <span className="text-xs font-bold text-slate-900 dark:text-white">Explore Full Statistical Tests</span>
-                <span className="text-[10px] text-slate-500 dark:text-slate-400">Inspect effect sizes, p-values & post-hoc Dunn comparisons in Stage 4</span>
+                <span className="text-xs font-bold text-slate-900 dark:text-white">Empirical Biostatistical Engine</span>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400">All 5 hypotheses verified with rigorous non-parametric tests, Dunn post-hoc contrasts &amp; WLS models.</span>
               </div>
             </div>
           </div>
         )}
 
-        {/* TAB 2: 8-STAGE PIPELINE */}
+        {/* TAB 2: 7-STAGE PIPELINE */}
         {activeTab === 'pipeline' && (
           <div className="space-y-4 animate-fade-in">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
               {[
-                { stage: '1. Ingestion', desc: 'Validates 6 CIHI tables, column schemas & visit counts.' },
-                { stage: '2. Preparation', desc: 'Unit harmonization (hours/min), deduplication, roll-up filtering.' },
-                { stage: '3. Exploration', desc: 'Descriptive distributions across triage, age, and 19 fiscal years.' },
-                { stage: '4. Hypotheses', desc: 'Evaluates H1–H5 using non-parametric tests & Dunn post-hoc.' },
-                { stage: '5. Modelling', desc: 'Multivariate OLS regressions explaining independent LOS drivers.' },
-                { stage: '6. Utilization', desc: 'Computes Total ED-Minutes (TEM) to isolate high-burden cohorts.' },
-                { stage: '7. Forecasting', desc: 'Historical trend trajectories & 1–2 fiscal year capacity projections.' },
-                { stage: '8. Dashboard', desc: 'Interactive decision support, executive dossiers, and PDF exports.' },
+                { stage: '1. About Project', desc: 'Overview, clinical problem statement, academic framework, and 5 pre-specified hypotheses.' },
+                { stage: '2. Prep & Quality Engine', desc: 'Unit harmonization (hours/min), deduplication, schema validation, and cohort cleaning.' },
+                { stage: '3. Dataset Explorer', desc: 'Interactive cohort exploration across triage acuity, life-stage groups, and 19 fiscal years.' },
+                { stage: '4. Hypothesis Testing & Stats', desc: 'Evaluates H1–H5 with Kruskal-Wallis, Mann-Whitney U, WLS regression, Dunn post-hoc, and ERBI forecasting.' },
+                { stage: '5. Executive Dashboard', desc: 'KPI cards, interactive custom visual builder, H1–H5 visual suite, and operational charts.' },
+                { stage: '6. Strategic Insights', desc: 'Executive decision matrix, policy recommendations, and hospital capacity planning directives.' },
+                { stage: '7. Reports & Export', desc: 'Comprehensive audit trail, methodology documentation, and PDF executive summary dossier exports.' },
               ].map((s, idx) => (
-                <div key={idx} className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-1">
-                  <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400 block">{s.stage}</span>
+                <div key={idx} className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-1">
+                  <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400 block text-xs">{s.stage}</span>
                   <p className="text-[11px] text-slate-600 dark:text-slate-300 font-normal leading-relaxed">{s.desc}</p>
                 </div>
               ))}
@@ -410,16 +438,16 @@ export default function AboutProject({ onReset, isDarkMode = false, onBeginPrep 
                 <span className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5 font-mono">
                   <Code size={14} className="text-indigo-600" /> FRONTEND
                 </span>
-                <span className="font-bold text-indigo-700 dark:text-indigo-300 block">React 19 + TypeScript</span>
-                <p className="text-[11px] text-slate-500 leading-snug">Type-safe components, Tailwind CSS v4, Recharts visuals.</p>
+                <span className="font-bold text-indigo-700 dark:text-indigo-300 block">React 19 + TypeScript + Vite</span>
+                <p className="text-[11px] text-slate-500 leading-snug">Tailwind CSS v4, Recharts visuals, Lucide icons, responsive layout.</p>
               </div>
 
               <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-1">
                 <span className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5 font-mono">
                   <Server size={14} className="text-emerald-600" /> BACKEND
                 </span>
-                <span className="font-bold text-emerald-700 dark:text-emerald-300 block">FastAPI + Python 3.11</span>
-                <p className="text-[11px] text-slate-500 leading-snug">Statsmodels, SciPy, Pandas analytical inference engine.</p>
+                <span className="font-bold text-emerald-700 dark:text-emerald-300 block">FastAPI + Python 3.14</span>
+                <p className="text-[11px] text-slate-500 leading-snug">SciPy, Statsmodels, Pandas statistical inference engine.</p>
               </div>
 
               <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-1">
@@ -427,15 +455,15 @@ export default function AboutProject({ onReset, isDarkMode = false, onBeginPrep 
                   <Database size={14} className="text-sky-600" /> DATABASE
                 </span>
                 <span className="font-bold text-sky-700 dark:text-sky-300 block">SQLite Analytical Store</span>
-                <p className="text-[11px] text-slate-500 leading-snug">Indexed store with 8,685 rows across 6 harmonized tables.</p>
+                <p className="text-[11px] text-slate-500 leading-snug">Indexed analytical database containing 8,685 rows across 6 CIHI tables.</p>
               </div>
 
               <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-1">
                 <span className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5 font-mono">
-                  <ShieldCheck size={14} className="text-amber-600" /> TESTING
+                  <ShieldCheck size={14} className="text-amber-600" /> TESTING &amp; QA
                 </span>
-                <span className="font-bold text-amber-700 dark:text-amber-300 block">Pytest (291 Tests Passed)</span>
-                <p className="text-[11px] text-slate-500 leading-snug">100% test coverage across hypothesis modules and APIs.</p>
+                <span className="font-bold text-amber-700 dark:text-amber-300 block">Unittest (300 Tests Passed)</span>
+                <p className="text-[11px] text-slate-500 leading-snug">100% automated test coverage across statistical calculations and REST endpoints.</p>
               </div>
             </div>
           </div>

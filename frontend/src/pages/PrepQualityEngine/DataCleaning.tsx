@@ -744,7 +744,9 @@ export default function DataCleaning({
                                 const keyName = typeof f === 'string' ? f : f.name;
                                 return (
                                   <td key={fIdx} className="p-3 whitespace-nowrap">
-                                    {String(row[keyName] !== undefined && row[keyName] !== null ? row[keyName] : '--')}
+                                    {row[keyName] !== undefined && row[keyName] !== null
+                                      ? String(row[keyName]).replace(/â€“|â|–|—/g, '-')
+                                      : '--'}
                                   </td>
                                 );
                               })}
@@ -774,7 +776,105 @@ export default function DataCleaning({
         )}
       </div>
 
-      {/* ── 4. DATA QUALITY FRAMEWORK (5 VALIDATION DIMENSIONS) ─────────────── */}
+      {/* ── 4. INTERACTIVE PIPELINE CONTROLLER & QUALITY METRICS ────────────── */}
+      <div className={`p-7 rounded-3xl border space-y-6 shadow-sm ${
+        isDarkMode ? 'border-slate-800 bg-slate-900/90 text-white' : 'border-slate-200 bg-white text-slate-900'
+      }`} id="pipeline-execution-panel">
+        
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 font-mono">
+              Pipeline Controller
+            </span>
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+              Data Preparation Execution Control
+            </h2>
+          </div>
+
+          {pipelineState === 'completed' && (
+            <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 flex items-center gap-1.5">
+              <CheckCircle size={14} /> Pipeline Executed
+            </span>
+          )}
+        </div>
+
+        {/* Progress Bar Display */}
+        {pipelineState !== 'idle' && (
+          <div className="space-y-2 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+            <div className="flex items-center justify-between text-xs font-mono">
+              <span className="font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
+                {pipelineState === 'running' ? (
+                  <Loader2 size={14} className="animate-spin text-indigo-600" />
+                ) : (
+                  <CheckCircle2 size={14} className="text-emerald-600" />
+                )}
+                {pipelineStepMessage}
+              </span>
+              <span className="font-bold text-slate-900 dark:text-white">{pipelineProgress}%</span>
+            </div>
+            
+            <div className="w-full h-2.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-500 transition-all duration-300" 
+                style={{ width: `${pipelineProgress}%` }}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Action Button */}
+        {pipelineState === 'idle' ? (
+          <button
+            onClick={executePipeline}
+            className="w-full h-13 rounded-2xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-bold text-sm shadow-md hover:shadow-lg transition flex items-center justify-center gap-2.5 cursor-pointer select-none"
+            id="run-prep-pipeline-btn"
+          >
+            <PlaySquare size={18} />
+            <span>Run Automated Data Preparation & Validation Pipeline</span>
+          </button>
+        ) : pipelineState === 'running' ? (
+          <div className="w-full h-13 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-700 dark:text-indigo-300 font-bold text-sm flex items-center justify-center gap-2">
+            <Loader2 size={18} className="animate-spin" />
+            <span>Standardizing & Validating Analytical Datasets...</span>
+          </div>
+        ) : (
+          <div className="w-full h-13 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold text-sm flex items-center justify-center gap-2">
+            <CheckCircle2 size={18} className="text-emerald-600 dark:text-emerald-400" />
+            <span>Analytical Datasets Prepared, Validated & Cached in SQLite Store</span>
+          </div>
+        )}
+
+        {/* Quality Metrics Grid - Displayed ONLY after running the pipeline */}
+        {pipelineState === 'completed' && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 pt-2 font-mono animate-fade-in">
+            {[
+              { label: 'Completeness', value: '100.0%', sub: '0 null fields' },
+              { label: 'Consistency', value: '100.0%', sub: 'snake_case' },
+              { label: 'Validity', value: '100.0%', sub: 'Valid bounds' },
+              { label: 'Uniqueness', value: '100.0%', sub: 'No duplicates' },
+              { label: 'Coverage', value: '19 Years', sub: '2003–2021' },
+              { label: 'Overall Quality', value: '98.5%', sub: 'Grade-A Ready' },
+            ].map((item, idx) => (
+              <div
+                key={idx}
+                className="p-3 rounded-xl border text-center space-y-0.5 transition-all duration-300 bg-emerald-500/10 dark:bg-emerald-950/30 border-emerald-500/25"
+              >
+                <span className="text-[9px] uppercase block font-semibold tracking-wider text-emerald-700 dark:text-emerald-300">
+                  {item.label}
+                </span>
+                <span className="text-lg font-bold block text-emerald-600 dark:text-emerald-400">
+                  {item.value}
+                </span>
+                <span className="text-[9px] block font-sans text-emerald-600/90 dark:text-emerald-400/90">
+                  {item.sub}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* ── 5. DATA QUALITY FRAMEWORK (5 VALIDATION DIMENSIONS) ─────────────── */}
       <div className={`p-7 rounded-3xl border space-y-5 shadow-sm ${
         isDarkMode ? 'border-slate-800 bg-slate-900/90 text-white' : 'border-slate-200 bg-white text-slate-900'
       }`}>
@@ -854,7 +954,7 @@ export default function DataCleaning({
         </div>
       </div>
 
-      {/* ── 5. DATA QUALITY STATUS: ANALYTICAL READINESS CHECK ───────────────── */}
+      {/* ── 6. DATA QUALITY STATUS: ANALYTICAL READINESS CHECK ───────────────── */}
       <div className={`p-7 rounded-3xl border space-y-5 shadow-sm ${
         isDarkMode ? 'border-slate-800 bg-slate-900/90 text-white' : 'border-slate-200 bg-white text-slate-900'
       }`}>
@@ -909,7 +1009,7 @@ export default function DataCleaning({
         </div>
       </div>
 
-      {/* ── 6. SEVEN-STEP DATA PREPARATION WORKFLOW ─────────────────────────── */}
+      {/* ── 7. SEVEN-STEP DATA PREPARATION WORKFLOW ─────────────────────────── */}
       <div className={`p-7 rounded-3xl border space-y-6 shadow-sm ${
         isDarkMode ? 'border-slate-800 bg-slate-900/90 text-white' : 'border-slate-200 bg-white text-slate-900'
       }`}>
@@ -981,114 +1081,6 @@ export default function DataCleaning({
               </div>
             </div>
           ))}
-        </div>
-      </div>
-
-      {/* ── 7. INTERACTIVE PIPELINE CONTROLLER & QUALITY METRICS ────────────── */}
-      <div className={`p-7 rounded-3xl border space-y-6 shadow-sm ${
-        isDarkMode ? 'border-slate-800 bg-slate-900/90 text-white' : 'border-slate-200 bg-white text-slate-900'
-      }`} id="pipeline-execution-panel">
-        
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 font-mono">
-              Pipeline Controller
-            </span>
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-              Data Preparation Execution Control
-            </h2>
-          </div>
-
-          {pipelineState === 'completed' && (
-            <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 flex items-center gap-1.5">
-              <CheckCircle size={14} /> Pipeline Executed
-            </span>
-          )}
-        </div>
-
-        {/* Progress Bar Display */}
-        {pipelineState !== 'idle' && (
-          <div className="space-y-2 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
-            <div className="flex items-center justify-between text-xs font-mono">
-              <span className="font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
-                {pipelineState === 'running' ? (
-                  <Loader2 size={14} className="animate-spin text-indigo-600" />
-                ) : (
-                  <CheckCircle2 size={14} className="text-emerald-600" />
-                )}
-                {pipelineStepMessage}
-              </span>
-              <span className="font-bold text-slate-900 dark:text-white">{pipelineProgress}%</span>
-            </div>
-            
-            <div className="w-full h-2.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-500 transition-all duration-300" 
-                style={{ width: `${pipelineProgress}%` }}
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Action Button */}
-        {pipelineState === 'idle' ? (
-          <button
-            onClick={executePipeline}
-            className="w-full h-13 rounded-2xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-bold text-sm shadow-md hover:shadow-lg transition flex items-center justify-center gap-2.5 cursor-pointer select-none"
-            id="run-prep-pipeline-btn"
-          >
-            <PlaySquare size={18} />
-            <span>Run Automated Data Preparation & Validation Pipeline</span>
-          </button>
-        ) : pipelineState === 'running' ? (
-          <div className="w-full h-13 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-700 dark:text-indigo-300 font-bold text-sm flex items-center justify-center gap-2">
-            <Loader2 size={18} className="animate-spin" />
-            <span>Standardizing & Validating Analytical Datasets...</span>
-          </div>
-        ) : (
-          <div className="w-full h-13 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold text-sm flex items-center justify-center gap-2">
-            <CheckCircle2 size={18} className="text-emerald-600 dark:text-emerald-400" />
-            <span>Analytical Datasets Prepared, Validated & Cached in SQLite Store</span>
-          </div>
-        )}
-
-        {/* Quality Metrics Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 pt-2 font-mono">
-          <div className="p-3 rounded-xl border bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700 text-center space-y-0.5">
-            <span className="text-[9px] text-slate-400 uppercase block font-semibold">Completeness</span>
-            <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400 block">100.0%</span>
-            <span className="text-[9px] text-slate-400 block font-sans">0 null fields</span>
-          </div>
-
-          <div className="p-3 rounded-xl border bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700 text-center space-y-0.5">
-            <span className="text-[9px] text-slate-400 uppercase block font-semibold">Consistency</span>
-            <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400 block">100.0%</span>
-            <span className="text-[9px] text-slate-400 block font-sans">snake_case</span>
-          </div>
-
-          <div className="p-3 rounded-xl border bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700 text-center space-y-0.5">
-            <span className="text-[9px] text-slate-400 uppercase block font-semibold">Validity</span>
-            <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400 block">100.0%</span>
-            <span className="text-[9px] text-slate-400 block font-sans">Valid bounds</span>
-          </div>
-
-          <div className="p-3 rounded-xl border bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700 text-center space-y-0.5">
-            <span className="text-[9px] text-slate-400 uppercase block font-semibold">Uniqueness</span>
-            <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400 block">100.0%</span>
-            <span className="text-[9px] text-slate-400 block font-sans">No duplicates</span>
-          </div>
-
-          <div className="p-3 rounded-xl border bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700 text-center space-y-0.5">
-            <span className="text-[9px] text-slate-400 uppercase block font-semibold">Coverage</span>
-            <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400 block">19 Years</span>
-            <span className="text-[9px] text-slate-400 block font-sans">2003–2021</span>
-          </div>
-
-          <div className="p-3 rounded-xl border bg-indigo-500/10 dark:bg-indigo-950/30 border-indigo-500/20 text-center space-y-0.5">
-            <span className="text-[9px] text-indigo-600 dark:text-indigo-300 uppercase block font-semibold">Overall Quality</span>
-            <span className="text-lg font-bold text-indigo-700 dark:text-indigo-300 block">98.5%</span>
-            <span className="text-[9px] text-indigo-500 block font-sans">Grade-A Ready</span>
-          </div>
         </div>
       </div>
 
@@ -1221,6 +1213,58 @@ export default function DataCleaning({
           <FitDiagnostics cleanedData={mergedPreviewData} isDarkMode={isDarkMode} />
         </div>
       )}
+
+      {/* ── 12. STAGE 2 TRANSITION & PROCEED ACTION ─────────────────────────── */}
+      <div className={`p-6 rounded-3xl border shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all ${
+        pipelineState === 'completed'
+          ? 'bg-emerald-500/10 dark:bg-emerald-950/30 border-emerald-500/30'
+          : 'bg-slate-50 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800'
+      }`}>
+        <div className="space-y-1">
+          <span className="text-[10px] font-bold uppercase tracking-wider font-mono block text-indigo-600 dark:text-indigo-400">
+            Stage 2 · Validation Status
+          </span>
+          {pipelineState === 'completed' ? (
+            <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-300 font-bold text-sm">
+              <CheckCircle2 size={18} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+              <span>Data preparation pipeline completed. Analytical datasets are verified and cached.</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400 text-xs font-medium">
+              <Lock size={16} className="text-amber-500 shrink-0" />
+              <span>Please run the <strong>Automated Data Preparation &amp; Validation Pipeline</strong> above before advancing to Stage 3.</span>
+            </div>
+          )}
+        </div>
+
+        <div>
+          {pipelineState === 'completed' ? (
+            <button
+              onClick={onNavigateNext}
+              className="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-bold text-sm shadow-md hover:shadow-lg transition flex items-center gap-2 cursor-pointer"
+            >
+              <span>Proceed to Stage 3: Dataset Explorer</span>
+              <ArrowRight size={16} />
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                const el = document.getElementById('run-prep-pipeline-btn');
+                if (el) {
+                  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  el.focus();
+                } else {
+                  executePipeline();
+                }
+              }}
+              className="px-5 py-2.5 rounded-2xl bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs transition flex items-center gap-2 cursor-pointer"
+            >
+              <PlaySquare size={14} />
+              <span>Go to Pipeline Execution Control</span>
+            </button>
+          )}
+        </div>
+      </div>
 
     </div>
   );

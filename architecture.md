@@ -74,7 +74,8 @@ The **Healthcare Analytics Platform** is a full-stack, enterprise-grade clinical
 │                                                                                  │
 │   ┌──────────────────────────────────────────────────────────────────────────┐   │
 │   │                 SQLite Database (backend/database/healthcare.db)        │   │
-│   │                 WAL Mode • Thread-Safe Repository Layer                  │   │
+│   │        WAL Mode • Pooled via SQLAlchemy (engine.py) • Sync route         │   │
+│   │        handlers run in FastAPI's threadpool, not the event loop          │   │
 │   │  Tables: age_sex, ctas_triage, visit_disposition, main_problems, etc.    │   │
 │   └──────────────────────────────────────────────────────────────────────────┘   │
 └──────────────────────────────────────────────────────────────────────────────────┘
@@ -97,10 +98,11 @@ The **Healthcare Analytics Platform** is a full-stack, enterprise-grade clinical
 ### 3.2 Backend Service Architecture (`backend/`)
 - **Framework**: FastAPI high-performance ASGI server with Pydantic schema validation.
 - **Layering Pattern**:
-  - `backend/api/`: REST route endpoints mapping web requests to analytical services.
+  - `backend/api/`: REST route endpoints mapping web requests to analytical services. All are synchronous (`def`, not `async def`) and, except `auth.py`, require a bearer token via `Depends(get_current_user)`.
+  - `backend/auth/`: JWT issuance/verification for the platform's single seeded account — `security.py` (hashing, encode/decode), `dependencies.py` (`get_current_user`), `rate_limit.py` (shared `Limiter`, applied to `POST /api/auth/login` only).
   - `backend/services/`: Orchestrates data fetching, business rule application, and responses.
-  - `backend/config/settings.py`: Centralized configuration (file paths, server options, significance thresholds, forecast constants).
-  - `backend/database/database_manager.py`: SQLite connection manager using Write-Ahead Logging (WAL) and automated schema initialization.
+  - `backend/config/settings.py`: Centralized configuration (file paths, server options, significance thresholds, forecast constants, auth credentials/secret).
+  - `backend/database/database_manager.py`: SQLite connection manager using Write-Ahead Logging (WAL), sourcing connections from the pooled SQLAlchemy engine in `engine.py` rather than opening one per call.
 
 ### 3.3 Analytics & Intelligence Engine (`backend/analytics/`)
 Organized into 5 isolated submodules:
@@ -380,10 +382,13 @@ scripted.
 | :-: | :--- | :--- | :--- |
 | C1 | `analytics/statistics/` imports nothing from `database/`, `api/`, `services/`, or `hypothesis/`, and performs no I/O | grep imports in `backend/analytics/statistics/*.py` | Pure math stays unit-testable and reusable; §1 principle 2 |
 | C2 | `backend/api/*` routers contain no raw SQL, `read_csv`, `read_excel`, or file handles | grep those tokens in `backend/api/*.py` | Routers must delegate to `services/`; §1 principle 3 |
-| C3 | `sqlite3.connect` appears only under `backend/database/` | grep the whole backend | Centralised connection lifecycle |
+| C3 | `sqlite3.connect(` never appears literally — every physical connection is opened by the pooled SQLAlchemy engine in `backend/database/engine.py` | grep the whole backend for `sqlite3.connect(` | Centralised, pooled connection lifecycle (see [Connection pooling](README.md#connection-pooling--concurrency)) |
 | C4 | Every `backend/api/*.py` exposing `router` is included in `backend/main.py` | compare `api/` filenames against `include_router` calls | An unregistered router is a silently dead endpoint |
 | C5 | No `foo.py` sits beside a `foo/` package | for each module, test whether a directory of the same stem exists | Shadowing makes **both** names unimportable and has already taken the app down |
-| C6 | `DatabaseManager.connection()` is used rather than a bare `get_connection()` in a `with` | grep `with .*get_connection` | `with sqlite3.connect(...)` commits but never closes — leaks handles, locks the file |
+| C6 | `DatabaseManager.connection()` is used rather than a bare `get_connection()` in a `with` | grep `with .*get_connection` | A bare `get_connection()` returns a pooled connection the caller owns; `with conn:` on it only commits/rolls back, never releases it back to the pool — the pool's `pool_size + max_overflow` cap is small (5 + 10), so a few leaked checkouts exhaust it and every subsequent request blocks waiting for a connection |
+| C7 | Every FastAPI route handler in `backend/api/*.py` is `def`, not `async def`, except in `auth.py`'s bearer-token dependency machinery which FastAPI itself resolves | grep `async def` in `backend/api/*.py` | An `async def` handler runs on the single event loop; ours call blocking `sqlite3`/pandas code, so FastAPI's threadpool (which only sync `def` handlers get) is what lets concurrent requests actually run in parallel instead of serializing |
+| C8 | Every `backend/api/*.py` router except `auth.py` is registered with `dependencies=[Depends(get_current_user)]` in `backend/main.py` | read the `app.include_router(...)` calls | A router registered without the dependency is silently unauthenticated — the only routes that should ever be reachable with no token are `/`, `/api/health`, and `/api/auth/login` |
+| C9 | `POST /api/auth/login` carries `@limiter.limit(...)` (`backend/api/auth.py`) and `backend/main.py` registers `RateLimitExceeded`/`SlowAPIMiddleware` against the same `Limiter` instance from `backend/auth/rate_limit.py` | grep `@limiter.limit` and `app.state.limiter` | The seeded account has no lockout of its own; without the decorator *and* the middleware wired to the same instance, login is unthrottled |
 
 ### Data flow checks (§4A)
 
@@ -559,7 +564,8 @@ DAMO-699-Capstone-Project/
 │   │   ├── hypothesis/       # H1 - H5 hypothesis modules
 │   │   ├── forecasting/      # SES forecasting, trend analysis
 │   │   └── dashboard/        # ERBI calculations, executive insights
-│   ├── database/             # SQLite connection & repository layer
+│   ├── database/             # SQLite connection & repository layer (engine.py: pooling)
+│   ├── auth/                 # JWT + password verification (single seeded account)
 │   ├── services/             # Business logic orchestration
 │   ├── models/               # Pydantic request/response schemas
 │   ├── config/               # Centralized settings & path configuration

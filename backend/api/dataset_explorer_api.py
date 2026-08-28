@@ -28,7 +28,7 @@ router = APIRouter(prefix="/api/dataset", tags=["Dataset Explorer Engine"])
 
 
 @router.get("/sheets")
-async def get_dataset_sheets() -> List[str]:
+def get_dataset_sheets() -> List[str]:
     """Returns list of all Excel worksheets present in the capstone workbook."""
     try:
         sheets = excel_service.get_sheet_names()
@@ -38,7 +38,7 @@ async def get_dataset_sheets() -> List[str]:
 
 
 @router.get("/statistics/{sheet}")
-async def get_dataset_sheet_statistics(sheet: str) -> Dict[str, Any]:
+def get_dataset_sheet_statistics(sheet: str) -> Dict[str, Any]:
     """Returns comprehensive statistical profile for a given worksheet."""
     try:
         stats_payload = excel_service.get_sheet_statistics(sheet)
@@ -53,7 +53,7 @@ async def get_dataset_sheet_statistics(sheet: str) -> Dict[str, Any]:
 
 
 @router.get("/correlation/{sheet}")
-async def get_dataset_correlation(sheet: str) -> Dict[str, Any]:
+def get_dataset_correlation(sheet: str) -> Dict[str, Any]:
     """Returns Pearson correlation matrix for all numeric columns in a worksheet."""
     try:
         import pandas as pd
@@ -117,7 +117,7 @@ async def get_dataset_correlation(sheet: str) -> Dict[str, Any]:
 
 
 @router.get("/outliers/{sheet}")
-async def get_dataset_outliers(sheet: str) -> Dict[str, Any]:
+def get_dataset_outliers(sheet: str) -> Dict[str, Any]:
     """Returns IQR-based outlier analysis for all numeric columns."""
     try:
         import pandas as pd
@@ -172,7 +172,7 @@ async def get_dataset_outliers(sheet: str) -> Dict[str, Any]:
 
 
 @router.get("/features/{sheet}")
-async def get_feature_engineering(sheet: str) -> Dict[str, Any]:
+def get_feature_engineering(sheet: str) -> Dict[str, Any]:
     """Returns automated feature engineering recommendations for a worksheet."""
     try:
         import pandas as pd
@@ -268,7 +268,7 @@ async def get_feature_engineering(sheet: str) -> Dict[str, Any]:
 
 
 @router.get("/dictionary/{sheet}")
-async def get_data_dictionary(sheet: str) -> Dict[str, Any]:
+def get_data_dictionary(sheet: str) -> Dict[str, Any]:
     """Returns data dictionary with type, cardinality, missing count, and description."""
     try:
         import pandas as pd
@@ -327,7 +327,7 @@ async def get_data_dictionary(sheet: str) -> Dict[str, Any]:
 
 
 @router.get("/{sheet}")
-async def get_dataset_sheet_data(sheet: str) -> Dict[str, Any]:
+def get_dataset_sheet_data(sheet: str) -> Dict[str, Any]:
     """Returns dataset rows and column schema for a given worksheet."""
     try:
         data_payload = excel_service.get_sheet_data(sheet)

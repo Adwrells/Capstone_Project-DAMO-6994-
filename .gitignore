@@ -47,6 +47,9 @@ BACKEND_STATISTICS_NOTES.md
 # Local dashboard engineering roadmap — not for distribution.
 DASHBOARD_ROADMAP.md
 
+# Local deployment/implementation guide (HTTPS, nginx, AWS) — not for distribution.
+guide_to_implement.md
+
 # ─── Claude Code ────────────────────────────────────────────────────────
 # CLAUDE.md, .claude/CLAUDE.md, .claude/settings.json and .claude/skills/ are
 # COMMITTED ON PURPOSE so the graphify setup and project instructions reach the

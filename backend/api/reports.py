@@ -14,7 +14,7 @@ except ImportError:
 router = APIRouter(prefix="/api/reports", tags=["Reports"])
 
 @router.get("/export-summary")
-async def get_report_summary() -> Dict[str, Any]:
+def get_report_summary() -> Dict[str, Any]:
     """Generates summary export metadata for PDF/CSV reports."""
     return {
         "success": True,

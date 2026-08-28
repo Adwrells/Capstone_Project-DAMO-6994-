@@ -46,7 +46,7 @@ class PersistRequest(BaseModel):
 
 
 @router.post("")
-async def persist_cleaned_dataset(
+def persist_cleaned_dataset(
     payload: PersistRequest,
     x_session_id: Optional[str] = Header(default=None),
 ) -> Dict[str, Any]:
@@ -66,7 +66,7 @@ async def persist_cleaned_dataset(
 
 
 @router.get("")
-async def list_user_datasets(
+def list_user_datasets(
     x_session_id: Optional[str] = Header(default=None),
 ) -> Dict[str, Any]:
     """Datasets belonging to the calling session, newest first.
@@ -79,7 +79,7 @@ async def list_user_datasets(
 
 
 @router.get("/{dataset_id}")
-async def get_user_dataset(
+def get_user_dataset(
     dataset_id: str,
     limit: int = 1000,
     x_session_id: Optional[str] = Header(default=None),
@@ -94,7 +94,7 @@ async def get_user_dataset(
 
 
 @router.delete("/{dataset_id}")
-async def delete_user_dataset(
+def delete_user_dataset(
     dataset_id: str,
     x_session_id: Optional[str] = Header(default=None),
 ) -> Dict[str, Any]:

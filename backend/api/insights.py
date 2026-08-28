@@ -28,7 +28,7 @@ router = APIRouter(prefix="/api/insights", tags=["Insights"])
 
 @router.get("/recommendations")
 @router.post("/recommendations")
-async def get_strategic_recommendations(payload: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+def get_strategic_recommendations(payload: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """Generates data-driven strategic recommendations from the SQLite ED database tables."""
     try:
         return {"success": True, **insights_service.get_recommendations()}
@@ -40,7 +40,7 @@ async def get_strategic_recommendations(payload: Optional[Dict[str, Any]] = None
 
 
 @router.get("/summary")
-async def get_insights_summary() -> Dict[str, Any]:
+def get_insights_summary() -> Dict[str, Any]:
     """Returns analytical summary of SQLite tables."""
     try:
         return {"success": True, "tables": insights_service.get_summary()}

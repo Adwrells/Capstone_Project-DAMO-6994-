@@ -32,8 +32,10 @@ RUN npm run build
 # Ensure the uploads directory exists (since it's in .gitignore)
 RUN mkdir -p uploads
 
-# Expose the port the app runs on
-EXPOSE 3000
+# This single image serves both the Node server and the FastAPI backend — docker-compose.yml
+# builds it twice, once per service, overriding CMD below with `command:` so each container
+# runs one process. `docker run` directly (no compose) gets this default, Node-only behavior;
+# see docker-compose.yml's `python` service for the `uvicorn backend.main:app` equivalent.
+EXPOSE 3000 8000
 
-# Define the command to run your app using the production start script
 CMD ["npm", "start"]
