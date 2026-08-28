@@ -6,7 +6,7 @@ import React, { useState, useEffect } from 'react';
 import {
   Database, ShieldCheck, BarChart3, Presentation, Sparkles,
   RefreshCw, CheckCircle2, ChevronRight, ChevronLeft, HelpCircle, FileDown,
-  Menu, X, User, Moon, Sun, Activity, Layers
+  Menu, X, User, Moon, Sun, Activity, Layers, AlertTriangle, PlaySquare
 } from 'lucide-react';
 import DatasetUpload from './components/common/DatasetUpload';
 import DataCleaning from './pages/PrepQualityEngine/PrepQualityEngine';
@@ -76,6 +76,9 @@ export default function App() {
 
   // Modern Toast notification state
   const [notification, setNotification] = useState<{ text: string; type: 'info' | 'error' | 'success' } | null>(null);
+
+  // Validation warning modal state
+  const [showValidationWarningModal, setShowValidationWarningModal] = useState<boolean>(false);
 
   const datasetNameRef = React.useRef<string | null>(null);
   React.useEffect(() => { datasetNameRef.current = datasetName; }, [datasetName]);
@@ -313,6 +316,10 @@ export default function App() {
   };
 
   const handleNextStage = () => {
+    if (currentIndex === 1 && !cleaningSummary) {
+      setShowValidationWarningModal(true);
+      return;
+    }
     if (currentIndex < STAGES.length - 1) {
       setCurrentSection(STAGES[currentIndex + 1].key);
     }
@@ -339,7 +346,7 @@ export default function App() {
       >
         {/* Brand Header */}
         <div className="h-16 px-4 flex items-center justify-between border-b border-slate-800 shrink-0">
-          <div className="flex items-center gap-3 overflow-hidden cursor-pointer" onClick={resetPlatform}>
+          <div className="flex items-center gap-3 overflow-hidden select-none cursor-default">
             <div className="w-9 h-9 rounded-xl bg-[#2563EB] flex items-center justify-center text-white shrink-0 shadow-sm">
               <Activity size={20} strokeWidth={2.5} />
             </div>
@@ -352,7 +359,7 @@ export default function App() {
           </div>
           <button
             onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
             title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
           >
             <Menu size={18} />
@@ -375,31 +382,30 @@ export default function App() {
           </div>
         </div>
 
-        {/* Navigation Menu Links */}
-        <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto" aria-label="Workflow stages">
-          {STAGES.map((stage, idx) => {
+        {/* Navigation Stage Indicators (Display-only, non-clickable) */}
+        <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto pointer-events-none select-none" aria-label="Workflow stages">
+          {STAGES.map((stage) => {
             const Icon = stage.icon;
             const isActive = stage.key === currentSection;
-            const isDisabled = idx > 1 && !datasetName;
 
             return (
-              <button
+              <div
                 key={stage.key}
-                disabled={isDisabled}
-                onClick={() => setCurrentSection(stage.key)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all duration-150 group relative ${isActive
+                role="status"
+                aria-current={isActive ? 'page' : undefined}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all duration-150 relative cursor-default ${isActive
                   ? 'bg-[#2563EB] text-white shadow-md font-semibold'
-                  : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/70'
-                  } ${isDisabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}
+                  : 'text-slate-400 opacity-60'
+                  }`}
               >
-                <Icon size={19} className={isActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-200'} />
+                <Icon size={19} className={isActive ? 'text-white' : 'text-slate-400'} />
                 {!isSidebarCollapsed && (
                   <span className="truncate text-left flex-1">{stage.label}</span>
                 )}
                 {!isSidebarCollapsed && isActive && (
                   <span className="w-1.5 h-1.5 rounded-full bg-white shrink-0 animate-pulse" />
                 )}
-              </button>
+              </div>
             );
           })}
         </nav>
@@ -423,33 +429,88 @@ export default function App() {
       {/* RIGHT MAIN CONTENT AREA */}
       <div className="flex-1 flex flex-col min-w-0 min-h-screen">
 
-        {/* STICKY TOP NAVIGATION NAVBAR (#FFFFFF) */}
-        <header role="banner" className="h-16 bg-white dark:bg-[#111827] border-b border-[#E2E8F0] dark:border-[#1F2937] px-8 flex items-center justify-between sticky top-0 z-30 shadow-xs">
+        {/* STICKY TOP STAGE NAVIGATION NAVBAR */}
+        <header role="banner" className="h-16 bg-white dark:bg-[#111827] border-b border-[#E2E8F0] dark:border-[#1F2937] px-6 sm:px-8 flex items-center justify-between sticky top-0 z-30 shadow-xs shrink-0">
 
-          {/* Breadcrumb Navigation */}
-          <div className="flex items-center gap-2 text-sm text-[#475569] dark:text-[#94A3B8]">
-            <span className="font-medium">Healthcare Analytics</span>
-            <ChevronRight size={14} className="text-[#94A3B8]" />
-            <span className="font-semibold text-[#0F172A] dark:text-white">{STAGES[currentIndex].label}</span>
+          {/* Left: Back Button */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handlePreviousStage}
+              disabled={currentIndex === 0}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border text-xs font-semibold transition-all shadow-xs ${
+                currentIndex === 0
+                  ? 'opacity-40 cursor-not-allowed border-slate-200 dark:border-slate-800 text-slate-400 bg-slate-50 dark:bg-slate-900/50'
+                  : 'cursor-pointer border-[#E2E8F0] dark:border-[#1F2937] text-slate-700 dark:text-slate-200 bg-white dark:bg-[#1E293B] hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-300'
+              }`}
+            >
+              <ChevronLeft size={15} />
+              <span>Back: {currentIndex > 0 ? STAGES[currentIndex - 1].label : 'Start'}</span>
+            </button>
           </div>
 
-          {/* Status & User Toolbar */}
-          <div className="flex items-center gap-4">
-
-            {/* Status Pill */}
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-[#F0FDF4] dark:bg-emerald-950/30 border border-[#DCFCE7] dark:border-emerald-900/50 text-[#16A34A] dark:text-emerald-400 text-xs font-semibold">
-              <span className="w-2 h-2 rounded-full bg-[#16A34A] dark:bg-emerald-400 animate-pulse" />
-              <span>STATUS: {getCurrentStatus()}</span>
+          {/* Center: Stage Number & Title + Status Pill */}
+          <div className="flex items-center gap-3">
+            <div className="text-xs font-medium text-[#475569] dark:text-[#94A3B8]">
+              Stage {currentIndex + 1} of {STAGES.length} –{' '}
+              <span className="font-bold text-[#0F172A] dark:text-white">
+                {STAGES[currentIndex].label}
+              </span>
             </div>
 
+            <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#F0FDF4] dark:bg-emerald-950/30 border border-[#DCFCE7] dark:border-emerald-900/50 text-[#16A34A] dark:text-emerald-400 text-[10px] font-bold">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#16A34A] dark:bg-emerald-400 animate-pulse" />
+              <span>STATUS: {getCurrentStatus()}</span>
+            </div>
+          </div>
+
+          {/* Right: Theme Toggle & Next Button */}
+          <div className="flex items-center gap-3">
             {/* Dark Mode Toggle */}
             <button
               onClick={() => setIsDarkMode(!isDarkMode)}
-              className="p-2 rounded-lg border border-[#E2E8F0] dark:border-[#1F2937] text-[#475569] dark:text-[#CBD5E1] hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B] transition-colors"
+              className="p-1.5 rounded-lg border border-[#E2E8F0] dark:border-[#1F2937] text-[#475569] dark:text-[#CBD5E1] hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B] transition-colors cursor-pointer"
               title="Toggle Light/Dark Theme"
             >
-              {isDarkMode ? <Sun size={18} className="text-amber-400" /> : <Moon size={18} />}
+              {isDarkMode ? <Sun size={16} className="text-amber-400" /> : <Moon size={16} />}
             </button>
+
+            {/* Next Stage Action */}
+            {currentIndex < STAGES.length - 1 ? (
+              (() => {
+                const needsValidation = currentIndex === 1 && !cleaningSummary;
+                return (
+                  <div className="relative group">
+                    <button
+                      onClick={needsValidation ? undefined : handleNextStage}
+                      disabled={needsValidation}
+                      aria-disabled={needsValidation}
+                      title={needsValidation ? 'Run the Data Preparation & Validation Pipeline on Stage 2 first' : undefined}
+                      className={`flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-bold transition-all shadow-sm ${
+                        needsValidation
+                          ? 'bg-slate-300 dark:bg-slate-700 text-slate-500 dark:text-slate-400 border border-slate-300 dark:border-slate-600 cursor-not-allowed opacity-70'
+                          : 'text-white bg-[#2563EB] hover:bg-blue-700 hover:shadow cursor-pointer'
+                      }`}
+                    >
+                      {needsValidation && <Layers size={13} className="shrink-0" />}
+                      <span>Next: {STAGES[currentIndex + 1].label}</span>
+                      <ChevronRight size={15} />
+                    </button>
+                    {needsValidation && (
+                      <div className="absolute right-0 top-full mt-2 z-50 w-64 px-3 py-2.5 rounded-xl bg-slate-900 dark:bg-slate-800 text-white text-[11px] font-medium shadow-xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-150 leading-relaxed">
+                        <span className="font-bold text-amber-400 block mb-1">⚠ Validation Required</span>
+                        Run the <span className="font-semibold text-indigo-300">Automated Data Preparation &amp; Validation Pipeline</span> on Stage 2 to unlock this step.
+                        <div className="absolute -top-1.5 right-6 w-3 h-3 bg-slate-900 dark:bg-slate-800 rotate-45" />
+                      </div>
+                    )}
+                  </div>
+                );
+              })()
+            ) : (
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/50 text-emerald-700 dark:text-emerald-400 text-xs font-bold shadow-xs">
+                <CheckCircle2 size={15} />
+                <span>Pipeline Verified</span>
+              </div>
+            )}
           </div>
         </header>
 
@@ -529,10 +590,10 @@ export default function App() {
           datasetName={datasetName}
           fields={fields}
           data={cleanedData}
-          aiKPIs={aiAnalysis ? aiAnalysis.kpis : null}
           customCharts={customCharts}
           onAddChart={handleAddChart}
           onRemoveChart={handleRemoveChart}
+          onNavigateToAnalytics={() => setCurrentSection('analytics')}
           isDarkMode={isDarkMode}
           setIsDarkMode={setIsDarkMode}
         />
@@ -587,38 +648,6 @@ export default function App() {
     )}
   </main>
 
-        {/* BOTTOM STAGE NAVIGATION CONTROL BAR */}
-        <div className="border-t border-[#E2E8F0] dark:border-[#1F2937] bg-white dark:bg-[#111827] px-8 py-4 flex items-center justify-between shrink-0">
-          <button
-            onClick={handlePreviousStage}
-            disabled={currentIndex === 0}
-            className={`btn-secondary text-sm ${currentIndex === 0 ? 'opacity-40 cursor-not-allowed' : ''}`}
-          >
-            <ChevronLeft size={16} />
-            <span>Back: {currentIndex > 0 ? STAGES[currentIndex - 1].label : 'Start'}</span>
-          </button>
-
-          <div className="text-xs font-medium text-[#475569] dark:text-[#94A3B8]">
-            Stage {currentIndex + 1} of {STAGES.length} – <span className="font-semibold text-[#0F172A] dark:text-white">{STAGES[currentIndex].label}</span>
-          </div>
-
-          {currentIndex < STAGES.length - 1 ? (
-            <button
-              onClick={handleNextStage}
-              disabled={currentIndex === 1 && !datasetName}
-              className={`btn-primary text-sm ${currentIndex === 1 && !datasetName ? 'opacity-40 cursor-not-allowed' : ''}`}
-            >
-              <span>Next: {STAGES[currentIndex + 1].label}</span>
-              <ChevronRight size={16} />
-            </button>
-          ) : (
-            <div className="badge badge-success text-xs font-semibold">
-              <CheckCircle2 size={14} />
-              <span>Pipeline Verified</span>
-            </div>
-          )}
-        </div>
-
         {/* FOOTER */}
         <footer className="border-t border-[#E2E8F0] dark:border-[#1F2937] bg-white dark:bg-[#111827] py-4 text-center text-xs text-[#94A3B8]">
           Healthcare Analytics Platform &copy; {new Date().getFullYear()} – Enterprise ED Operational Intelligence
@@ -633,6 +662,82 @@ export default function App() {
             {notification.text}
           </div>
           <button onClick={() => setNotification(null)} className="text-[#94A3B8] hover:text-[#0F172A] text-xs font-bold">✕</button>
+        </div>
+      )}
+
+      {/* ── STAGE 2 VALIDATION WARNING POP-UP MODAL ───────────────────────── */}
+      {showValidationWarningModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white dark:bg-[#111c30] border border-amber-300 dark:border-amber-700/80 rounded-3xl p-6 sm:p-7 max-w-lg w-full shadow-2xl space-y-5 text-left font-sans animate-scale-up">
+            
+            {/* Modal Header */}
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
+                  <AlertTriangle size={22} className="animate-pulse" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 block">
+                    Data Validation Required
+                  </span>
+                  <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+                    Run Preparation Pipeline First
+                  </h3>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowValidationWarningModal(false)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="space-y-3 text-xs sm:text-[13px] text-slate-600 dark:text-slate-300 leading-relaxed font-light">
+              <p>
+                You cannot advance to <strong className="font-semibold text-slate-800 dark:text-slate-100">Stage 3: Dataset Explorer</strong> without running the automated data preparation and quality validation pipeline.
+              </p>
+              <div className="p-3.5 rounded-xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-900/50 space-y-1.5 text-xs">
+                <span className="font-bold text-amber-900 dark:text-amber-200 block font-mono text-[11px] uppercase tracking-wider">
+                  Required Pipeline Operations:
+                </span>
+                <ul className="space-y-1 text-slate-700 dark:text-slate-300 list-disc list-inside text-[11px]">
+                  <li>Column schema standardization to snake_case</li>
+                  <li>Unit harmonization to Total ED-Minutes (TEM)</li>
+                  <li>Validation across 5 dimensions (Completeness, Consistency, Validity, Uniqueness, Coverage)</li>
+                  <li>Persistence and caching in SQLite analytical store</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="flex flex-col sm:flex-row items-center justify-end gap-3 pt-2">
+              <button
+                onClick={() => setShowValidationWarningModal(false)}
+                className="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold transition cursor-pointer"
+              >
+                Cancel / Stay on Stage 2
+              </button>
+              <button
+                onClick={() => {
+                  setShowValidationWarningModal(false);
+                  const el = document.getElementById('run-prep-pipeline-btn');
+                  if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    setTimeout(() => {
+                      (el as HTMLElement).click();
+                    }, 400);
+                  }
+                }}
+                className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white text-xs font-bold shadow-md hover:shadow-lg transition flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <PlaySquare size={15} />
+                <span>Run Data Validation Pipeline Now</span>
+              </button>
+            </div>
+
+          </div>
         </div>
       )}
 

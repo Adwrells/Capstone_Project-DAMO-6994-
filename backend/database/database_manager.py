@@ -5,11 +5,15 @@ Handles SQLite database connection lifecycle, pooling, transaction management, a
 
 import logging
 import sqlite3
-import os
-from contextlib import closing, contextmanager
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Iterator, List, Dict, Any, Optional
 import pandas as pd
+
+try:
+    from backend.database.engine import get_engine
+except ImportError:
+    from database.engine import get_engine
 
 DB_DIR = Path(__file__).parent
 DEFAULT_DB_PATH = DB_DIR / "healthcare.db"
@@ -29,35 +33,40 @@ class DatabaseManager:
     def __init__(self, db_path: Optional[str] = None):
         self.db_path = Path(db_path) if db_path else DEFAULT_DB_PATH
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
+        # A custom db_path is always an isolated test/CLI database (see engine.py) and
+        # gets NullPool, so it behaves exactly like the old open-per-call connection.
+        self._engine = get_engine(str(self.db_path), pooled=db_path is None)
 
     def get_connection(self) -> sqlite3.Connection:
-        """Establishes and returns an optimized SQLite connection.
+        """Checks out a pooled SQLite connection.
 
         The caller owns the connection and must close it. Prefer the `connection()`
-        context manager below, which closes it for you.
+        context manager below, which returns it to the pool for you.
         """
         try:
-            conn = sqlite3.connect(str(self.db_path))
+            fairy = self._engine.raw_connection()
+            conn = fairy.dbapi_connection
             conn.row_factory = sqlite3.Row
-            conn.execute("PRAGMA journal_mode = WAL")
-            conn.execute("PRAGMA foreign_keys = ON")
             return conn
         except sqlite3.Error:
-            logger.error("Failed to open SQLite connection at %s", self.db_path, exc_info=True)
+            logger.error("Failed to check out a pooled SQLite connection at %s", self.db_path, exc_info=True)
             raise
 
     @contextmanager
     def connection(self) -> Iterator[sqlite3.Connection]:
-        """Yields a connection and always closes it on exit.
+        """Yields a pooled connection and returns it to the pool on exit.
 
-        `with sqlite3.connect(...) as conn` only commits or rolls back the transaction —
-        it does NOT close the connection. Closing matters here: an open handle keeps the
-        database file locked (Windows cannot delete it) and leaks a file descriptor per
-        query. contextlib.closing() supplies the close; the inner `with conn` keeps the
-        original transaction semantics.
+        Unlike `sqlite3.connect()`, closing here does not tear down the physical
+        connection: `fairy.close()` just releases it back to the SQLAlchemy pool
+        (or, for a NullPool test/CLI database, closes it immediately — same as before).
         """
-        with closing(self.get_connection()) as conn:
+        fairy = self._engine.raw_connection()
+        conn = fairy.dbapi_connection
+        conn.row_factory = sqlite3.Row
+        try:
             yield conn
+        finally:
+            fairy.close()
 
     def read_sql(self, sql: str, params: tuple = ()) -> pd.DataFrame:
         """Executes a SELECT query and returns the results as a Pandas DataFrame."""

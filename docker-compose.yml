@@ -1,16 +1,41 @@
 services:
-  app:
+  node:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: healthcare_analytics_platform
+    container_name: healthcare_analytics_node
+    command: ["npm", "start"]
     ports:
       - "3000:3000"
-      - "8000:8000"
     environment:
       - PORT=3000
-      - API_PORT=8000
+      - PYTHON_API_URL=http://python:8000
+      - AUTH_USERNAME=${AUTH_USERNAME:-admin}
+      - AUTH_PASSWORD=${AUTH_PASSWORD:-changeme}
+      - CORS_ORIGINS=${CORS_ORIGINS:-}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+    restart: unless-stopped
+    depends_on:
+      - python
+
+  python:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: healthcare_analytics_python
+    command: ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    # `expose`, not `ports` — reachable from `node` over the compose network, never from the
+    # host. FastAPI should have no direct internet-facing entry point; only the Node server
+    # (and, in production, whatever TLS-terminating reverse proxy/load balancer sits in front
+    # of it) should be reachable. See guide_to_implement.md for the full deployment writeup.
+    expose:
+      - "8000"
+    environment:
       - API_HOST=0.0.0.0
-      - HOST=0.0.0.0
-      - DEBUG=false
+      - API_PORT=8000
+      - DEBUG=${DEBUG:-false}
+      - AUTH_USERNAME=${AUTH_USERNAME:-admin}
+      - AUTH_PASSWORD=${AUTH_PASSWORD:-changeme}
+      - SECRET_KEY=${SECRET_KEY:-}
+      - CORS_ORIGINS=${CORS_ORIGINS:-}
     restart: unless-stopped

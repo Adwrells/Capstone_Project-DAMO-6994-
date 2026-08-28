@@ -26,12 +26,13 @@ IMPORT_TO_DISTRIBUTION = {
     "multipart": "python-multipart",
     "dotenv": "python-dotenv",
     "pip_audit": "pip-audit",
+    "jose": "python-jose",
 }
 
 # First-party packages — resolved from the repository, never installed.
 LOCAL_PACKAGES = {
     "backend", "tests", "api", "database", "services", "analytics",
-    "preprocessing", "models", "utils", "config",
+    "preprocessing", "models", "utils", "config", "auth",
 }
 
 

@@ -12,6 +12,14 @@ pydantic>=2.0.0
 uvicorn>=0.23.0
 python-multipart>=0.0.9      # NOT imported: FastAPI needs it for multipart form uploads
 
+# ─── Auth & database pooling ────────────────────────────────────────────────
+sqlalchemy>=2.0.0            # connection pool only; queries still go through sqlite3 directly
+python-jose[cryptography]>=3.3.0   # JWT encode/decode
+passlib[bcrypt]>=1.7.4       # password hashing
+bcrypt==4.0.1                 # pinned: bcrypt>=4.1 breaks passlib 1.7.4's backend self-test (ValueError: password cannot be longer than 72 bytes)
+slowapi>=0.1.9                # rate limiting on /api/auth/login
+python-dotenv>=1.0.0          # loads .env for backend/config/settings.py (Node's server.ts loads it separately)
+
 # ─── Data science ───────────────────────────────────────────────────────────
 pandas>=2.0.0
 numpy>=1.26.0

@@ -41,7 +41,7 @@ class ColumnsRequest(BaseModel):
 
 
 @router.post("/assess")
-async def assess_fit(payload: DiagnosticsRequest) -> Dict[str, Any]:
+def assess_fit(payload: DiagnosticsRequest) -> Dict[str, Any]:
     """Assess whether a model fitted on the cleaned dataset over- or underfits."""
     if not payload.feature or not payload.target:
         return {
@@ -62,7 +62,7 @@ async def assess_fit(payload: DiagnosticsRequest) -> Dict[str, Any]:
 
 
 @router.post("/columns")
-async def modelable_columns(payload: ColumnsRequest) -> Dict[str, Any]:
+def modelable_columns(payload: ColumnsRequest) -> Dict[str, Any]:
     """Numeric columns in the cleaned dataset that can serve as feature or target."""
     columns = model_diagnostics_service.numeric_columns(payload.records)
     return {"success": True, "columns": columns, "count": len(columns)}

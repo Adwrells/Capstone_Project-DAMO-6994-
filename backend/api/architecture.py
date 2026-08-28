@@ -21,7 +21,7 @@ router = APIRouter(prefix="/api/architecture", tags=["Architecture"])
 
 
 @router.get("/pipeline")
-async def get_pipeline_overview() -> Dict[str, Any]:
+def get_pipeline_overview() -> Dict[str, Any]:
     return {
         "success": True,
         **analytics_service.get_pipeline_overview(),

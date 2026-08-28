@@ -192,6 +192,13 @@ def preflight():
         print(f"  WARNING: {db_path} is missing. Dashboards will be empty.")
         print("  Rebuild it with: python -m backend.database.load_csv")
 
+    # backend/config/settings.py loads .env itself (via python-dotenv) if present, so this
+    # is advisory only — the app runs with the AUTH_USERNAME/AUTH_PASSWORD/SECRET_KEY
+    # defaults either way. Just flagging that the defaults are dev-only, not a hard stop.
+    if os.path.exists(".env.example") and not os.path.exists(".env"):
+        print("  NOTE: .env not found — using default auth credentials (admin/changeme) and")
+        print("  an ephemeral SECRET_KEY. Copy .env.example to .env to set real values.")
+
     # The preload reads this directory. It has silently pointed at a non-existent path
     # before, which left every dataset-gated page blank with no error shown.
     data_dir = os.path.join("data", "Explorer Dataset")

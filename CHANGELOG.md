@@ -7,7 +7,63 @@ All notable changes to this project are documented in this file. The format foll
 This file starts at 1.1.0; versions 1.0.0–1.0.4 predate it and are recorded only as git tags,
 each named after the fix or feature it introduced.
 
-## [1.1.0] — 2026-08-24
+## [Unreleased]
+
+### Added
+- JWT authentication (`backend/auth/`) — a single seeded account (`AUTH_USERNAME` /
+  `AUTH_PASSWORD` / `SECRET_KEY` in `backend/config/settings.py`), `POST /api/auth/login`
+  issuing bearer tokens, and `get_current_user` gating every FastAPI router except `auth`
+  itself, `/`, and `/api/health`. `server.ts` now authenticates server-to-server (caching the
+  token, re-authenticating once on a `401`) when proxying `/api/model-diagnostics/*` and
+  `/api/user-datasets/*`, since those calls would otherwise be rejected.
+- Rate limiting on `POST /api/auth/login` (`backend/auth/rate_limit.py`, `slowapi`) — 5
+  attempts/minute per IP; a caller over the limit gets `429` before the password check even
+  runs. In-memory storage (resets on restart, not shared across processes/workers) — fine for
+  this single-process deployment; a multi-worker deployment would need `Limiter(storage_uri=
+  "redis://...")` for the limit to hold across workers.
+- Pooled SQLite connections (`backend/database/engine.py`) — a SQLAlchemy `QueuePool`
+  (`pool_size=5, max_overflow=10`) backs the production database instead of opening and
+  closing a raw `sqlite3.connect()` on every call. Only the pool is used; query execution
+  stays on genuine `sqlite3.Connection` objects (via `engine.raw_connection().dbapi_connection`)
+  so pandas' `read_sql_query`/`to_sql` and existing `?`-placeholder queries are untouched. A
+  `DatabaseManager` built against a custom path (tests, `load_csv.py`) gets `NullPool` instead,
+  preserving the old open/close-per-call behavior so temp-directory teardown isn't blocked by
+  an open pooled connection (an issue on Windows).
+- Two-service `docker-compose.yml` (`node` + `python`, same image, different `command:`) —
+  the Python backend previously never started in the container at all (`Dockerfile`'s `CMD`
+  only ran `npm start`); `python` now runs `uvicorn backend.main:app` and is reachable only
+  from `node` over the compose network (`expose`, not `ports`), not published to the host.
+- `.env.example` and `python-dotenv` (`backend/config/settings.py` loads `.env` automatically)
+  so `AUTH_USERNAME`/`AUTH_PASSWORD`/`SECRET_KEY`/`CORS_ORIGINS`/`GEMINI_API_KEY` can be set
+  once and picked up by Docker, `launch.py`, and a direct `python -m backend.main` alike.
+  `launch.py` prints a note when `.env` is missing. `guide_to_implement.md` (gitignored,
+  local-only) covers the remaining path to a public HTTPS deployment on AWS.
+- Pulled the Executive Dashboard rebuild and Dataset Explorer/Insights/Reports page updates
+  from the `Bharath` branch — frontend only. Backend changes on that branch (including a
+  different `server.ts` proxy implementation and modified FastAPI routers) were deliberately
+  not pulled, to avoid disturbing the auth/pooling/rate-limiting work above. `server.ts` gained
+  four additional proxy prefixes (`/api/dashboard`, `/api/statistics`, `/api/insights`,
+  `/api/reports`) so the pulled pages' data fetches resolve, reusing the existing JWT-forwarding
+  proxy — `/api/dataset` was deliberately excluded since server.ts already has native handlers
+  for it (a different, Node-side data source) that a proxy prefix would have shadowed.
+
+### Changed
+- Every FastAPI route handler in `backend/api/*.py` changed from `async def` to `def`. None
+  of them ever awaited anything — each one called straight into blocking `sqlite3`/pandas code
+  while declared `async`, which runs directly on the single asyncio event loop and stalls every
+  other in-flight request for the query's duration. A sync `def` handler runs in FastAPI's
+  threadpool instead, so combined with connection pooling above, concurrent requests actually
+  parallelize now instead of serializing.
+- `requirements.txt` — added `sqlalchemy`, `python-jose[cryptography]`, `passlib[bcrypt]`,
+  `slowapi`, `python-dotenv`, and pinned `bcrypt==4.0.1` (bcrypt ≥4.1's stricter 72-byte check
+  breaks passlib 1.7.4's own backend self-test with `ValueError: password cannot be longer
+  than 72 bytes`).
+
+> **Breaking:** every FastAPI route now requires a bearer token except `/`, `/api/health`, and
+> `/api/auth/login`. Any existing direct caller of the API (outside `server.ts`, which was
+> updated alongside this change) will start getting `401` until it authenticates first.
+
+## [2.0.0] — 2026-08-27
 
 ### Added
 - A minimal frontend test suite (Vitest + React Testing Library) — the frontend previously

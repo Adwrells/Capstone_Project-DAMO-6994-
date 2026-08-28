@@ -24,7 +24,7 @@ except ImportError:
 router = APIRouter(prefix="/api/datasets", tags=["Datasets"])
 
 @router.get("")
-async def get_datasets() -> Dict[str, Any]:
+def get_datasets() -> Dict[str, Any]:
     """Returns list of preloaded SQLite dataset tables."""
     tables = dataset_service.list_datasets()
     return {
@@ -34,7 +34,7 @@ async def get_datasets() -> Dict[str, Any]:
     }
 
 @router.get("/{dataset_name}")
-async def get_dataset_records(dataset_name: str) -> Dict[str, Any]:
+def get_dataset_records(dataset_name: str) -> Dict[str, Any]:
     """Returns rows for a given dataset table."""
     result = dataset_service.get_records(dataset_name)
     if result is None:

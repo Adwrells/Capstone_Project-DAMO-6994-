@@ -10,7 +10,7 @@ try:
 
     try:
         @router.post("")
-        async def upload_dataset(file: UploadFile = File(...)) -> Dict[str, Any]:
+        def upload_dataset(file: UploadFile = File(...)) -> Dict[str, Any]:
             """Ingests uploaded clinical dataset CSV/XLSX file."""
             if not getattr(file, "filename", None):
                 raise HTTPException(status_code=400, detail="No file provided")
@@ -23,7 +23,7 @@ try:
             }
     except Exception:
         @router.post("")
-        async def upload_dataset_fallback(payload: Dict[str, Any] = None) -> Dict[str, Any]:
+        def upload_dataset_fallback(payload: Dict[str, Any] = None) -> Dict[str, Any]:
             return {"success": True, "message": "Upload endpoint active (fallback mode)"}
 
 except ImportError:

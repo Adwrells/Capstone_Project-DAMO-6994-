@@ -3,7 +3,6 @@ Healthcare Analytics Platform - Test Suite: FastAPI Endpoints & API Handlers
 """
 
 import unittest
-import asyncio
 
 TEST_CLIENT_AVAILABLE = False
 try:
@@ -43,34 +42,34 @@ class TestAPIEndpoints(unittest.TestCase):
             self.assertEqual(response.json()["status"], "healthy")
 
     def test_dashboard_kpis_direct(self):
-        res = asyncio.run(get_dashboard_kpis())
+        res = get_dashboard_kpis()
         self.assertTrue(res["success"])
         self.assertIn("kpis", res)
 
     def test_statistics_h1_to_h5_direct(self):
-        h1_res = asyncio.run(get_hypothesis_h1())
+        h1_res = get_hypothesis_h1()
         self.assertTrue(h1_res["success"])
 
-        h2_res = asyncio.run(get_hypothesis_h2())
+        h2_res = get_hypothesis_h2()
         self.assertTrue(h2_res["success"])
 
-        h3_res = asyncio.run(get_hypothesis_h3())
+        h3_res = get_hypothesis_h3()
         self.assertTrue(h3_res["success"])
 
-        h4_res = asyncio.run(get_hypothesis_h4())
+        h4_res = get_hypothesis_h4()
         self.assertTrue(h4_res["success"])
 
-        h5_res = asyncio.run(get_hypothesis_h5())
+        h5_res = get_hypothesis_h5()
         self.assertTrue(h5_res["success"])
 
-        dash_res = asyncio.run(get_statistics_dashboard())
+        dash_res = get_statistics_dashboard()
         self.assertTrue(dash_res["success"])
 
     def test_hypothesis_endpoints_report_weighted_tests(self):
         """The API must advertise the weighting it actually performs."""
-        h1 = asyncio.run(get_hypothesis_h1())
-        h2 = asyncio.run(get_hypothesis_h2())
-        h4 = asyncio.run(get_hypothesis_h4())
+        h1 = get_hypothesis_h1()
+        h2 = get_hypothesis_h2()
+        h4 = get_hypothesis_h4()
 
         for res in (h1, h2, h4):
             self.assertIn("Weighted", res["test_name"])
@@ -85,7 +84,7 @@ class TestAPIEndpoints(unittest.TestCase):
         self.assertIn("rank_biserial", h2)
 
     def test_statistics_dashboard_carries_effect_sizes(self):
-        dash = asyncio.run(get_statistics_dashboard())
+        dash = get_statistics_dashboard()
         summary = dash["summary_dashboard"]
         self.assertEqual(dash["alpha"], 0.05)
         for key, metric in (("H1_Triage_Difference", "epsilon_squared"),
@@ -99,7 +98,7 @@ class TestAPIEndpoints(unittest.TestCase):
         """/methods must be derived from the modules, not a hand-maintained list."""
         from backend.analytics.hypothesis_testing import TEST_KRUSKAL, TEST_MANN_WHITNEY
 
-        res = asyncio.run(get_statistical_methods())
+        res = get_statistical_methods()
         self.assertTrue(res["success"])
         self.assertTrue(res["weighting"]["applied"])
         self.assertEqual(res["weighting"]["weight_column"], "ed_visits")

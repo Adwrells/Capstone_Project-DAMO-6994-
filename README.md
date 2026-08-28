@@ -32,9 +32,10 @@ dashboard, all reading from a reproducible analytical database.
 | :--- | :--- |
 | Frontend | React 19, TypeScript, Vite, Tailwind CSS v4, Recharts |
 | Node server | Express (`server.ts`), port **3000** — serves Vite in middleware mode, handles uploads, Excel parsing and Gemini insight calls |
-| Python backend | FastAPI (`backend/main.py`), port **8000** — 31 routes |
-| Database | SQLite, schema in `backend/database/schema.sql` |
-| Testing | pytest — 291 tests across 20 suites |
+| Python backend | FastAPI (`backend/main.py`), port **8000** — 33 routes, sync handlers (see [Connection pooling](#connection-pooling--concurrency)) |
+| Database | SQLite, schema in `backend/database/schema.sql`, pooled via SQLAlchemy (see below) |
+| Auth | JWT bearer tokens (`python-jose` + `passlib`) gating every FastAPI route except `/` and `/api/health`; `POST /api/auth/login` is rate-limited (`slowapi`, 5/minute/IP) — see [Authentication](#authentication) |
+| Testing | pytest — 299 tests across 20 suites |
 
 The platform runs as two services on two ports. The user interface remains functional
 without the Python backend, though model diagnostics and dataset persistence report as
@@ -103,6 +104,22 @@ remains usable without it, reporting those two features as unavailable.
 
 All Python commands must be run from the repository root — every module imports `backend.*`,
 which resolves only when the root is the working directory.
+
+The FastAPI backend requires a bearer token on every route except `/` and `/api/health` (see
+[Authentication](#authentication)). It works with no configuration — `AUTH_USERNAME` /
+`AUTH_PASSWORD` default to `admin` / `changeme`, and `SECRET_KEY` falls back to a per-process
+random value if unset — but a real deployment should set all three explicitly:
+
+```bash
+# .env, or the environment the server runs in
+AUTH_USERNAME=admin
+AUTH_PASSWORD=changeme
+SECRET_KEY=some-long-random-value      # required for tokens to survive a server restart
+```
+
+`server.ts` reads the same `AUTH_USERNAME` / `AUTH_PASSWORD` variables to log into FastAPI on
+the app's behalf when proxying `/api/model-diagnostics/*` and `/api/user-datasets/*` — see
+[Authentication](#authentication) for why the Node layer, not the browser, holds this token.
 
 ### Additional commands
 
@@ -251,10 +268,61 @@ identifier exists at all.
 Concurrency was verified with two simultaneous uploads: both succeeded, each landed in its
 own table with no cross-contamination, and the seeded cohort was unchanged.
 
-> This is isolation, not authentication. The identifier is generated client-side and sent
-> unverified, so it prevents users from encountering each other's data by accident rather
-> than defending against a determined caller. Genuine confidentiality for clinical data
-> requires authenticated identity and transport security.
+> This is isolation, not per-user authentication. The session identifier is generated
+> client-side and sent unverified, so it prevents users from encountering each other's data
+> by accident rather than defending against a determined caller. The JWT layer below gates
+> *access to the API at all*; it does not attach an identity to a session, so it does not by
+> itself change this paragraph — see [Authentication](#authentication).
+
+### Authentication
+
+Every FastAPI route requires a bearer token except `/` and `/api/health`. There is a single
+seeded account (`AUTH_USERNAME` / `AUTH_PASSWORD` in `backend/config/settings.py`, both
+overridable by environment variable) rather than a `users` table — this platform has no
+self-registration and no per-user roles today, so a token proves "this caller was allowed to
+authenticate," not "this caller is a distinct user." Session-scoped dataset isolation (above)
+remains a separate mechanism, keyed by the `X-Session-Id` header, not by the JWT subject.
+
+| Piece | Where |
+| :--- | :--- |
+| Password hashing, token encode/decode | `backend/auth/security.py` (`passlib[bcrypt]`, `python-jose`) |
+| `get_current_user` dependency | `backend/auth/dependencies.py` — `OAuth2PasswordBearer`, reads the `Authorization: Bearer …` header |
+| `POST /api/auth/login` | `backend/api/auth.py` — the only unauthenticated route besides `/` and `/api/health`; returns `{"access_token", "token_type"}` |
+| Wiring | `backend/main.py` — `app.include_router(router, dependencies=[Depends(get_current_user)])` for every router except `auth` |
+| Rate limiting | `backend/auth/rate_limit.py` (`slowapi`) — `POST /api/auth/login` is capped at **5 attempts/minute per IP**; a caller over the limit gets `429` with `{"error": "Rate limit exceeded: 5 per 1 minute"}` instead of reaching the password check |
+
+The browser never holds this token. `server.ts` is the only client of the FastAPI backend in
+the deployed app — it proxies `/api/model-diagnostics/*` and `/api/user-datasets/*` — so it
+logs in with the seeded credentials on first proxied request, caches the token in memory, and
+re-authenticates once on a `401` (e.g. after a backend restart mints a new ephemeral
+`SECRET_KEY`). See `getFastApiToken()` in `server.ts`. This server-to-server login happens at
+most a couple of times per backend restart, well under the rate limit above — it isn't a
+caller the limit is meant to catch.
+
+The rate limiter's storage is in-memory (`slowapi`'s default `MemoryStorage`): the counter
+resets on every restart and is not shared across processes. That's fine for the single-process
+deployment this platform runs as, but would need a shared backend (`Limiter(storage_uri=
+"redis://...")`) to hold the limit across multiple workers or instances.
+
+### Connection pooling & concurrency
+
+FastAPI route handlers in `backend/api/` are synchronous (`def`, not `async def`) so the
+framework runs each one in its threadpool rather than on the single asyncio event loop —
+before this, an `async def` handler calling straight into blocking `sqlite3` code would stall
+every other in-flight request for the duration of that query. `backend/database/engine.py`
+backs this with a pooled SQLAlchemy engine (`QueuePool`, `pool_size=5, max_overflow=10`) so
+concurrent requests reuse warm connections instead of opening and closing a new one each time.
+
+SQLAlchemy supplies the pool only, not the query layer: `DatabaseManager.connection()`
+(`backend/database/database_manager.py`) checks out a connection via
+`engine.raw_connection()` and hands callers the underlying `sqlite3.Connection` directly —
+`pandas.read_sql_query`/`to_sql`, `?`-style placeholders and raw cursor calls all work
+unchanged, because pandas needs a genuine synchronous DBAPI connection regardless. A
+`DatabaseManager` constructed against a custom path (tests, `load_csv.py --target`) gets
+`NullPool` instead — connections open and close per checkout exactly as before, so a test's
+`TemporaryDirectory` can be cleaned up immediately rather than waiting on a pooled connection
+to release its file handle (pooled connections holding a database file open past teardown
+fail to delete on Windows).
 
 ### AI assistance (Gemini)
 
@@ -493,7 +561,7 @@ as the print destination.
 
 ## Testing
 
-The platform ships **291 tests across 20 suites**.
+The platform ships **299 tests across 20 suites**.
 
 ```bash
 python -m pytest tests
@@ -516,7 +584,7 @@ python -m pytest tests
 | `test_model_validation.py` | 33 | Splitting, polynomial fitting, metrics, curves, fit verdict |
 | `test_dashboard_services.py` | 29 | Dashboard, insights and dataset service layers |
 | `test_user_datasets.py` | 28 | Cleaned-dataset persistence and cohort isolation |
-| `test_hypothesis_pipeline.py` | 26 | H1/H2/H4 against the seeded database, incl. a notebook-anchored parity check |
+| `test_hypothesis_pipeline.py` | 34 | H1/H2/H4 against the seeded database, incl. a notebook-anchored parity check |
 | `test_model_diagnostics_service.py` | 23 | Underfitting, overfitting and good-fit verdicts end to end |
 | `test_data_loader.py` | 15 | Cleaned-dataset to schema column contract |
 | `test_h1.py`–`test_h5.py` | 49 | The five hypothesis handlers and their statistical routines |
@@ -562,14 +630,16 @@ space-free path and the default pool is preferred.
 │                           /api/model-diagnostics and /api/user-datasets to FastAPI
 ├── backend/
 │   ├── api/                FastAPI routers (transport only)
+│   ├── auth/                JWT + password verification for the single seeded account,
+│   │                       plus rate limiting on /api/auth/login (rate_limit.py)
 │   ├── analytics/
 │   │   ├── statistics/     Pure mathematical routines
 │   │   ├── hypothesis/     H1–H5 business handlers
 │   │   ├── dashboard/      KPI and ERBI computation
 │   │   └── forecasting/    Exponential smoothing
 │   ├── services/           Business logic and data access
-│   ├── database/           Schema, connection manager, loader, seeded database
-│   │                       (healthcare.db — Path A/B, committed)
+│   ├── database/           Schema, pooled connection manager (engine.py), loader, seeded
+│   │                       database (healthcare.db — Path A/B, committed)
 │   └── hypothesis testing/ H1–H5 notebooks, each verified against the running API
 ├── data/
 │   ├── Explorer Dataset/   Raw CSV exports, cleaning notebook, and cleaned/ output
@@ -596,8 +666,9 @@ space-free path and the default pool is preferred.
 | `requirements.txt` | Python dependency manifest for the FastAPI backend (see `PIPELINE_MODULES_REPORT.md` for the full breakdown). |
 | `pyrightconfig.json` | Pyright type-checker config for the Python backend — points it at `.venv` and adds `backend/` to the search path. |
 | `vitest.config.ts` | Vitest config for the (new, minimal) frontend test suite — `jsdom` environment, React plugin, `pool: 'threads'` to work around a Windows spawn issue with spaces in the repo path. Deliberately separate from `vite.config.ts`. |
-| `docker-compose.yml` | Single-service compose file wrapping the `Dockerfile` image, exposing ports 3000 and 8000. |
-| `Dockerfile` | Container image definition — Node 20 base plus a Python 3 virtualenv (see [Docker Deployment](#docker-deployment) below). |
+| `docker-compose.yml` | Two-service compose file — `node` and `python` — both built from the same `Dockerfile`, distinguished only by `command:`. Only `node` publishes a port to the host; `python` is reachable solely from `node` over the compose network (see [Docker Deployment](#docker-deployment)). |
+| `Dockerfile` | Container image definition — Node 20 base plus a Python 3 virtualenv. One image serves both compose services. |
+| `.env.example` | Template for `.env` (gitignored) — `AUTH_USERNAME`/`AUTH_PASSWORD`/`SECRET_KEY`/`CORS_ORIGINS`/`GEMINI_API_KEY`. Loaded automatically by `backend/config/settings.py` (`python-dotenv`) and by `server.ts` (`dotenv`). |
 | `launch.py` | One-shot local bootstrap: installs Node/Python dependencies, verifies the analytical database, frees stale ports, runs the test suite as a smoke check, then starts both servers. |
 | `architecture.md` | The full architecture specification — layer contracts and conformance checks referenced throughout this README. |
 | `DASHBOARD_ROADMAP.md` | A planning/roadmap document for dashboard engineering work — describes target state and grading goals, not necessarily what's implemented today. |
@@ -607,7 +678,7 @@ space-free path and the default pool is preferred.
 
 **Backend — `backend/api/` (FastAPI routers, transport only)**
 
-> ⚠️ Of these 10 routers, `server.ts` proxies only two to the browser —
+> ⚠️ Of these 11 routers, `server.ts` proxies only two to the browser —
 > `model_diagnostics.py` and `user_datasets.py` (`PYTHON_PROXY_PREFIXES` at `server.ts:437`).
 > The rest are real, tested, and reachable only by calling FastAPI directly on port 8000 —
 > nothing in the deployed app's request path reaches them, and (checked directly)
@@ -628,6 +699,7 @@ space-free path and the default pool is preferred.
 | `datasets.py` | Dataset management endpoints. |
 | `user_datasets.py` | Session-isolated persistence for datasets a user has cleaned (see the concurrency note above). **Genuinely reachable** — proxied. |
 | `architecture.py` | Pipeline-overview endpoint. Its only caller, `ArchitecturePipelineCard.tsx`, is itself never rendered by any page — dead on both ends. |
+| `auth.py` | `POST /api/auth/login` — the one public router; issues a bearer token for the seeded account (see [Authentication](#authentication)). |
 
 **Backend — `backend/services/` (business logic and data access)**
 
@@ -672,20 +744,24 @@ space-free path and the default pool is preferred.
 
 ## Docker Deployment
 
-A `Dockerfile` builds a self-contained image carrying both runtimes, so neither Node nor
-Python needs to be installed on the host.
+One `Dockerfile` builds a single image carrying both runtimes (Node + Python), so neither
+needs to be installed on the host. `docker-compose.yml` builds that image **twice** — once
+per service — and overrides its default command so one container runs the Node server and
+the other runs FastAPI; this is what actually starts both halves of the app, which running
+the raw image alone (`docker run`, no compose) does not.
 
-### Build and run
+### Quick start (recommended — via Compose)
 
 ```bash
-docker build -t healthcare-analytics .
+cp .env.example .env    # fill in real AUTH_PASSWORD / SECRET_KEY before this leaves your machine
+docker compose up --build
 ```
 
-```bash
-docker run -p 3000:3000 healthcare-analytics
-```
-
-The application is then available at `http://localhost:3000`.
+The application is then available at `http://localhost:3000`, with FastAPI reachable only
+from the `node` container over the compose network — not published to the host. See
+[Authentication](#authentication) for what `AUTH_PASSWORD`/`SECRET_KEY` control, and
+`guide_to_implement.md` (gitignored, local-only) for the full path to a public HTTPS
+deployment on AWS.
 
 ### What the image contains
 
@@ -696,7 +772,7 @@ The application is then available at `http://localhost:3000`.
 | Node dependencies | `npm install` against the copied `package*.json` |
 | Python environment | Virtual environment at `/opt/venv`, placed on `PATH`, populated from `requirements.txt` |
 | Build | `npm run build` — Vite compiles the frontend, esbuild bundles the server to `dist/server.cjs` |
-| Runtime | `npm start`, exposing port 3000 |
+| Default runtime | `npm start` (Node only) — the default `CMD`, used as-is by the `node` compose service and by a bare `docker run`; the `python` compose service overrides it with `uvicorn backend.main:app --host 0.0.0.0 --port 8000` |
 
 Dependency files are copied before the application source, so Docker's layer cache reuses
 the dependency install whenever only application code has changed.
@@ -705,10 +781,29 @@ the dependency install whenever only application code has changed.
 `.git/` out of the build context. Host artefacts therefore cannot leak into the image, and
 the build stays fast.
 
+### Running the image directly (without Compose)
+
+`docker run` alone only gets the Node server — the same limitation the image always had,
+now made explicit by the `EXPOSE 3000 8000` and the comment above `CMD` in the `Dockerfile`.
+Run FastAPI in a second container from the same image, pointing Node at it:
+
+```bash
+docker build -t healthcare-analytics .
+docker network create hap-net
+docker run -d --name hap-python --network hap-net \
+  healthcare-analytics uvicorn backend.main:app --host 0.0.0.0 --port 8000
+docker run -p 3000:3000 --network hap-net \
+  -e PYTHON_API_URL=http://hap-python:8000 \
+  healthcare-analytics
+```
+
+`docker compose up` (above) does exactly this, with less to type and no port published for
+the Python container by default.
+
 ### Persisting uploads
 
 The container creates `uploads/` at build time, but its contents are lost when the container
-is removed. Mount a volume to retain them:
+is removed. Mount a volume onto the `node` service to retain them:
 
 ```bash
 docker run -p 3000:3000 -v ${PWD}/uploads:/app/uploads healthcare-analytics
@@ -716,14 +811,10 @@ docker run -p 3000:3000 -v ${PWD}/uploads:/app/uploads healthcare-analytics
 
 ### Scope of the container
 
-> The image runs the **Node server only**. Model fit diagnostics and cleaned-dataset
-> persistence proxy to the FastAPI backend on port 8000, and report as unavailable unless
-> that service also runs. Data cleaning, exploration, dashboards, hypothesis views and
-> report export all function normally.
->
-> To include the analytics backend, run FastAPI alongside the container and point the server
-> at it with the `PYTHON_API_URL` environment variable, or extend the image with a process
-> manager that supervises both services.
+Data cleaning, exploration, dashboards, hypothesis views and report export function from the
+`node` service alone. Model fit diagnostics and cleaned-dataset persistence proxy to FastAPI
+and report as unavailable unless the `python` service (or a manually run second container,
+above) is also up and reachable at `PYTHON_API_URL`.
 
 ---
 
@@ -826,7 +917,7 @@ eviction, before being returned.
 Finally, `ExportReports.tsx` calls `printToPdf.ts`, which invokes the browser's native print
 engine against the already-rendered `recharts` SVG output — producing a genuine vector PDF
 with no server round trip, `html-to-image`/`jszip` used only for image/archive export
-variants elsewhere in the UI. On the Python side, the loop closes with `pytest` (291 tests
+variants elsewhere in the UI. On the Python side, the loop closes with `pytest` (299 tests
 across 20 suites) exercising every module named above, and `graphify update .` re-extracting
 this project's own AST into `graphify-out/graph.json` after each commit, so the architecture
 documented here stays checkable against the code that actually produced it.
