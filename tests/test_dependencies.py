@@ -30,8 +30,7 @@ IMPORT_TO_DISTRIBUTION = {
 
 # First-party packages — resolved from the repository, never installed.
 LOCAL_PACKAGES = {
-    "backend", "tests", "api", "database", "services", "analytics",
-    "preprocessing", "models", "utils", "config",
+    "backend", "tests", "api", "database", "services", "analytics", "config",
 }
 
 

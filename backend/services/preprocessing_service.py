@@ -2,12 +2,8 @@
 
 from typing import Any, Dict, List
 
-from backend.preprocessing.cleaning import clean_missing_values, remove_duplicates
-from backend.preprocessing.feature_engineering import encode_sex_category, extract_year_from_period
-
-# Validation must come from the record-based package. backend/preprocessing/validation.py
-# has same-named functions that take pandas DataFrames — importing those raises TypeError
-# at call time. See architecture.md §3.4 on the two parallel preprocessing packages.
+from backend.analytics.preprocessing.cleaning import clean_missing_values, remove_duplicates
+from backend.analytics.preprocessing.feature_engineering import encode_sex_category, extract_year_from_period
 from backend.analytics.preprocessing.validation import calculate_null_ratios, validate_schema
 
 
