@@ -6,6 +6,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { BarChart3, LineChart, Cpu, Calculator, KeyRound, TrendingUp, HelpCircle, Activity, Sparkles, Filter, Search, X } from 'lucide-react';
 import { ColumnInfo } from '../../utils/types';
+import { fetchSmartQuery } from '../../services/apiService';
 
 interface AnalyticsEngineProps {
   datasetId?: string | null;
@@ -281,17 +282,7 @@ export default function AnalyticsEngine({ datasetId, fields, data, aiAnalysisTex
     const colsPayload = fields.map(f => ({ name: f.name, type: f.type }));
 
     try {
-      const response = await fetch('/api/smart-query', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: userQuery,
-          columns: colsPayload,
-          sampleRows,
-        }),
-      });
-
-      const resData = await response.json();
+      const resData = await fetchSmartQuery(userQuery, colsPayload);
       if (resData.success && resData.filteredQuery) {
         setSmartQueryExplanation(resData.filteredQuery.explanation);
         setSmartQueryFilters(resData.filteredQuery.filters || []);

@@ -22,6 +22,7 @@ import {
   Lock, Workflow, Sparkles, Scale, FileCheck, CheckCircle
 } from 'lucide-react';
 import { CleaningSummary, CleaningAction, PreloadedDataset } from '../../utils/types';
+import { fetchSqliteStatus } from '../../services/apiService';
 import FitDiagnostics from './FitDiagnostics';
 
 interface DataCleaningProps {
@@ -62,15 +63,14 @@ export default function DataCleaning({
 
   // Fetch live SQLite connection status on mount
   useEffect(() => {
-    fetch('/api/sqlite-status')
-      .then(res => res.json())
+    fetchSqliteStatus()
       .then(data => {
-        if (data && data.connected) {
+        if (data && (data.connected || data.success)) {
           setSqliteInfo({
             connected: true,
             dbPath: data.dbPath || "backend/database/healthcare.db",
-            tables: data.tables || ["ed_visits_2003_2021", "visit_disposition", "ctas_triage", "top_10_main_problems", "ed_visits_month_age_sex"],
-            journalMode: "WAL",
+            tables: data.tables || ["ed_visits", "visit_disposition", "ctas_triage", "main_problems", "age_sex", "demographics"],
+            journalMode: data.journalMode || "WAL",
             message: data.message || "SQLite database connected."
           });
         }

@@ -14,13 +14,14 @@
 | **CodeQL** | Python + TypeScript/JavaScript | ⚙️ Daily 07:17 UTC + every push |
 | **`npm audit`** | 304 Node packages | ✅ **0 vulnerabilities** |
 | **`pip-audit`** | 17 Python distributions | ✅ **0 vulnerabilities** |
-| **`bandit`** | 3,681 lines of Python | ⚠️ 9 medium / 2 low — **all triaged, none exploitable** |
-| **Automated tests** | 177 tests, 17 suites | ✅ **149 / 149 pass** |
+| **`bandit`** | 6,036 lines of Python | ⚠️ 14 medium / 2 low — **all triaged, none exploitable** |
+| **Automated tests** | 317 tests, 23 suites | ✅ **316 / 316 pass (1 skipped)** |
 
 | Risk area | Status |
 | :--- | :--- |
 | Reachable SQL injection | ✅ **0** (1 found, fixed) |
 | Known-vulnerable dependencies | ✅ **0** (1 high found, fixed) |
+| Dead code / obsolete SQL loaders | ✅ **0** (`sqlite_loader.py` removed) |
 | Network exposure | ✅ Loopback by default |
 | Secrets in repository | ✅ None — `.env*` gitignored |
 | Credential handling | ✅ API keys read from environment only |
@@ -100,7 +101,7 @@ The Dockerfile runs `npm start`, not FastAPI, so container behaviour is unaffect
 
 ## 3. Findings Accepted — Triaged False Positives
 
-`bandit -r backend -ll` reports **9 medium, 2 low**. Each has been individually verified as
+`bandit -r backend -ll` reports **14 medium, 2 low**. Each has been individually verified as
 non-exploitable. **Do not suppress these with `# nosec`** — the annotations below are the
 record; suppression would hide a future real one.
 
@@ -111,10 +112,10 @@ record; suppression would hide a future real one.
 | 3 | B608 | `services/insights_service.py:145` | Same as above |
 | 4 | B608 | `services/analytics_service.py:22` | Guarded by `if table_name not in tables: return error` |
 | 5 | B608 | `analytics/descriptive.py:58` | Allow-listed as of §2.1 |
-| 6 | B608 | `database/load_csv.py:130` | Table names come from the hardcoded `SOURCES` map |
-| 7 | B608 | `analytics/preprocessing/sqlite_loader.py:39` | **Dead code** — imported by nothing. Recommend deletion |
-| 8 | B104 | `config/settings.py:15` | Configuration constant, not a live bind |
-| 9 | B104 | `utils/config.py:12` | Configuration constant, not a live bind |
+| 6 | B608 | `database/load_csv.py:144` | Table names come from the hardcoded `SOURCES` map |
+| 7 | B608 | `services/user_dataset_service.py:161,174,216,219,240,255,273,283` | Table names and IDs generated via internal UUID/prefix; dataset registry queries parameterized |
+| 8 | B104 | `config/settings.py:13` | Configuration constant (`API_HOST`), default is loopback `127.0.0.1` |
+| 9 | B104 | `main.py:84` | Local dev server execution block |
 
 **Why B608 fires so often.** A table or column name **cannot** be passed as a bound SQL
 parameter — only values can. Any dynamic table selection must therefore build the identifier
@@ -193,8 +194,8 @@ Anything beyond this is new and warrants investigation:
 | :--- | :--- |
 | `npm audit` | 0 vulnerabilities |
 | `pip-audit` | No known vulnerabilities |
-| `bandit` | 9 medium, 2 low — matching §3 exactly |
-| `pytest` | 177 passed |
+| `bandit` | 14 medium, 2 low — matching §3 exactly |
+| `pytest` | 316 passed, 1 skipped |
 
 
 ## 6. Outstanding Recommendations
@@ -205,7 +206,7 @@ Anything beyond this is new and warrants investigation:
 | 2 | Confirm repository visibility | **High** | CodeQL is free only on public repos; on a private repo it fails with a **licensing** error, which reads as a broken build |
 | 3 | Add `npm audit` + `pip-audit` to CI | Medium | Currently manual; a vulnerable dependency could land unnoticed between runs |
 | 4 | Enable secret scanning + push protection | Medium | Native GitHub feature, one settings toggle |
-| 5 | Delete `analytics/preprocessing/sqlite_loader.py` | Medium | Dead code containing raw SQL writes — removes finding #7 entirely |
+| 5 | Delete `analytics/preprocessing/sqlite_loader.py` | ✅ Completed | Dead code containing raw SQL writes — deleted in architecture cleanup |
 | 6 | Restrict CORS from `allow_origins=["*"]` | Medium | Acceptable for local development, not for any deployed instance |
 | 7 | Add API rate limiting (`slowapi`) | Low | architecture.md §6.4; statistical endpoints are compute-heavy |
 | 8 | Validate upload extension and MIME type | Low | architecture.md §6.4 |
