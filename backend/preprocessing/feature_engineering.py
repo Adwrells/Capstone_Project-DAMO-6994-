@@ -4,7 +4,7 @@ Generates derived temporal features, demographic age categorization,
 triage severity scores, length of stay conversions, and admission indicators.
 """
 
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 import pandas as pd
 import numpy as np
 
@@ -34,20 +34,31 @@ def encode_sex_category(sex_str: str) -> str:
     return "Other/Unknown"
 
 
-def map_ctas_urgency(triage_str: str) -> int:
-    """Maps CTAS triage text levels to numerical urgency scores (1=Resuscitation to 5=Non-Urgent)."""
-    t = str(triage_str).lower()
-    if "1" in t or "resuscitation" in t:
+def map_ctas_urgency(triage_str: str) -> Optional[int]:
+    """Maps CTAS triage text to numerical acuity (1=Resuscitation .. 5=Non-Urgent).
+
+    Checks the most specific keywords first: both "Less urgent" and "Non-urgent"
+    contain the substring "urgent", so a naive "urgent" check (tried before "less"/
+    "non") would catch them along with CTAS III and collapse three distinct acuity
+    levels onto one score. "Unknown" / unrecognised triage text returns None rather
+    than a default urgency, so it reads as missing data and is excluded from any
+    downstream analysis that filters on `ctas_urgency_score IS NOT NULL` -- the same
+    way roll-up rows are already excluded -- instead of silently pooling into CTAS III.
+    """
+    t = str(triage_str).strip().lower()
+    if not t or t in ("nan", "none", "unknown"):
+        return None
+    if "resuscitation" in t or t.startswith("1"):
         return 1
-    elif "2" in t or "emergent" in t:
+    if "emergent" in t or t.startswith("2"):
         return 2
-    elif "3" in t or "urgent" in t:
-        return 3
-    elif "4" in t or "less" in t:
+    if "less" in t or t.startswith("4"):
         return 4
-    elif "5" in t or "non" in t:
+    if "non" in t or t.startswith("5"):
         return 5
-    return 3  # Default to moderate urgency
+    if "urgent" in t or t.startswith("3"):
+        return 3
+    return None  # Unrecognised text: treat as missing rather than guessing.
 
 
 def classify_age_group(age_str: str) -> str:
