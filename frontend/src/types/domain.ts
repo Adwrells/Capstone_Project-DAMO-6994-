@@ -43,17 +43,20 @@ export interface CleaningSummary {
 }
 
 export interface PreloadedDataset {
-  key: 'dataset_1' | 'dataset_2' | 'dataset_3';
-  label: string;
+  key: string;
+  label?: string;
   name: string;
-  filePath: string;
-  rows: number;
-  cols: number;
-  fileSize: string;
-  memoryUsage: string;
-  missingValues: number;
-  duplicates: number;
-  dataTypes: string[];
+  sheetName?: string;
+  filePath?: string;
+  rows?: number;
+  cols?: number;
+  rowCount?: number;
+  colCount?: number;
+  fileSize?: string;
+  memoryUsage?: string;
+  missingValues?: number;
+  duplicates?: number;
+  dataTypes?: string[];
   loadStatus: 'success' | 'error';
   errorMessage?: string;
   fields: { name: string; type: ColumnType }[];
