@@ -99,7 +99,9 @@ export default function App() {
             (d: PreloadedDataset) => d.loadStatus === 'success' && d.data.length > 0
           );
           if (successDatasets.length > 0 && !datasetNameRef.current) {
-            const primary = successDatasets[0];
+            const primary = successDatasets.find(
+              (d: PreloadedDataset) => d.key === 'ED_Visits' || d.sheetName === 'ED_Visits' || d.name.toLowerCase().includes('ed visit')
+            ) || successDatasets[0];
             setDatasetName(primary.name);
             setFields(primary.fields);
             setRawData(primary.data);
@@ -348,20 +350,20 @@ export default function App() {
           </div>
         </div>
 
-        {/* Navigation Stage Indicators (Display-only, non-clickable) */}
-        <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto pointer-events-none select-none" aria-label="Workflow stages">
+        {/* Navigation Stage Links */}
+        <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto" aria-label="Workflow stages">
           {STAGES.map((stage) => {
             const Icon = stage.icon;
             const isActive = stage.key === currentSection;
 
             return (
-              <div
+              <button
                 key={stage.key}
-                role="status"
-                aria-current={isActive ? 'page' : undefined}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all duration-150 relative cursor-default ${isActive
+                type="button"
+                onClick={() => setCurrentSection(stage.key)}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all duration-150 relative text-left cursor-pointer ${isActive
                   ? 'bg-[#2563EB] text-white shadow-md font-semibold'
-                  : 'text-slate-400 opacity-60'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800/70'
                   }`}
               >
                 <Icon size={19} className={isActive ? 'text-white' : 'text-slate-400'} />
@@ -371,7 +373,7 @@ export default function App() {
                 {!isSidebarCollapsed && isActive && (
                   <span className="w-1.5 h-1.5 rounded-full bg-white shrink-0 animate-pulse" />
                 )}
-              </div>
+              </button>
             );
           })}
         </nav>

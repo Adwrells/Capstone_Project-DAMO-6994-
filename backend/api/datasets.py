@@ -22,7 +22,7 @@ except ImportError:
 
 try:
     from backend.services.dataset_service import dataset_service
-    from backend.services.excel_service import excel_service, SHEET_LABELS
+    from backend.services.excel_service import excel_service, SHEET_LABELS, ANALYTICAL_SHEETS
     from backend.database.database_manager import db_manager
 except ImportError:
     from services.dataset_service import dataset_service
@@ -59,7 +59,9 @@ async def get_preloaded_datasets() -> Dict[str, Any]:
     try:
         sheets = excel_service.load_all_sheets()
         datasets_list = []
-        for sheet_name, df in sheets.items():
+        target_sheets = [s for s in ANALYTICAL_SHEETS if s in sheets]
+        for sheet_name in target_sheets:
+            df = sheets[sheet_name]
             df_clean = df.replace({np.nan: None, np.inf: None, -np.inf: None})
             fields = []
             for col in df.columns:

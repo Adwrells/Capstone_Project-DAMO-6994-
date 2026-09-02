@@ -7,7 +7,7 @@ Exclusively utilized by Dataset Explorer endpoints.
 
 import math
 from pathlib import Path
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, cast
 import pandas as pd
 import numpy as np
 
@@ -23,12 +23,22 @@ SHEET_LABELS = {
     "Demographics": "Demographics Overview"
 }
 
+ANALYTICAL_SHEETS: List[str] = [
+    "ED_Visits",
+    "CTAS_Triage",
+    "Visit_Disposition",
+    "Age_Sex",
+    "Main_Problems",
+    "Demographics"
+]
+
 
 class ExcelDatasetService:
     """Thread-safe Excel dataset service for Healthcare Analytics Platform."""
 
     def __init__(self, excel_path: Optional[Path] = None):
         self.excel_path = excel_path or EXCEL_PATH
+        self._sheets_cache: Optional[Dict[str, pd.DataFrame]] = None
 
     def _verify_file(self) -> Path:
         if not self.excel_path.exists():
@@ -39,10 +49,13 @@ class ExcelDatasetService:
         """Returns verified Path to the Excel workbook file."""
         return self._verify_file()
 
-    def load_all_sheets(self) -> Dict[str, pd.DataFrame]:
-        """Loads all six worksheets from the target Excel workbook using Pandas."""
+    def load_all_sheets(self, force_reload: bool = False) -> Dict[str, pd.DataFrame]:
+        """Loads all worksheets from the target Excel workbook using Pandas with in-memory caching."""
+        if self._sheets_cache is not None and not force_reload:
+            return self._sheets_cache
         path = self._verify_file()
         sheets_dict = pd.read_excel(path, sheet_name=None)
+        self._sheets_cache = sheets_dict
         return sheets_dict
 
     def get_sheet_names(self) -> List[str]:
@@ -62,7 +75,7 @@ class ExcelDatasetService:
         fields = []
         for col in df.columns:
             col_type = "numeric" if pd.api.types.is_numeric_dtype(df[col]) else "categorical"
-            fields.append({"name": str(col), "type": col_type})
+            fields.append({"name": col, "type": col_type})
 
         rows = df_clean.to_dict(orient="records")
         return {
@@ -86,8 +99,8 @@ class ExcelDatasetService:
         missing_count = int(df.isna().sum().sum())
         duplicate_count = int(df.duplicated().sum())
 
-        numeric_cols = [str(c) for c in df.columns if pd.api.types.is_numeric_dtype(df[c])]
-        categorical_cols = [str(c) for c in df.columns if not pd.api.types.is_numeric_dtype(df[c])]
+        numeric_cols = [c for c in df.columns if pd.api.types.is_numeric_dtype(df[c])]
+        categorical_cols = [c for c in df.columns if not pd.api.types.is_numeric_dtype(df[c])]
 
         mem_bytes = df.memory_usage(deep=True).sum()
         if mem_bytes >= 1024 * 1024:
@@ -102,20 +115,20 @@ class ExcelDatasetService:
                 continue
 
             mode_val = series.mode()
-            mode_result = float(mode_val.iloc[0]) if not mode_val.empty else float(series.median())
+            mode_result = mode_val.iloc[0] if not mode_val.empty else series.median()
 
             summary_stats[col] = {
-                "count": int(len(series)),
-                "missing": int(df[col].isna().sum()),
+                "count": len(series),
+                "missing": df[col].isna().sum(),
                 "min": float(series.min()),
                 "max": float(series.max()),
-                "mean": float(series.mean()),
-                "median": float(series.median()),
+                "mean": series.mean(),
+                "median": series.median(),
                 "mode": mode_result,
-                "std_dev": float(series.std(ddof=1)) if len(series) > 1 else 0.0,
-                "variance": float(series.var(ddof=1)) if len(series) > 1 else 0.0,
-                "q1": float(series.quantile(0.25)),
-                "q3": float(series.quantile(0.75)),
+                "std_dev": series.std(ddof=1) if len(series) > 1 else 0.0,
+                "variance": cast(float, series.var(ddof=1)) if len(series) > 1 else 0.0,
+                "q1": series.quantile(0.25),
+                "q3": series.quantile(0.75),
             }
 
         return {
