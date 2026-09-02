@@ -11,8 +11,22 @@ from typing import Dict, Any, List, Optional
 import pandas as pd
 import numpy as np
 
+from backend.analytics.statistics.weighted import (
+    weighted_mean,
+    weighted_quantile,
+    weighted_variance,
+    weighted_mode,
+)
+
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 EXCEL_PATH = PROJECT_ROOT / "data" / "cleaned dataset" / "Explanatory_and_Predictive_ED_Analytics_Dataset.xlsx"
+
+# Every sheet's rows are CIHI/NACRS aggregates: a reported value plus the visit count
+# it summarises. ed_visits (or total_visits on Demographics, which has no per-visit
+# grain) is a frequency weight, not an ordinary column, so descriptive statistics must
+# be weighted by it the same way the H1-H5 engine weights its tests - otherwise the
+# numbers describe the ~900 spreadsheet rows instead of the ~174M visits they represent.
+WEIGHT_COLUMN_CANDIDATES = ["ed_visits", "total_visits"]
 
 SHEET_LABELS = {
     "ED_Visits": "ED Visits",
@@ -91,28 +105,53 @@ class ExcelDatasetService:
         else:
             mem_str = f"{mem_bytes / 1024:.1f} KB"
 
+        weight_col = next((c for c in WEIGHT_COLUMN_CANDIDATES if c in df.columns), None)
+
         summary_stats = {}
         for col in numeric_cols:
-            series = df[col].dropna()
-            if len(series) == 0:
-                continue
+            missing = int(df[col].isna().sum())
 
-            mode_val = series.mode()
-            mode_result = float(mode_val.iloc[0]) if not mode_val.empty else float(series.median())
-
-            summary_stats[col] = {
-                "count": int(len(series)),
-                "missing": int(df[col].isna().sum()),
-                "min": float(series.min()),
-                "max": float(series.max()),
-                "mean": float(series.mean()),
-                "median": float(series.median()),
-                "mode": mode_result,
-                "std_dev": float(series.std(ddof=1)) if len(series) > 1 else 0.0,
-                "variance": float(series.var(ddof=1)) if len(series) > 1 else 0.0,
-                "q1": float(series.quantile(0.25)),
-                "q3": float(series.quantile(0.75)),
-            }
+            # The weight column describes itself unweighted (weighting ed_visits by
+            # ed_visits would distort its own total), as does any sheet with no weight.
+            if weight_col and col != weight_col:
+                pair_mask = df[col].notna() & df[weight_col].notna() & (df[weight_col] > 0)
+                series = df.loc[pair_mask, col]
+                weights = df.loc[pair_mask, weight_col]
+                if len(series) == 0:
+                    continue
+                summary_stats[col] = {
+                    "count": int(len(series)),
+                    "missing": missing,
+                    "min": float(series.min()),
+                    "max": float(series.max()),
+                    "mean": round(weighted_mean(series, weights), 4),
+                    "median": round(weighted_quantile(series, weights, 0.5), 4),
+                    "mode": round(weighted_mode(series, weights), 4),
+                    "std_dev": round(math.sqrt(weighted_variance(series, weights)), 4),
+                    "variance": round(weighted_variance(series, weights), 4),
+                    "q1": round(weighted_quantile(series, weights, 0.25), 4),
+                    "q3": round(weighted_quantile(series, weights, 0.75), 4),
+                    "weighted_by": weight_col,
+                }
+            else:
+                series = df[col].dropna()
+                if len(series) == 0:
+                    continue
+                mode_val = series.mode()
+                mode_result = float(mode_val.iloc[0]) if not mode_val.empty else float(series.median())
+                summary_stats[col] = {
+                    "count": int(len(series)),
+                    "missing": missing,
+                    "min": float(series.min()),
+                    "max": float(series.max()),
+                    "mean": float(series.mean()),
+                    "median": float(series.median()),
+                    "mode": mode_result,
+                    "std_dev": float(series.std(ddof=1)) if len(series) > 1 else 0.0,
+                    "variance": float(series.var(ddof=1)) if len(series) > 1 else 0.0,
+                    "q1": float(series.quantile(0.25)),
+                    "q3": float(series.quantile(0.75)),
+                }
 
         return {
             "sheet_name": sheet_name,

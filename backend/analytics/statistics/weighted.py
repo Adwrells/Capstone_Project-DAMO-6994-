@@ -36,6 +36,9 @@ __all__ = [
     "student_t_sf",
     "weighted_mean",
     "weighted_median",
+    "weighted_quantile",
+    "weighted_variance",
+    "weighted_mode",
     "weighted_midranks",
     "weighted_kruskal_wallis",
     "weighted_mann_whitney_u",
@@ -225,18 +228,48 @@ def weighted_mean(values: Iterable[float], weights: Optional[Iterable[float]] = 
     return sum(v * w for v, w in zip(vals, wts)) / total
 
 
-def weighted_median(values: Iterable[float], weights: Optional[Iterable[float]] = None) -> float:
+def weighted_quantile(values: Iterable[float], weights: Optional[Iterable[float]] = None, q: float = 0.5) -> float:
+    """Frequency-weighted quantile: the value at which the cumulative weight first
+    reaches ``q`` of the total, over the weight-expanded population. ``q=0.5`` is the
+    weighted median; ``q=0.25``/``q=0.75`` give the weighted first/third quartile.
+    """
     vals, wts = _clean_pairs(values, weights)
     if not vals:
         return 0.0
     order = sorted(range(len(vals)), key=lambda i: vals[i])
-    midpoint = sum(wts) / 2.0
+    target = q * sum(wts)
     cumulative = 0.0
     for i in order:
         cumulative += wts[i]
-        if cumulative >= midpoint:
+        if cumulative >= target:
             return vals[i]
     return vals[order[-1]]
+
+
+def weighted_median(values: Iterable[float], weights: Optional[Iterable[float]] = None) -> float:
+    return weighted_quantile(values, weights, 0.5)
+
+
+def weighted_variance(values: Iterable[float], weights: Optional[Iterable[float]] = None) -> float:
+    """Frequency-weighted sample variance (Bessel-corrected over the expanded population)."""
+    vals, wts = _clean_pairs(values, weights)
+    n = sum(wts)
+    if n <= 1:
+        return 0.0
+    mean = weighted_mean(vals, wts)
+    ss = sum(w * (v - mean) ** 2 for v, w in zip(vals, wts))
+    return ss / (n - 1)
+
+
+def weighted_mode(values: Iterable[float], weights: Optional[Iterable[float]] = None) -> float:
+    """The value carrying the largest total frequency weight."""
+    vals, wts = _clean_pairs(values, weights)
+    if not vals:
+        return 0.0
+    weight_by_value: Dict[float, int] = {}
+    for v, w in zip(vals, wts):
+        weight_by_value[v] = weight_by_value.get(v, 0) + w
+    return max(weight_by_value, key=lambda v: weight_by_value[v])
 
 
 def weighted_midranks(values: Sequence[float], weights: Sequence[int]) -> Tuple[Dict[float, float], List[int], int]:

@@ -7,6 +7,8 @@ from typing import List, Dict, Any
 import pandas as pd
 import numpy as np
 
+from backend.analytics.preprocessing.cleaning import AGGREGATE_ROW_LABELS, normalize_age_group
+
 
 def aggregate_by_group(records: List[Dict[str, Any]], group_col: str, val_col: str) -> Dict[str, float]:
     """Aggregates numeric column sums grouped by categorical key."""
@@ -29,11 +31,26 @@ def normalize_fiscal_year(fy_str: str) -> str:
     return str(fy_str).replace("–", "-").replace("—", "-").strip()
 
 
+def strip_rollup_rows(df: pd.DataFrame) -> pd.DataFrame:
+    """Drops roll-up rows (e.g. visit_disposition=='Total') that duplicate the sum of
+    the detail rows in the same column. Left in place, a naive sum(ed_visits) would
+    double-count every visit these roll-ups summarise.
+    """
+    mask = pd.Series(True, index=df.index)
+    for col, labels in AGGREGATE_ROW_LABELS.items():
+        if col in df.columns:
+            mask &= ~df[col].isin(labels)
+    return df[mask].reset_index(drop=True)
+
+
 def apply_transformations(datasets: Dict[str, pd.DataFrame]) -> Dict[str, pd.DataFrame]:
     """
     Applies data transformations to all six datasets:
     - Normalizes fiscal year hyphenation
     - Cleans categorical strings
+    - Normalizes age_group dash characters onto one canonical spelling, so joins
+      across sheets (which don't all use the same dash character) actually match
+    - Strips roll-up/summary rows that double-count the detail rows they summarise
     - Ensures non-negative values and correct numerical dtypes
     """
     transformed = {}
@@ -47,6 +64,11 @@ def apply_transformations(datasets: Dict[str, pd.DataFrame]) -> Dict[str, pd.Dat
         for col in df_copy.columns:
             if df_copy[col].dtype == "object":
                 df_copy[col] = df_copy[col].astype(str).str.strip()
+
+        if "age_group" in df_copy.columns:
+            df_copy["age_group"] = df_copy["age_group"].apply(normalize_age_group)
+
+        df_copy = strip_rollup_rows(df_copy)
 
         # Coerce numeric counts
         for num_col in ["ed_visits", "total_visits"]:
