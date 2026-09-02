@@ -6,6 +6,7 @@ export interface ArchitectureStageStatus {
 export interface ArchitecturePipelineOverview {
   success: boolean;
   status: string;
+  tables_registered?: number;
   stages: Record<string, ArchitectureStageStatus>;
 }
 

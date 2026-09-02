@@ -8,7 +8,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import {
-  ChevronRight, ChevronDown, ChevronUp, Info, ShieldCheck, Clock, Cpu, FileText, TrendingUp
+  ChevronRight, ChevronDown, ChevronUp, Info, ShieldCheck, Clock, Cpu, FileText, TrendingUp, ArrowRight, CheckCircle2
 } from 'lucide-react';
 import {
   ResponsiveContainer, ComposedChart, Line, Area,
@@ -2225,11 +2225,36 @@ export default function AnalyticsCore({ fields, data, onNavigateNext }: Analytic
                 { label: 'α', value: '0.05 (two-sided); Data: SQLite-loaded processed dataset' },
               ]} />
 
-
             </div>
           )}
         </div>
 
+      </div>
+
+      {/* ── WORKFLOW ADVANCEMENT TO STAGE 5 ──────────────────────── */}
+      <div className="mt-8 p-5 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/90 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm text-left">
+        <div className="space-y-1">
+          <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-indigo-600 dark:text-indigo-400 block">
+            Stage 4 · Hypothesis Testing &amp; Statistical Verification Complete
+          </span>
+          <div className="flex items-center gap-2 text-slate-900 dark:text-white font-bold text-sm">
+            <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />
+            <span>All 5 Hypotheses Evaluated (H1–H5 Significant at p &lt; .0001 • WLS R² = 0.316)</span>
+          </div>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            Advance to Stage 5 to interact with executive KPI cards, provincial volume trends, and the operational decision builder.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3 shrink-0">
+          <button
+            onClick={onNavigateNext}
+            className="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm shadow-md transition flex items-center gap-2 cursor-pointer"
+          >
+            <span>Proceed to Stage 5: Executive Dashboard</span>
+            <ArrowRight size={16} />
+          </button>
+        </div>
       </div>
     </div>
   );

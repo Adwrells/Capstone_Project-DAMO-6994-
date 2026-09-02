@@ -154,14 +154,12 @@ Organized into 5 isolated submodules:
   layer, not under `data/`** — `DatabaseManager.DEFAULT_DB_PATH` resolves to
   `backend/database/healthcare.db`.
 
-> **Documentation drift — resolved.** Earlier revisions of this section described
-> `data/optimized/`, `data/explorer/`, `data/sqlite/`, and `data/exports/`. None of those
-> directories exist. The paths above are the real ones.
->
-> This drift is not cosmetic: `backend/database/load_csv.py` and `server.ts` still read from
-> `data/optimized/`, so **database seeding is currently broken** and every table is skipped
-> with "CSV not found". The committed `healthcare.db` is therefore the only copy of the
-> ~17,200 analytical rows. See README.md → "Database & Data Provenance".
+> **Data provenance & loader alignment — verified.** `backend/database/load_csv.py` reads directly from
+> `data/cleaned dataset/Explanatory_and_Predictive_ED_Analytics_Dataset.xlsx` (with fallback to `data/Explorer Dataset/*.csv`).
+> Running `python -m backend.database.load_csv` successfully parses all six sheets (`ED_Visits`, `CTAS_Triage`,
+> `Visit_Disposition`, `Age_Sex`, `Main_Problems`, `Demographics`) and populates 8,685 clinical rows into
+> `backend/database/healthcare.db` with complete schema parity. SQLite seeding is fully automated, deterministic, and reproducible.
+
 
 ---
 

@@ -11,7 +11,7 @@ import {
   BarChart2, AlertTriangle, Grid, BookOpen, Filter, ArrowUpDown,
   ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Info, Zap, Activity,
   Eye, FileSpreadsheet, CheckCircle2, XCircle, FileText,
-  Loader2, X, Layers
+  Loader2, X, Layers, ArrowRight, Check
 } from 'lucide-react';
 import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -433,17 +433,25 @@ interface DataExplorerProps {
   fields?: any[];
   data?: any[];
   onNavigateNext?: () => void;
+  onSelectActiveCohort?: (name: string, fields: any[], data: any[]) => void;
+  activeDatasetName?: string | null;
+  isDarkMode?: boolean;
 }
 
 type Tab = 'summary' | 'features' | 'dictionary' | 'table';
 
-export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
+export default function DataExplorer({
+  fields = [],
+  data = [],
+  onNavigateNext,
+  onSelectActiveCohort,
+  activeDatasetName,
+  isDarkMode = false
+}: DataExplorerProps) {
   /* sheet state */
   const [sheets, setSheets] = useState<string[]>([]);
   const [activeSheet, setActiveSheet] = useState<string>('');
   const [sheetDropOpen, setSheetDropOpen] = useState(false);
-
-
 
   /* data state */
   const [sheetData, setSheetData] = useState<SheetData | null>(null);
@@ -471,6 +479,7 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
     setLoadingSheets(true);
     setError(null);
     const analyticalPriority = [
+      'Cleaned_Enriched_Cohort',
       'ED_Visits',
       'ED_Visits_2003_2021',
       'CTAS_Triage',
@@ -483,32 +492,37 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
 
     apiFetch('/api/dataset/sheets')
       .then((names: string[]) => {
-        if (Array.isArray(names) && names.length > 0) {
-          const sorted = [...names].sort((a, b) => {
-            const idxA = analyticalPriority.indexOf(a);
-            const idxB = analyticalPriority.indexOf(b);
-            if (idxA !== -1 && idxB !== -1) return idxA - idxB;
-            if (idxA !== -1) return -1;
-            if (idxB !== -1) return 1;
-            return a.localeCompare(b);
-          });
-          setSheets(sorted);
-          const firstAnalytical = sorted.find(s => analyticalPriority.includes(s)) || sorted[0];
-          setActiveSheet(firstAnalytical);
-        } else {
-          const keys = ['ED_Visits', 'CTAS_Triage', 'Visit_Disposition', 'Age_Sex', 'Main_Problems', 'Demographics'];
-          setSheets(keys);
-          setActiveSheet('ED_Visits');
+        let allSheets = Array.isArray(names) && names.length > 0
+          ? names
+          : ['ED_Visits', 'CTAS_Triage', 'Visit_Disposition', 'Age_Sex', 'Main_Problems', 'Demographics'];
+
+        if (data && data.length > 0 && !allSheets.includes('Cleaned_Enriched_Cohort')) {
+          allSheets = ['Cleaned_Enriched_Cohort', ...allSheets];
         }
+
+        const sorted = [...allSheets].sort((a, b) => {
+          const idxA = analyticalPriority.indexOf(a);
+          const idxB = analyticalPriority.indexOf(b);
+          if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+          if (idxA !== -1) return -1;
+          if (idxB !== -1) return 1;
+          return a.localeCompare(b);
+        });
+        setSheets(sorted);
+        const firstAnalytical = sorted.find(s => analyticalPriority.includes(s)) || sorted[0];
+        setActiveSheet(firstAnalytical);
       })
       .catch((err) => {
         console.warn('Backend sheets endpoint unavailable, loading embedded master dataset sheets:', err);
-        const keys = ['ED_Visits', 'CTAS_Triage', 'Visit_Disposition', 'Age_Sex', 'Main_Problems', 'Demographics'];
+        let keys = ['ED_Visits', 'CTAS_Triage', 'Visit_Disposition', 'Age_Sex', 'Main_Problems', 'Demographics'];
+        if (data && data.length > 0) {
+          keys = ['Cleaned_Enriched_Cohort', ...keys];
+        }
         setSheets(keys);
-        setActiveSheet('ED_Visits');
+        setActiveSheet(keys[0]);
       })
       .finally(() => setLoadingSheets(false));
-  }, []);
+  }, [data]);
 
   /* ── Load sheet data + stats when activeSheet changes with automatic fallback ── */
   useEffect(() => {
@@ -520,6 +534,35 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
     setTablePage(1);
     setTableSearch('');
     setSortCol('');
+
+    // If viewing the in-memory cleaned cohort from Stage 2
+    if (activeSheet === 'Cleaned_Enriched_Cohort' && data && data.length > 0) {
+      const cleanFields: Field[] = fields && fields.length > 0
+        ? fields.map(f => ({ name: f.name, type: (f.type === 'numeric' ? 'numeric' : 'categorical') as 'numeric' | 'categorical' }))
+        : Object.keys(data[0] || {}).map(k => ({
+            name: k,
+            type: (typeof data[0][k] === 'number' ? 'numeric' : 'categorical') as 'numeric' | 'categorical'
+          }));
+      const finalData: SheetData = {
+        sheet_name: 'Cleaned_Enriched_Cohort',
+        label: 'Cleaned & Enriched Cohort (Stage 2)',
+        rows_count: data.length,
+        cols_count: cleanFields.length,
+        fields: cleanFields,
+        data: data
+      };
+      const finalStats = computeClientStats(data, cleanFields);
+      finalStats.sheet_name = 'Cleaned_Enriched_Cohort';
+      finalStats.label = 'Cleaned & Enriched Cohort (Stage 2)';
+      setSheetData(finalData);
+      setSheetStats(finalStats);
+      const numCols = cleanFields.filter(f => f.type === 'numeric').map(f => f.name);
+      const catCols = cleanFields.filter(f => f.type === 'categorical').map(f => f.name);
+      setSelectedNumCol(numCols[0] || '');
+      setSelectedCatCol(catCols[0] || '');
+      setLoadingData(false);
+      return;
+    }
 
     Promise.all([
       apiFetch(`/api/dataset/${encodeURIComponent(activeSheet)}`).catch(() => null),
@@ -834,6 +877,33 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
 
           {/* Action buttons (right-aligned) */}
           <div className="ml-auto flex items-center gap-2">
+            {/* Set as Active Cohort Button / Badge */}
+            {onSelectActiveCohort && sheetData && (
+              <button
+                onClick={() => {
+                  onSelectActiveCohort(sheetData.label || sheetData.sheet_name, sheetData.fields, sheetData.data);
+                }}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer border ${
+                  activeDatasetName === (sheetData.label || sheetData.sheet_name) || activeDatasetName === activeSheet
+                    ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30'
+                    : 'bg-indigo-600 hover:bg-indigo-700 text-white border-indigo-600 shadow-xs'
+                }`}
+                title="Use this dataset for Stages 4–7 (Hypothesis Testing, Dashboard, Reports)"
+              >
+                {activeDatasetName === (sheetData.label || sheetData.sheet_name) || activeDatasetName === activeSheet ? (
+                  <>
+                    <Check size={13} className="text-emerald-600 dark:text-emerald-400" />
+                    <span>Active Cohort</span>
+                  </>
+                ) : (
+                  <>
+                    <Database size={13} />
+                    <span>Use as Active Cohort</span>
+                  </>
+                )}
+              </button>
+            )}
+
             {/* Refresh */}
             <button
               onClick={() => { const s = activeSheet; setActiveSheet(''); setTimeout(() => setActiveSheet(s), 50); }}
@@ -1129,7 +1199,38 @@ export default function DataExplorer({ onNavigateNext }: DataExplorerProps) {
         </div>
       )}
 
+      {/* ── WORKFLOW ADVANCEMENT TO STAGE 4 ──────────────────────── */}
+      <div className={`mt-8 p-5 sm:p-6 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm ${
+        isDarkMode ? 'border-slate-800 bg-slate-900/90' : 'border-slate-200 bg-white'
+      }`}>
+        <div className="space-y-1 text-left">
+          <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-indigo-600 dark:text-indigo-400 block">
+            Stage 3 · Cohort Exploration Complete
+          </span>
+          <div className="flex items-center gap-2 text-slate-900 dark:text-white font-bold text-sm">
+            <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />
+            <span>Active Dataset: <strong>{sheetData?.label || activeSheet}</strong> ({sheetData?.rows_count?.toLocaleString() || 0} rows • {sheetData?.cols_count || 0} fields)</span>
+          </div>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            Advance to Stage 4 to evaluate the 5 formal biostatistical hypotheses (H1–H5), WLS regression, and ERBI forecasting against this cohort.
+          </p>
+        </div>
 
+        <div className="flex items-center gap-3 shrink-0">
+          <button
+            onClick={() => {
+              if (onSelectActiveCohort && sheetData) {
+                onSelectActiveCohort(sheetData.label || sheetData.sheet_name, sheetData.fields, sheetData.data);
+              }
+              onNavigateNext?.();
+            }}
+            className="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm shadow-md transition flex items-center gap-2 cursor-pointer"
+          >
+            <span>Proceed to Stage 4: Hypothesis Testing</span>
+            <ArrowRight size={16} />
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
