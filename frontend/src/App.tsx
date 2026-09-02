@@ -142,6 +142,20 @@ export default function App() {
     triggerAIAnalysis(name, cols, data, stats);
   };
 
+  const handleSelectActiveCohort = (name: string, cols: any[], data: any[]) => {
+    setDatasetName(name);
+    setFields(cols);
+    setRawData(data);
+    setCleanedData(data);
+    const initialSemantic = buildSemanticModel(cols);
+    setSemanticFields(initialSemantic);
+    setNotification({
+      text: `Active analysis cohort updated to "${name}" (${data.length} records).`,
+      type: 'success'
+    });
+    setTimeout(() => setNotification(null), 4000);
+  };
+
   const triggerAIAnalysis = async (rawName: string, cols: any[], rowsData: any[], statsObj: DatasetStats) => {
     setAiIsLoading(true);
     try {
@@ -515,6 +529,9 @@ export default function App() {
           fields={fields}
           data={cleanedData}
           onNavigateNext={handleNextStage}
+          onSelectActiveCohort={handleSelectActiveCohort}
+          activeDatasetName={datasetName}
+          isDarkMode={isDarkMode}
         />
       </div>
     )}
@@ -562,6 +579,7 @@ export default function App() {
           onAddChart={handleAddChart}
           onRemoveChart={handleRemoveChart}
           onNavigateToAnalytics={() => setCurrentSection('analytics')}
+          onNavigateNext={handleNextStage}
           isDarkMode={isDarkMode}
           setIsDarkMode={setIsDarkMode}
         />
@@ -573,6 +591,7 @@ export default function App() {
         {datasetName ? (
           <ConsultantInsights
             isLoading={aiIsLoading}
+            onNavigateNext={handleNextStage}
           />
         ) : (
           <div className="border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-950/20 rounded-xl p-8 text-center space-y-3">

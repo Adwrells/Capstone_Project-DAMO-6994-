@@ -34,6 +34,7 @@ import {
   Target,
   Users
 } from 'lucide-react';
+import ArchitecturePipelineCard from '../../components/architecture/ArchitecturePipelineCard';
 
 interface AboutProjectProps {
   onReset?: () => void;
@@ -432,38 +433,91 @@ export default function AboutProject({ onReset, isDarkMode = false, onBeginPrep 
 
         {/* TAB 3: TECH STACK & ARCHITECTURE */}
         {activeTab === 'architecture' && (
-          <div className="space-y-4 animate-fade-in text-xs">
+          <div className="space-y-6 animate-fade-in text-xs">
+            {/* Live Backend Introspection Card */}
+            <ArchitecturePipelineCard isDarkMode={isDarkMode} />
+
+            {/* Core Tech Stack Specifications */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-1">
                 <span className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5 font-mono">
                   <Code size={14} className="text-indigo-600" /> FRONTEND
                 </span>
-                <span className="font-bold text-indigo-700 dark:text-indigo-300 block">React 19 + TypeScript + Vite</span>
-                <p className="text-[11px] text-slate-500 leading-snug">Tailwind CSS v4, Recharts visuals, Lucide icons, responsive layout.</p>
+                <span className="font-bold text-indigo-700 dark:text-indigo-300 block">React 18/19 + TypeScript + Vite</span>
+                <p className="text-[11px] text-slate-500 leading-snug">Tailwind CSS v4, Recharts visuals, Lucide icons, responsive dashboard layouts.</p>
               </div>
 
               <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-1">
                 <span className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5 font-mono">
                   <Server size={14} className="text-emerald-600" /> BACKEND
                 </span>
-                <span className="font-bold text-emerald-700 dark:text-emerald-300 block">FastAPI + Python 3.14</span>
-                <p className="text-[11px] text-slate-500 leading-snug">SciPy, Statsmodels, Pandas statistical inference engine.</p>
+                <span className="font-bold text-emerald-700 dark:text-emerald-300 block">FastAPI + Python 3.12</span>
+                <p className="text-[11px] text-slate-500 leading-snug">SciPy, Statsmodels, Pandas statistical inference engine, Pydantic contracts.</p>
               </div>
 
               <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-1">
                 <span className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5 font-mono">
                   <Database size={14} className="text-sky-600" /> DATABASE
                 </span>
-                <span className="font-bold text-sky-700 dark:text-sky-300 block">SQLite Analytical Store</span>
-                <p className="text-[11px] text-slate-500 leading-snug">Indexed analytical database containing 8,685 rows across 6 CIHI tables.</p>
+                <span className="font-bold text-sky-700 dark:text-sky-300 block">SQLite WAL Analytical Store</span>
+                <p className="text-[11px] text-slate-500 leading-snug">Thread-safe repository pattern containing 8,685 rows across 6 CIHI tables.</p>
               </div>
 
               <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-1">
                 <span className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5 font-mono">
                   <ShieldCheck size={14} className="text-amber-600" /> TESTING &amp; QA
                 </span>
-                <span className="font-bold text-amber-700 dark:text-amber-300 block">Unittest (300 Tests Passed)</span>
-                <p className="text-[11px] text-slate-500 leading-snug">100% automated test coverage across statistical calculations and REST endpoints.</p>
+                <span className="font-bold text-amber-700 dark:text-amber-300 block">Automated Test Suites</span>
+                <p className="text-[11px] text-slate-500 leading-snug">Exhaustive automated coverage across statistical calculations and REST endpoints.</p>
+              </div>
+            </div>
+
+            {/* Unidirectional Data Pipeline Flow Diagram */}
+            <div className={`p-4 sm:p-5 rounded-2xl border ${
+              isDarkMode ? 'border-slate-800 bg-slate-900/60' : 'border-slate-200 bg-slate-50/70'
+            }`}>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Workflow size={16} className="text-indigo-600 dark:text-indigo-400" />
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white font-mono">
+                    Unidirectional Clinical Data Pipeline Flow
+                  </h4>
+                </div>
+                <span className="text-[10px] font-mono text-slate-400">Strict Separation of Concerns</span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-3 text-[11px]">
+                <div className="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/60 space-y-1.5">
+                  <div className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400 font-bold font-mono text-xs">
+                    <span>1. Ingestion</span>
+                  </div>
+                  <p className="text-slate-600 dark:text-slate-300 font-medium">Raw CIHI Excel Workbook</p>
+                  <p className="text-[10px] text-slate-400">Multi-worksheet Excel loaded via openpyxl and seeded into SQLite repository.</p>
+                </div>
+
+                <div className="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/60 space-y-1.5">
+                  <div className="flex items-center gap-1.5 text-teal-600 dark:text-teal-400 font-bold font-mono text-xs">
+                    <span>2. Preparation</span>
+                  </div>
+                  <p className="text-slate-600 dark:text-slate-300 font-medium">Client-Side Engine</p>
+                  <p className="text-[10px] text-slate-400">Harmonizes units (TEM = Vol × LOS), standardizes CTAS, controls roll-up totals.</p>
+                </div>
+
+                <div className="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/60 space-y-1.5">
+                  <div className="flex items-center gap-1.5 text-purple-600 dark:text-purple-400 font-bold font-mono text-xs">
+                    <span>3. Analytics Core</span>
+                  </div>
+                  <p className="text-slate-600 dark:text-slate-300 font-medium">Biostatistical Verification</p>
+                  <p className="text-[10px] text-slate-400">Weighted Kruskal-Wallis, Mann-Whitney U, Dunn post-hoc, WLS regression, and SES.</p>
+                </div>
+
+                <div className="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/60 space-y-1.5">
+                  <div className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-bold font-mono text-xs">
+                    <span>4. Delivery</span>
+                  </div>
+                  <p className="text-slate-600 dark:text-slate-300 font-medium">Clinical Decision Support</p>
+                  <p className="text-[10px] text-slate-400">Live Recharts visualization, executive KPI cards, and print-ready PDF reports.</p>
+                </div>
               </div>
             </div>
           </div>

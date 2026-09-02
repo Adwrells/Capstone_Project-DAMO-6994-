@@ -35,7 +35,7 @@ import CustomChartBuilder from '../../components/charts/CustomChartBuilder';
 import { DashboardKPIs, TrendDataPoint, FilterState } from './components/types';
 import { fetchDashboardKPIs, fetchDashboardTrends } from '../../services/apiService';
 import { KPIItem, CustomVisualization } from '../../utils/types';
-import { Sparkles, X, PlusCircle } from 'lucide-react';
+import { Sparkles, X, PlusCircle, ArrowRight, CheckCircle2 } from 'lucide-react';
 
 interface ExecutiveDashboardProps {
   datasetName: string;
@@ -46,6 +46,7 @@ interface ExecutiveDashboardProps {
   onAddChart?: (c: CustomVisualization) => void;
   onRemoveChart?: (id: string) => void;
   onNavigateToAnalytics?: () => void;
+  onNavigateNext?: () => void;
   isDarkMode?: boolean;
   setIsDarkMode?: (v: boolean) => void;
 }
@@ -81,6 +82,7 @@ export default function ExecutiveDashboard({
   onAddChart,
   onRemoveChart,
   onNavigateToAnalytics,
+  onNavigateNext,
   isDarkMode = false,
   setIsDarkMode,
 }: ExecutiveDashboardProps) {
@@ -390,6 +392,36 @@ export default function ExecutiveDashboard({
                 isDarkMode={dark}
               />
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── WORKFLOW ADVANCEMENT TO STAGE 6 ──────────────────────── */}
+      {onNavigateNext && (
+        <div className={`p-5 sm:p-6 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm text-left ${
+          dark ? 'border-slate-800 bg-slate-900/90' : 'border-slate-200 bg-white'
+        }`}>
+          <div className="space-y-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-indigo-600 dark:text-indigo-400 block">
+              Stage 5 · Executive Synthesis &amp; Macro Overview Complete
+            </span>
+            <div className="flex items-center gap-2 text-slate-900 dark:text-white font-bold text-sm">
+              <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />
+              <span>Operational KPIs &amp; Longitudinal ERBI Synthesis Ready</span>
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Advance to Stage 6 for Strategic Insights, Clinical Decision Boundaries, and Prioritized Intervention Roadmaps.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3 shrink-0">
+            <button
+              onClick={onNavigateNext}
+              className="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm shadow-md transition flex items-center gap-2 cursor-pointer"
+            >
+              <span>Proceed to Stage 6: Strategic Insights</span>
+              <ArrowRight size={16} />
+            </button>
           </div>
         </div>
       )}

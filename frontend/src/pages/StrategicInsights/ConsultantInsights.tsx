@@ -173,9 +173,10 @@ interface StrategicPayload {
 
 interface ConsultantInsightsProps {
   isLoading?: boolean;
+  onNavigateNext?: () => void;
 }
 
-export default function ConsultantInsights({ isLoading: parentLoading }: ConsultantInsightsProps) {
+export default function ConsultantInsights({ isLoading: parentLoading, onNavigateNext }: ConsultantInsightsProps) {
   const [data, setData] = useState<StrategicPayload | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -1135,6 +1136,34 @@ export default function ConsultantInsights({ isLoading: parentLoading }: Consult
           </p>
         </div>
       </section>
+
+      {/* ── WORKFLOW ADVANCEMENT TO STAGE 7 ──────────────────────── */}
+      {onNavigateNext && (
+        <div className="mt-8 p-5 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/90 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm text-left">
+          <div className="space-y-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-indigo-600 dark:text-indigo-400 block">
+              Stage 6 · Strategic Insights &amp; Clinical Advisory Complete
+            </span>
+            <div className="flex items-center gap-2 text-slate-900 dark:text-white font-bold text-sm">
+              <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />
+              <span>Evidence-to-Action Matrix &amp; 4 Priority Frameworks Synthesized</span>
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Advance to Stage 7 to export executive summaries, download raw datasets, and print the formal capstone project dossier.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3 shrink-0">
+            <button
+              onClick={onNavigateNext}
+              className="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm shadow-md transition flex items-center gap-2 cursor-pointer"
+            >
+              <span>Proceed to Stage 7: Reports &amp; Export</span>
+              <ArrowRight size={16} />
+            </button>
+          </div>
+        </div>
+      )}
 
     </div>
   );
