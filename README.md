@@ -398,6 +398,14 @@ agree with it bit-for-bit on the seeded H1 cohort (H = 126,319,368.2434, weighte
 (pure Python, checked against SciPy to ~1e-12), not the logistic tail approximations the
 platform previously used.
 
+The Dataset Explorer's per-column statistics (`excel_service.get_sheet_statistics`) are
+weighted the same way: `weighted_quantile`/`weighted_variance`/`weighted_mode` (added to
+`weighted.py` alongside the existing `weighted_mean`/`weighted_median`) drive mean, median,
+mode, quartiles, and standard deviation for every numeric column whenever its sheet carries
+a weight column (`ed_visits`, or `total_visits` on `Demographics`) — the weight column itself,
+and sheets without one, keep the plain unweighted `pandas` path. Each weighted result carries
+a `weighted_by` field so the frontend can label it.
+
 ---
 
 ## Data
@@ -430,11 +438,19 @@ falls back to the raw files, so table names, column names, and every downstream 
 are unaffected — rebuild with `python -m backend.database.load_csv` after re-running the
 cleaning notebook.
 
-One data issue is intentionally left uncorrected: `ctas_urgency_score` maps CTAS III,
-`Less urgent`, `Non-urgent`, and `Unknown` all onto the value `3`, so H3's predictor cannot
-separate the three lowest acuity levels. The `H3_testing.ipynb` notebook surfaces this with
-a diagnostic before reporting the regression, since re-deriving the score changes H3's
-substantive result — an analyst decision, not a cleaning one.
+**Fixed:** `ctas_urgency_score` previously collapsed CTAS III, `Less urgent`, `Non-urgent`,
+and `Unknown` all onto the value `3` — a substring-matching bug in `map_ctas_urgency()`
+(`backend/preprocessing/feature_engineering.py`) checked the generic `"urgent"` pattern
+before the specific `"less"`/`"non"` checks. Fixed by reordering the checks and mapping the
+five CTAS acuity tiers to five distinct scores; `Unknown`/unrecognised triage text now
+returns `None` rather than a default score, so it's excluded from H3's regression and the
+Executive Dashboard's ERBI breakdown the same way roll-up rows already are, instead of being
+silently pooled into a real acuity level. This changed H3's measured result
+(`run_h3_regression()`, the live weighted-least-squares engine): sample size 912 → 760
+(`Unknown` correctly excluded) and R² rose to 0.6256, since the regression's design matrix
+no longer has four of its six triage categories collapsed onto one x-value. The Model Fit
+Diagnostics numbers below (an unrelated, unweighted polynomial-degree fit) moved too — see
+that section.
 
 ### Database provenance
 
@@ -445,11 +461,11 @@ The database is fully reproducible from source. `load_csv.py` reads the cleaned 
 workbook — the only source carrying all six datasets, including `Age_Sex`, which has no
 standalone CSV export.
 
-A rebuild produces **10,433 rows** across the six analytical tables:
+A rebuild produces **8,685 rows** across the six analytical tables:
 
 ```
-ed_visits           7,296     ctas_triage           912
-visit_disposition     936     age_sex               190
+ed_visits           5,586     ctas_triage           912
+visit_disposition     936     age_sex               152
 main_problems       1,063     demographics           36
 ```
 
@@ -509,24 +525,30 @@ polynomial degree 1. They are reported as found rather than as hoped for.
 | Dataset | Predictor → Target | n | Train R² | Holdout R² | Verdict |
 | :--- | :--- | ---: | ---: | ---: | :--- |
 | `Visit_Disposition` | admission flag → LOS hours | 936 | 0.642 | 0.657 | **Good Fit** |
-| `CTAS_Triage` | CTAS urgency → LOS hours | 912 | 0.424 | 0.318 | **Good Fit** |
-| `ED_Visits` | admission flag → LOS hours | 7,296 | 0.219 | 0.204 | Underfitting |
+| `CTAS_Triage` | CTAS urgency → LOS hours | 760 | 0.588 | 0.602 | **Good Fit** |
+| `ED_Visits` | admission flag → LOS hours | 5,586 | 0.229 | 0.233 | Underfitting |
 | `Main_Problems` | ED visits → LOS hours | 1,063 | 0.094 | 0.094 | Underfitting |
-| `ED_Visits` | CTAS urgency → LOS hours | 7,296 | 0.008 | 0.011 | Underfitting |
-| `ED_Visits` | ED visits → LOS hours | 7,296 | 0.000 | −0.000 | Underfitting |
+| `ED_Visits` | CTAS urgency → LOS hours | 4,655 | 0.007 | 0.012 | Underfitting |
+| `ED_Visits` | ED visits → LOS hours | 5,586 | 0.000 | −0.000 | Underfitting |
+
+> `CTAS_Triage` and `ED_Visits` CTAS-urgency rows were re-measured after fixing the
+> `ctas_urgency_score` collapse bug (see [Every row is an aggregate](#every-row-is-an-aggregate-not-an-observation)
+> and the changelog) — `n` drops because `Unknown` triage rows now correctly score as
+> missing rather than a default `3`, and R² rose because the predictor now has five genuinely
+> distinct values instead of three.
 
 **Two relationships hold.** Admission status explains roughly 64% of the variance in length
 of stay, and holdout R² slightly *exceeds* training R² — the model generalises cleanly, with
-no sign of memorisation. CTAS urgency explains around 42%. Both are clinically expected:
-admitted patients occupy beds longer, and higher-acuity presentations take longer to
-resolve. These support H2 and H3 respectively.
+no sign of memorisation. CTAS urgency explains around 59%, up from 42% before the urgency-score
+fix. Both are clinically expected: admitted patients occupy beds longer, and higher-acuity
+presentations take longer to resolve. These support H2 and H3 respectively.
 
 **Most other pairings explain almost nothing**, and the platform says so rather than
 presenting a weak model as a finding. Volume (`ED visits`) does not predict length of stay
 at all — R² of 0.000 — which is itself a defensible negative result.
 
 **Aggregation level decides whether the CTAS signal is visible.** The same predictor scores
-0.424 in `CTAS_Triage` but 0.008 in `ED_Visits`. `ED_Visits` is disaggregated by main problem
+0.588 in `CTAS_Triage` but 0.007 in `ED_Visits`. `ED_Visits` is disaggregated by main problem
 and disposition, so case-mix variation swamps the acuity effect. The relationship is real;
 it is only detectable once the data is aggregated to the level at which acuity is the
 dominant driver. Any claim about CTAS and length of stay should state the aggregation it was
@@ -537,16 +559,20 @@ measured at.
 The complexity curve for CTAS urgency shows why degree should not be raised casually:
 
 ```
-degree 1   train R²  0.4243   validation R²  0.3177
-degree 2   train R²  0.5454   validation R²  0.4325   ← optimal
-degree 3+  train R² -2.9129   validation R² -3.6682
+degree 1   train R²  0.5877   validation R²  0.6021
+degree 2   train R²  0.6339   validation R²  0.6357
+degree 3   train R²  0.6824   validation R²  0.6834
+degree 4   train R²  0.6824   validation R²  0.6834   ← optimal
+degree 5+  train R² -4.6930   validation R² -3.9898
 ```
 
-`ctas_urgency_score` takes only five distinct values, so a polynomial above degree 2 is
-unidentifiable and the fit collapses — the negative R² means it predicts worse than the
-mean. R² is deliberately not clamped at zero, because that collapse is a real signal and
-hiding it would misrepresent the model. Five-fold cross-validation gives 0.380 ± 0.064,
-consistent with the holdout result.
+`ctas_urgency_score` takes only five distinct values (before the urgency-score fix above, it
+effectively took only three — CTAS III/`Less urgent`/`Non-urgent`/`Unknown` were all collapsed
+onto `3`, and the "five distinct values" this section used to claim wasn't actually true of
+the data). A polynomial above degree 4 is unidentifiable against five points and the fit
+collapses — the negative R² means it predicts worse than the mean. R² is deliberately not
+clamped at zero, because that collapse is a real signal and hiding it would misrepresent the
+model. Five-fold cross-validation gives 0.589 ± 0.034, consistent with the holdout result.
 
 ---
 
@@ -698,7 +724,7 @@ space-free path and the default pool is preferred.
 | `upload.py` | Dataset ingestion and upload handling. |
 | `datasets.py` | Dataset management endpoints. |
 | `user_datasets.py` | Session-isolated persistence for datasets a user has cleaned (see the concurrency note above). **Genuinely reachable** — proxied. |
-| `architecture.py` | Pipeline-overview endpoint. Its only caller, `ArchitecturePipelineCard.tsx`, is itself never rendered by any page — dead on both ends. |
+| `architecture.py` | Pipeline-overview endpoint. `ArchitecturePipelineCard.tsx` now renders (from `AboutProject.tsx`), but `/api/architecture` still isn't in `server.ts`'s `PYTHON_PROXY_PREFIXES`, so the card's fetch fails against a live backend — it catches that and falls back to its built-in static overview rather than erroring. |
 | `auth.py` | `POST /api/auth/login` — the one public router; issues a bearer token for the seeded account (see [Authentication](#authentication)). |
 
 **Backend — `backend/services/` (business logic and data access)**
@@ -712,7 +738,7 @@ space-free path and the default pool is preferred.
 | `dataset_service.py` | Generic dataset access layer. |
 | `user_dataset_service.py` | Persists a user's cleaned dataset into its own isolated SQLite table. |
 | `model_diagnostics_service.py` | Fits a train/test split and scores over/underfitting for the Fit Diagnostics panel. |
-| `excel_service.py` | Reads the master Excel workbook via pandas/openpyxl for the Dataset Explorer. |
+| `excel_service.py` | Reads the master Excel workbook via pandas/openpyxl for the Dataset Explorer. Column statistics are visit-weighted via `weighted.py` (see [Every row is an aggregate](#every-row-is-an-aggregate-not-an-observation)) whenever the sheet carries a weight column. |
 
 **Frontend — `frontend/src/pages/`**
 
@@ -735,8 +761,8 @@ space-free path and the default pool is preferred.
 | `utils/biEngine.ts` | Builds the semantic model (`buildSemanticModel`, `SemanticField`) consumed by the dashboard and chart builder. |
 | `utils/mockDatasets.ts` | Sample/preloaded dataset definitions offered in the upload UI. |
 | `utils/printToPdf.ts` | Wraps the browser print engine for the PDF report export. |
-| `services/apiService.ts` | A generic HTTP client (`fetchHealth`, `fetchDatasetsList`, `fetchDashboardKPIs`, `fetchDatasetSheets`/`SheetData`/`SheetStats`) against `/api`. **Dead code** — no other file in the frontend references any of its exports. |
-| `services/architectureService.ts` | Fetches `/api/architecture/pipeline` for `ArchitecturePipelineCard.tsx` — dead along with it (unreachable route, unrendered component). |
+| `services/apiService.ts` | An HTTP client against `/api`. No longer dead code: `App.tsx`, `DataCleaning.tsx`, `CustomChartBuilder.tsx`, `ExecutiveDashboard.tsx`, and `ConsultantInsights.tsx` call its `fetchPreloadedDatasets`/`fetchSqliteStatus`/`fetchDashboardTrends`/`fetchSmartQuery`/`fetchChartBuilderAssistant`/`fetchAnalyzeDataset` exports. Most of these resolve against `server.ts`'s own Node-side routes, not FastAPI. |
+| `services/architectureService.ts` | Fetches `/api/architecture/pipeline` for `ArchitecturePipelineCard.tsx`, which now renders (from `AboutProject.tsx`) — but the route still isn't proxied, so the call fails and the card falls back to its static overview (see the `architecture.py` row above). |
 | `services/modelDiagnosticsService.ts` | Client for the FastAPI model-diagnostics endpoints — **genuinely live**, via the proxied `/api/model-diagnostics/*`. |
 | `services/userDatasetService.ts` | Client for persisting/loading a user's cleaned dataset (`persistCleanedDataset`) — **genuinely live**, via the proxied `/api/user-datasets/*`. |
 

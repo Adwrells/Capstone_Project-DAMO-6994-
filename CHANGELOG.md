@@ -7,6 +7,51 @@ All notable changes to this project are documented in this file. The format foll
 This file starts at 1.1.0; versions 1.0.0–1.0.4 predate it and are recorded only as git tags,
 each named after the fix or feature it introduced.
 
+## [2.1.0] — 2026-09-02
+
+### Added
+- Pulled the remaining genuinely-new frontend pieces from the `Bharath` branch that the
+  earlier partial pull (below) had missed: `App.tsx`'s clickable sidebar navigation wired
+  through typed `apiService` calls, a redesigned `ArchitecturePipelineCard.tsx`, an Executive
+  Dashboard trends hook (`fetchDashboardTrends`, calls `GET /api/dashboard/trends` — that
+  route doesn't exist yet, so the call fails gracefully and the trend chart stays empty until
+  it's added), chart builder / data cleaning UX polish, and a Stage 6 → Stage 7 workflow
+  navigation button on Strategic Insights. As before, backend/server/auth files were left
+  untouched. `apiService.ts` and `architectureService.ts` are consequently no longer dead
+  code (see Fixed, below, for the caveat on the latter).
+
+### Fixed
+- `ctas_urgency_score` collapse: `map_ctas_urgency()` checked the generic `"urgent"`
+  substring before the specific `"less"`/`"non"` checks, so `Less urgent` and `Non-urgent`
+  both matched CTAS-III. Four of six triage categories (CTAS III, Less urgent, Non-urgent,
+  Unknown) collapsed onto urgency score `3`, which corrupted H3's WLS regression design
+  matrix and silently degraded the Executive Dashboard's ERBI breakdown by triage level.
+  Reordered the checks and made `Unknown`/unrecognised text return `None` instead of a
+  default score, so it's excluded via the `IS NOT NULL` filters `regression.py`/`erbi.py`
+  already had, rather than pooled into a real acuity level. Patched the live
+  `healthcare.db` and the master Excel workbook so this is correct immediately, not just
+  after a future reprocess. H3's measured sample size moved 912 → 760 and R² rose to 0.6256.
+- Dataset Explorer's column statistics (`excel_service.get_sheet_statistics`) computed plain
+  unweighted `mean`/`median`/quartiles over the aggregate CIHI rows, ignoring `ed_visits` —
+  the same frequency-weighting mistake H1–H5 were built to avoid. Added
+  `weighted_quantile`/`weighted_variance`/`weighted_mode` to the canonical
+  `backend/analytics/statistics/weighted.py` engine and wired `excel_service` to use them
+  whenever a sheet carries a weight column (`ed_visits`, or `total_visits` on `Demographics`).
+- A correct, already-unit-tested fix for the `age_group` dash-mismatch and roll-up
+  double-counting defects existed in `backend/analytics/preprocessing/cleaning.py` but was
+  never imported by the live pipeline that populates `healthcare.db`. Wired
+  `normalize_age_group()`/`AGGREGATE_ROW_LABELS` into `backend/preprocessing/transformations.py`
+  so a future reprocess (including from a custom upload) can't silently reintroduce either
+  defect. No effect on current output — today's data was already clean going in.
+
+### Changed
+- `README.md` — corrected the Model Fit Diagnostics table, the polynomial-degree complexity
+  curve, and the database provenance row counts to the values measured after the fixes above
+  (several were stale even before this pass, notably `ed_visits`'s row count); corrected the
+  `apiService.ts`/`architectureService.ts`/`architecture.py` dead-code claims now that
+  `ArchitecturePipelineCard.tsx` renders (its backend call still isn't proxied, so it falls
+  back to a static overview).
+
 ## [Unreleased]
 
 ### Added
