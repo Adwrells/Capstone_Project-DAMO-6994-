@@ -19,6 +19,7 @@ import AboutProject from './pages/AboutProject/AboutProject';
 import { CleaningSummary, CustomVisualization, AIAnalysisResult, DatasetStats, PreloadedDataset } from './utils/types';
 import { persistCleanedDataset } from './services/userDatasetService';
 import { buildSemanticModel, SemanticField } from './utils/biEngine';
+import { fetchPreloadedDatasets, fetchAnalyzeDataset } from './services/apiService';
 
 const STAGES = [
   { key: 'about', label: 'About Project', icon: HelpCircle },
@@ -88,8 +89,7 @@ export default function App() {
     if (preloadStatus !== 'idle') return;
     setPreloadStatus('loading');
 
-    fetch('/api/preload-datasets')
-      .then(r => r.json())
+    fetchPreloadedDatasets()
       .then(json => {
         if (json.success && Array.isArray(json.datasets)) {
           setPreloadedDatasets(json.datasets as PreloadedDataset[]);
@@ -99,7 +99,9 @@ export default function App() {
             (d: PreloadedDataset) => d.loadStatus === 'success' && d.data.length > 0
           );
           if (successDatasets.length > 0 && !datasetNameRef.current) {
-            const primary = successDatasets[0];
+            const primary = successDatasets.find(
+              (d: PreloadedDataset) => d.key === 'ED_Visits' || d.sheetName === 'ED_Visits' || d.name.toLowerCase().includes('ed visit')
+            ) || successDatasets[0];
             setDatasetName(primary.name);
             setFields(primary.fields);
             setRawData(primary.data);
@@ -137,42 +139,36 @@ export default function App() {
       qualityScore: 92
     };
 
-    fetch('/api/datasets', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, fields: cols, data })
-    })
-      .then(r => r.json())
-      .then(dbData => {
-        if (dbData.success && dbData.dataset) {
-          setDatasetId(dbData.dataset.id);
-        }
-      })
-      .catch(e => console.error('Backend database registration failed:', e));
-
     triggerAIAnalysis(name, cols, data, stats);
+  };
+
+  const handleSelectActiveCohort = (name: string, cols: any[], data: any[]) => {
+    setDatasetName(name);
+    setFields(cols);
+    setRawData(data);
+    setCleanedData(data);
+    const initialSemantic = buildSemanticModel(cols);
+    setSemanticFields(initialSemantic);
+    setNotification({
+      text: `Active analysis cohort updated to "${name}" (${data.length} records).`,
+      type: 'success'
+    });
+    setTimeout(() => setNotification(null), 4000);
   };
 
   const triggerAIAnalysis = async (rawName: string, cols: any[], rowsData: any[], statsObj: DatasetStats) => {
     setAiIsLoading(true);
     try {
-      const res = await fetch('/api/analyze-dataset', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          datasetName: rawName,
-          rowCount: rowsData.length,
-          colCount: cols.length,
-          stats: statsObj,
-          columns: cols,
-          sampleRows: rowsData.slice(0, 10)
-        })
+      const result = await fetchAnalyzeDataset({
+        datasetName: rawName,
+        rowCount: rowsData.length,
+        colCount: cols.length,
+        stats: statsObj,
+        columns: cols,
+        sampleRows: rowsData.slice(0, 10)
       });
-      const result = await res.json();
       if (result.success && result.analysis) {
         setAiAnalysis(result.analysis);
-      } else {
-        throw new Error(result.warning || "Analytical pipeline offline");
       }
     } catch (err) {
       console.warn("AI intelligence model analysis experienced fallback routing.", err);
@@ -184,20 +180,6 @@ export default function App() {
   const onDataCleaned = async (cleanRows: any[], summary: CleaningSummary) => {
     setCleanedData(cleanRows);
     setCleaningSummary(summary);
-
-    try {
-      const dbRes = await fetch('/api/datasets', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: `Cleaned_${datasetName}`, fields, data: cleanRows })
-      });
-      const dbData = await dbRes.json();
-      if (dbData.success && dbData.dataset) {
-        setDatasetId(dbData.dataset.id);
-      }
-    } catch (e) {
-      console.error("Backend database registration update failed:", e);
-    }
 
     // Persist the cleaned cohort into SQLite, in its own isolated table. This is what makes
     // the data survive a refresh and become queryable by the analytics layer. It never
@@ -382,20 +364,20 @@ export default function App() {
           </div>
         </div>
 
-        {/* Navigation Stage Indicators (Display-only, non-clickable) */}
-        <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto pointer-events-none select-none" aria-label="Workflow stages">
+        {/* Navigation Stage Links */}
+        <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto" aria-label="Workflow stages">
           {STAGES.map((stage) => {
             const Icon = stage.icon;
             const isActive = stage.key === currentSection;
 
             return (
-              <div
+              <button
                 key={stage.key}
-                role="status"
-                aria-current={isActive ? 'page' : undefined}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all duration-150 relative cursor-default ${isActive
+                type="button"
+                onClick={() => setCurrentSection(stage.key)}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all duration-150 relative text-left cursor-pointer ${isActive
                   ? 'bg-[#2563EB] text-white shadow-md font-semibold'
-                  : 'text-slate-400 opacity-60'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800/70'
                   }`}
               >
                 <Icon size={19} className={isActive ? 'text-white' : 'text-slate-400'} />
@@ -405,7 +387,7 @@ export default function App() {
                 {!isSidebarCollapsed && isActive && (
                   <span className="w-1.5 h-1.5 rounded-full bg-white shrink-0 animate-pulse" />
                 )}
-              </div>
+              </button>
             );
           })}
         </nav>
@@ -547,6 +529,9 @@ export default function App() {
           fields={fields}
           data={cleanedData}
           onNavigateNext={handleNextStage}
+          onSelectActiveCohort={handleSelectActiveCohort}
+          activeDatasetName={datasetName}
+          isDarkMode={isDarkMode}
         />
       </div>
     )}
@@ -594,6 +579,7 @@ export default function App() {
           onAddChart={handleAddChart}
           onRemoveChart={handleRemoveChart}
           onNavigateToAnalytics={() => setCurrentSection('analytics')}
+          onNavigateNext={handleNextStage}
           isDarkMode={isDarkMode}
           setIsDarkMode={setIsDarkMode}
         />
@@ -605,6 +591,7 @@ export default function App() {
         {datasetName ? (
           <ConsultantInsights
             isLoading={aiIsLoading}
+            onNavigateNext={handleNextStage}
           />
         ) : (
           <div className="border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-950/20 rounded-xl p-8 text-center space-y-3">

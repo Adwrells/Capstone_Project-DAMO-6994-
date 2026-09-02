@@ -16,6 +16,7 @@ import {
   HeartPulse, Clock, Users, Building2, Layers, Check
 } from 'lucide-react';
 import { CustomVisualization, AggregationOption } from '../../utils/types';
+import { fetchChartBuilderAssistant } from '../../services/apiService';
 
 interface CustomChartBuilderProps {
   fields: any[];
@@ -550,17 +551,7 @@ export default function CustomChartBuilder({
       const sampleRows = data.slice(0, 15);
       const colsPayload = fields.map(f => ({ name: f.name, type: f.type }));
 
-      const res = await fetch('/api/assistant/chart-builder', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          prompt: userPrompt,
-          columns: colsPayload,
-          sampleRows
-        })
-      });
-
-      const resData = await res.json();
+      const resData = await fetchChartBuilderAssistant(userPrompt, colsPayload, sampleRows);
       if (resData.success && resData.chartConfig) {
         const config = resData.chartConfig;
         
