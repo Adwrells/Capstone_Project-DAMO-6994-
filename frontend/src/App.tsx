@@ -19,6 +19,7 @@ import AboutProject from './pages/AboutProject/AboutProject';
 import { CleaningSummary, CustomVisualization, AIAnalysisResult, DatasetStats, PreloadedDataset } from './utils/types';
 import { persistCleanedDataset } from './services/userDatasetService';
 import { buildSemanticModel, SemanticField } from './utils/biEngine';
+import { fetchPreloadedDatasets, fetchAnalyzeDataset } from './services/apiService';
 
 const STAGES = [
   { key: 'about', label: 'About Project', icon: HelpCircle },
@@ -88,8 +89,7 @@ export default function App() {
     if (preloadStatus !== 'idle') return;
     setPreloadStatus('loading');
 
-    fetch('/api/preload-datasets')
-      .then(r => r.json())
+    fetchPreloadedDatasets()
       .then(json => {
         if (json.success && Array.isArray(json.datasets)) {
           setPreloadedDatasets(json.datasets as PreloadedDataset[]);
@@ -137,42 +137,22 @@ export default function App() {
       qualityScore: 92
     };
 
-    fetch('/api/datasets', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, fields: cols, data })
-    })
-      .then(r => r.json())
-      .then(dbData => {
-        if (dbData.success && dbData.dataset) {
-          setDatasetId(dbData.dataset.id);
-        }
-      })
-      .catch(e => console.error('Backend database registration failed:', e));
-
     triggerAIAnalysis(name, cols, data, stats);
   };
 
   const triggerAIAnalysis = async (rawName: string, cols: any[], rowsData: any[], statsObj: DatasetStats) => {
     setAiIsLoading(true);
     try {
-      const res = await fetch('/api/analyze-dataset', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          datasetName: rawName,
-          rowCount: rowsData.length,
-          colCount: cols.length,
-          stats: statsObj,
-          columns: cols,
-          sampleRows: rowsData.slice(0, 10)
-        })
+      const result = await fetchAnalyzeDataset({
+        datasetName: rawName,
+        rowCount: rowsData.length,
+        colCount: cols.length,
+        stats: statsObj,
+        columns: cols,
+        sampleRows: rowsData.slice(0, 10)
       });
-      const result = await res.json();
       if (result.success && result.analysis) {
         setAiAnalysis(result.analysis);
-      } else {
-        throw new Error(result.warning || "Analytical pipeline offline");
       }
     } catch (err) {
       console.warn("AI intelligence model analysis experienced fallback routing.", err);
@@ -184,20 +164,6 @@ export default function App() {
   const onDataCleaned = async (cleanRows: any[], summary: CleaningSummary) => {
     setCleanedData(cleanRows);
     setCleaningSummary(summary);
-
-    try {
-      const dbRes = await fetch('/api/datasets', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: `Cleaned_${datasetName}`, fields, data: cleanRows })
-      });
-      const dbData = await dbRes.json();
-      if (dbData.success && dbData.dataset) {
-        setDatasetId(dbData.dataset.id);
-      }
-    } catch (e) {
-      console.error("Backend database registration update failed:", e);
-    }
 
     // Persist the cleaned cohort into SQLite, in its own isolated table. This is what makes
     // the data survive a refresh and become queryable by the analytics layer. It never

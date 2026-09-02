@@ -2,10 +2,11 @@
  * Healthcare Analytics Platform - Centralized API Service Client
  *
  * Provides typed HTTP client methods for interacting with FastAPI backend
- * endpoints via the Express reverse proxy.
+ * endpoints via the transparent API Gateway proxy.
  */
 
 import type { DashboardKPIs } from '../types/domain';
+import type { PreloadedDataset, AIAnalysisResult, CustomVisualization } from '../utils/types';
 
 const API_BASE_URL = '/api';
 
@@ -15,6 +16,24 @@ const API_BASE_URL = '/api';
 export async function fetchHealth(): Promise<{ status: string; service?: string; version?: string }> {
   const response = await fetch(`${API_BASE_URL}/health`);
   if (!response.ok) throw new Error(`API Health check failed with status ${response.status}`);
+  return response.json();
+}
+
+/**
+ * Fetches preloaded clinical datasets with schema and records.
+ */
+export async function fetchPreloadedDatasets(): Promise<{ success: boolean; datasets: PreloadedDataset[] }> {
+  const response = await fetch(`${API_BASE_URL}/preload-datasets`);
+  if (!response.ok) throw new Error(`Failed to fetch preloaded datasets (${response.status})`);
+  return response.json();
+}
+
+/**
+ * Fetches SQLite database connectivity, storage metrics, and table row counts.
+ */
+export async function fetchSqliteStatus(): Promise<any> {
+  const response = await fetch(`${API_BASE_URL}/sqlite-status`);
+  if (!response.ok) throw new Error(`Failed to fetch SQLite status (${response.status})`);
   return response.json();
 }
 
@@ -34,6 +53,15 @@ export async function fetchDatasetsList(): Promise<string[]> {
 export async function fetchDashboardKPIs(): Promise<DashboardKPIs | any> {
   const response = await fetch(`${API_BASE_URL}/dashboard/kpis`);
   if (!response.ok) throw new Error(`Failed to fetch dashboard KPIs (${response.status})`);
+  return response.json();
+}
+
+/**
+ * Fetches longitudinal monthly/annual trend data for the Executive Dashboard.
+ */
+export async function fetchDashboardTrends(): Promise<any> {
+  const response = await fetch(`${API_BASE_URL}/dashboard/trends`);
+  if (!response.ok) throw new Error(`Failed to fetch dashboard trends (${response.status})`);
   return response.json();
 }
 
@@ -151,5 +179,51 @@ export async function fetchStrategicInsights(): Promise<any> {
 export async function fetchReports(): Promise<any> {
   const response = await fetch(`${API_BASE_URL}/reports`);
   if (!response.ok) throw new Error(`Failed to fetch reports catalog (${response.status})`);
+  return response.json();
+}
+
+/**
+ * Executes natural language Smart Query filter recommendation via AI Assistant.
+ */
+export async function fetchSmartQuery(query: string, columns: any[]): Promise<any> {
+  const response = await fetch(`${API_BASE_URL}/smart-query`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query, columns }),
+  });
+  if (!response.ok) throw new Error(`Smart query failed (${response.status})`);
+  return response.json();
+}
+
+/**
+ * Generates custom chart configuration from natural language prompt via AI Assistant.
+ */
+export async function fetchChartBuilderAssistant(prompt: string, columns: any[], sampleRows: any[]): Promise<any> {
+  const response = await fetch(`${API_BASE_URL}/assistant/chart-builder`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt, columns, sampleRows }),
+  });
+  if (!response.ok) throw new Error(`Chart builder assistant failed (${response.status})`);
+  return response.json();
+}
+
+/**
+ * Generates automated executive dataset overview and insights via AI Assistant.
+ */
+export async function fetchAnalyzeDataset(payload: {
+  datasetName: string;
+  rowCount: number;
+  colCount: number;
+  stats: any;
+  columns: any[];
+  sampleRows: any[];
+}): Promise<{ success: boolean; analysis: AIAnalysisResult }> {
+  const response = await fetch(`${API_BASE_URL}/analyze-dataset`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) throw new Error(`Analyze dataset failed (${response.status})`);
   return response.json();
 }

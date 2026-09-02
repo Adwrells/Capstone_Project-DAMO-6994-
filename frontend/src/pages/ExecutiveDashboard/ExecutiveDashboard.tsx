@@ -33,6 +33,7 @@ import HypothesisEvidenceHub from './components/HypothesisEvidenceHub';
 import DescriptiveStatsTable from './components/DescriptiveStatsTable';
 import CustomChartBuilder from '../../components/charts/CustomChartBuilder';
 import { DashboardKPIs, TrendDataPoint, FilterState } from './components/types';
+import { fetchDashboardKPIs, fetchDashboardTrends } from '../../services/apiService';
 import { KPIItem, CustomVisualization } from '../../utils/types';
 import { Sparkles, X, PlusCircle } from 'lucide-react';
 
@@ -137,8 +138,7 @@ export default function ExecutiveDashboard({
   // ── Fetch Verified Backend Analytics Data ──────────────────────────────────
   useEffect(() => {
     setIsLoading(true);
-    fetch('/api/dashboard/kpis')
-      .then(r => r.json())
+    fetchDashboardKPIs()
       .then(json => {
         if (json.success && json.kpis) {
           setBackendKPIs(json.kpis);
@@ -146,8 +146,7 @@ export default function ExecutiveDashboard({
       })
       .catch(err => console.error('Failed to fetch dashboard KPIs:', err));
 
-    fetch('/api/dashboard/trends')
-      .then(r => r.json())
+    fetchDashboardTrends()
       .then(json => {
         if (json.success && Array.isArray(json.series) && json.series.length > 0) {
           setTrendSeries(json.series);
