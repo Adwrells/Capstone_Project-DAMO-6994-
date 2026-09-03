@@ -364,20 +364,19 @@ export default function App() {
           </div>
         </div>
 
-        {/* Navigation Stage Links */}
+        {/* Navigation Stage Indicators (Display-only workflow progress) */}
         <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto" aria-label="Workflow stages">
           {STAGES.map((stage) => {
             const Icon = stage.icon;
             const isActive = stage.key === currentSection;
 
             return (
-              <button
+              <div
                 key={stage.key}
-                type="button"
-                onClick={() => setCurrentSection(stage.key)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all duration-150 relative text-left cursor-pointer ${isActive
+                aria-current={isActive ? 'step' : undefined}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all duration-150 relative text-left select-none cursor-default ${isActive
                   ? 'bg-[#2563EB] text-white shadow-md font-semibold'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/70'
+                  : 'text-slate-400/80 bg-transparent'
                   }`}
               >
                 <Icon size={19} className={isActive ? 'text-white' : 'text-slate-400'} />
@@ -387,7 +386,7 @@ export default function App() {
                 {!isSidebarCollapsed && isActive && (
                   <span className="w-1.5 h-1.5 rounded-full bg-white shrink-0 animate-pulse" />
                 )}
-              </button>
+              </div>
             );
           })}
         </nav>
