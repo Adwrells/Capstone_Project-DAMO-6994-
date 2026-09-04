@@ -3,6 +3,7 @@ Healthcare Analytics Platform - Test Suite: FastAPI Endpoints & API Handlers
 """
 
 import unittest
+import asyncio
 
 TEST_CLIENT_AVAILABLE = False
 try:
@@ -43,6 +44,8 @@ class TestAPIEndpoints(unittest.TestCase):
 
     def test_dashboard_kpis_direct(self):
         res = get_dashboard_kpis()
+        if asyncio.iscoroutine(res):
+            res = asyncio.run(res)
         self.assertTrue(res["success"])
         self.assertIn("kpis", res)
 
