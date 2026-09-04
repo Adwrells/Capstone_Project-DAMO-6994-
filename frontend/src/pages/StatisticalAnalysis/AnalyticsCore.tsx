@@ -2246,15 +2246,7 @@ export default function AnalyticsCore({ fields, data, onNavigateNext }: Analytic
           </p>
         </div>
 
-        <div className="flex items-center gap-3 shrink-0">
-          <button
-            onClick={onNavigateNext}
-            className="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm shadow-md transition flex items-center gap-2 cursor-pointer"
-          >
-            <span>Proceed to Stage 5: Executive Dashboard</span>
-            <ArrowRight size={16} />
-          </button>
-        </div>
+
       </div>
     </div>
   );
