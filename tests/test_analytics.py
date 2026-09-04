@@ -5,7 +5,7 @@ Healthcare Analytics Platform - Test Suite: Analytics & Statistics Engine
 import unittest
 from backend.analytics.descriptive import calculate_mean, calculate_std, calculate_five_number_summary
 from backend.analytics.regression import linear_regression, run_h3_regression
-from backend.analytics.hypothesis_testing import run_h1_test, run_h2_test, run_h4_test
+from backend.analytics.hypothesis_testing import run_h1_test, run_h2_test, run_h4_test, run_h5_test
 from backend.analytics.trend_analysis import mann_kendall_test, run_ed_visits_trend_analysis
 from backend.analytics.forecasting import exponential_smoothing_forecast, run_ed_visits_forecasting
 from backend.analytics.erbi import compute_erbi_metrics
@@ -49,6 +49,9 @@ class TestAnalyticsEngine(unittest.TestCase):
         self.assertIn("slope", h3)
         h4 = run_h4_test()
         self.assertIn("h_statistic", h4)
+        h5 = run_h5_test()
+        self.assertIn("results", h5)
+        self.assertIn("chi2_statistic", h5["results"])
         erbi = compute_erbi_metrics()
         self.assertIn("overall_erbi_score", erbi)
 

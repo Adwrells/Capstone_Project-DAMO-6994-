@@ -4,11 +4,17 @@ Provides REST endpoints for Excel worksheets, dataset rows, statistical summarie
 correlation matrices, outlier detection, feature engineering, and data dictionaries.
 """
 
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 import math
+import os
+import io
+import zipfile
+import pandas as pd
+from pathlib import Path
 
 try:
     from fastapi import APIRouter, HTTPException
+    from fastapi.responses import FileResponse, Response
 except ImportError:
     class APIRouter:
         def __init__(self, *args, **kwargs): pass
@@ -18,6 +24,10 @@ except ImportError:
         def __init__(self, status_code: int, detail: str):
             self.status_code = status_code
             self.detail = detail
+    class FileResponse:
+        def __init__(self, *args, **kwargs): pass
+    class Response:
+        def __init__(self, *args, **kwargs): pass
 
 try:
     from backend.services.excel_service import excel_service
@@ -25,6 +35,122 @@ except ImportError:
     from services.excel_service import excel_service
 
 router = APIRouter(prefix="/api/dataset", tags=["Dataset Explorer Engine"])
+
+
+@router.get("/download/export")
+async def download_custom_export(
+    sheets: Optional[str] = None,
+    format: str = "xlsx"
+):
+    """
+    Downloads custom export:
+    - If format is 'xlsx': generates an Excel workbook with the requested sheet(s).
+    - If format is 'csv' and 1 sheet: returns that CSV.
+    - If format is 'csv' and multiple sheets: returns a ZIP archive containing all selected CSV files.
+    """
+    try:
+        all_sheets_dict = excel_service.load_all_sheets()
+        available_names = list(all_sheets_dict.keys())
+
+        if not sheets or sheets.strip().lower() in ["all", "entire_workbook", ""]:
+            selected_names = available_names
+        else:
+            requested = [s.strip() for s in sheets.split(",") if s.strip()]
+            selected_names = [s for s in requested if s in all_sheets_dict]
+            if not selected_names:
+                selected_names = available_names
+
+        fmt = format.strip().lower()
+
+        if fmt == "xlsx":
+            if len(selected_names) == len(available_names):
+                path = excel_service.get_excel_path()
+                if path and os.path.exists(path):
+                    return FileResponse(
+                        path=str(path),
+                        filename="Explanatory_and_Predictive_ED_Analytics_Dataset.xlsx",
+                        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    )
+            
+            output = io.BytesIO()
+            with pd.ExcelWriter(output, engine='openpyxl') as writer:
+                for s_name in selected_names:
+                    df = all_sheets_dict[s_name]
+                    safe_sheet_name = s_name[:31]
+                    df.to_excel(writer, sheet_name=safe_sheet_name, index=False)
+            output.seek(0)
+            filename = "Selected_ED_Analytics_Sheets.xlsx" if len(selected_names) < len(available_names) else "Explanatory_and_Predictive_ED_Analytics_Dataset.xlsx"
+            return Response(
+                content=output.getvalue(),
+                media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                headers={"Content-Disposition": f'attachment; filename="{filename}"'}
+            )
+
+        elif fmt == "csv":
+            if len(selected_names) == 1:
+                s_name = selected_names[0]
+                df = all_sheets_dict[s_name]
+                csv_bytes = df.to_csv(index=False).encode('utf-8')
+                return Response(
+                    content=csv_bytes,
+                    media_type="text/csv",
+                    headers={"Content-Disposition": f'attachment; filename="{s_name}_export.csv"'}
+                )
+            else:
+                zip_buffer = io.BytesIO()
+                with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
+                    for s_name in selected_names:
+                        df = all_sheets_dict[s_name]
+                        csv_data = df.to_csv(index=False).encode('utf-8')
+                        zip_file.writestr(f"{s_name}.csv", csv_data)
+                zip_buffer.seek(0)
+                zip_name = "ED_Analytics_All_Worksheets_CSV.zip" if len(selected_names) == len(available_names) else "ED_Analytics_Selected_Sheets_CSV.zip"
+                return Response(
+                    content=zip_buffer.getvalue(),
+                    media_type="application/zip",
+                    headers={"Content-Disposition": f'attachment; filename="{zip_name}"'}
+                )
+        else:
+            raise HTTPException(status_code=400, detail=f"Unsupported format '{format}'. Use 'xlsx' or 'csv'.")
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Custom export failed: {str(e)}")
+
+
+@router.get("/download/raw-xlsx")
+async def download_raw_xlsx():
+    """Downloads the master Excel workbook (.xlsx) as it is."""
+    try:
+        path = excel_service.get_excel_path()
+        if not path or not os.path.exists(path):
+            raise HTTPException(status_code=404, detail="Master Excel workbook not found.")
+        filename = os.path.basename(path)
+        return FileResponse(
+            path=str(path),
+            filename=filename,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to stream raw Excel workbook: {str(e)}")
+
+
+@router.get("/download/csv/{sheet}")
+async def download_sheet_csv(sheet: str):
+    """Downloads the specified worksheet as a CSV file."""
+    try:
+        sheets = excel_service.load_all_sheets()
+        if sheet not in sheets:
+            raise HTTPException(status_code=404, detail=f"Worksheet '{sheet}' not found.")
+        df = sheets[sheet]
+        csv_bytes = df.to_csv(index=False).encode('utf-8')
+        return Response(
+            content=csv_bytes,
+            media_type="text/csv",
+            headers={"Content-Disposition": f'attachment; filename="{sheet}_export.csv"'}
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to generate CSV for '{sheet}': {str(e)}")
 
 
 @router.get("/sheets")
@@ -83,7 +209,7 @@ def get_dataset_correlation(sheet: str) -> Dict[str, Any]:
                 valid = df[[col_a, col_b]].dropna()
                 if len(valid) < 3:
                     continue
-                corr_val = float(valid[col_a].corr(valid[col_b]))
+                corr_val = valid[col_a].corr(valid[col_b])
                 if math.isnan(corr_val):
                     continue
                 abs_r = abs(corr_val)
@@ -136,12 +262,12 @@ def get_dataset_outliers(sheet: str) -> Dict[str, Any]:
             series = df[col].dropna()
             if len(series) < 4:
                 continue
-            q1 = float(series.quantile(0.25))
-            q3 = float(series.quantile(0.75))
+            q1 = series.quantile(0.25)
+            q3 = series.quantile(0.75)
             iqr = q3 - q1
             lower_fence = q1 - 1.5 * iqr
             upper_fence = q3 + 1.5 * iqr
-            outlier_count = int(((series < lower_fence) | (series > upper_fence)).sum())
+            outlier_count = ((series < lower_fence) | (series > upper_fence)).sum()
             pct = round((outlier_count / total_rows) * 100, 2) if total_rows > 0 else 0.0
             severity = "High" if pct > 5 else "Low" if outlier_count > 0 else "None"
             results.append({
@@ -154,7 +280,7 @@ def get_dataset_outliers(sheet: str) -> Dict[str, Any]:
                 "outlier_count": outlier_count,
                 "pct_of_data": pct,
                 "severity": severity,
-                "n_valid": int(len(series)),
+                "n_valid": len(series),
             })
 
         return {
@@ -191,9 +317,9 @@ def get_feature_engineering(sheet: str) -> Dict[str, Any]:
             series = df[col].dropna()
             if len(series) < 2:
                 continue
-            col_min = float(series.min())
-            col_max = float(series.max())
-            col_std = float(series.std())
+            col_min = series.min()
+            col_max = series.max()
+            col_std = series.std()
             range_val = col_max - col_min
             safe_name = col.lower().replace(" ", "_").replace("(", "").replace(")", "").replace("/", "_")
 
@@ -223,7 +349,7 @@ def get_feature_engineering(sheet: str) -> Dict[str, Any]:
 
         for col in cat_cols[:5]:
             safe_name = col.lower().replace(" ", "_").replace("(", "").replace(")", "").replace("/", "_")
-            unique_count = int(df[col].nunique())
+            unique_count = df[col].nunique()
             if unique_count <= 15:
                 ideas.append({
                     "feature": f"{safe_name}_ohe",
@@ -286,17 +412,17 @@ def get_data_dictionary(sheet: str) -> Dict[str, Any]:
             series = df[col]
             is_numeric = pd.api.types.is_numeric_dtype(series)
             col_type = "numeric" if is_numeric else "categorical"
-            missing = int(series.isna().sum())
-            unique_count = int(series.nunique())
+            missing = series.isna().sum()
+            unique_count = series.nunique()
 
             sample_vals: list = []
             if is_numeric:
                 valid = series.dropna()
                 if len(valid) > 0:
                     sample_vals = [
-                        f"min={float(valid.min()):.2f}",
-                        f"max={float(valid.max()):.2f}",
-                        f"mean={float(valid.mean()):.2f}",
+                        f"min={valid.min():.2f}",
+                        f"max={valid.max():.2f}",
+                        f"mean={valid.mean():.2f}",
                     ]
             else:
                 top_vals = series.dropna().value_counts().head(5).index.tolist()

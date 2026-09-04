@@ -20,5 +20,8 @@ export default defineConfig(() => {
         ignored: ['**/uploads/**'],
       },
     },
+    build: {
+      chunkSizeWarningLimit: 1500,
+    },
   };
 });

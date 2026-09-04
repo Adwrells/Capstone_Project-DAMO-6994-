@@ -1,50 +1,9 @@
 from typing import List, Dict, Any
+from backend.analytics.resource_burden import compute_erbi_from_records
 
-def compute_erbi(records: List[Dict[str, Any]]) -> Dict[str, Any]:
-    if not records:
-        return {"error": "No records provided for ERBI calculation."}
-    for r in records:
-        urgency = float(r.get("ctas_urgency_score") or 1.0)
-        los_hours = float(r.get("length_of_stay_hours") or 0.0)
-        visits = float(r.get("ed_visits") or 0.0)
-        r["_raw_burden"] = urgency * los_hours * visits
+# Canonical in-memory ERBI function
+compute_erbi = compute_erbi_from_records
 
-    overall_visits = sum(float(r.get("ed_visits") or 0) for r in records)
-    overall_burden = sum(r["_raw_burden"] for r in records)
-    overall_erbi = overall_burden / overall_visits if overall_visits > 0 else 0.0
-
-    triage_groups: Dict[str, Dict[str, float]] = {}
-    for r in records:
-        level = str(r.get("triage_level", "Unknown"))
-        triage_groups.setdefault(level, {"visits": 0.0, "burden": 0.0})
-        triage_groups[level]["visits"] += float(r.get("ed_visits") or 0)
-        triage_groups[level]["burden"] += r["_raw_burden"]
-
-    triage_erbi = [
-        {"triage_level": level, "total_visits": int(data["visits"]), "erbi_score": round(data["burden"] / data["visits"], 2) if data["visits"] > 0 else 0.0}
-        for level, data in sorted(triage_groups.items())
-    ]
-
-    age_groups: Dict[str, Dict[str, float]] = {}
-    for r in records:
-        cat = str(r.get("age_broad_category", "Unknown"))
-        age_groups.setdefault(cat, {"visits": 0.0, "burden": 0.0})
-        age_groups[cat]["visits"] += float(r.get("ed_visits") or 0)
-        age_groups[cat]["burden"] += r["_raw_burden"]
-
-    age_erbi = [
-        {"age_category": cat, "total_visits": int(data["visits"]), "erbi_score": round(data["burden"] / data["visits"], 2) if data["visits"] > 0 else 0.0}
-        for cat, data in sorted(age_groups.items())
-    ]
-
-    return {
-        "metric": "Estimated Resource Burden Index (ERBI)",
-        "formula": "ERBI = (ctas_urgency_score × los_hours × ed_visits) / total_ed_visits",
-        "overall_erbi_score": round(overall_erbi, 2),
-        "total_visits_analyzed": int(overall_visits),
-        "by_triage_level": triage_erbi,
-        "by_age_category": age_erbi,
-    }
 
 def compute_er_kpis(records: List[Dict[str, Any]]) -> Dict[str, Any]:
     if not records:
@@ -59,11 +18,13 @@ def compute_er_kpis(records: List[Dict[str, Any]]) -> Dict[str, Any]:
         "record_count": len(records),
     }
 
+
 def compute_problem_rank(records: List[Dict[str, Any]], count_key: str = "ed_visits") -> List[Dict[str, Any]]:
     sorted_records = sorted(records, key=lambda r: float(r.get(count_key) or 0), reverse=True)
     for rank, r in enumerate(sorted_records, start=1):
         r["problem_rank"] = rank
     return sorted_records
+
 
 def compute_population_category(age_group: str) -> str:
     ag = str(age_group).strip().lower()

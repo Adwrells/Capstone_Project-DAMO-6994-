@@ -4,6 +4,7 @@ Executes non-parametric statistical hypothesis tests from SQLite analytical tabl
 - H1: Weighted Kruskal-Wallis & Dunn Post Hoc (CTAS Triage Levels)
 - H2: Weighted Mann-Whitney U (Visit Disposition: Admitted vs Non-Admitted)
 - H4: Weighted Kruskal-Wallis & Dunn Post Hoc (Age Groups)
+- H5: Pearson Chi-Square Test of Independence (Sex × Admission Status)
 
 Weighting
 ---------
@@ -15,6 +16,7 @@ delegated to backend.analytics.statistics.weighted, which is the single definiti
 these tests across the platform.
 """
 
+import math
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 import math

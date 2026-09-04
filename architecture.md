@@ -85,15 +85,23 @@ The **Healthcare Analytics Platform** is a full-stack, enterprise-grade clinical
 
 ## 3. Current Architecture Breakdown
 
-### 3.1 Frontend Architecture (`src/` & `frontend/`)
+### 3.1 Frontend Architecture (`frontend/src/`)
 - **Framework**: React 18 with Vite fast build tooling and TypeScript static typing.
 - **UI & Layout**: Tailwind CSS for responsive styling; Lucide React for consistent clinical iconography.
 - **Data Visualization**: Recharts engine rendering interactive line graphs, stacked bar charts, scatter plots, and volume heatmaps.
-- **Component Taxonomy**:
-  - `components/dashboard/`: `ExecutiveDashboard.tsx`, `AnalyticsEngine.tsx` (KPI cards, ERBI resource burden, macro summaries).
-  - `components/explorer/`: `DataExplorer.tsx`, `AnalyticsCore.tsx` (Tabular preview, data dictionary, summary stats, top-N problem analysis).
-  - `components/upload/`: `DatasetUpload.tsx` (CSV file drag-and-drop ingestion & validation wizard).
-  - `components/shared/`: `DataCleaning.tsx`, `AboutProject.tsx`, `ConsultantInsights.tsx`, `CustomChartBuilder.tsx`, `ExportReports.tsx`.
+- **Module & Component Taxonomy**:
+  - `pages/`:
+    - `ExecutiveDashboard/`: Executive KPIs, patient volume trends, ERBI resource burden, hypothesis evidence hub.
+    - `StatisticalAnalysis/`: `AnalyticsCore.tsx`, `AnalyticsEngine.tsx` for granular analytical breakdowns.
+    - `StrategicInsights/`: `ConsultantInsights.tsx` clinical and operational recommendations.
+    - `PrepQualityEngine/`: `DataCleaning.tsx`, `FitDiagnostics.tsx` for data hygiene and ML model fit validation.
+    - `DatasetExplorer/`: `DataExplorer.tsx` tabular browsing, summary metrics, and custom visual charts.
+    - `Reports/`: `ExportReports.tsx` PDF executive summaries, audit logs, and CSV data exports.
+    - `AboutProject/`: Academic capstone specifications, data limitations, and clinical problem statement.
+  - `components/`: Modular reusable UI components (`cards/MetricCard.tsx`, `charts/CustomChartBuilder.tsx`, `tables/DataTable.tsx`, `common/DatasetUpload.tsx`, `architecture/ArchitecturePipelineCard.tsx`).
+  - `services/`: Typed API client interfaces (`apiService.ts`, `architectureService.ts`, `modelDiagnosticsService.ts`, `userDatasetService.ts`).
+  - `utils/`: Centralized business utilities (`formatters.ts`, `biEngine.ts`, `printToPdf.ts`, `mockDatasets.ts`).
+  - `types/`: Canonical domain contracts and schemas (`types/domain.ts`, `types/index.ts`).
 
 ### 3.2 Backend Service Architecture (`backend/`)
 - **Framework**: FastAPI high-performance ASGI server with Pydantic schema validation.
@@ -148,14 +156,12 @@ Organized into 5 isolated submodules:
   layer, not under `data/`** — `DatabaseManager.DEFAULT_DB_PATH` resolves to
   `backend/database/healthcare.db`.
 
-> **Documentation drift — resolved.** Earlier revisions of this section described
-> `data/optimized/`, `data/explorer/`, `data/sqlite/`, and `data/exports/`. None of those
-> directories exist. The paths above are the real ones.
->
-> This drift is not cosmetic: `backend/database/load_csv.py` and `server.ts` still read from
-> `data/optimized/`, so **database seeding is currently broken** and every table is skipped
-> with "CSV not found". The committed `healthcare.db` is therefore the only copy of the
-> ~17,200 analytical rows. See README.md → "Database & Data Provenance".
+> **Data provenance & loader alignment — verified.** `backend/database/load_csv.py` reads directly from
+> `data/cleaned dataset/Explanatory_and_Predictive_ED_Analytics_Dataset.xlsx` (with fallback to `data/Explorer Dataset/*.csv`).
+> Running `python -m backend.database.load_csv` successfully parses all six sheets (`ED_Visits`, `CTAS_Triage`,
+> `Visit_Disposition`, `Age_Sex`, `Main_Problems`, `Demographics`) and populates 8,685 clinical rows into
+> `backend/database/healthcare.db` with complete schema parity. SQLite seeding is fully automated, deterministic, and reproducible.
+
 
 ---
 
