@@ -74,6 +74,7 @@ export default function App() {
   // Theme & Sidebar State
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState<boolean>(false);
 
   // Modern Toast notification state
   const [notification, setNotification] = useState<{ text: string; type: 'info' | 'error' | 'success' } | null>(null);
@@ -318,12 +319,21 @@ export default function App() {
         Skip to main content
       </a>
 
+      {/* Mobile nav backdrop — dismisses the drawer, sits below the sidebar's z-40 */}
+      {isMobileNavOpen && (
+        <div
+          className="fixed inset-0 z-[35] bg-slate-950/60 backdrop-blur-xs md:hidden"
+          onClick={() => setIsMobileNavOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
       {/* ENTERPRISE DARK NAVY SIDEBAR (#0F172A) */}
       <aside
         role="navigation"
         aria-label="Main navigation"
-        className={`bg-[#0F172A] text-slate-300 flex flex-col transition-all duration-300 z-40 fixed inset-y-0 left-0 md:relative ${isSidebarCollapsed ? 'w-20' : 'w-64'
-          } border-r border-slate-800 shadow-xl`}
+        className={`bg-[#0F172A] text-slate-300 flex flex-col transition-all duration-300 z-40 fixed inset-y-0 left-0 md:sticky md:top-0 md:h-screen md:self-start ${isSidebarCollapsed ? 'w-20' : 'w-64'
+          } ${isMobileNavOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 border-r border-slate-800 shadow-xl`}
         id="enterprise-sidebar"
       >
         {/* Brand Header */}
@@ -340,11 +350,18 @@ export default function App() {
             )}
           </div>
           <button
-            onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+            onClick={() => {
+              if (window.matchMedia('(max-width: 767px)').matches) {
+                setIsMobileNavOpen(false);
+              } else {
+                setIsSidebarCollapsed(!isSidebarCollapsed);
+              }
+            }}
             className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
             title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
           >
-            <Menu size={18} />
+            {isMobileNavOpen ? <X size={18} className="md:hidden" /> : null}
+            <Menu size={18} className={isMobileNavOpen ? 'hidden md:block' : ''} />
           </button>
         </div>
 
@@ -413,8 +430,16 @@ export default function App() {
         {/* STICKY TOP STAGE NAVIGATION NAVBAR */}
         <header role="banner" className="h-16 bg-white dark:bg-[#111827] border-b border-[#E2E8F0] dark:border-[#1F2937] px-6 sm:px-8 flex items-center justify-between sticky top-0 z-30 shadow-xs shrink-0">
 
-          {/* Left: Back Button */}
+          {/* Left: Mobile Nav Toggle & Back Button */}
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsMobileNavOpen(true)}
+              className="md:hidden p-1.5 rounded-lg border border-[#E2E8F0] dark:border-[#1F2937] text-[#475569] dark:text-[#CBD5E1] hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B] transition-colors cursor-pointer"
+              title="Open navigation menu"
+              aria-label="Open navigation menu"
+            >
+              <Menu size={16} />
+            </button>
             <button
               onClick={handlePreviousStage}
               disabled={currentIndex === 0}

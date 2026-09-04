@@ -136,7 +136,7 @@ export default function ExecutiveKPIGrid({
             <p className={`text-2xl sm:text-3xl font-extrabold tracking-tight font-mono ${dark ? 'text-white' : 'text-slate-900'}`}>
               {kpi.value}
             </p>
-            <p className="text-[10px] text-slate-500 font-medium truncate">{kpi.subtitle}</p>
+            <p className="text-[10px] text-slate-500 font-medium leading-snug min-h-[2.2em]">{kpi.subtitle}</p>
 
             <div className={`mt-2.5 pt-2 border-t text-[9px] ${dark ? 'border-[#1e2d4a]' : 'border-slate-100'}`}>
               {kpi.footer}

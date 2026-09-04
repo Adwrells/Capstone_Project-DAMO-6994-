@@ -7,6 +7,29 @@ All notable changes to this project are documented in this file. The format foll
 This file starts at 1.1.0; versions 1.0.0–1.0.4 predate it and are recorded only as git tags,
 each named after the fix or feature it introduced.
 
+## [2.1.2] — 2026-09-04
+
+### Fixed
+- `App.tsx`'s enterprise sidebar was `position: fixed` on every screen narrower than the
+  `md` (768px) breakpoint, permanently overlaying the left ~256px (~80px collapsed) of the
+  viewport at `z-40` with no way to dismiss it, while the main content div still rendered at
+  full width underneath, starting at `x: 0`. On a 390px-wide viewport this covered roughly
+  two-thirds of the screen and intercepted clicks on the content beneath it (confirmed via a
+  Playwright walkthrough — a `Next:` button click timed out with "subtree intercepts pointer
+  events"). Added mobile-drawer behaviour: a header hamburger button opens it, a dismissible
+  backdrop and slide transform (`-translate-x-full` / `translate-x-0`, gated by
+  `md:translate-x-0`) close it, and the sidebar's own collapse button now closes the drawer
+  on mobile instead of collapsing it.
+- Executive Dashboard KPI card subtitles (`ExecutiveKPIGrid.tsx`) were clipped mid-word by a
+  forced `truncate` even though the card had vertical room to spare — e.g. "18.00M Admitted
+  Inpati…", "1.62B Acuity-Weighted…", "100% Empirical Decisi…" on a full 1440px desktop
+  viewport. Replaced with wrapping text so the full subtitle renders on up to two lines.
+
+### Changed
+- The sidebar is now `sticky` (desktop/tablet) instead of scrolling out of view after about
+  one viewport height on long pages such as the Executive Dashboard (~5300px tall); mobile
+  keeps its `fixed` drawer behaviour via the same responsive class.
+
 ## [2.1.0] — 2026-09-02
 
 ### Added

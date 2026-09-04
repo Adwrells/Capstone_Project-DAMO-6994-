@@ -26,6 +26,18 @@ dashboard, all reading from a reproducible analytical database.
 
 ---
 
+## Recent Updates
+
+**v2.1.2** — The enterprise sidebar (`App.tsx`) is now a proper responsive drawer instead of
+a fixed overlay that blocked interaction below the 768px breakpoint: it slides in/out on
+mobile and tablet behind a dismissible backdrop, opened via a header hamburger button, and
+stays pinned (`sticky`) alongside the content on desktop instead of scrolling out of view on
+long pages like the Executive Dashboard. The Executive Dashboard's KPI cards no longer clip
+their subtitle text mid-word (`ExecutiveKPIGrid.tsx`). See [CHANGELOG.md](CHANGELOG.md) for
+the full history.
+
+---
+
 ## Technology Stack
 
 | Layer | Technology |
