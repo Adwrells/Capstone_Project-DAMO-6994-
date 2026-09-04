@@ -27,7 +27,7 @@ router = APIRouter(prefix="/api/dashboard", tags=["Executive Dashboard"])
 
 
 @router.get("/kpis")
-def get_dashboard_kpis() -> Dict[str, Any]:
+async def get_dashboard_kpis() -> Dict[str, Any]:
     """Returns high-level executive KPIs derived from real SQLite ED dataset tables."""
     try:
         return {
@@ -157,7 +157,7 @@ async def get_dashboard_hypotheses() -> Dict[str, Any]:
 
 
 @router.get("/summary")
-def get_dashboard_summary() -> Dict[str, Any]:
+async def get_dashboard_summary() -> Dict[str, Any]:
     """Returns metadata summary of SQLite dataset tables."""
     try:
         return {"success": True, "tables": dashboard_service.get_summary()}
