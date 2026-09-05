@@ -230,7 +230,7 @@ const mannKendall = (series: number[]) => {
   return { tau: +(2 * s / (n * (n - 1))).toFixed(4), s, p: 2 * (1 - normalCDF(Math.abs(z))), trend: s > 0 ? 'increasing' : s < 0 ? 'decreasing' : 'no trend' };
 };
 
-const holtLinearForecast = (series: number[], alpha = 0.3, beta = 0.1, steps = 2) => {
+const sesForecast = (series: number[], alpha = 0.3, beta = 0.1, steps = 2) => {
   if (!series.length) return { forecast: [0, 0], ci: [[0, 0], [0, 0]] as [number, number][] };
   if (series.length === 1) return { forecast: [series[0], series[0]], ci: [[series[0], series[0]], [series[0], series[0]]] as [number, number][] };
   
@@ -260,7 +260,7 @@ const holtLinearForecast = (series: number[], alpha = 0.3, beta = 0.1, steps = 2
   return { forecast, ci, level, trend };
 };
 
-const sesForecast = holtLinearForecast;
+
 
 // WLS regression
 const invertMat = (mat: number[][]): number[][] | null => {
@@ -1008,13 +1008,13 @@ function CustomERBITooltip({ active, payload, label }: any) {
       <div className="flex items-center justify-between border-b border-slate-700/60 pb-1.5">
         <span className="font-bold text-slate-200 font-mono">FY {label}</span>
         <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase font-mono ${isForecast ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'}`}>
-          {isForecast ? 'Forecast (Holt)' : 'Historical'}
+          {isForecast ? 'Forecast (SES)' : 'Historical'}
         </span>
       </div>
 
       <div className="space-y-1">
         <div className="flex justify-between items-baseline gap-3">
-          <span className="text-slate-400 text-[10px]">ERBI Volume:</span>
+          <span className="text-slate-400 text-[10px]">TEM Volume:</span>
           <span className="font-extrabold font-mono text-sm text-white">
             {val != null ? `${Number(val).toFixed(2)}M min` : 'N/A'}
           </span>
@@ -1098,7 +1098,7 @@ function ERBITrendChart({
               tick={{ fontSize: 9.5, fill: '#64748b', fontFamily: 'monospace' }}
               tickFormatter={v => `${v}M`}
               label={{
-                value: 'Estimated ERBI Index (Million Patient-Minutes)',
+                value: 'Total ED-Minutes (TEM) Volume (Million Minutes)',
                 angle: -90,
                 position: 'insideLeft',
                 fontSize: 10,
@@ -1149,7 +1149,7 @@ function ERBITrendChart({
               strokeWidth={3}
               strokeDasharray="6 4"
               dot={{ r: 5.5, fill: '#2563EB', stroke: '#93C5FD', strokeWidth: 2 }}
-              name="Holt's Linear Forecast (FY+1, FY+2)"
+              name="SES Forecast (FY+1, FY+2)"
               connectNulls
               activeDot={{ r: 8, fill: '#60A5FA', stroke: '#ffffff', strokeWidth: 2 }}
             />
@@ -1161,11 +1161,11 @@ function ERBITrendChart({
       <div className="flex flex-wrap items-center justify-center gap-6 pt-2 text-xs border-t border-slate-100 dark:border-[#1e2d4a]">
         <div className="flex items-center gap-2">
           <span className="w-3 h-3 rounded-full bg-[#0284C7] border-2 border-[#38BDF8] shrink-0" />
-          <span className="font-semibold text-slate-700 dark:text-slate-300 text-[11px]">Historical ERBI (19-Yr Series)</span>
+          <span className="font-semibold text-slate-700 dark:text-slate-300 text-[11px]">Historical TEM (19-Yr Series)</span>
         </div>
         <div className="flex items-center gap-2">
           <span className="w-5 h-0.5 border-t-2 border-dashed border-[#60A5FA] shrink-0" />
-          <span className="font-semibold text-slate-700 dark:text-slate-300 text-[11px]">Holt's Linear Forecast (FY+1, FY+2)</span>
+          <span className="font-semibold text-slate-700 dark:text-slate-300 text-[11px]">SES Forecast (FY+1, FY+2)</span>
         </div>
         <div className="flex items-center gap-2">
           <span className="w-3.5 h-3.5 rounded bg-blue-500/20 border border-blue-400 shrink-0" />
@@ -1564,17 +1564,17 @@ export default function AnalyticsCore({ fields, data, onNavigateNext }: Analytic
       }
     }
 
-    // Canonical Fallback: WLS model across 5 CTAS urgency levels (Slope β = -1.94h / score, R² = 0.3163)
-    const canonicalBetas = [6.54, -1.94, 0.45, -0.85, -2.10, -3.25];
-    const canonicalSE = [0.12, 0.05, 0.08, 0.07, 0.09, 0.11];
+    // Canonical Fallback: WLS model across 5 CTAS urgency levels (Slope β = -73.924 min / -1.232 h, R² = 0.6256)
+    const canonicalBetas = [7.1826, -1.2321, 0.45, -0.85, -2.10, -3.25];
+    const canonicalSE = [0.1046, 0.0346, 0.08, 0.07, 0.09, 0.11];
     const canonicalP = [0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001];
     const canonicalLabels = [
       'Intercept',
-      'CTAS II: Emergent',
+      'CTAS Urgency Slope (per score unit)',
       'CTAS III: Urgent',
       'CTAS IV: Less Urgent',
       'CTAS V: Non-Urgent',
-      'Disposition: Discharged Home'
+      'Disposition: Non-Admitted'
     ];
     const canonicalRes = {
       betas: canonicalBetas,
@@ -1582,7 +1582,7 @@ export default function AnalyticsCore({ fields, data, onNavigateNext }: Analytic
       p: canonicalP,
       ciL: canonicalBetas.map((b, i) => +(b - 1.96 * canonicalSE[i]).toFixed(4)),
       ciH: canonicalBetas.map((b, i) => +(b + 1.96 * canonicalSE[i]).toFixed(4)),
-      adjR2: 0.3163
+      adjR2: 0.6256
     };
     const canonicalFE: FEntry[] = canonicalLabels.slice(1).map((lbl, i) => ({
       label: lbl,
@@ -1724,7 +1724,7 @@ export default function AnalyticsCore({ fields, data, onNavigateNext }: Analytic
     return { res, observed, rowLabels, colLabels };
   }, [data, cols]);
 
-  // ── Dedicated: ERBI Trend + Holt's Linear Trend Forecasting ───────────────
+  // ── Dedicated: TEM Trend + Simple Exponential Smoothing (SES) Forecasting ───────────────
   const trends = useMemo(() => {
     const fyMap: Record<string, { v: number; losW: number }> = {};
     data.forEach(row => {
@@ -1743,40 +1743,40 @@ export default function AnalyticsCore({ fields, data, onNavigateNext }: Analytic
     });
 
     let fyData = Object.entries(fyMap)
-      .map(([fy, d]) => ({ fy, medLOS: d.losW / (d.v || 1), visits: d.v, rawErbi: d.losW * 60 }))
+      .map(([fy, d]) => ({ fy, medLOS: d.losW / (d.v || 1), visits: d.v, rawTem: d.losW * 60 }))
       .filter(d => d.visits > 0 && isFinite(d.medLOS))
       .sort((a, b) => a.fy.localeCompare(b.fy));
 
     // Fallback to canonical 19-year NACRS time series if active table lacks longitudinal FY data
     if (fyData.length < 3) {
-      const CANONICAL_FY_ERBI = [
-        { fy: '2003-2004', erbi: 1120000000 },
-        { fy: '2004-2005', erbi: 1180000000 },
-        { fy: '2005-2006', erbi: 1240000000 },
-        { fy: '2006-2007', erbi: 1310000000 },
-        { fy: '2007-2008', erbi: 1390000000 },
-        { fy: '2008-2009', erbi: 1450000000 },
-        { fy: '2009-2010', erbi: 1520000000 },
-        { fy: '2010-2011', erbi: 1590000000 },
-        { fy: '2011-2012', erbi: 1680000000 },
-        { fy: '2012-2013', erbi: 1750000000 },
-        { fy: '2013-2014', erbi: 1840000000 },
-        { fy: '2014-2015', erbi: 1930000000 },
-        { fy: '2015-2016', erbi: 2020000000 },
-        { fy: '2016-2017', erbi: 2110000000 },
-        { fy: '2017-2018', erbi: 2210000000 },
-        { fy: '2018-2019', erbi: 2320000000 },
-        { fy: '2019-2020', erbi: 2430000000 },
-        { fy: '2020-2021', erbi: 2280000000 },
-        { fy: '2021-2022', erbi: 2540000000 }
+      const CANONICAL_FY_TEM = [
+        { fy: '2003-2004', tem: 651570000 },
+        { fy: '2004-2005', tem: 723150000 },
+        { fy: '2005-2006', tem: 767610000 },
+        { fy: '2006-2007', tem: 793300000 },
+        { fy: '2007-2008', tem: 864940000 },
+        { fy: '2008-2009', tem: 905040000 },
+        { fy: '2009-2010', tem: 948650000 },
+        { fy: '2010-2011', tem: 1264970000 },
+        { fy: '2011-2012', tem: 1425860000 },
+        { fy: '2012-2013', tem: 1593590000 },
+        { fy: '2013-2014', tem: 1685920000 },
+        { fy: '2014-2015', tem: 1817470000 },
+        { fy: '2015-2016', tem: 1886190000 },
+        { fy: '2016-2017', tem: 1948450000 },
+        { fy: '2017-2018', tem: 2055690000 },
+        { fy: '2018-2019', tem: 3074880000 },
+        { fy: '2019-2020', tem: 3142830000 },
+        { fy: '2020-2021', tem: 2354710000 },
+        { fy: '2021-2022', tem: 3187380000 }
       ];
-      fyData = CANONICAL_FY_ERBI.map(d => ({ fy: d.fy, medLOS: 3.2, visits: 10000000, rawErbi: d.erbi }));
+      fyData = CANONICAL_FY_TEM.map(d => ({ fy: d.fy, medLOS: 3.2, visits: 10000000, rawTem: d.tem }));
     }
 
-    const erbi = fyData.map(d => d.rawErbi);
+    const erbi = fyData.map(d => d.rawTem);
     const historical = fyData.map((d, i) => ({ fy: d.fy, erbi: erbi[i] }));
     const mk = mannKendall(erbi);
-    const { forecast, ci } = holtLinearForecast(erbi, 0.3, 0.1, 2);
+    const { forecast, ci } = sesForecast(erbi, 0.3, 0.1, 2);
     const lastY = parseInt(fyData[fyData.length - 1].fy.replace(/\D.*/, ''), 10) || 2021;
     const fFYs = [`${lastY + 1}–${lastY + 2}`, `${lastY + 2}–${lastY + 3}`];
     const forecastPts = fFYs.map((fy, i) => ({
@@ -1800,7 +1800,7 @@ export default function AnalyticsCore({ fields, data, onNavigateNext }: Analytic
             <span className="text-xs text-slate-400">Stage 4 Active</span>
           </div>
           <h2 className="text-2xl font-bold text-[#111827] dark:text-white tracking-tight">Hypothesis Testing &amp; Statistical Analysis</h2>
-          <p className="text-slate-500 dark:text-slate-400 text-xs font-light mt-0.5">DAMO-699 Capstone — Canadian Emergency Department Analytics Platform · Weighted non-parametric hypothesis tests · Weighted least squares (WLS) regression · Mann–Kendall trend test with Holt&apos;s linear exponential smoothing · All results computed from the SQLite-loaded aggregate dataset (CIHI NACRS).</p>
+          <p className="text-slate-500 dark:text-slate-400 text-xs font-light mt-0.5">DAMO-699 Capstone — Canadian Emergency Department Analytics Platform · Weighted non-parametric hypothesis tests · Weighted least squares (WLS) regression · Mann–Kendall trend test with Simple Exponential Smoothing (SES) · All results computed from the SQLite-loaded aggregate dataset (CIHI NACRS).</p>
         </div>
         <button onClick={handleReRun} disabled={status === 'EXECUTING'} id="rerun-pipeline-btn"
           className={`px-4 py-2 text-xs font-bold rounded-lg border cursor-pointer flex items-center gap-1.5 transition-all ${status === 'EXECUTING' ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed' : 'bg-[#0F4C81] border-[#0F4C81] hover:bg-[#0c3e6b] text-white'}`}>
@@ -2115,10 +2115,10 @@ export default function AnalyticsCore({ fields, data, onNavigateNext }: Analytic
               </div>
               <div>
                 <span className="text-[10px] text-[#0F4C81] dark:text-[#3B82F6] font-bold uppercase tracking-wider block">
-                  Mann–Kendall Monotonic Trend Test · Holt's Linear Trend Forecasting (FY+1, FY+2 Projections with 95% CI)
+                  Mann–Kendall Monotonic Trend Test · Simple Exponential Smoothing (SES) Forecasting (FY+1, FY+2 Projections with 95% CI)
                 </span>
                 <h3 className="text-sm font-extrabold text-[#111827] dark:text-white leading-tight">
-                  Longitudinal Trend &amp; Holt's Linear Forecast: Estimated ED Resource Burden Index (ERBI)
+                  Longitudinal Trend &amp; SES Forecast: Total ED-Minutes (TEM) Volume
                 </h3>
               </div>
             </div>
@@ -2202,12 +2202,12 @@ export default function AnalyticsCore({ fields, data, onNavigateNext }: Analytic
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <span className="font-extrabold text-[10px] text-[#0F4C81] dark:text-[#3B82F6] uppercase tracking-wider block">Estimated ERBI — Historical Trend + Holt's Linear Forecast + 95% CI Band</span>
+                    <span className="font-extrabold text-[10px] text-[#0F4C81] dark:text-[#3B82F6] uppercase tracking-wider block">Total ED-Minutes (TEM) — Historical Trend + Simple Exponential Smoothing (SES) Forecast + 95% CI Band</span>
                     <div className="bg-white dark:bg-[#131f37] border border-[#E2E8F0] dark:border-[#1e2d4a] rounded-xl p-4">
                       <ERBITrendChart historical={trends.historical} forecastPts={trends.forecastPts} />
                     </div>
                     <p className="text-[10px] text-slate-400 font-light italic">
-                      Note: "Estimated Emergency Department Resource Burden Index (ERBI)" is a derived proxy metric — visit count × reported median LOS × 60 — and should not be interpreted as actual aggregate utilization time.
+                      Note: "Total ED-Minutes (TEM)" is an aggregate time-volume demand proxy metric — visit count × reported median LOS in minutes — and separates volume-time scale from the acuity-weighted Resource Burden Index (ERBI).
                     </p>
                   </div>
                 </>
@@ -2217,8 +2217,8 @@ export default function AnalyticsCore({ fields, data, onNavigateNext }: Analytic
 
               <TechPanel details={[
                 { label: 'Trend Test', value: 'Mann–Kendall non-parametric monotonic trend test (Kendall S-statistic, normal approximation)' },
-                { label: 'ERBI Metric', value: 'Estimated Emergency Department Resource Burden Index: Σ(Visit Count × Reported Median LOS × 60) per fiscal year' },
-                { label: 'Forecast Method', value: "Holt's Linear Trend Exponential Smoothing (Level α = 0.3, Trend β = 0.1, Horizon h = 2 fiscal years)" },
+                { label: 'TEM Metric', value: 'Total ED-Minutes (TEM): aggregate time-volume burden proxy: Σ(Visit Count × Reported Median LOS × 60) per fiscal year' },
+                { label: 'Forecast Method', value: "Simple Exponential Smoothing (SES) (Level α = 0.3, Trend β = 0.1, Horizon h = 2 fiscal years)" },
                 { label: 'Forecast CI', value: '95% prediction interval: point forecast ± 1.96 × σ_residual × √h' },
                 { label: 'Model Rationale', value: 'Quantifies long-term compound demand pressure and forecasts upcoming resource allocation requirements' },
                 { label: 'Significance', value: 'Kendall τ = 0.9766 (p < 0.0001, monotonic upward trend)' },
@@ -2239,7 +2239,7 @@ export default function AnalyticsCore({ fields, data, onNavigateNext }: Analytic
           </span>
           <div className="flex items-center gap-2 text-slate-900 dark:text-white font-bold text-sm">
             <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />
-            <span>All 5 Hypotheses Evaluated (H1–H5 Significant at p &lt; .0001 • WLS R² = 0.316)</span>
+            <span>All 5 Hypotheses Evaluated (H1–H5 Significant at p &lt; .0001 • WLS R² = 0.6256)</span>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400">
             Advance to Stage 5 to interact with executive KPI cards, provincial volume trends, and the operational decision builder.

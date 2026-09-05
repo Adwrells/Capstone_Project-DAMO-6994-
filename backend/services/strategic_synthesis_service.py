@@ -266,7 +266,7 @@ def _build_h3_insight(raw: Dict[str, Any]) -> Dict[str, Any]:
     intercept = raw.get("intercept")
     dec = raw.get("decision", "—")
 
-    r2_val = r2 or 0.3163
+    r2_val = r2 or 0.6256
     if r2_val >= 0.50:
         mag = "Large"
     elif r2_val >= 0.25:
@@ -310,7 +310,7 @@ def _build_h3_insight(raw: Dict[str, Any]) -> Dict[str, Any]:
         "evidenceStrength": evidence,
         "whyItMatters": (
             "CTAS urgency score is a statistically supported explanatory variable within the "
-            f"completed aggregate model, accounting for {round((r2 or 0.3163)*100, 2)}% of the variation "
+            f"completed aggregate model, accounting for {round((r2 or 0.6256)*100, 2)}% of the variation "
             "represented by the model. Additional factors remain unexplained by this single predictor, "
             "reinforcing the need to consider other case-mix and operational dimensions."
         ),
@@ -519,7 +519,7 @@ def _build_trend_insight(
     last_obs = fc.get("last_observed_value")
     rmse = fc.get("rmse")
 
-    erbi_score = erbi_raw.get("overall_erbi_score") if erbi_raw and "error" not in erbi_raw else 8.33
+    erbi_score = erbi_raw.get("overall_erbi_score") if erbi_raw and "error" not in erbi_raw else 9.32
 
     evidence = "Moderate" if reject_mk else "Exploratory"
 
@@ -618,7 +618,7 @@ def _build_recommendations(
         "supportingSourceIds": ["H1", "H3", "H4", "Dashboard"],
         "strategicRationale": (
             "Aggregate LOS differs across major case-mix dimensions, while the completed explanatory model "
-            "identifies CTAS urgency as a statistically significant variable (R² = 0.3163, p < 0.001). "
+            "identifies CTAS urgency as a statistically significant variable (R² = 0.6256, p < 0.001). "
             "Together, these findings support incorporating case-mix composition into aggregate capacity planning "
             "rather than relying on visit volume alone."
         ),
@@ -691,7 +691,7 @@ def _build_recommendations(
             "Mann-Kendall trend direction",
             "Sen's slope metric",
             "Exponential smoothing forecast outputs and uncertainty ranges",
-            "Approved burden indicators (ERBI = 8.33)",
+            "Approved burden indicators (ERBI = 9.32)",
         ],
         "workflowSteps": [
             "New Aggregate Data Release",
@@ -839,8 +839,8 @@ class StrategicInsightsSynthesisService:
                 "letter": "C",
                 "title": "Acuity as an Explanatory Dimension",
                 "dashboardObservation": "Linear trendline indicates a systematic decrease in stay times as CTAS acuity urgency score decreases (from Resuscitation to Non-Urgent).",
-                "analyticalValidation": f"H3 · Weighted Least Squares Regression: {h3.get('statisticalConclusion', 'Reject H₀')} (R² = {h3.get('metrics', {}).get('modelMetric', 0.3163)}, slope = {h3.get('metrics', {}).get('slope', -116.60)} min/score, p < 0.001).",
-                "whyItMatters": "CTAS urgency score explains 31.63% of model variation. Additional factors remain outside single-predictor models, reinforcing multi-dimensional planning.",
+                "analyticalValidation": f"H3 · Weighted Least Squares Regression: {h3.get('statisticalConclusion', 'Reject H₀')} (R² = {h3.get('metrics', {}).get('modelMetric', 0.6256)}, slope = {h3.get('metrics', {}).get('slope', -73.92)} min/score, p < 0.001).",
+                "whyItMatters": "CTAS urgency score accounts for 62.56% of model variation in reported median LOS. Additional factors remain outside single-predictor models, reinforcing multi-dimensional planning.",
                 "strategicConsideration": "Interpret total demand alongside relevant case-mix dimensions rather than using visit volume alone.",
                 "evidenceLabel": "Dashboard · H3",
                 "boundary": "Aggregate explanatory modelling does not establish causality or predict individual patient LOS.",
@@ -987,3 +987,4 @@ class StrategicInsightsSynthesisService:
 
 
 strategic_synthesis_service = StrategicInsightsSynthesisService()
+generate_strategic_synthesis = StrategicInsightsSynthesisService.synthesise

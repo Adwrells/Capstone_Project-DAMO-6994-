@@ -7,6 +7,22 @@ All notable changes to this project are documented in this file. The format foll
 This file starts at 1.1.0; versions 1.0.0–1.0.4 predate it and are recorded only as git tags,
 each named after the fix or feature it introduced.
 
+## [2.2.0] — 2026-09-05
+
+### Fixed
+- **H3 Single Source of Truth Reconciled**: Eliminated all stale multivariate regression fallbacks ($R^2 = 0.3163$, slope $-116.60\text{ min}$, $-1.94\text{ h}$) across frontend dashboards, strategic insights, export reports, and backend synthesis services. Reconciled all references to the canonical univariate WLS model across 5 triage categories ($N = 760$, total visit weight $174,207,395$, $\beta_1 = -73.9240\text{ min/unit}$ [$-1.232\text{ h/unit}$], intercept $\beta_0 = 430.9542\text{ min}$ [$7.183\text{ h}$], $R^2 = 0.6256$, $F = 1266.6521$, $p = 7.10 \times 10^{-164}$, 95% CI $[-78.0016, -69.8465]\text{ min}$).
+- **ERBI Burden Reconciled to Canonical 9.32**: Corrected legacy 8.33 placeholders in `ExecutiveKPIGrid.tsx`, `strategic_synthesis_service.py`, `ExportReports.tsx`, and `ResourceBurdenTrend.tsx` to canonical $9.32$ score-hours per visit ($1,623,142,920.63$ total burden hours over $174,207,395$ visits).
+- **Metric Decoupling (ERBI vs TEM)**: Distinctly separated Estimated Resource Burden Index (acuity-weighted reported LOS proxy: $\Sigma(\text{urgency} \times \text{LOS hours} \times \text{visits}) / \Sigma(\text{visits}) = 9.32$) from Total ED-Minutes (TEM: time-volume scale $\text{visits} \times \text{median LOS minutes}$).
+- **Forecasting Methodology Standardized**: Replaced all mentions of "Holt's Linear" with "Simple Exponential Smoothing (SES)" and 95% prediction intervals in analytics hubs, reports, and charts, conforming to backend forecasting implementation.
+- **H2 Terminology & Metrics Hardened**: Enforced "Admitted vs Non-Admitted" (never "Discharged") across all views and reconciled median stay durations ($10.60\text{ h}$ vs $2.50\text{ h}$, $U = 2.689 \times 10^{12}, z = 6,952.46, r_b = 0.9981, p < 0.001$).
+- **Longitudinal Trend Reconciled**: Grounded 19-year annual series (FY 2003–2021) in canonical `age_sex` table ($4.91\text{M}$ to $13.99\text{M}$ arrivals, peak $15.08\text{M}$ in FY 2018-19, total $175,762,944$ visits, Mann-Kendall $Z = 5.5977, p < 0.001$, Sen's slope $= 550,907.4\text{ visits/year}$).
+- **Causal Claims Removed**: Enforced strict non-causal academic phrasing in `AboutProject.tsx`, `H3UrgencyRegression.tsx`, and `ConsultantInsights.tsx`.
+
+### Added
+- Dedicated backend analytical routes: `/api/statistics/h5` (Pearson Chi-Square & Cramér's V), `/api/statistics/trend` and `/trends` (Mann-Kendall), `/api/statistics/forecast` (SES), and `/api/statistics/erbi` (canonical burden metrics).
+- Explicit warning banners in `DataExplorer.tsx` when backend data services are unreachable, preventing silent fallback substitution.
+- Architecture specification updates detailing React 19.0.1, database topology (6 tables, 8,685 rows), and clear decoupling between deterministic Python analytics and optional Gemini assistant features.
+
 ## [2.1.2] — 2026-09-04
 
 ### Fixed

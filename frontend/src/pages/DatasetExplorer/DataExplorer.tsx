@@ -461,6 +461,7 @@ export default function DataExplorer({
   const [loadingSheets, setLoadingSheets] = useState(true);
   const [loadingData, setLoadingData] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isFallbackData, setIsFallbackData] = useState(false);
 
   /* ui state */
   const [activeTab, setActiveTab] = useState<Tab>('summary');
@@ -574,7 +575,9 @@ export default function DataExplorer({
 
         if (dataRes && dataRes.fields && Array.isArray(dataRes.data) && dataRes.data.length > 0) {
           finalData = dataRes;
+          setIsFallbackData(false);
         } else {
+          setIsFallbackData(true);
           const fallback = FALLBACK_SHEET_DATA[activeSheet] || FALLBACK_SHEET_DATA['ED_Visits_2003_2021'];
           finalData = {
             sheet_name: activeSheet,
@@ -602,6 +605,7 @@ export default function DataExplorer({
       })
       .catch(e => {
         console.error('Error loading worksheet:', e);
+        setIsFallbackData(true);
         const fallback = FALLBACK_SHEET_DATA[activeSheet] || FALLBACK_SHEET_DATA['ED_Visits_2003_2021'];
         const finalData: SheetData = {
           sheet_name: activeSheet,
@@ -808,6 +812,19 @@ export default function DataExplorer({
         <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
           <XCircle size={18} className="shrink-0" />
           <div><strong>Failed to load dataset:</strong> {error}</div>
+        </div>
+      )}
+
+      {/* Explicit Backend Unavailability Warning Banner */}
+      {isFallbackData && (
+        <div className="flex items-start gap-3 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-400 text-xs leading-relaxed animate-fade-in">
+          <AlertTriangle size={18} className="shrink-0 mt-0.5 text-amber-500" />
+          <div>
+            <span className="font-bold block text-sm mb-0.5">Notice: Canonical Backend Dataset API Unavailable</span>
+            <span>
+              Dynamic SQLite query for worksheet <strong>{activeSheet || 'selected'}</strong> could not be completed by the backend. Displaying client-side fallback schema preview. Please verify that the FastAPI backend server is online at port 8000 to explore the full canonical database records.
+            </span>
+          </div>
         </div>
       )}
 

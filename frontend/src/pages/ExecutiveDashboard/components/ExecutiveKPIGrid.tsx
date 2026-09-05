@@ -18,11 +18,11 @@ export default function ExecutiveKPIGrid({
 }: ExecutiveKPIGridProps) {
   const dark = isDarkMode;
 
-  const totalVisits = filteredVisitsCount ?? kpis?.total_ed_visits ?? 47722174;
-  const medianLOSHours = filteredMedianLOS ?? kpis?.reported_median_los_hours ?? 3.69;
+  const totalVisits = filteredVisitsCount ?? kpis?.total_ed_visits ?? 175762944;
+  const medianLOSHours = filteredMedianLOS ?? kpis?.reported_median_los_hours ?? 2.80;
   const admissionRate = kpis?.admission_rate_percent ?? 10.25;
-  const erbiScore = kpis?.overall_erbi_score ?? 8.33;
-  const totalBurdenHours = kpis?.total_burden_hours ?? 1464704546.7;
+  const erbiScore = kpis?.overall_erbi_score ?? 9.32;
+  const totalBurdenHours = kpis?.total_burden_hours ?? 1623142920.63;
 
   const isLOSOverBenchmark = medianLOSHours > 6.0;
 

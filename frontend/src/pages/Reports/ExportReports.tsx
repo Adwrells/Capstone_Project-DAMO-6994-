@@ -90,7 +90,7 @@ export default function ExportReports({
       text += `- H3 (Multi-Attribute Drivers): Model LOS determinants via Weighted Least Squares (WLS) regression with visit-count weights.\n`;
       text += `- H4 (Life-Stage Variance): Evaluate reported median LOS across broad demographic age categories (Weighted Kruskal-Wallis, ε²).\n`;
       text += `- H5 (Demographic Association): Test independence of Patient Sex and Visit Disposition (Pearson Chi-Square, Cramér's V).\n`;
-      text += `- Longitudinal Trend & Forecast: Mann-Kendall Monotonic Trend Test and Holt's Linear Trend Exponential Smoothing on ERBI.\n\n`;
+      text += `- Longitudinal Trend & Forecast: Mann-Kendall Monotonic Trend Test and Simple Exponential Smoothing (SES) on Total ED-Minutes (TEM).\n\n`;
     }
 
     if (includeAIInsights) {
@@ -104,11 +104,11 @@ export default function ExportReports({
       text += `------------------------------------------------------------------------\n`;
       text += `- H1 (CTAS Acuity): Weighted Kruskal-Wallis H(4) = 48.74, p < 0.001, ε² = 0.7251 (Large effect).\n`;
       text += `- H2 (Disposition): Weighted Mann-Whitney U = 5.22e14, p < 0.001, rank-biserial rb = 0.9981 (Large effect).\n`;
-      text += `- H3 (WLS Model): Weighted Least Squares Linear Regression, R² = 0.3163 (31.63% model variation), slope = -116.60 min/unit (p < 0.001).\n`;
+      text += `- H3 (WLS Model): Weighted Least Squares Linear Regression, R² = 0.6256 (62.56% model variation), slope = -73.92 min/unit (p < 0.001).\n`;
       text += `- H4 (Age Demographics): Weighted Kruskal-Wallis H(3) = 111.45, p < 0.001, ε² = 0.7218 (Large effect; Older Adult median 250.0 min vs Pediatric 123.0 min).\n`;
       text += `- H5 (Equity Association): Pearson Chi-Square χ²(1) = 18,164.97, p < 0.001, Cramér's V = 0.0102 (Negligible effect magnitude).\n`;
       text += `- Longitudinal Trend: Mann-Kendall Z = 5.5977, p < 0.001, Sen's slope = 550,907 visits/year; SES 5-year forecast.\n`;
-      text += `- Derived Planning Context: Canonical ERBI = 8.33 acuity-weighted patient-hours per visit.\n`;
+      text += `- Derived Planning Context: Canonical ERBI = 9.32 acuity-weighted score-hours per visit.\n`;
       text += `------------------------------------------------------------------------\n`;
     }
 
@@ -468,7 +468,7 @@ export default function ExportReports({
                   <div className="space-y-1.5 animate-fade-in">
                     <h4 className="text-[10px] font-bold uppercase tracking-wider text-slate-400">3. Research Objectives &amp; Methodology</h4>
                     <p className="text-xs text-slate-700 leading-relaxed font-light">
-                      The core scientific framework maps five pre-specified hypotheses: (a) Evaluating median LOS variance across CTAS acuity tiers (Weighted Kruskal-Wallis, ε² = 0.7251), (b) Testing admission status disparity (Weighted Mann-Whitney U, rb = 0.9981), (c) Modeling multi-attribute stay duration determinants via Weighted Least Squares (WLS, R² = 0.3163), (d) Measuring life-stage demographic variations (Weighted Kruskal-Wallis, ε² = 0.7218), and (e) Testing independence of Patient Sex and Visit Disposition (Pearson Chi-Square, χ² = 18,164.97, Cramér's V = 0.0102). In addition, longitudinal trends are evaluated using the Mann-Kendall test (Z = 5.5977) and Simple Exponential Smoothing.
+                      The core scientific framework maps five pre-specified hypotheses: (a) Evaluating median LOS variance across CTAS acuity tiers (Weighted Kruskal-Wallis, ε² = 0.7251), (b) Testing admission status disparity (Weighted Mann-Whitney U, rb = 0.9981), (c) Modeling stay duration determinants via Weighted Least Squares (WLS, R² = 0.6256), (d) Measuring life-stage demographic variations (Weighted Kruskal-Wallis, ε² = 0.7218), and (e) Testing independence of Patient Sex and Visit Disposition (Pearson Chi-Square, χ² = 18,164.97, Cramér's V = 0.0102). In addition, longitudinal trends are evaluated using the Mann-Kendall test (Z = 5.5977) and Simple Exponential Smoothing.
                     </p>
                   </div>
                 )}
@@ -488,7 +488,7 @@ export default function ExportReports({
                   <div className="space-y-1.5 animate-fade-in">
                     <h4 className="text-[10px] font-bold uppercase tracking-wider text-slate-400">5. Statistical &amp; Model Estimations</h4>
                     <p className="text-xs text-slate-700 leading-relaxed font-light">
-                      Weighted Least Squares (WLS) regression estimates: <code className="font-mono bg-slate-100 px-1 rounded text-[#0F4C81] font-semibold">LOS = β₀ + β₁·UrgencyScore</code> (R² = 0.3163, p &lt; 0.001). Longitudinal visit analysis registers a statistically significant upward trend (Mann-Kendall Z = 5.5977, p &lt; 0.001) with Simple Exponential Smoothing projecting multi-year capacity planning intervals.
+                      Weighted Least Squares (WLS) regression estimates: <code className="font-mono bg-slate-100 px-1 rounded text-[#0F4C81] font-semibold">LOS = β₀ + β₁·UrgencyScore</code> (R² = 0.6256, p &lt; 0.001). Longitudinal visit analysis registers a statistically significant upward trend (Mann-Kendall Z = 5.5977, p &lt; 0.001) with Simple Exponential Smoothing projecting multi-year capacity planning intervals.
                     </p>
                   </div>
                 )}

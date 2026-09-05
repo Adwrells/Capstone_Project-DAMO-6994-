@@ -530,15 +530,15 @@ export default function ConsultantInsights({ isLoading: parentLoading, onNavigat
                       <div className="grid grid-cols-3 gap-2 text-center">
                         <div className="p-1 rounded bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/50">
                           <span className="text-blue-700 dark:text-blue-300 font-bold block">R² Score</span>
-                          <span className="text-slate-700 dark:text-slate-200">0.3163 (31.63%)</span>
+                          <span className="text-slate-700 dark:text-slate-200">0.6256 (62.56%)</span>
                         </div>
                         <div className="p-1 rounded bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-900/50">
                           <span className="text-indigo-700 dark:text-indigo-300 font-bold block">Slope β₁</span>
-                          <span className="text-slate-700 dark:text-slate-200">-116.60 min/unit</span>
+                          <span className="text-slate-700 dark:text-slate-200">-73.92 min/unit</span>
                         </div>
                         <div className="p-1 rounded bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-900/50">
                           <span className="text-purple-700 dark:text-purple-300 font-bold block">Intercept β₀</span>
-                          <span className="text-slate-700 dark:text-slate-200">513.20 min</span>
+                          <span className="text-slate-700 dark:text-slate-200">430.95 min</span>
                         </div>
                       </div>
                     </div>

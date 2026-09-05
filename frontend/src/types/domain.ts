@@ -200,6 +200,7 @@ export interface TrendDataPoint {
   median_los_min: number;
   los_hours: number;
   erbi_m_min: number;
+  tem_m_min?: number;
 }
 
 export interface HypothesisHubItem {

@@ -41,7 +41,9 @@ from backend.analytics.hypothesis_testing import (
     run_h1_test,
     run_h2_test,
     run_h4_test,
+    run_h5_test,
 )
+from backend.analytics.hypotheses_registry import methods_payload
 from backend.analytics.regression import run_h3_regression, linear_regression
 from backend.analytics.trend_analysis import run_ed_visits_trend_analysis, mann_kendall_test
 from backend.analytics.forecasting import run_ed_visits_forecasting
@@ -85,7 +87,7 @@ def get_hypothesis_h1() -> Dict[str, Any]:
 
 @router.get("/h2")
 def get_hypothesis_h2() -> Dict[str, Any]:
-    """GET /statistics/h2: Weighted Mann-Whitney U test for Visit Disposition (Admitted vs Discharged)."""
+    """GET /statistics/h2: Weighted Mann-Whitney U test for Visit Disposition (Admitted vs Non-Admitted)."""
     try:
         res = run_h2_test()
         return {"success": True, "source": "SQLite Database (visit_disposition)", **res}
@@ -115,20 +117,43 @@ def get_hypothesis_h4() -> Dict[str, Any]:
 
 @router.get("/h5")
 def get_hypothesis_h5() -> Dict[str, Any]:
-    """GET /statistics/h5: Mann-Kendall Trend Test & Exponential Smoothing Forecast."""
+    """GET /statistics/h5: Pearson Chi-Square Test of Independence (Sex x Visit Disposition)."""
     try:
-        trend_res = run_ed_visits_trend_analysis()
-        forecast_res = run_ed_visits_forecasting(horizon=5)
-        erbi_res = compute_erbi_metrics()
-        return {
-            "success": True,
-            "source": "SQLite Database",
-            "trend_analysis": trend_res,
-            "forecasting": forecast_res,
-            "erbi_metrics": erbi_res
-        }
+        res = run_h5_test()
+        return {"success": True, "source": "SQLite Database (visit_disposition)", **res}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"H5 execution error: {str(e)}")
+
+
+@router.get("/trend")
+@router.get("/trends")
+def get_trend_analysis() -> Dict[str, Any]:
+    """GET /statistics/trend: Mann-Kendall Trend Test and Sen's Slope Estimator across 19 fiscal years."""
+    try:
+        trend_res = run_ed_visits_trend_analysis()
+        return {"success": True, "source": "SQLite Database (age_sex)", **trend_res}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Trend analysis error: {str(e)}")
+
+
+@router.get("/forecast")
+def get_forecasting(horizon: int = Query(5, ge=1, le=10)) -> Dict[str, Any]:
+    """GET /statistics/forecast: Simple Exponential Smoothing (SES) annual ED visit forecasting."""
+    try:
+        forecast_res = run_ed_visits_forecasting(horizon=horizon)
+        return {"success": True, "source": "SQLite Database (age_sex)", **forecast_res}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Forecasting error: {str(e)}")
+
+
+@router.get("/erbi")
+def get_erbi_metrics() -> Dict[str, Any]:
+    """GET /statistics/erbi: Canonical Estimated Resource Burden Index (ERBI) calculations."""
+    try:
+        erbi_res = compute_erbi_metrics()
+        return {"success": True, "source": "SQLite Database (ctas_triage)", **erbi_res}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"ERBI calculation error: {str(e)}")
 
 
 @router.get("/dashboard")
@@ -139,7 +164,8 @@ def get_statistics_dashboard() -> Dict[str, Any]:
         h2 = run_h2_test()
         h3 = run_h3_regression()
         h4 = run_h4_test()
-        h5 = run_ed_visits_trend_analysis()
+        h5 = run_h5_test()
+        trend = run_ed_visits_trend_analysis()
         erbi = compute_erbi_metrics()
 
         return {
@@ -181,13 +207,31 @@ def get_statistics_dashboard() -> Dict[str, Any]:
                     "effect_size_magnitude": h4.get("effect_size_magnitude"),
                     "weighted_n": h4.get("weighted_n"),
                 },
-                "H5_Volume_Trend": {
+                "H5_Sex_Disposition": {
+                    "test": "Pearson Chi-Square Test of Independence",
+                    "chi2_statistic": h5.get("results", {}).get("chi2_statistic"),
+                    "p_value": h5.get("results", {}).get("p_value"),
+                    "degrees_of_freedom": h5.get("results", {}).get("degrees_of_freedom"),
+                    "cramers_v": h5.get("cramers_v"),
+                    "effect_size": h5.get("cramers_v"),
+                    "effect_size_metric": "cramers_v",
+                    "effect_size_magnitude": h5.get("effect_size_magnitude"),
+                    "decision": h5.get("results", {}).get("decision"),
+                    "total_visits_analyzed": h5.get("total_visits_analyzed"),
+                },
+                "Longitudinal_Trend": {
                     "test": "Mann-Kendall Trend Test",
-                    "trend": h5.get("mann_kendall_result", {}).get("trend"),
-                    "p_value": h5.get("mann_kendall_result", {}).get("p_value")
+                    "trend": trend.get("mann_kendall_result", {}).get("trend"),
+                    "z_score": trend.get("mann_kendall_result", {}).get("z_score"),
+                    "sens_slope": trend.get("mann_kendall_result", {}).get("sens_slope"),
+                    "p_value": trend.get("mann_kendall_result", {}).get("p_value"),
+                    "decision": trend.get("mann_kendall_result", {}).get("decision"),
                 },
                 "Resource_Burden": {
-                    "overall_erbi": erbi.get("overall_erbi_score")
+                    "overall_erbi": erbi.get("overall_erbi_score"),
+                    "overall_erbi_score": erbi.get("overall_erbi_score"),
+                    "total_burden_hours": erbi.get("total_burden_hours"),
+                    "units": erbi.get("units")
                 }
             }
         }
@@ -197,33 +241,8 @@ def get_statistics_dashboard() -> Dict[str, Any]:
 
 @router.get("/methods")
 def get_statistical_methods() -> Dict[str, Any]:
-    """GET /statistics/methods: the algorithms actually executed by the engine.
-
-    Read from the analytics modules rather than restated here, so this endpoint cannot
-    drift from the code the way a hardcoded methodology list would.
-    """
-    return {
-        "success": True,
-        "alpha": ALPHA,
-        "weighting": {
-            "applied": True,
-            "weight_column": "ed_visits",
-            "rationale": (
-                "Rows are aggregates carrying a visit count, so ed_visits is a frequency "
-                "weight. Tests run over the weight-expanded population."
-            ),
-        },
-        "engine": "backend.analytics.statistics.weighted",
-        "methods": {
-            "H1": {"test": TEST_KRUSKAL, "effect_size": "epsilon_squared", "post_hoc": "Dunn (Bonferroni-adjusted)"},
-            "H2": {"test": TEST_MANN_WHITNEY, "effect_size": "rank_biserial", "post_hoc": None},
-            "H3": {"test": "Weighted Least Squares Linear Regression", "effect_size": "r_squared", "post_hoc": None},
-            "H4": {"test": TEST_KRUSKAL, "effect_size": "epsilon_squared", "post_hoc": "Dunn (Bonferroni-adjusted)"},
-            "H5": {"test": "Mann-Kendall Trend Test", "effect_size": "kendall_tau", "post_hoc": None},
-        },
-        "p_value_computation": "Exact chi-square / normal survival functions (pure Python, SciPy-independent)",
-        "tie_handling": "Midrank assignment with 1 - sum(t^3 - t) / (N^3 - N) correction",
-    }
+    """GET /statistics/methods: canonical algorithm and hypothesis registry definitions."""
+    return {"success": True, **methods_payload()}
 
 
 @router.post("/regression")

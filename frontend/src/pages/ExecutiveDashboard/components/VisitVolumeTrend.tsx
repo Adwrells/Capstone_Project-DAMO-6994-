@@ -168,7 +168,7 @@ export default function VisitVolumeTrend({ data, isDarkMode }: VisitVolumeTrendP
       }`}>
         <span className="text-[#0F4C81] dark:text-[#3B82F6] font-bold shrink-0">📈 Key Finding:</span>
         <span>
-          <strong>Historical Peak:</strong> <strong>2.89M arrivals</strong> in FY 2021-22 representing a <strong>+131.6% aggregate increase</strong> over the 19-year reporting window (Mann-Kendall upward trend, <em>p &lt; 0.0001</em>).
+          <strong>Longitudinal Trajectory:</strong> Annual ED visits grew from <strong>4.91M</strong> (FY 2003-04) to <strong>13.99M</strong> (FY 2021-22), peaking at <strong>15.08M</strong> in FY 2018-19 (+185.2% overall, Mann-Kendall <em>Z = 5.5977, p &lt; 0.001</em>, Sen's slope = 550.9K visits/year).
         </span>
       </div>
     </div>

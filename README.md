@@ -28,13 +28,14 @@ dashboard, all reading from a reproducible analytical database.
 
 ## Recent Updates
 
-**v2.1.2** — The enterprise sidebar (`App.tsx`) is now a proper responsive drawer instead of
-a fixed overlay that blocked interaction below the 768px breakpoint: it slides in/out on
-mobile and tablet behind a dismissible backdrop, opened via a header hamburger button, and
-stays pinned (`sticky`) alongside the content on desktop instead of scrolling out of view on
-long pages like the Executive Dashboard. The Executive Dashboard's KPI cards no longer clip
-their subtitle text mid-word (`ExecutiveKPIGrid.tsx`). See [CHANGELOG.md](CHANGELOG.md) for
-the full history.
+**v2.2.0** — Master Capstone Platform Audit & Analytical Consistency Hardening:
+- Established a single source of analytical truth across the database, Python analytics engines, FastAPI endpoints, React pages, and PDF export dossier.
+- Reconciled H3 WLS regression parameters to canonical univariate model ($R^2 = 0.6256$, slope $\beta_1 = -73.92\text{ min/score}$ [$-1.232\text{ h/score}$], $p < 0.001$).
+- Reconciled ERBI to canonical $9.32$ score-hours per visit ($1.623\text{B}$ total burden hours), cleanly decoupled from TEM (Total ED-Minutes: $visits \times median\_los\_min$).
+- Standardized forecasting methodology to Simple Exponential Smoothing (SES) with 95% prediction intervals (deprecating "Holt's Linear").
+- Reconciled 19-year annual volume series to canonical `age_sex` table ($4.91\text{M}$ to $13.99\text{M}$ visits, $N = 175,762,944$, Mann-Kendall $Z = 5.5977, p < 0.001$).
+- Standardized H2 terminology and metrics to "Admitted vs Non-Admitted" visits ($10.60\text{ h}$ vs $2.50\text{ h}$, $U = 2.689 \times 10^{12}, r_b = 0.9981$).
+- Enforced non-causal language and added explicit warning banners for API fallbacks. See [CHANGELOG.md](CHANGELOG.md) for the complete audit log.
 
 ---
 

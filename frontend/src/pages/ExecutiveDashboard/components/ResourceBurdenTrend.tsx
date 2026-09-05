@@ -20,18 +20,18 @@ interface ResourceBurdenTrendProps {
 
 // 19-Year historical ERBI points + 2-year forecast
 const ERBI_LONGITUDINAL_DATA = [
-  { fy: '2003-04', hist: 4.21, forecast: null, forecast_label: null, ci_low: null, ci_high: null },
-  { fy: '2005-06', hist: 4.85, forecast: null, forecast_label: null, ci_low: null, ci_high: null },
-  { fy: '2007-08', hist: 5.32, forecast: null, forecast_label: null, ci_low: null, ci_high: null },
-  { fy: '2009-10', hist: 5.98, forecast: null, forecast_label: null, ci_low: null, ci_high: null },
-  { fy: '2011-12', hist: 6.45, forecast: null, forecast_label: null, ci_low: null, ci_high: null },
-  { fy: '2013-14', hist: 6.92, forecast: null, forecast_label: null, ci_low: null, ci_high: null },
-  { fy: '2015-16', hist: 7.41, forecast: null, forecast_label: null, ci_low: null, ci_high: null },
-  { fy: '2017-18', hist: 7.89, forecast: null, forecast_label: null, ci_low: null, ci_high: null },
-  { fy: '2019-20', hist: 8.24, forecast: null, forecast_label: null, ci_low: null, ci_high: null },
-  { fy: '2021-22', hist: 8.33, forecast: 8.33, forecast_label: null, ci_low: 8.33, ci_high: 8.33 },
-  { fy: '2022-23 (F)', hist: null, forecast: 8.65, forecast_label: '8.65 (F)', ci_low: 7.45, ci_high: 9.85 },
-  { fy: '2023-24 (F)', hist: null, forecast: 8.98, forecast_label: '8.98 (F)', ci_low: 7.10, ci_high: 10.86 },
+  { fy: '2003-04', hist: 5.21, forecast: null, forecast_label: null, ci_low: null, ci_high: null },
+  { fy: '2005-06', hist: 5.85, forecast: null, forecast_label: null, ci_low: null, ci_high: null },
+  { fy: '2007-08', hist: 6.32, forecast: null, forecast_label: null, ci_low: null, ci_high: null },
+  { fy: '2009-10', hist: 6.98, forecast: null, forecast_label: null, ci_low: null, ci_high: null },
+  { fy: '2011-12', hist: 7.45, forecast: null, forecast_label: null, ci_low: null, ci_high: null },
+  { fy: '2013-14', hist: 7.92, forecast: null, forecast_label: null, ci_low: null, ci_high: null },
+  { fy: '2015-16', hist: 8.41, forecast: null, forecast_label: null, ci_low: null, ci_high: null },
+  { fy: '2017-18', hist: 8.89, forecast: null, forecast_label: null, ci_low: null, ci_high: null },
+  { fy: '2019-20', hist: 9.15, forecast: null, forecast_label: null, ci_low: null, ci_high: null },
+  { fy: '2021-22', hist: 9.32, forecast: 9.32, forecast_label: null, ci_low: 9.32, ci_high: 9.32 },
+  { fy: '2022-23 (F)', hist: null, forecast: 9.32, forecast_label: '9.32 (F)', ci_low: 8.12, ci_high: 10.52 },
+  { fy: '2023-24 (F)', hist: null, forecast: 9.32, forecast_label: '9.32 (F)', ci_low: 7.85, ci_high: 10.79 },
 ];
 
 function CustomTrendTooltip({ active, payload, label }: any) {
@@ -55,7 +55,7 @@ function CustomTrendTooltip({ active, payload, label }: any) {
       {fc != null && label.includes('(F)') && (
         <>
           <div className="flex justify-between items-baseline gap-3">
-            <span className="text-blue-400 text-[10px]">Holt's Linear Forecast:</span>
+            <span className="text-blue-400 text-[10px]">SES Point Forecast:</span>
             <span className="font-mono font-bold text-white">{fc} Score</span>
           </div>
           <div className="flex justify-between items-baseline gap-3 pt-1 border-t border-slate-800 text-[10px]">
@@ -87,7 +87,7 @@ export default function ResourceBurdenTrend({ isDarkMode }: ResourceBurdenTrendP
               Estimated Resource Burden Over Time (19-Year Trend + 2-Year Forecast)
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 font-light">
-              Mann-Kendall Monotonic Test (τ = 0.9766, p &lt; 0.0001) · Holt's Linear Exponential Smoothing with 95% Prediction Intervals
+              Mann-Kendall Monotonic Test (Z = 5.5977, p &lt; 0.001) · Simple Exponential Smoothing (SES) with 95% Prediction Intervals
             </p>
           </div>
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9.5px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
@@ -111,7 +111,7 @@ export default function ResourceBurdenTrend({ isDarkMode }: ResourceBurdenTrendP
                 stroke="#94a3b8"
                 height={50}
                 label={{
-                  value: 'Fiscal Year (19-Yr Observed Series + 2-Yr Holt Forecast)',
+                  value: 'Fiscal Year (19-Yr Observed Series + 2-Yr SES Forecast)',
                   position: 'insideBottom',
                   offset: -16,
                   fill: dark ? '#94a3b8' : '#475569',
@@ -186,7 +186,7 @@ export default function ResourceBurdenTrend({ isDarkMode }: ResourceBurdenTrendP
                   offset={8}
                   formatter={(v: any) => {
                     const num = Number(v);
-                    if (num === 4.21 || num === 8.33) {
+                    if (num === 5.21 || num === 9.32) {
                       return num.toFixed(2);
                     }
                     return '';
@@ -204,7 +204,7 @@ export default function ResourceBurdenTrend({ isDarkMode }: ResourceBurdenTrendP
                 strokeWidth={2.5}
                 strokeDasharray="5 4"
                 dot={{ r: 4.5, fill: '#3B82F6', stroke: '#93C5FD', strokeWidth: 1.5 }}
-                name="Holt Forecast"
+                name="SES Forecast"
                 connectNulls
               >
                 <LabelList
@@ -229,7 +229,7 @@ export default function ResourceBurdenTrend({ isDarkMode }: ResourceBurdenTrendP
           </div>
           <div className="flex items-center gap-2">
             <span className="w-4 h-0.5 border-t-2 border-dashed border-[#3B82F6]" />
-            <span className="text-slate-600 dark:text-slate-300 font-medium">Holt's Linear Forecast (FY+1: 8.65, FY+2: 8.98)</span>
+            <span className="text-slate-600 dark:text-slate-300 font-medium">Simple Exponential Smoothing (SES) Forecast</span>
           </div>
         </div>
       </div>

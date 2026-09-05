@@ -18,7 +18,7 @@ interface H2AdmissionLOSProps {
 }
 
 const DISPOSITION_DATA = [
-  { group: 'Non-Admitted', short: 'Discharged', los_hours: 2.50, los_min: 150, color: '#10B981', visits: '157.62M' },
+  { group: 'Non-Admitted', short: 'Non-Admitted', los_hours: 2.50, los_min: 150, color: '#10B981', visits: '157.62M' },
   { group: 'Admitted Inpatient', short: 'Admitted', los_hours: 10.60, los_min: 636, color: '#EF4444', visits: '18.00M' },
 ];
 
@@ -44,7 +44,7 @@ export default function H2AdmissionLOS({ isDarkMode }: H2AdmissionLOSProps) {
           Admission Status vs Reported LOS
         </h3>
         <p className="text-xs text-slate-500 dark:text-slate-400 font-light">
-          Reported median LOS differs significantly by inpatient admission status (Discharged vs Admitted)
+          Reported median LOS differs significantly by admission status (Admitted vs Non-Admitted)
         </p>
 
         <div className="h-[235px] pt-2 w-full">
@@ -117,7 +117,7 @@ export default function H2AdmissionLOS({ isDarkMode }: H2AdmissionLOSProps) {
         dark ? 'bg-[#152033]/60 border-[#1e2d4a] text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-600'
       }`}>
         <span>
-          <strong>Inpatient Disparity:</strong> <strong>Δ = +8.10 h (+324% longer stay)</strong> for admitted patients (10.60 h vs 2.50 h for discharged cases; rank-biserial effect <em>r_b = 0.998</em>).
+          <strong>Inpatient Disparity:</strong> <strong>Δ = +8.10 h (+324% longer stay)</strong> for admitted patients (10.60 h vs 2.50 h for non-admitted visits; rank-biserial effect <em>r_b = 0.998</em>).
         </span>
       </div>
 

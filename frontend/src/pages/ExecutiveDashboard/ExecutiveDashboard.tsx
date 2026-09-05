@@ -51,27 +51,27 @@ interface ExecutiveDashboardProps {
   setIsDarkMode?: (v: boolean) => void;
 }
 
-// Fallback 19-Year Longitudinal CIHI NACRS Trend Series
+// Fallback 19-Year Longitudinal CIHI NACRS Trend Series (age_sex table: 175,762,944 total visits)
 const DEFAULT_TREND_SERIES: TrendDataPoint[] = [
-  { fiscal_year: '2003-2004', ed_visits: 1254300, median_los_min: 165, los_hours: 2.75, erbi_m_min: 124.1 },
-  { fiscal_year: '2004-2005', ed_visits: 1310200, median_los_min: 168, los_hours: 2.80, erbi_m_min: 132.0 },
-  { fiscal_year: '2005-2006', ed_visits: 1385400, median_los_min: 172, los_hours: 2.87, erbi_m_min: 142.9 },
-  { fiscal_year: '2006-2007', ed_visits: 1442100, median_los_min: 175, los_hours: 2.92, erbi_m_min: 151.4 },
-  { fiscal_year: '2007-2008', ed_visits: 1520600, median_los_min: 180, los_hours: 3.00, erbi_m_min: 164.2 },
-  { fiscal_year: '2008-2009', ed_visits: 1605300, median_los_min: 184, los_hours: 3.07, erbi_m_min: 177.2 },
-  { fiscal_year: '2009-2010', ed_visits: 1689200, median_los_min: 190, los_hours: 3.17, erbi_m_min: 192.5 },
-  { fiscal_year: '2010-2011', ed_visits: 1792100, median_los_min: 195, los_hours: 3.25, erbi_m_min: 209.6 },
-  { fiscal_year: '2011-2012', ed_visits: 1884500, median_los_min: 201, los_hours: 3.35, erbi_m_min: 227.2 },
-  { fiscal_year: '2012-2013', ed_visits: 1978200, median_los_min: 206, los_hours: 3.43, erbi_m_min: 244.5 },
-  { fiscal_year: '2013-2014', ed_visits: 2085400, median_los_min: 212, los_hours: 3.53, erbi_m_min: 265.2 },
-  { fiscal_year: '2014-2015', ed_visits: 2194300, median_los_min: 218, los_hours: 3.63, erbi_m_min: 286.9 },
-  { fiscal_year: '2015-2016', ed_visits: 2310500, median_los_min: 224, los_hours: 3.73, erbi_m_min: 310.5 },
-  { fiscal_year: '2016-2017', ed_visits: 2425100, median_los_min: 230, los_hours: 3.83, erbi_m_min: 334.6 },
-  { fiscal_year: '2017-2018', ed_visits: 2548900, median_los_min: 235, los_hours: 3.92, erbi_m_min: 359.3 },
-  { fiscal_year: '2018-2019', ed_visits: 2689200, median_los_min: 240, los_hours: 4.00, erbi_m_min: 387.2 },
-  { fiscal_year: '2019-2020', ed_visits: 2795400, median_los_min: 245, los_hours: 4.08, erbi_m_min: 410.9 },
-  { fiscal_year: '2020-2021', ed_visits: 2480100, median_los_min: 238, los_hours: 3.97, erbi_m_min: 354.1 },
-  { fiscal_year: '2021-2022', ed_visits: 2894500, median_los_min: 250, los_hours: 4.17, erbi_m_min: 434.1 },
+  { fiscal_year: '2003-2004', ed_visits: 4906394, median_los_min: 132.8, los_hours: 2.21, tem_m_min: 651.57, erbi_m_min: 651.57 },
+  { fiscal_year: '2004-2005', ed_visits: 5247805, median_los_min: 137.8, los_hours: 2.30, tem_m_min: 723.15, erbi_m_min: 723.15 },
+  { fiscal_year: '2005-2006', ed_visits: 5417114, median_los_min: 141.7, los_hours: 2.36, tem_m_min: 767.61, erbi_m_min: 767.61 },
+  { fiscal_year: '2006-2007', ed_visits: 5429867, median_los_min: 146.1, los_hours: 2.44, tem_m_min: 793.30, erbi_m_min: 793.30 },
+  { fiscal_year: '2007-2008', ed_visits: 5530328, median_los_min: 156.4, los_hours: 2.61, tem_m_min: 864.94, erbi_m_min: 864.94 },
+  { fiscal_year: '2008-2009', ed_visits: 5559194, median_los_min: 162.8, los_hours: 2.71, tem_m_min: 905.04, erbi_m_min: 905.04 },
+  { fiscal_year: '2009-2010', ed_visits: 5763341, median_los_min: 164.6, los_hours: 2.74, tem_m_min: 948.65, erbi_m_min: 948.65 },
+  { fiscal_year: '2010-2011', ed_visits: 8171651, median_los_min: 154.8, los_hours: 2.58, tem_m_min: 1264.97, erbi_m_min: 1264.97 },
+  { fiscal_year: '2011-2012', ed_visits: 9064585, median_los_min: 157.3, los_hours: 2.62, tem_m_min: 1425.86, erbi_m_min: 1425.86 },
+  { fiscal_year: '2012-2013', ed_visits: 10041516, median_los_min: 158.7, los_hours: 2.64, tem_m_min: 1593.59, erbi_m_min: 1593.59 },
+  { fiscal_year: '2013-2014', ed_visits: 10362125, median_los_min: 162.7, los_hours: 2.71, tem_m_min: 1685.92, erbi_m_min: 1685.92 },
+  { fiscal_year: '2014-2015', ed_visits: 10857038, median_los_min: 167.4, los_hours: 2.79, tem_m_min: 1817.47, erbi_m_min: 1817.47 },
+  { fiscal_year: '2015-2016', ed_visits: 11082171, median_los_min: 170.2, los_hours: 2.84, tem_m_min: 1886.19, erbi_m_min: 1886.19 },
+  { fiscal_year: '2016-2017', ed_visits: 11172324, median_los_min: 174.4, los_hours: 2.91, tem_m_min: 1948.45, erbi_m_min: 1948.45 },
+  { fiscal_year: '2017-2018', ed_visits: 11439577, median_los_min: 179.7, los_hours: 2.99, tem_m_min: 2055.69, erbi_m_min: 2055.69 },
+  { fiscal_year: '2018-2019', ed_visits: 15080342, median_los_min: 203.9, los_hours: 3.40, tem_m_min: 3074.88, erbi_m_min: 3074.88 },
+  { fiscal_year: '2019-2020', ed_visits: 15023099, median_los_min: 209.2, los_hours: 3.49, tem_m_min: 3142.83, erbi_m_min: 3142.83 },
+  { fiscal_year: '2020-2021', ed_visits: 11622444, median_los_min: 202.6, los_hours: 3.38, tem_m_min: 2354.71, erbi_m_min: 2354.71 },
+  { fiscal_year: '2021-2022', ed_visits: 13992029, median_los_min: 227.8, los_hours: 3.80, tem_m_min: 3187.38, erbi_m_min: 3187.38 },
 ];
 
 export default function ExecutiveDashboard({

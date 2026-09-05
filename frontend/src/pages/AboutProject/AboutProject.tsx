@@ -193,14 +193,14 @@ export default function AboutProject({ onReset, isDarkMode = false, onBeginPrep 
             </div>
 
             <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
-              Emergency Departments face compounding pressures from aging demographics, rising patient acuity, and bed shortages. <strong className="font-semibold text-slate-900 dark:text-white">Length of Stay (LOS)</strong> is the primary indicator of system strain.
+              Emergency Departments navigate complex operational demands across evolving demographics, clinical acuity tiers, and system capacity boundaries. <strong className="font-semibold text-slate-900 dark:text-white">Length of Stay (LOS)</strong> serves as a primary macro-level indicator of operational throughput.
             </p>
 
             <div className="space-y-2 pt-1">
               {[
-                { tag: '🔴 Acuity Bottlenecks', desc: 'CTAS 3 "Urgent" patients queue behind resuscitation cases.' },
-                { tag: '👴 Age Vulnerability', desc: 'Geriatric patients (65+) experience 1.8× longer boarding times.' },
-                { tag: '🏥 Disposition Delays', desc: 'Admitted patients face acute inpatient bed transfer bottlenecks.' },
+                { tag: '🔴 Acuity Variation', desc: 'Higher-acuity presentations exhibit distinct clinical pathways and extended stay durations.' },
+                { tag: '👴 Age Differences', desc: 'Older adult cohorts (65+) experience longer aggregate median stay durations.' },
+                { tag: '🏥 Disposition Disparity', desc: 'Admitted patients exhibit substantially longer median stay durations than non-admitted visits.' },
                 { tag: '📈 Resource Burden (TEM)', desc: 'Total ED-Minutes = Total Volume × Median Stay Duration.' },
               ].map((item, i) => (
                 <div key={i} className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 text-xs">
@@ -341,7 +341,7 @@ export default function AboutProject({ onReset, isDarkMode = false, onBeginPrep 
                   question: 'Does median ED stay differ across CTAS urgency levels (1–5)?',
                   method: 'Weighted Kruskal-Wallis & Dunn Post-Hoc',
                   status: '✅ Reject H₀ (p < .0001)',
-                  finding: 'Resuscitation (~4.85h) and Emergent (~3.92h) visits require significantly longer stays than Non-Urgent (~1.25h).',
+                  finding: 'CTAS I Resuscitation (4.60h / 276m) and CTAS II Emergent (4.80h / 288m) exhibit substantially longer reported stays than CTAS V Non-Urgent (1.33h / 80m) (ε² = 0.7251).',
                 },
                 {
                   tag: 'H2',
@@ -349,15 +349,15 @@ export default function AboutProject({ onReset, isDarkMode = false, onBeginPrep 
                   question: 'Does length of stay differ between admitted and non-admitted visits?',
                   method: 'Weighted Mann-Whitney U Test',
                   status: '✅ Reject H₀ (p < .0001)',
-                  finding: 'Admitted patients face a severe inpatient boarding bottleneck (~13.62h median stay vs. ~2.24h for discharged).',
+                  finding: 'Admitted visits follow significantly longer aggregate stay durations (10.60h median stay vs. 2.50h for non-admitted visits; rb = 0.9981).',
                 },
                 {
                   tag: 'H3',
                   title: 'WLS Regression Predictors of LOS',
-                  question: 'Do triage acuity, age, and disposition independently predict stay duration?',
+                  question: 'Does CTAS urgency score predict reported median stay duration?',
                   method: 'Weighted Least Squares (WLS) Regression',
-                  status: '✅ Reject H₀ (Adj. R² ≈ 0.88)',
-                  finding: 'Inpatient admission (+11.20h) and CTAS 1 (+2.85h) are the strongest independent predictors of stay length.',
+                  status: '✅ Reject H₀ (R² = 0.6256, p < .0001)',
+                  finding: 'Urgency score significantly predicts reported stay duration (β₁ = -73.92 min/unit / -1.23 h/unit, R² = 0.6256, N = 174.2M visits).',
                 },
                 {
                   tag: 'H4',
@@ -365,15 +365,15 @@ export default function AboutProject({ onReset, isDarkMode = false, onBeginPrep 
                   question: 'Does reported median stay differ across broad age categories?',
                   method: 'Weighted Kruskal-Wallis & Dunn Post-Hoc',
                   status: '✅ Reject H₀ (p < .0001)',
-                  finding: 'Older Adults 65+ (~4.12h) experience 106% longer stays than pediatric patients (~2.00h) due to diagnostic workups.',
+                  finding: 'Older Adults 65+ (4.17h / 250m) experience longer aggregate stays than pediatric patients (2.05h / 123m) (ε² = 0.7218).',
                 },
                 {
                   tag: 'H5',
                   title: 'Patient Sex & Visit Disposition',
                   question: 'Is patient sex significantly associated with ED admission outcome?',
-                  method: 'Pearson Chi-Square Test (N = 175.7M)',
-                  status: '✅ Reject H₀ (p < .0001 · V = 0.021)',
-                  finding: 'Statistically significant due to massive sample size (N > 175M), with negligible practical clinical disparity.',
+                  method: 'Pearson Chi-Square Test (N = 175.8M)',
+                  status: '✅ Reject H₀ (p < .0001 · V = 0.0102)',
+                  finding: 'Statistically significant due to massive sample size (χ² = 18,164.97, N = 175.76M), with negligible practical effect (Cramér\'s V = 0.0102; Female 9.95% vs Male 10.56% admission).',
                 },
               ].map((h) => (
                 <div key={h.tag} className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-2 flex flex-col justify-between">

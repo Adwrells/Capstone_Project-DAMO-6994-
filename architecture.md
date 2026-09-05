@@ -3,7 +3,7 @@
 **Project Title:** Operational & Clinical Modelling of Emergency Department Wait Times  
 **Institution:** University of Niagara Falls — Master of Data Analytics (Capstone Project)  
 **Author:** Bharath Paramasivan  
-**Document Version:** 2.0  
+**Document Version:** 2.2.0  
 **Target Evaluation Grade:** 9.8 – 10.0 / 10.0  
 
 ---
@@ -25,7 +25,7 @@ The **Healthcare Analytics Platform** is a full-stack, enterprise-grade clinical
 ```
 ┌──────────────────────────────────────────────────────────────────────────────────┐
 │                                 REACT FRONTEND                                   │
-│    (Vite + React 18 + TypeScript + Tailwind CSS + Recharts + Lucide Icons)       │
+│   (Vite + React 19.0.1 + TypeScript + Tailwind CSS + Recharts + Lucide Icons)    │
 │                                                                                  │
 │   ┌────────────────────┐   ┌────────────────────┐   ┌────────────────────┐      │
 │   │ Executive Dashboard│   │  Dataset Explorer  │   │ Hypothesis Testing │      │
@@ -86,7 +86,7 @@ The **Healthcare Analytics Platform** is a full-stack, enterprise-grade clinical
 ## 3. Current Architecture Breakdown
 
 ### 3.1 Frontend Architecture (`frontend/src/`)
-- **Framework**: React 18 with Vite fast build tooling and TypeScript static typing.
+- **Framework**: React 19.0.1 with Vite fast build tooling and TypeScript static typing.
 - **UI & Layout**: Tailwind CSS for responsive styling; Lucide React for consistent clinical iconography.
 - **Data Visualization**: Recharts engine rendering interactive line graphs, stacked bar charts, scatter plots, and volume heatmaps.
 - **Module & Component Taxonomy**:
@@ -220,7 +220,7 @@ propagates to every downstream stage without a database round-trip.
 │         ├─► ExecutiveDashboard   KPI cards & ERBI                              │
 │         ├─► FitDiagnostics ──► POST /api/model-diagnostics/assess              │
 │         │                       (FastAPI, stateless compute, returns verdict)  │
-│         ├─► StrategicInsights   Gemini-backed recommendations                  │
+│         ├─► StrategicInsights   Deterministic synthesis + optional Gemini chat │
 │         └─► ExportReports  ──► PDF via browser print engine (printToPdf.ts)    │
 └────────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -317,6 +317,31 @@ backend/database/healthcare.db   ──►  DatabaseManager  ──►  analytic
 
 **Path B is not written to at runtime.** Nothing a user does in the browser modifies
 `healthcare.db`. It is regenerated deliberately by running the loader.
+
+#### Seeded Analytical Database Topology (6 Tables, 8,685 Rows)
+
+| Table Name | Row Count | Visit Coverage | Analytical Role & Primary Consumer |
+| :--- | :--- | :--- | :--- |
+| `age_sex` | 152 rows | 175,762,944 visits | Canonical 19-year longitudinal trend (FY 2003–2021), Mann-Kendall monotonic trend test ($Z = 5.5977$), and Simple Exponential Smoothing (SES). |
+| `ctas_triage` | 912 rows | 174,207,395 visits | H1 CTAS Acuity Kruskal-Wallis ($H = 126,319,368.24, \varepsilon^2 = 0.7251$), H3 Univariate Weighted Least Squares regression ($R^2 = 0.6256, \beta_1 = -73.92\text{ min}$), and ERBI calculation ($9.32$ score-hours). |
+| `visit_disposition` | 936 rows | 175,619,773 visits | H2 Admission Status Mann-Whitney U ($U = 2.689 \times 10^{12}, r_b = 0.9981$), H5 Patient Sex vs Disposition Chi-Square ($\chi^2 = 18,164.97, V = 0.0102$). |
+| `ed_visits` | 5,586 rows | 47,716,846 visits | High-dimensional 4-way cross-tabulation table (Year × Age × Sex × CTAS × Disposition) for granular multi-filter slicing. |
+| `main_problems` | 1,063 rows | N/A (condition aggregate) | Top 10 clinical conditions and ICD-10 diagnostic volume rankings. |
+| `demographics` | 36 rows | N/A (population baseline) | Baseline population and provincial demographic controls. |
+
+### 3.4 Role of Generative AI vs Deterministic Analytics Engine
+
+The platform strictly separates statistical computation from generative language assistance:
+
+1. **Deterministic Analytical Core (Ground Truth)**:
+   - All hypothesis evaluations (H1–H5), $p$-values, effect sizes, regression parameters, Mann-Kendall statistics, SES forecasts, and ERBI index values are computed strictly by deterministic Python algorithms in `backend/analytics/` and synthesized by `backend/services/strategic_synthesis_service.py`.
+   - Recommendations 01–04 and Insights A–E are rule-bound and mathematically grounded.
+   - Zero hallucination or LLM dependency in the analytical pipeline.
+
+2. **Generative AI Capabilities (Optional Clinical Assistant)**:
+   - Google Gemini GenAI (`@google/genai` in `server.ts`) powers optional conversational assistant features on the Node development/BFF layer.
+   - It answers free-form clinical questions and explains statistical terminology in natural language.
+   - If the Gemini API key is absent or the service is unreachable, all platform pages, dashboards, reports, and strategic recommendations continue to operate with full fidelity and zero degradation.
 
 ### Why both exist
 

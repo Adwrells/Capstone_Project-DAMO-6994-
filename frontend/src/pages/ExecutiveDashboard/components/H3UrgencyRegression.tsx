@@ -155,23 +155,23 @@ export default function H3UrgencyRegression({ isDarkMode }: H3UrgencyRegressionP
         dark ? 'bg-[#152033]/60 border-[#1e2d4a] text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-600'
       }`}>
         <span>
-          <strong>Analytical Interpretation:</strong> CTAS urgency is a statistically significant aggregate explanatory variable (<em>R² = 0.316, p &lt; 0.0001</em>); substantial LOS variation remains unexplained by urgency alone.
+          <strong>Analytical Interpretation:</strong> Within the aggregate CTAS cohort, weighted regression identifies a statistically significant linear relationship between CTAS urgency score and reported median LOS (<em>R² = 0.6256, p &lt; 0.001</em>); explanatory at the aggregate level, not establishing individual-level causality.
         </span>
       </div>
 
       {/* Compact Evidence Panel */}
       <div className="pt-2 border-t border-slate-100 dark:border-[#1e2d4a] grid grid-cols-4 gap-2 text-center text-[10px]">
         <div className="p-1.5 rounded-lg bg-slate-50 dark:bg-[#182640]">
-          <span className="text-slate-400 block text-[8.5px] font-bold uppercase">Slope (β)</span>
-          <span className="font-mono font-bold text-slate-800 dark:text-slate-200">-0.94 h/tier</span>
+          <span className="text-slate-400 block text-[8.5px] font-bold uppercase">Slope (β₁)</span>
+          <span className="font-mono font-bold text-slate-800 dark:text-slate-200">-1.23 h/score</span>
         </div>
         <div className="p-1.5 rounded-lg bg-slate-50 dark:bg-[#182640]">
           <span className="text-slate-400 block text-[8.5px] font-bold uppercase">R-Squared</span>
-          <span className="font-mono font-bold text-blue-600 dark:text-blue-400">R² = 0.316</span>
+          <span className="font-mono font-bold text-blue-600 dark:text-blue-400">R² = 0.6256</span>
         </div>
         <div className="p-1.5 rounded-lg bg-slate-50 dark:bg-[#182640]">
           <span className="text-slate-400 block text-[8.5px] font-bold uppercase">95% CI</span>
-          <span className="font-mono font-bold text-purple-600 dark:text-purple-400">[-1.03h, -0.85h]</span>
+          <span className="font-mono font-bold text-purple-600 dark:text-purple-400">[-1.30h, -1.16h]</span>
         </div>
         <div className="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/40">
           <span className="text-emerald-600 dark:text-emerald-400 block text-[8.5px] font-bold uppercase">Decision</span>
