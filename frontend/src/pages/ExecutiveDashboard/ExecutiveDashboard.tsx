@@ -32,7 +32,10 @@ import ResourceBurdenTrend from './components/ResourceBurdenTrend';
 import HypothesisEvidenceHub from './components/HypothesisEvidenceHub';
 import DescriptiveStatsTable from './components/DescriptiveStatsTable';
 import CustomChartBuilder from '../../components/charts/CustomChartBuilder';
+import SectionHeader from '../../components/common/SectionHeader';
+
 import { DashboardKPIs, TrendDataPoint, FilterState } from './components/types';
+
 import { fetchDashboardKPIs, fetchDashboardTrends } from '../../services/apiService';
 import { KPIItem, CustomVisualization } from '../../utils/types';
 import { Sparkles, X, PlusCircle, ArrowRight, CheckCircle2 } from 'lucide-react';
@@ -280,17 +283,11 @@ export default function ExecutiveDashboard({
 
       {/* ══ 5. HYPOTHESIS ANALYSIS SUITE (H1 – H5) ═══════════════════════════ */}
       <div className="space-y-6">
-        <div className="flex items-center justify-between border-b border-slate-200 dark:border-[#1e2d4a] pb-2">
-          <div>
-            <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#0F4C81] dark:text-[#3B82F6] block">
-              Biostatistical Modeling · Primary Hypotheses
-            </span>
-            <h2 className={`text-base font-extrabold ${dark ? 'text-white' : 'text-slate-900'}`}>
-              Hypothesis Testing Visual Suite (H1 – H5)
-            </h2>
-          </div>
-          <span className="text-[10px] text-slate-400 font-mono">Weighted Non-Parametric &amp; WLS Engine</span>
-        </div>
+        <SectionHeader
+          category="BIOSTATISTICAL MODELING · PRIMARY HYPOTHESES"
+          title="Hypothesis Testing Visual Suite (H1 – H5)"
+          right="Weighted Non-Parametric & WLS Engine"
+        />
 
         {/* Row 1: H1 & H2 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -310,17 +307,12 @@ export default function ExecutiveDashboard({
 
       {/* ══ 6. OPERATIONAL & CLINICAL ANALYSIS ═══════════════════════════════ */}
       <div className="space-y-6">
-        <div className="flex items-center justify-between border-b border-slate-200 dark:border-[#1e2d4a] pb-2">
-          <div>
-            <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#0F4C81] dark:text-[#3B82F6] block">
-              Operational Resource Allocation &amp; Clinical Burden
-            </span>
-            <h2 className={`text-base font-extrabold ${dark ? 'text-white' : 'text-slate-900'}`}>
-              Estimated Resource Burden &amp; Diagnostic Profiles
-            </h2>
-          </div>
-          <span className="text-[10px] text-slate-400 font-mono">ERBI = Σ(Urgency × LOS × Visits)</span>
-        </div>
+        <SectionHeader
+          category="OPERATIONAL RESOURCE ALLOCATION · CLINICAL BURDEN"
+          title="Estimated Resource Burden & Diagnostic Profiles"
+          right="ERBI = Σ(Urgency × LOS × Visits)"
+        />
+
 
         {/* Operational Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

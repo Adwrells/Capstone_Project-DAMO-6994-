@@ -14,6 +14,9 @@ import {
   ResponsiveContainer, ComposedChart, Line, Area,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend
 } from 'recharts';
+import PageHeader from '../../components/common/PageHeader';
+import SectionHeader from '../../components/common/SectionHeader';
+
 
 // ─── INTERFACES ──────────────────────────────────────────────────────────────
 interface AnalyticsCoreProps { fields: any[]; data: any[]; onNavigateNext?: () => void; }
@@ -1792,21 +1795,30 @@ export default function AnalyticsCore({ fields, data, onNavigateNext }: Analytic
   return (
     <div className="space-y-6 text-left font-sans" id="analytics-core-component">
 
-      {/* Banner */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border border-[#E5E7EB] dark:border-[#1e2d4a] bg-white dark:bg-[#131f37] rounded-xl p-6 shadow-xs">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="px-2.5 py-1 rounded-md bg-[#0F4C81]/10 border border-[#0F4C81]/20 text-[10px] text-[#0F4C81] dark:text-[#3B82F6] font-semibold tracking-wider uppercase">STATISTICAL COMPUTING HUB</span>
-            <span className="text-xs text-slate-400">Stage 4 Active</span>
-          </div>
-          <h2 className="text-2xl font-bold text-[#111827] dark:text-white tracking-tight">Hypothesis Testing &amp; Statistical Analysis</h2>
-          <p className="text-slate-500 dark:text-slate-400 text-xs font-light mt-0.5">DAMO-699 Capstone — Canadian Emergency Department Analytics Platform · Weighted non-parametric hypothesis tests · Weighted least squares (WLS) regression · Mann–Kendall trend test with Simple Exponential Smoothing (SES) · All results computed from the SQLite-loaded aggregate dataset (CIHI NACRS).</p>
-        </div>
-        <button onClick={handleReRun} disabled={status === 'EXECUTING'} id="rerun-pipeline-btn"
-          className={`px-4 py-2 text-xs font-bold rounded-lg border cursor-pointer flex items-center gap-1.5 transition-all ${status === 'EXECUTING' ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed' : 'bg-[#0F4C81] border-[#0F4C81] hover:bg-[#0c3e6b] text-white'}`}>
-          <Cpu size={14} className={status === 'EXECUTING' ? 'animate-spin' : ''} /><span>Re-Run Solver</span>
-        </button>
-      </div>
+      {/* Page Header */}
+      <PageHeader
+        category="BIOSTATISTICAL INFERENCE · STAGE 4"
+        title="Hypothesis Testing & Statistical Analysis"
+        subtitle="Weighted non-parametric hypothesis tests, weighted least squares (WLS) regressions, and Mann-Kendall longitudinal forecasting with Simple Exponential Smoothing (SES)."
+        contextPills={[
+          { label: 'Solvers', value: 'Weighted Non-Parametric', variant: 'blue' },
+          { label: 'Significance', value: 'α = 0.05 (Two-Sided)', variant: 'default' },
+          { label: 'Hypotheses', value: 'H1–H5 Evaluated', variant: 'purple' },
+          { label: 'Convergence', value: status === 'COMPLETED' ? '100% Validated' : 'Computing...', variant: status === 'COMPLETED' ? 'success' : 'amber' },
+        ]}
+        action={
+          <button
+            onClick={handleReRun}
+            disabled={status === 'EXECUTING'}
+            id="rerun-pipeline-btn"
+            className="btn-primary text-xs cursor-pointer flex items-center gap-1.5"
+          >
+            <Cpu size={14} className={status === 'EXECUTING' ? 'animate-spin' : ''} />
+            <span>Re-Run Solvers</span>
+          </button>
+        }
+      />
+
 
       {/* Telemetry */}
       <div className="border border-[#E5E7EB] dark:border-[#1e2d4a] bg-[#F9FAFB] dark:bg-[#152033] rounded-xl p-5 space-y-4">

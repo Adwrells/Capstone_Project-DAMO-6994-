@@ -18,4 +18,10 @@ export {
   formatDuration,
   formatPValue,
   formatFiscalYear,
+  fmtVisits,
+  fmtLOS,
+  fmtERBI,
+  fmtR2,
+  fmtEta,
 } from '../../../utils/formatters';
+

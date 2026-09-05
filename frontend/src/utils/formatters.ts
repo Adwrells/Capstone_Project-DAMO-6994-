@@ -126,3 +126,47 @@ export function formatFiscalYear(fy: string | null | undefined): string {
   }
   return `FY ${cleaned}`;
 }
+
+/**
+ * Formats patient visits cleanly with M/k suffix or comma formatting.
+ */
+export function fmtVisits(n: number | null | undefined): string {
+  if (n === null || n === undefined || !Number.isFinite(Number(n))) return '—';
+  const num = Number(n);
+  if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(1)}M`;
+  if (num >= 1_000) return `${(num / 1_000).toFixed(1)}k`;
+  return num.toLocaleString('en-US');
+}
+
+/**
+ * Formats Length of Stay with standard clinical precision and unit.
+ */
+export function fmtLOS(hours: number | null | undefined, dp: number = 2): string {
+  if (hours === null || hours === undefined || !Number.isFinite(Number(hours))) return '—';
+  return `${Number(hours).toFixed(dp)} hrs`;
+}
+
+/**
+ * Formats Emergency Resource Burden Index (ERBI).
+ */
+export function fmtERBI(score: number | null | undefined, dp: number = 2): string {
+  if (score === null || score === undefined || !Number.isFinite(Number(score))) return '—';
+  return Number(score).toFixed(dp);
+}
+
+/**
+ * Formats R² regression coefficient with symbol.
+ */
+export function fmtR2(r: number | null | undefined, dp: number = 4): string {
+  if (r === null || r === undefined || !Number.isFinite(Number(r))) return '—';
+  return `R² = ${Number(r).toFixed(dp)}`;
+}
+
+/**
+ * Formats Eta-squared effect size with symbol.
+ */
+export function fmtEta(eta: number | null | undefined, dp: number = 3): string {
+  if (eta === null || eta === undefined || !Number.isFinite(Number(eta))) return '—';
+  return `η² = ${Number(eta).toFixed(dp)}`;
+}
+

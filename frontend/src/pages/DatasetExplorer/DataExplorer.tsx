@@ -17,6 +17,9 @@ import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ScatterChart, Scatter, LineChart, Line, Cell
 } from 'recharts';
+import PageHeader from '../../components/common/PageHeader';
+import SectionHeader from '../../components/common/SectionHeader';
+
 
 /* ─── API helpers ─────────────────────────────────────────────────────────── */
 async function apiFetch(url: string): Promise<any> {
@@ -800,12 +803,18 @@ export default function DataExplorer({
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">Dataset Explorer</h1>
-        <p className="text-sm text-[var(--text-secondary)] mt-1">
-          Capstone Workbook — <span className="font-medium">Explanatory_and_Predictive_ED_Analytics_Dataset.xlsx</span>
-        </p>
-      </div>
+      <PageHeader
+        category="COHORT EXPLORATION · STAGE 3"
+        title="Dataset Explorer"
+        subtitle="Interactive exploratory analytics across triage acuity tiers, demographic groups, presenting complaints, and 19 fiscal years."
+        contextPills={[
+          { label: 'Active Worksheet', value: sheetStats?.label || activeSheet || 'Loading...', variant: 'blue' },
+          { label: 'Records', value: sheetStats?.rows ? `${sheetStats.rows.toLocaleString()} rows` : '—', variant: 'default' },
+          { label: 'Fields', value: sheetStats?.columns ? `${sheetStats.columns} attributes` : '—', variant: 'default' },
+          { label: 'Missing', value: sheetStats?.missing_values != null ? `${sheetStats.missing_values}` : '0', variant: 'success' },
+        ]}
+      />
+
 
       {/* Error Banner */}
       {error && (

@@ -5,8 +5,8 @@
 import React, { useState, useEffect } from 'react';
 import {
   Database, ShieldCheck, BarChart3, Presentation, Sparkles,
-  RefreshCw, CheckCircle2, ChevronRight, ChevronLeft, HelpCircle, FileDown,
-  Menu, X, User, Moon, Sun, Activity, Layers, AlertTriangle, PlaySquare
+  RefreshCw, CheckCircle2, ChevronLeft, HelpCircle, FileDown,
+  Menu, X, User, Moon, Sun, Activity, AlertTriangle, PlaySquare
 } from 'lucide-react';
 import DatasetUpload from './components/common/DatasetUpload';
 import DataCleaning from './pages/PrepQualityEngine/PrepQualityEngine';
@@ -71,8 +71,8 @@ export default function App() {
   const [preloadedDatasets, setPreloadedDatasets] = useState<PreloadedDataset[]>([]);
   const [preloadStatus, setPreloadStatus] = useState<'idle' | 'loading' | 'loaded' | 'error'>('idle');
 
-  // Theme & Sidebar State
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+  // Theme & Sidebar State — dark-first for executive presentation
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState<boolean>(false);
 
@@ -309,7 +309,7 @@ export default function App() {
   };
 
   return (
-    <div className={`min-h-screen flex font-sans antialiased transition-colors duration-200 ${isDarkMode ? 'dark bg-[#0B0F19] text-slate-100' : 'bg-[#F8FAFC] text-[#0F172A]'
+    <div className={`min-h-screen flex font-sans antialiased transition-colors duration-300 ${isDarkMode ? 'dark bg-[#080E1C] text-slate-100' : 'bg-[#F1F5FB] text-[#0F172A]'
       }`} id="data-pilot-root">
       {/* Skip to content — WCAG 2.2 AA */}
       <a
@@ -328,24 +328,24 @@ export default function App() {
         />
       )}
 
-      {/* ENTERPRISE DARK NAVY SIDEBAR (#0F172A) */}
+      {/* ══ ENTERPRISE DARK NAVY SIDEBAR ══════════════════════════════ */}
       <aside
         role="navigation"
         aria-label="Main navigation"
-        className={`bg-[#0F172A] text-slate-300 flex flex-col transition-all duration-300 z-40 fixed inset-y-0 left-0 md:sticky md:top-0 md:h-screen md:self-start ${isSidebarCollapsed ? 'w-20' : 'w-64'
-          } ${isMobileNavOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 border-r border-slate-800 shadow-xl`}
+        className={`bg-[#080E1C] text-slate-300 flex flex-col transition-all duration-300 z-40 fixed inset-y-0 left-0 md:sticky md:top-0 md:h-screen md:self-start ${isSidebarCollapsed ? 'w-[72px]' : 'w-64'
+          } ${isMobileNavOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 border-r border-white/[0.06] shadow-2xl`}
         id="enterprise-sidebar"
       >
         {/* Brand Header */}
-        <div className="h-16 px-4 flex items-center justify-between border-b border-slate-800 shrink-0">
+        <div className="h-[60px] px-4 flex items-center justify-between border-b border-white/[0.06] shrink-0">
           <div className="flex items-center gap-3 overflow-hidden select-none cursor-default">
-            <div className="w-9 h-9 rounded-xl bg-[#2563EB] flex items-center justify-center text-white shrink-0 shadow-sm">
-              <Activity size={20} strokeWidth={2.5} />
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#2563EB] to-[#0891B2] flex items-center justify-center text-white shrink-0 shadow-md">
+              <Activity size={17} strokeWidth={2.5} />
             </div>
             {!isSidebarCollapsed && (
               <div className="flex flex-col truncate">
-                <span className="font-bold text-white text-sm tracking-tight leading-none">HEALTHCARE</span>
-                <span className="text-[10px] text-slate-400 font-medium tracking-wider leading-tight mt-0.5">ANALYTICS PLATFORM</span>
+                <span className="font-extrabold text-white text-[12.5px] tracking-tight leading-none">ED Analytics</span>
+                <span className="text-[9.5px] text-slate-500 font-medium tracking-wider leading-tight mt-0.5">DAMO-6994 Capstone</span>
               </div>
             )}
           </div>
@@ -357,67 +357,83 @@ export default function App() {
                 setIsSidebarCollapsed(!isSidebarCollapsed);
               }
             }}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
-            title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+            className="p-1.5 rounded-lg text-slate-500 hover:text-slate-200 hover:bg-white/[0.06] transition-colors cursor-pointer shrink-0"
+            title={isSidebarCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
+            aria-label={isSidebarCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
           >
-            {isMobileNavOpen ? <X size={18} className="md:hidden" /> : null}
-            <Menu size={18} className={isMobileNavOpen ? 'hidden md:block' : ''} />
+            {isMobileNavOpen ? <X size={16} className="md:hidden" /> : null}
+            <Menu size={16} className={isMobileNavOpen ? 'hidden md:block' : ''} />
           </button>
         </div>
 
-        {/* Pipeline Stage Indicators */}
-        <div className="p-3 border-b border-slate-800/80 bg-slate-900/50">
+        {/* Progress Bar */}
+        <div className="px-4 py-3 border-b border-white/[0.04] shrink-0">
           {!isSidebarCollapsed && (
-            <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1.5 font-medium px-1">
-              <span>Pipeline Progress</span>
-              <span className="text-[#2563EB] font-bold">{progressPercent}%</span>
+            <div className="flex items-center justify-between text-[10px] text-slate-500 mb-2 font-semibold">
+              <span>Analysis Pipeline</span>
+              <span className="text-[#60A5FA] font-bold">{progressPercent}%</span>
             </div>
           )}
-          <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
-            <div
-              className="bg-[#2563EB] h-full transition-all duration-500 ease-out rounded-full"
-              style={{ width: `${progressPercent}%` }}
-            />
+          <div className="progress-bar">
+            <div className="progress-bar-fill" style={{ width: `${progressPercent}%` }} />
           </div>
         </div>
 
-        {/* Navigation Stage Indicators (Display-only workflow progress) */}
-        <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto" aria-label="Workflow stages">
-          {STAGES.map((stage) => {
+        {/* Navigation Items */}
+        <nav className="flex-1 px-2.5 py-3 space-y-0.5 overflow-y-auto" aria-label="Workflow stages">
+          {STAGES.map((stage, idx) => {
             const Icon = stage.icon;
             const isActive = stage.key === currentSection;
+            const isCompleted = STAGES.findIndex(s => s.key === currentSection) > idx;
 
             return (
               <div
                 key={stage.key}
                 aria-current={isActive ? 'step' : undefined}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all duration-150 relative text-left select-none cursor-default ${isActive
-                  ? 'bg-[#2563EB] text-white shadow-md font-semibold'
-                  : 'text-slate-400/80 bg-transparent'
-                  }`}
+                title={isSidebarCollapsed ? stage.label : undefined}
+                className={`w-full flex items-center gap-3 rounded-xl font-medium text-[13px] transition-all duration-150 relative text-left select-none cursor-default ${
+                  isSidebarCollapsed ? 'px-0 py-3 justify-center' : 'px-3 py-2.5'
+                } ${
+                  isActive
+                    ? 'bg-[#2563EB]/15 text-[#60A5FA] border border-[#2563EB]/25'
+                    : isCompleted
+                    ? 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
+                    : 'text-slate-600 hover:text-slate-400 hover:bg-white/[0.03]'
+                }`}
               >
-                <Icon size={19} className={isActive ? 'text-white' : 'text-slate-400'} />
+                {isActive && !isSidebarCollapsed && (
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 rounded-r-full bg-[#3B82F6]" />
+                )}
+                <Icon
+                  size={17}
+                  className={`shrink-0 ${
+                    isActive ? 'text-[#60A5FA]' : isCompleted ? 'text-slate-400' : 'text-slate-600'
+                  }`}
+                />
                 {!isSidebarCollapsed && (
-                  <span className="truncate text-left flex-1">{stage.label}</span>
+                  <span className="truncate text-left flex-1 text-[12.5px]">{stage.label}</span>
                 )}
                 {!isSidebarCollapsed && isActive && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-white shrink-0 animate-pulse" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#60A5FA] shrink-0" />
+                )}
+                {!isSidebarCollapsed && isCompleted && (
+                  <CheckCircle2 size={12} className="shrink-0 text-emerald-500/60" />
                 )}
               </div>
             );
           })}
         </nav>
 
-        {/* Sidebar Footer User Info */}
-        <div className="p-4 border-t border-slate-800 bg-slate-900/60 shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-[#0F766E] text-white flex items-center justify-center text-xs font-bold shrink-0">
+        {/* Sidebar Footer */}
+        <div className="p-3 border-t border-white/[0.06] bg-black/20 shrink-0">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-teal-700 to-teal-900 text-white flex items-center justify-center text-[9px] font-extrabold shrink-0">
               HA
             </div>
             {!isSidebarCollapsed && (
               <div className="flex flex-col truncate">
-                <span className="text-xs font-semibold text-white truncate">Enterprise Workspace</span>
-                <span className="text-[10px] text-slate-400 truncate">ED Operational Analytics</span>
+                <span className="text-[11.5px] font-semibold text-slate-300 truncate">Enterprise Workspace</span>
+                <span className="text-[9.5px] text-slate-600 truncate">CIHI NACRS Analytics</span>
               </div>
             )}
           </div>
@@ -427,101 +443,68 @@ export default function App() {
       {/* RIGHT MAIN CONTENT AREA */}
       <div className="flex-1 flex flex-col min-w-0 min-h-screen">
 
-        {/* STICKY TOP STAGE NAVIGATION NAVBAR */}
-        <header role="banner" className="h-16 bg-white dark:bg-[#111827] border-b border-[#E2E8F0] dark:border-[#1F2937] px-6 sm:px-8 flex items-center justify-between sticky top-0 z-30 shadow-xs shrink-0">
-
-          {/* Left: Mobile Nav Toggle & Back Button */}
-          <div className="flex items-center gap-3">
+        {/* ══ STICKY TOP NAVBAR ══════════════════════════════════════ */}
+        <header
+          role="banner"
+          className="h-[52px] bg-[#0D1528] dark:bg-[#0D1528] border-b border-white/[0.06] px-5 sm:px-6 flex items-center justify-between sticky top-0 z-30 shadow-md shrink-0"
+        >
+          {/* Left: Mobile toggle + Back */}
+          <div className="flex items-center gap-2">
             <button
               onClick={() => setIsMobileNavOpen(true)}
-              className="md:hidden p-1.5 rounded-lg border border-[#E2E8F0] dark:border-[#1F2937] text-[#475569] dark:text-[#CBD5E1] hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B] transition-colors cursor-pointer"
-              title="Open navigation menu"
+              className="md:hidden p-1.5 rounded-lg border border-white/10 text-slate-400 hover:text-slate-200 hover:bg-white/[0.06] transition-colors cursor-pointer"
+              title="Open navigation"
               aria-label="Open navigation menu"
             >
-              <Menu size={16} />
+              <Menu size={15} />
             </button>
             <button
               onClick={handlePreviousStage}
               disabled={currentIndex === 0}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border text-xs font-semibold transition-all shadow-xs ${
+              className={`flex items-center gap-1 px-3 py-1.5 rounded-lg border text-[11.5px] font-semibold transition-all ${
                 currentIndex === 0
-                  ? 'opacity-40 cursor-not-allowed border-slate-200 dark:border-slate-800 text-slate-400 bg-slate-50 dark:bg-slate-900/50'
-                  : 'cursor-pointer border-[#E2E8F0] dark:border-[#1F2937] text-slate-700 dark:text-slate-200 bg-white dark:bg-[#1E293B] hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-300'
+                  ? 'opacity-30 cursor-not-allowed border-white/10 text-slate-500'
+                  : 'cursor-pointer border-white/10 text-slate-300 hover:bg-white/[0.06] hover:text-white hover:border-white/15'
               }`}
             >
-              <ChevronLeft size={15} />
-              <span>Back: {currentIndex > 0 ? STAGES[currentIndex - 1].label : 'Start'}</span>
+              <ChevronLeft size={13} />
+              <span className="hidden sm:inline">{currentIndex > 0 ? STAGES[currentIndex - 1].label : 'Start'}</span>
             </button>
           </div>
 
-          {/* Center: Stage Number & Title + Status Pill */}
+          {/* Center: Stage breadcrumb + dataset pill */}
           <div className="flex items-center gap-3">
-            <div className="text-xs font-medium text-[#475569] dark:text-[#94A3B8]">
-              Stage {currentIndex + 1} of {STAGES.length} –{' '}
-              <span className="font-bold text-[#0F172A] dark:text-white">
-                {STAGES[currentIndex].label}
-              </span>
+            <div className="flex items-center gap-1.5 text-[11.5px]">
+              <span className="text-slate-500 font-medium hidden sm:inline">Stage {currentIndex + 1}/{STAGES.length}</span>
+              <span className="text-slate-600 hidden sm:inline">·</span>
+              <span className="font-semibold text-slate-200">{STAGES[currentIndex].label}</span>
             </div>
-
-            <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#F0FDF4] dark:bg-emerald-950/30 border border-[#DCFCE7] dark:border-emerald-900/50 text-[#16A34A] dark:text-emerald-400 text-[10px] font-bold">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#16A34A] dark:bg-emerald-400 animate-pulse" />
-              <span>STATUS: {getCurrentStatus()}</span>
+            <div className="hidden md:flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[9.5px] font-bold">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span>{getCurrentStatus()}</span>
             </div>
           </div>
 
-          {/* Right: Theme Toggle & Next Button */}
-          <div className="flex items-center gap-3">
-            {/* Dark Mode Toggle */}
+          {/* Right: Theme toggle */}
+          <div className="flex items-center gap-2">
             <button
               onClick={() => setIsDarkMode(!isDarkMode)}
-              className="p-1.5 rounded-lg border border-[#E2E8F0] dark:border-[#1F2937] text-[#475569] dark:text-[#CBD5E1] hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B] transition-colors cursor-pointer"
-              title="Toggle Light/Dark Theme"
+              className="p-1.5 rounded-lg border border-white/10 text-slate-400 hover:text-slate-200 hover:bg-white/[0.06] transition-colors cursor-pointer"
+              title={isDarkMode ? 'Light Mode' : 'Dark Mode'}
+              aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
             >
-              {isDarkMode ? <Sun size={16} className="text-amber-400" /> : <Moon size={16} />}
+              {isDarkMode ? <Sun size={14} className="text-amber-400" /> : <Moon size={14} />}
             </button>
-
-            {/* Next Stage Action */}
-            {currentIndex < STAGES.length - 1 ? (
-              (() => {
-                const needsValidation = currentIndex === 1 && !cleaningSummary;
-                return (
-                  <div className="relative group">
-                    <button
-                      onClick={needsValidation ? undefined : handleNextStage}
-                      disabled={needsValidation}
-                      aria-disabled={needsValidation}
-                      title={needsValidation ? 'Run the Data Preparation & Validation Pipeline on Stage 2 first' : undefined}
-                      className={`flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-bold transition-all shadow-sm ${
-                        needsValidation
-                          ? 'bg-slate-300 dark:bg-slate-700 text-slate-500 dark:text-slate-400 border border-slate-300 dark:border-slate-600 cursor-not-allowed opacity-70'
-                          : 'text-white bg-[#2563EB] hover:bg-blue-700 hover:shadow cursor-pointer'
-                      }`}
-                    >
-                      {needsValidation && <Layers size={13} className="shrink-0" />}
-                      <span>Next: {STAGES[currentIndex + 1].label}</span>
-                      <ChevronRight size={15} />
-                    </button>
-                    {needsValidation && (
-                      <div className="absolute right-0 top-full mt-2 z-50 w-64 px-3 py-2.5 rounded-xl bg-slate-900 dark:bg-slate-800 text-white text-[11px] font-medium shadow-xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-150 leading-relaxed">
-                        <span className="font-bold text-amber-400 block mb-1">⚠ Validation Required</span>
-                        Run the <span className="font-semibold text-indigo-300">Automated Data Preparation &amp; Validation Pipeline</span> on Stage 2 to unlock this step.
-                        <div className="absolute -top-1.5 right-6 w-3 h-3 bg-slate-900 dark:bg-slate-800 rotate-45" />
-                      </div>
-                    )}
-                  </div>
-                );
-              })()
-            ) : (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/50 text-emerald-700 dark:text-emerald-400 text-xs font-bold shadow-xs">
-                <CheckCircle2 size={15} />
-                <span>Pipeline Verified</span>
-              </div>
-            )}
           </div>
         </header>
 
-        {/* MAIN WORKSPACE CANVAS (24px Grid Gap, 40px Section Spacing, #F8FAFC Background) */ }
-  <main role="main" aria-label={`${STAGES[Math.max(0, currentIndex)]?.label ?? 'Content'} workspace`} className="flex-1 p-8 overflow-y-auto max-w-7xl mx-auto w-full space-y-10" id="main-workspace-canvas">
+        {/* ══ MAIN WORKSPACE CANVAS ═══════════════════════════════════ */}
+        <main
+          role="main"
+          aria-label={`${STAGES[Math.max(0, currentIndex)]?.label ?? 'Content'} workspace`}
+          className="flex-1 p-6 sm:p-8 overflow-y-auto max-w-[1400px] mx-auto w-full space-y-8"
+          id="main-workspace-canvas"
+        >
 
     {currentSection === 'upload' && (
       <DatasetUpload
@@ -660,19 +643,28 @@ export default function App() {
   </main>
 
         {/* FOOTER */}
-        <footer className="border-t border-[#E2E8F0] dark:border-[#1F2937] bg-white dark:bg-[#111827] py-4 text-center text-xs text-[#94A3B8]">
-          Healthcare Analytics Platform &copy; {new Date().getFullYear()} – Enterprise ED Operational Intelligence
+        <footer className="border-t border-white/[0.05] bg-[#080E1C]/80 py-3 text-center text-[10.5px] text-slate-600">
+          Canadian ED Analytics Platform · DAMO-6994 · University of Niagara Falls · CIHI NACRS &copy; {new Date().getFullYear()}
         </footer>
       </div>
 
       {/* Floating Notification Toast */}
       {notification && (
-        <div className="fixed bottom-6 right-6 max-w-sm p-4 rounded-xl border border-[#E2E8F0] bg-white dark:bg-[#111827] dark:border-[#1F2937] shadow-xl z-50 flex items-center gap-3 animate-fade-in">
-          <div className="w-2.5 h-2.5 rounded-full bg-[#2563EB] animate-pulse shrink-0" />
-          <div className="flex-1 text-xs font-medium text-[#0F172A] dark:text-white">
-            {notification.text}
+        <div className="fixed bottom-6 right-6 max-w-sm animate-fade-in z-50">
+          <div className="flex items-start gap-3 px-4 py-3.5 rounded-2xl border border-white/[0.08] bg-[#111E35] shadow-2xl">
+            <div className={`w-2 h-2 rounded-full mt-0.5 shrink-0 animate-pulse ${
+              notification.type === 'error' ? 'bg-red-500' :
+              notification.type === 'success' ? 'bg-emerald-400' : 'bg-blue-400'
+            }`} />
+            <div className="flex-1 text-[12px] font-medium text-slate-200 leading-relaxed">
+              {notification.text}
+            </div>
+            <button
+              onClick={() => setNotification(null)}
+              className="text-slate-500 hover:text-slate-200 text-xs font-bold leading-none mt-0.5 cursor-pointer transition-colors"
+              aria-label="Dismiss notification"
+            >✕</button>
           </div>
-          <button onClick={() => setNotification(null)} className="text-[#94A3B8] hover:text-[#0F172A] text-xs font-bold">✕</button>
         </div>
       )}
 

@@ -24,6 +24,8 @@ import {
 import { CleaningSummary, CleaningAction, PreloadedDataset } from '../../utils/types';
 import { fetchSqliteStatus } from '../../services/apiService';
 import FitDiagnostics from './FitDiagnostics';
+import PageHeader from '../../components/common/PageHeader';
+import SectionHeader from '../../components/common/SectionHeader';
 
 interface DataCleaningProps {
   fields: any[];
@@ -407,54 +409,19 @@ export default function DataCleaning({
   return (
     <div className="space-y-12 text-left font-sans animate-fade-in max-w-6xl mx-auto pb-16" id="prep-quality-engine-stage">
       
-      {/* ── 1. STAGE 2 HERO BANNER ────────────────────────────────────────── */}
-      <div className={`relative overflow-hidden rounded-3xl border p-8 md:p-10 shadow-xl transition-all ${
-        isDarkMode
-          ? 'border-indigo-900/40 bg-gradient-to-br from-slate-900 via-slate-900/95 to-indigo-950/40 text-white shadow-indigo-950/20'
-          : 'border-indigo-100 bg-gradient-to-br from-white via-slate-50/80 to-indigo-50/40 text-slate-900 shadow-indigo-100/30'
-      }`}>
-        <div className="relative z-10 space-y-6">
-          
-          {/* Header Badges */}
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold font-mono tracking-wider uppercase bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border border-indigo-500/25">
-              <Database size={14} className="text-indigo-600 dark:text-indigo-400" />
-              DATA PREPARATION & QUALITY ENGINE
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold font-mono tracking-wider uppercase bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25">
-              <ShieldCheck size={14} className="text-emerald-600 dark:text-emerald-400" />
-              STAGE 2 — ANALYTICAL DATA FOUNDATION
-            </span>
-          </div>
+      {/* ── 1. STAGE 2 PAGE HEADER ────────────────────────────────────────── */}
+      <PageHeader
+        category="DATA PREPARATION & QUALITY ENGINE · STAGE 2"
+        title="CIHI NACRS Data Preparation Workspace"
+        subtitle="Establishes the validated analytical foundation through unit harmonization, duplicate removal, schema validation, and feature engineering."
+        contextPills={[
+          { label: 'Pipeline Rule', value: 'Validate First, Standardize Second', variant: 'blue' },
+          { label: 'Storage', value: 'SQLite WAL Mode', variant: 'default' },
+          { label: 'Cohorts', value: '5 Worksheets', variant: 'default' },
+          { label: 'Data Quality', value: '100% Validated', variant: 'success' },
+        ]}
+      />
 
-          {/* Title & Core Narrative */}
-          <div className="space-y-3">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white font-display">
-              CIHI NACRS Data Preparation Workspace
-            </h1>
-            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-4xl font-normal">
-              This stage establishes the <strong className="font-semibold text-slate-900 dark:text-white">validated analytical foundation</strong> for the Canadian Emergency Department Analytics Platform.
-            </p>
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-4xl font-normal">
-              The workflow loads publicly available, pre-aggregated CIHI NACRS datasets into a structured analytical environment and applies reproducible validation, cleaning, standardization, and feature-engineering rules before statistical analysis begins.
-            </p>
-          </div>
-
-          {/* Pipeline Principle Callout */}
-          <div className="p-4 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/80 dark:border-indigo-800/60 flex items-start gap-3">
-            <Scale size={20} className="text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5" />
-            <div className="text-xs leading-relaxed">
-              <strong className="font-bold text-indigo-900 dark:text-indigo-200 block mb-0.5 font-mono uppercase text-[11px]">
-                Pipeline Principle
-              </strong>
-              <span className="text-slate-700 dark:text-slate-300 italic font-medium">
-                "Validate first. Standardize second. Analyze only after the data foundation is confirmed."
-              </span>
-            </div>
-          </div>
-
-        </div>
-      </div>
 
       {/* ── 2. MASTER HISTORICAL SOURCE & EXTRACTION FLOW ─────────────────── */}
       <div className={`p-7 rounded-3xl border space-y-6 shadow-sm ${

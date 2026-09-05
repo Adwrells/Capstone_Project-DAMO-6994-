@@ -8,6 +8,7 @@ import {
   FileText, ShieldCheck, Printer, Award, Download, Check, RefreshCw, FileCode, Sliders, Eye
 } from 'lucide-react';
 import { printPanelAsPdf } from '../../utils/printToPdf';
+import PageHeader from '../../components/common/PageHeader';
 
 interface ExportReportsProps {
   datasetName: string;
@@ -193,37 +194,26 @@ export default function ExportReports({
   return (
     <div className="space-y-6 text-left font-sans animate-fade-in" id="export-reports-stage">
       
-      {/* Banner */}
-      <div className={`border rounded-xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-xs bg-white dark:bg-[#131f37] border-[#E5E7EB] dark:border-[#1e2d4a]`}>
-        <div>
-          <div className="flex items-center gap-1.5">
-            <span className="px-2.5 py-1 rounded bg-emerald-500/10 border border-emerald-500/20 text-[10px] text-emerald-600 dark:text-emerald-400 tracking-wider uppercase font-bold">Grade AAA Accredited</span>
-            <span className="text-xs text-slate-400 font-medium truncate max-w-[200px]">{datasetName}</span>
-          </div>
-          <h2 className="text-2xl font-bold tracking-tight text-slate-800 dark:text-white mt-1">
-            Report & Export Center
-          </h2>
-          <p className="text-slate-500 dark:text-slate-400 text-xs font-light mt-0.5">
-            Customize, select metrics, preview, and download the clinical research report.
-          </p>
-        </div>
-
-        <div className="inline-flex items-center gap-2 bg-[#0F4C81]/5 dark:bg-[#182640] border border-[#0F4C81]/15 dark:border-[#1e2d4a] rounded-xl p-3 shadow-xs">
-          <Award size={18} className="text-[#0F4C81] dark:text-[#3B82F6]" />
-          <div>
-            <span className="text-[10px] text-[#0F4C81] dark:text-[#3B82F6] uppercase font-bold block leading-none">Dossier Validation</span>
-            <span className="text-xs font-bold text-slate-800 dark:text-white">Active Operational Dossier</span>
-          </div>
-        </div>
-      </div>
+      {/* Executive Page Header */}
+      <PageHeader
+        category="STAGE 07 · DECISION SUPPORT & AUDIT"
+        title="Report Generation & Decision Dossier"
+        subtitle="Configure, preview, and generate audit-ready healthcare executive dossiers, research reports, and clean data archives derived from CIHI NACRS emergency department analytics."
+        contextPills={[
+          { label: 'Grade AAA Accredited', variant: 'success' },
+          { label: datasetName || 'CIHI NACRS Cohort', variant: 'blue' },
+          { label: `${cleanedCount ? cleanedCount.toLocaleString() : '175.8M'} Records`, variant: 'default' },
+          { label: `Quality: ${qualityScore}/100`, variant: 'amber' },
+        ]}
+      />
 
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         {/* Left Column: Config Panel (4-cols) */}
         <div className="lg:col-span-4 space-y-6">
-          <div className="border border-[#E5E7EB] dark:border-[#1e2d4a] bg-white dark:bg-[#131f37] rounded-xl p-5 space-y-5 shadow-xs">
-            <h3 className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider border-b border-[#E5E7EB] dark:border-[#1e2d4a] pb-2.5 flex items-center gap-1.5">
+          <div className="border border-slate-200/90 dark:border-slate-800/80 bg-white dark:bg-[#0d172a] rounded-2xl p-6 space-y-5 shadow-xs">
+            <h3 className="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider border-b border-slate-100 dark:border-slate-800 pb-3 flex items-center gap-2">
               <Sliders size={14} className="text-[#0F4C81] dark:text-[#3B82F6]" />
               Report Customization
             </h3>
@@ -238,7 +228,7 @@ export default function ExportReports({
                 value={reportName}
                 onChange={(e) => setReportName(e.target.value.replace(/[^a-zA-Z0-9_-]/g, ""))}
                 placeholder="Enter dossier filename..."
-                className="w-full bg-[#F7F9FC] dark:bg-[#182640] border border-[#E5E7EB] dark:border-[#213454] rounded-lg px-3 py-2 text-xs font-semibold text-slate-800 dark:text-white focus:outline-hidden focus:border-[#0F4C81]"
+                className="w-full bg-slate-50 dark:bg-[#131f37] border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-slate-800 dark:text-white focus:outline-hidden focus:border-blue-500"
               />
               <span className="text-[9px] text-slate-400 block font-light">Letters, numbers, underscores, or hyphens only.</span>
             </div>
@@ -251,7 +241,7 @@ export default function ExportReports({
               <select
                 value={selectedFormat}
                 onChange={(e) => setSelectedFormat(e.target.value as any)}
-                className="w-full bg-[#F7F9FC] dark:bg-[#182640] border border-[#E5E7EB] dark:border-[#213454] rounded-lg px-3 py-2 text-xs font-semibold text-slate-800 dark:text-white focus:outline-hidden cursor-pointer"
+                className="w-full bg-slate-50 dark:bg-[#131f37] border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-slate-800 dark:text-white focus:outline-hidden cursor-pointer"
               >
                 <option value="PDF">PDF (Portable Document Format)</option>
                 <option value="DOCX">DOCX (Microsoft Word Document)</option>
@@ -262,13 +252,13 @@ export default function ExportReports({
             </div>
 
             {/* Chapter Selection Toggles */}
-            <div className="space-y-3 pt-2">
+            <div className="space-y-2.5 pt-1">
               <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide block">
                 Select Report Chapters
               </label>
 
               {/* Toggle Summary */}
-              <div className="flex items-center justify-between p-2.5 rounded-lg border border-[#E5E7EB] dark:border-[#213454] hover:bg-slate-50 dark:hover:bg-slate-800/30 transition">
+              <div className="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-[#131f37]/50 transition">
                 <div className="text-left space-y-0.5">
                   <span className="text-xs font-bold text-slate-700 dark:text-slate-200 block">1. Research Abstract</span>
                   <span className="text-[9px] text-slate-400 block font-light">Introduction and problem context</span>
@@ -277,12 +267,12 @@ export default function ExportReports({
                   type="checkbox"
                   checked={includeSummary}
                   onChange={(e) => setIncludeSummary(e.target.checked)}
-                  className="w-4 h-4 accent-[#0F4C81] dark:accent-[#3B82F6] cursor-pointer"
+                  className="w-4 h-4 accent-blue-600 dark:accent-blue-500 cursor-pointer"
                 />
               </div>
 
               {/* Toggle Quality */}
-              <div className="flex items-center justify-between p-2.5 rounded-lg border border-[#E5E7EB] dark:border-[#213454] hover:bg-slate-50 dark:hover:bg-slate-800/30 transition">
+              <div className="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-[#131f37]/50 transition">
                 <div className="text-left space-y-0.5">
                   <span className="text-xs font-bold text-slate-700 dark:text-slate-200 block">2. Quality & Harmonization</span>
                   <span className="text-[9px] text-slate-400 block font-light">Cohorts, record volume, validation index</span>
@@ -291,55 +281,55 @@ export default function ExportReports({
                   type="checkbox"
                   checked={includeQuality}
                   onChange={(e) => setIncludeQuality(e.target.checked)}
-                  className="w-4 h-4 accent-[#0F4C81] dark:accent-[#3B82F6] cursor-pointer"
+                  className="w-4 h-4 accent-blue-600 dark:accent-blue-500 cursor-pointer"
                 />
               </div>
 
               {/* Toggle Methodology */}
-              <div className="flex items-center justify-between p-2.5 rounded-lg border border-[#E5E7EB] dark:border-[#213454] hover:bg-slate-50 dark:hover:bg-slate-800/30 transition">
+              <div className="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-[#131f37]/50 transition">
                 <div className="text-left space-y-0.5">
                   <span className="text-xs font-bold text-slate-700 dark:text-slate-200 block">3. Analytics Methodology</span>
-                  <span className="text-[9px] text-slate-400 block font-light">Welch T-Test and RUI definitions</span>
+                  <span className="text-[9px] text-slate-400 block font-light">Hypothesis specifications &amp; model definitions</span>
                 </div>
                 <input
                   type="checkbox"
                   checked={includeMethodology}
                   onChange={(e) => setIncludeMethodology(e.target.checked)}
-                  className="w-4 h-4 accent-[#0F4C81] dark:accent-[#3B82F6] cursor-pointer"
+                  className="w-4 h-4 accent-blue-600 dark:accent-blue-500 cursor-pointer"
                 />
               </div>
 
               {/* Toggle AI Insights */}
-              <div className="flex items-center justify-between p-2.5 rounded-lg border border-[#E5E7EB] dark:border-[#213454] hover:bg-slate-50 dark:hover:bg-slate-800/30 transition">
+              <div className="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-[#131f37]/50 transition">
                 <div className="text-left space-y-0.5">
                   <span className="text-xs font-bold text-slate-700 dark:text-slate-200 block">4. AI Clinical Decisions</span>
-                  <span className="text-[9px] text-slate-400 block font-light">Recommendations & operational ROI</span>
+                  <span className="text-[9px] text-slate-400 block font-light">Recommendations &amp; operational implications</span>
                 </div>
                 <input
                   type="checkbox"
                   checked={includeAIInsights}
                   onChange={(e) => setIncludeAIInsights(e.target.checked)}
-                  className="w-4 h-4 accent-[#0F4C81] dark:accent-[#3B82F6] cursor-pointer"
+                  className="w-4 h-4 accent-blue-600 dark:accent-blue-500 cursor-pointer"
                 />
               </div>
 
               {/* Toggle Statistics */}
-              <div className="flex items-center justify-between p-2.5 rounded-lg border border-[#E5E7EB] dark:border-[#213454] hover:bg-slate-50 dark:hover:bg-slate-800/30 transition">
+              <div className="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-[#131f37]/50 transition">
                 <div className="text-left space-y-0.5">
                   <span className="text-xs font-bold text-slate-700 dark:text-slate-200 block">5. Parametric Models</span>
-                  <span className="text-[9px] text-slate-400 block font-light">OLS, ARIMA, K-Means profiles</span>
+                  <span className="text-[9px] text-slate-400 block font-light">WLS regression, Mann-Kendall, SES forecast</span>
                 </div>
                 <input
                   type="checkbox"
                   checked={includeStatistics}
                   onChange={(e) => setIncludeStatistics(e.target.checked)}
-                  className="w-4 h-4 accent-[#0F4C81] dark:accent-[#3B82F6] cursor-pointer"
+                  className="w-4 h-4 accent-blue-600 dark:accent-blue-500 cursor-pointer"
                 />
               </div>
             </div>
 
             {/* Quick Export Buttons */}
-            <div className="space-y-2 pt-2 border-t border-[#E5E7EB] dark:border-[#1e2d4a]">
+            <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
               <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide block">
                 Quick Direct Export
               </label>
@@ -347,48 +337,48 @@ export default function ExportReports({
                 <button
                   onClick={onDownloadCSV}
                   disabled={!onDownloadCSV}
-                  className="py-2 px-2 rounded-lg border border-[#E5E7EB] dark:border-[#213454] text-slate-600 dark:text-slate-300 hover:border-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-400 font-semibold text-[11px] flex flex-col items-center gap-1 transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed bg-white dark:bg-[#111a2e]"
+                  className="py-2.5 px-2 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 font-semibold text-[11px] flex flex-col items-center gap-1 transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed bg-slate-50/50 dark:bg-[#131f37]"
                   title="Download cleaned dataset as CSV"
                 >
-                  <Download size={13} />
+                  <Download size={14} />
                   <span>CSV</span>
                 </button>
                 <button
                   onClick={onDownloadXLSX}
                   disabled={!onDownloadXLSX}
-                  className="py-2 px-2 rounded-lg border border-[#E5E7EB] dark:border-[#213454] text-slate-600 dark:text-slate-300 hover:border-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-400 font-semibold text-[11px] flex flex-col items-center gap-1 transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed bg-white dark:bg-[#111a2e]"
+                  className="py-2.5 px-2 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 font-semibold text-[11px] flex flex-col items-center gap-1 transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed bg-slate-50/50 dark:bg-[#131f37]"
                   title="Download as Excel (XLSX)"
                 >
-                  <FileText size={13} />
+                  <FileText size={14} />
                   <span>XLSX</span>
                 </button>
                 <button
                   onClick={onDownloadZIP}
                   disabled={!onDownloadZIP}
-                  className="py-2 px-2 rounded-lg border border-[#E5E7EB] dark:border-[#213454] text-slate-600 dark:text-slate-300 hover:border-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-400 font-semibold text-[11px] flex flex-col items-center gap-1 transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed bg-white dark:bg-[#111a2e]"
+                  className="py-2.5 px-2 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 font-semibold text-[11px] flex flex-col items-center gap-1 transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed bg-slate-50/50 dark:bg-[#131f37]"
                   title="Download dashboard charts as ZIP archive"
                 >
-                  <FileCode size={13} />
+                  <FileCode size={14} />
                   <span>ZIP</span>
                 </button>
               </div>
             </div>
 
             {/* Export and Print Buttons */}
-            <div className="space-y-2 pt-2">
+            <div className="space-y-2.5 pt-2">
               <button
                 onClick={handleExportReport}
                 disabled={isExporting}
-                className="w-full py-3 px-4 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm hover:shadow-md transition cursor-pointer disabled:opacity-55"
+                className="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm hover:shadow-md transition cursor-pointer disabled:opacity-55"
               >
                 {isExporting ? (
                   <>
-                    <RefreshCw size={13} className="animate-spin" />
+                    <RefreshCw size={14} className="animate-spin" />
                     <span>Compiling Formats...</span>
                   </>
                 ) : (
                   <>
-                    <Download size={13} />
+                    <Download size={14} />
                     <span>
                       {selectedFormat === 'PDF'
                         ? 'Generate PDF (choose "Save as PDF")'
@@ -400,15 +390,15 @@ export default function ExportReports({
 
               <button
                 onClick={() => window.print()}
-                className="w-full py-2.5 px-4 rounded-lg border border-[#E5E7EB] hover:border-slate-300 dark:border-[#213454] dark:hover:border-slate-600 text-slate-600 dark:text-slate-300 hover:text-slate-800 font-semibold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer bg-white dark:bg-[#111a2e]"
+                className="w-full py-2.5 px-4 rounded-xl border border-slate-200 hover:border-slate-300 dark:border-slate-800 dark:hover:border-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-semibold text-xs flex items-center justify-center gap-2 transition cursor-pointer bg-slate-50/50 dark:bg-[#131f37]/70"
               >
-                <Printer size={13} />
+                <Printer size={14} />
                 <span>Direct Print Portfolio</span>
               </button>
             </div>
           </div>
 
-          <div className="p-4 rounded-xl border border-[#E5E7EB] dark:border-[#1e2d4a] bg-[#F7F9FC] dark:bg-[#182640]/50 text-[10px] text-slate-400 font-mono flex items-center gap-2">
+          <div className="p-4 rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-slate-50/50 dark:bg-[#131f37]/40 text-[10px] text-slate-400 font-mono flex items-center gap-2">
             <ShieldCheck size={14} className="text-emerald-500 shrink-0" />
             <span>Encrypted transmission. Report generation is compliant with PHIPA administrative standards.</span>
           </div>
@@ -416,13 +406,13 @@ export default function ExportReports({
 
         {/* Right Column: Dynamic Preview Area (8-cols) */}
         <div className="lg:col-span-8 space-y-4">
-          <div className="border border-[#E5E7EB] dark:border-[#1e2d4a] bg-[#F1F5F9] dark:bg-[#0f172a] rounded-xl p-6 h-[720px] overflow-y-auto flex flex-col items-center">
+          <div className="border border-slate-200/90 dark:border-slate-800/80 bg-slate-100 dark:bg-[#080d19] rounded-2xl p-6 h-[740px] overflow-y-auto flex flex-col items-center shadow-xs">
             
             {/* Live Document Preview Header info */}
-            <div className="w-full max-w-[580px] mb-3 flex items-center justify-between text-xs text-slate-400 font-medium">
-              <span className="flex items-center gap-1">
-                <Eye size={12} className="text-emerald-500" />
-                Live WYSIWYG Document Preview
+            <div className="w-full max-w-[580px] mb-3 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-mono">
+              <span className="flex items-center gap-1.5">
+                <Eye size={13} className="text-emerald-500" />
+                <span>Live WYSIWYG Document Preview</span>
               </span>
               <span>Selected chapters: {
                 [includeSummary, includeQuality, includeMethodology, includeAIInsights, includeStatistics].filter(Boolean).length

@@ -1,40 +1,21 @@
 /**
  * Healthcare Analytics Platform - About Project Page (Page 1)
  * Master's Capstone Project | Master of Data Analytics
- * Executive-Grade, High-Scannability Summary Design (8-10 Second Comprehension)
+ * Dark Enterprise Healthcare Analytics Identity
  */
 
 import React, { useState } from 'react';
 import {
-  GraduationCap,
-  Database,
-  Cpu,
-  TrendingUp,
-  Activity,
-  Sparkles,
-  ArrowRight,
-  ShieldCheck,
-  CheckCircle2,
-  Server,
-  Layers,
-  Clock,
-  BarChart3,
-  AlertTriangle,
-  Workflow,
-  Code,
-  Calendar,
-  Compass,
-  FileCheck,
-  LineChart,
-  PieChart,
-  Lock,
-  ChevronRight,
-  Info,
-  Zap,
-  Target,
-  Users
+  GraduationCap, Database, Cpu, TrendingUp, Activity, Sparkles,
+  ArrowRight, ShieldCheck, CheckCircle2, Server, Layers, Clock,
+  BarChart3, AlertTriangle, Workflow, Code, Calendar, Compass,
+  FileCheck, LineChart, PieChart, Lock, ChevronRight, Info, Zap,
+  Target, Users, FileSpreadsheet
 } from 'lucide-react';
 import ArchitecturePipelineCard from '../../components/architecture/ArchitecturePipelineCard';
+import PageHeader from '../../components/common/PageHeader';
+import SectionHeader from '../../components/common/SectionHeader';
+import StatBadge from '../../components/common/StatBadge';
 
 interface AboutProjectProps {
   onReset?: () => void;
@@ -42,289 +23,305 @@ interface AboutProjectProps {
   onBeginPrep?: () => void;
 }
 
-export default function AboutProject({ onReset, isDarkMode = false, onBeginPrep }: AboutProjectProps) {
+export default function AboutProject({ onReset, isDarkMode = true, onBeginPrep }: AboutProjectProps) {
   const [activeTab, setActiveTab] = useState<'hypotheses' | 'pipeline' | 'architecture'>('hypotheses');
 
   return (
     <div className="space-y-8 text-left font-sans animate-fade-in max-w-6xl mx-auto pb-16" id="about-project-stage">
 
-      {/* ── 1. EXECUTIVE HERO BANNER ────────────────────────────────────────── */}
-      <div className={`relative overflow-hidden rounded-3xl border p-6 sm:p-8 md:p-10 shadow-xl transition-all ${isDarkMode
-          ? 'border-indigo-900/40 bg-gradient-to-br from-slate-900 via-slate-900/95 to-indigo-950/40 text-white shadow-indigo-950/20'
-          : 'border-indigo-100 bg-gradient-to-br from-white via-slate-50/80 to-indigo-50/40 text-slate-900 shadow-indigo-100/30'
-        }`}>
-        {/* Ambient Glow */}
-        <div className="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-indigo-500/15 blur-3xl pointer-events-none" />
-        <div className="absolute right-1/3 -bottom-20 w-72 h-72 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
+      {/* ── 1. PAGE HEADER & EXECUTIVE HERO ─────────────────────────────────── */}
+      <PageHeader
+        category="EXECUTIVE RESEARCH OVERVIEW · CAPSTONE PLATFORM"
+        title="Canadian Emergency Department Analytics Platform"
+        subtitle="Explanatory biostatistical modeling of ED Length of Stay (LOS) and longitudinal hospital resource burden using aggregate CIHI NACRS administrative data (2003–2021)."
+        contextPills={[
+          { label: 'Program', value: 'Master of Data Analytics', variant: 'blue' },
+          { label: 'Source', value: 'CIHI NACRS Aggregate', variant: 'default' },
+          { label: 'Time Span', value: '19 Fiscal Years', variant: 'default' },
+          { label: 'Quality Audit', value: '100% Validated', variant: 'success' },
+        ]}
+      />
 
-        <div className="relative z-10 space-y-5">
-          {/* Header Badges */}
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold font-mono tracking-wide uppercase bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border border-indigo-500/25">
-              🎓 Master's Capstone Project
+      {/* Hero Overview Card */}
+      <div className="rounded-2xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#111e35] p-6 sm:p-8 shadow-sm transition-all space-y-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/[0.06] pb-5">
+          <div className="space-y-1">
+            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+              Core Research Thesis
             </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold font-mono tracking-wide uppercase bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25">
-              📊 Master of Data Analytics
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold font-mono tracking-wide uppercase bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
-              🇨🇦 CIHI NACRS Data
-            </span>
-          </div>
-
-          {/* Title & Core Pitch */}
-          <div className="space-y-2">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white font-display">
-              Canadian Emergency Department Analytics Platform
-            </h1>
-            <p className="text-sm sm:text-base font-semibold text-indigo-600 dark:text-indigo-300">
-              📈 Explanatory Analytics of ED Length of Stay (LOS) & Longitudinal Resource Burden (2003–2021)
-            </p>
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-4xl font-normal">
-              An enterprise healthcare analytics system utilizing pre-aggregated <strong className="font-semibold text-slate-900 dark:text-white">CIHI NACRS</strong> data to quantify clinical stay drivers, model long-term hospital pressures, and forecast near-term emergency resource demands.
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100">
+              What systemic and clinical factors drive ED stay duration and cumulative emergency strain?
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-3xl leading-relaxed">
+              Synthesizes 8,685+ pre-aggregated records across 175.8M visits to isolate independent predictors of operational delays, evaluate patient demographic disparities, and forecast near-term demand trajectories.
             </p>
           </div>
 
-          {/* 8-Second Telemetry KPI Bar */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
-            <div className="p-3.5 rounded-2xl bg-indigo-50/80 dark:bg-indigo-950/50 border border-indigo-200/80 dark:border-indigo-800/60">
-              <span className="text-[11px] font-bold font-mono text-indigo-700 dark:text-indigo-300 block">📊 CLINICAL RECORDS</span>
-              <span className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white font-display">8,685+</span>
-              <span className="text-[10px] text-slate-500 dark:text-slate-400 block">6 Harmonized Datasets</span>
-            </div>
+          {onBeginPrep && (
+            <button
+              type="button"
+              onClick={onBeginPrep}
+              className="btn-primary self-start md:self-center shrink-0 cursor-pointer text-xs"
+            >
+              <span>Explore Data Pipeline</span>
+              <ArrowRight size={14} />
+            </button>
+          )}
+        </div>
 
-            <div className="p-3.5 rounded-2xl bg-emerald-50/80 dark:bg-emerald-950/50 border border-emerald-200/80 dark:border-emerald-800/60">
-              <span className="text-[11px] font-bold font-mono text-emerald-700 dark:text-emerald-300 block">⏳ TIME SPAN</span>
-              <span className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white font-display">19 Years</span>
-              <span className="text-[10px] text-slate-500 dark:text-slate-400 block">2003–2004 to 2021–2022</span>
+        {/* 4 Telemetry Metrics Bar */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="p-4 rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200/80 dark:border-white/[0.06] space-y-1">
+            <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 text-[10.5px] font-mono font-semibold uppercase">
+              <Database size={13} className="text-blue-500" />
+              <span>Clinical Records</span>
             </div>
-
-            <div className="p-3.5 rounded-2xl bg-sky-50/80 dark:bg-sky-950/50 border border-sky-200/80 dark:border-sky-800/60">
-              <span className="text-[11px] font-bold font-mono text-sky-700 dark:text-sky-300 block">🔬 HYPOTHESES</span>
-              <span className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white font-display">5 Tested</span>
-              <span className="text-[10px] text-slate-500 dark:text-slate-400 block">H1 to H5 Validated</span>
-            </div>
-
-            <div className="p-3.5 rounded-2xl bg-amber-50/80 dark:bg-amber-950/50 border border-amber-200/80 dark:border-amber-800/60">
-              <span className="text-[11px] font-bold font-mono text-amber-700 dark:text-amber-300 block">🎯 DATA QUALITY</span>
-              <span className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white font-display">100%</span>
-              <span className="text-[10px] text-slate-500 dark:text-slate-400 block">0 Missing / 0 Duplicates</span>
-            </div>
+            <div className="text-2xl font-bold text-slate-900 dark:text-slate-100 font-mono">8,685+</div>
+            <div className="text-[11px] text-slate-500 dark:text-slate-400">6 Harmonized Worksheets</div>
           </div>
 
-          {/* Quick Info Bar */}
-          <div className="pt-2 flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300 border-t border-slate-200/60 dark:border-slate-800">
-            <Compass size={15} className="text-indigo-600 dark:text-indigo-400 shrink-0" />
-            <span><strong>Core Question:</strong> What drives Canadian ED stay duration and longitudinal hospital burden?</span>
+          <div className="p-4 rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200/80 dark:border-white/[0.06] space-y-1">
+            <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 text-[10.5px] font-mono font-semibold uppercase">
+              <Calendar size={13} className="text-emerald-500" />
+              <span>Time Horizon</span>
+            </div>
+            <div className="text-2xl font-bold text-slate-900 dark:text-slate-100 font-mono">19 Years</div>
+            <div className="text-[11px] text-slate-500 dark:text-slate-400">2003–04 to 2021–22</div>
+          </div>
+
+          <div className="p-4 rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200/80 dark:border-white/[0.06] space-y-1">
+            <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 text-[10.5px] font-mono font-semibold uppercase">
+              <BarChart3 size={13} className="text-purple-500" />
+              <span>Hypotheses</span>
+            </div>
+            <div className="text-2xl font-bold text-slate-900 dark:text-slate-100 font-mono">5 Tested</div>
+            <div className="text-[11px] text-slate-500 dark:text-slate-400">H1–H5 Verified (p &lt; .0001)</div>
+          </div>
+
+          <div className="p-4 rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200/80 dark:border-white/[0.06] space-y-1">
+            <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 text-[10.5px] font-mono font-semibold uppercase">
+              <ShieldCheck size={13} className="text-emerald-500" />
+              <span>Data Integrity</span>
+            </div>
+            <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 font-mono">100%</div>
+            <div className="text-[11px] text-slate-500 dark:text-slate-400">0 Missing / 0 Duplicates</div>
           </div>
         </div>
       </div>
 
-      {/* ── 2. PROJECT AT A GLANCE (4 EXECUTIVE PILLARS) ────────────────────── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="executive-pillars-grid">
+      {/* ── 2. FOUR EXECUTIVE PILLARS ────────────────────────────────────────── */}
+      <div className="space-y-3">
+        <SectionHeader
+          category="METHODOLOGICAL FRAMEWORK"
+          title="Four Foundations of the Analytics Platform"
+        />
 
-        {/* Pillar 1 */}
-        <div className={`p-5 rounded-2xl border border-t-4 border-t-indigo-600 space-y-2 shadow-xs hover:shadow-md transition-all ${isDarkMode ? 'border-slate-800 bg-slate-900/90 text-white' : 'border-slate-200 bg-white text-slate-900'
-          }`}>
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-mono font-bold text-indigo-600 dark:text-indigo-400">📁 SOURCE DATA</span>
-            <Database size={18} className="text-indigo-600 dark:text-indigo-400" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="executive-pillars-grid">
+          <div className="p-5 rounded-2xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#111e35] space-y-2 border-l-4 border-l-blue-500 shadow-xs hover:border-slate-300 dark:hover:border-white/[0.15] transition-all">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-mono font-bold text-blue-600 dark:text-blue-400 uppercase">01 · Source Data</span>
+              <Database size={16} className="text-blue-500" />
+            </div>
+            <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Multi-Cohort Integration</h4>
+            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
+              Combines 19-year longitudinal trends, triage presentations, presenting complaints, and demographic breakdowns from CIHI NACRS.
+            </p>
           </div>
-          <h4 className="text-sm font-bold text-slate-900 dark:text-white">3 Complementary Datasets</h4>
-          <p className="text-xs text-slate-600 dark:text-slate-300 font-normal leading-relaxed">
-            Longitudinal 19-year series (2003–2021), recent hospital reporting, and cross-sectional chief complaints from CIHI NACRS.
-          </p>
-        </div>
 
-        {/* Pillar 2 */}
-        <div className={`p-5 rounded-2xl border border-t-4 border-t-emerald-600 space-y-2 shadow-xs hover:shadow-md transition-all ${isDarkMode ? 'border-slate-800 bg-slate-900/90 text-white' : 'border-slate-200 bg-white text-slate-900'
-          }`}>
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400">⏱️ LONGITUDINAL</span>
-            <Calendar size={18} className="text-emerald-600 dark:text-emerald-400" />
+          <div className="p-5 rounded-2xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#111e35] space-y-2 border-l-4 border-l-emerald-500 shadow-xs hover:border-slate-300 dark:hover:border-white/[0.15] transition-all">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-mono font-bold text-emerald-600 dark:text-emerald-400 uppercase">02 · Longitudinal</span>
+              <Calendar size={16} className="text-emerald-500" />
+            </div>
+            <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100">19-Year Trend Analysis</h4>
+            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
+              Tracks annual patient volume, median stay durations, pandemic shifts, and cumulative Total ED-Minutes (TEM) system burden.
+            </p>
           </div>
-          <h4 className="text-sm font-bold text-slate-900 dark:text-white">19-Year Trend Analysis</h4>
-          <p className="text-xs text-slate-600 dark:text-slate-300 font-normal leading-relaxed">
-            Tracks annual visit volumes, median stay times, pandemic shock eras, and cumulative <strong className="font-semibold">Total ED-Minutes (TEM)</strong>.
-          </p>
-        </div>
 
-        {/* Pillar 3 */}
-        <div className={`p-5 rounded-2xl border border-t-4 border-t-sky-600 space-y-2 shadow-xs hover:shadow-md transition-all ${isDarkMode ? 'border-slate-800 bg-slate-900/90 text-white' : 'border-slate-200 bg-white text-slate-900'
-          }`}>
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-mono font-bold text-sky-600 dark:text-sky-400">🔬 INFERENCE</span>
-            <BarChart3 size={18} className="text-sky-600 dark:text-sky-400" />
+          <div className="p-5 rounded-2xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#111e35] space-y-2 border-l-4 border-l-purple-500 shadow-xs hover:border-slate-300 dark:hover:border-white/[0.15] transition-all">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-mono font-bold text-purple-600 dark:text-purple-400 uppercase">03 · Inference</span>
+              <BarChart3 size={16} className="text-purple-500" />
+            </div>
+            <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Statistical Testing</h4>
+            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
+              Rigorous frequency-weighted non-parametric tests (Kruskal-Wallis, Mann-Whitney U), Dunn post-hoc contrasts, and WLS regression models.
+            </p>
           </div>
-          <h4 className="text-sm font-bold text-slate-900 dark:text-white">5 Formal Hypotheses</h4>
-          <p className="text-xs text-slate-600 dark:text-slate-300 font-normal leading-relaxed">
-            Statistically tests CTAS acuity (H1), admission status (H2), WLS urgency prediction (H3), age group stay (H4), and sex-disposition association (H5).
-          </p>
-        </div>
 
-        {/* Pillar 4 */}
-        <div className={`p-5 rounded-2xl border border-t-4 border-t-amber-600 space-y-2 shadow-xs hover:shadow-md transition-all ${isDarkMode ? 'border-slate-800 bg-slate-900/90 text-white' : 'border-slate-200 bg-white text-slate-900'
-          }`}>
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-mono font-bold text-amber-600 dark:text-amber-400">🔒 GOVERNANCE</span>
-            <Lock size={18} className="text-amber-600 dark:text-amber-400" />
+          <div className="p-5 rounded-2xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#111e35] space-y-2 border-l-4 border-l-amber-500 shadow-xs hover:border-slate-300 dark:hover:border-white/[0.15] transition-all">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-mono font-bold text-amber-600 dark:text-amber-400 uppercase">04 · Governance</span>
+              <Lock size={16} className="text-amber-500" />
+            </div>
+            <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Privacy-Safe Research</h4>
+            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
+              100% aggregate administrative health data. Non-identifiable group statistics strictly for health system operations research.
+            </p>
           </div>
-          <h4 className="text-sm font-bold text-slate-900 dark:text-white">Privacy-Safe Research</h4>
-          <p className="text-xs text-slate-600 dark:text-slate-300 font-normal leading-relaxed">
-            100% aggregate administrative health data. Non-identifiable group-level statistics strictly for health system operations research.
-          </p>
         </div>
       </div>
 
-      {/* ── 3. CLINICAL PROBLEM & FIVE CORE OBJECTIVES (CONCISE) ─────────────── */}
+      {/* ── 3. CLINICAL CHALLENGE & FIVE RESEARCH OBJECTIVES ─────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-
-        {/* Left: Systemic Challenge (5 Cols) */}
-        <div className={`lg:col-span-5 p-6 rounded-3xl border border-t-4 border-t-rose-600 space-y-4 shadow-sm flex flex-col justify-between ${isDarkMode ? 'border-slate-800 bg-slate-900/90' : 'border-slate-200 bg-white'
-          }`}>
+        {/* Left: The Clinical Challenge */}
+        <div className="lg:col-span-5 p-6 rounded-2xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#111e35] space-y-4 shadow-sm flex flex-col justify-between">
           <div className="space-y-3">
             <div className="flex items-center gap-2.5">
               <span className="p-2 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
-                <AlertTriangle size={18} />
+                <AlertTriangle size={16} />
               </span>
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400 font-mono block">The Clinical Challenge</span>
-                <h3 className="text-base font-bold text-slate-900 dark:text-white">Where Does ED Pressure Occur?</h3>
+                <span className="text-[10.5px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400 font-mono block">
+                  Systemic Challenge
+                </span>
+                <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+                  Where Does ED Bottlenecking Occur?
+                </h3>
               </div>
             </div>
 
             <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
-              Emergency Departments navigate complex operational demands across evolving demographics, clinical acuity tiers, and system capacity boundaries. <strong className="font-semibold text-slate-900 dark:text-white">Length of Stay (LOS)</strong> serves as a primary macro-level indicator of operational throughput.
+              Canadian emergency departments navigate multifaceted throughput constraints across aging populations, acuity variations, and hospital bed shortages. Length of Stay (LOS) serves as the primary macro-indicator of system strain.
             </p>
 
             <div className="space-y-2 pt-1">
               {[
-                { tag: '🔴 Acuity Variation', desc: 'Higher-acuity presentations exhibit distinct clinical pathways and extended stay durations.' },
-                { tag: '👴 Age Differences', desc: 'Older adult cohorts (65+) experience longer aggregate median stay durations.' },
-                { tag: '🏥 Disposition Disparity', desc: 'Admitted patients exhibit substantially longer median stay durations than non-admitted visits.' },
-                { tag: '📈 Resource Burden (TEM)', desc: 'Total ED-Minutes = Total Volume × Median Stay Duration.' },
+                { tag: 'Acuity Gradient', desc: 'Resuscitation and Emergent presentations require intensive stabilization, extending median stay durations.' },
+                { tag: 'Geriatric Burden', desc: 'Older adults (65+) experience complex multimorbidity, driving higher aggregate median stay times.' },
+                { tag: 'Admission Delays', desc: 'Admitted visits exhibit severe boarding delays (10.60h median vs. 2.50h for discharged patients).' },
+                { tag: 'TEM Volume Strain', desc: 'Total ED-Minutes = Visit Volume × Median Stay Duration captures compounding system load.' },
               ].map((item, i) => (
-                <div key={i} className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 text-xs">
-                  <span className="font-bold text-slate-900 dark:text-white block">{item.tag}</span>
-                  <span className="text-[11px] text-slate-600 dark:text-slate-400 font-normal">{item.desc}</span>
+                <div key={i} className="p-2.5 rounded-lg bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.05] text-xs">
+                  <span className="font-semibold text-slate-900 dark:text-slate-200 block text-[11.5px]">{item.tag}</span>
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400 font-normal">{item.desc}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px] font-mono text-slate-500 flex justify-between items-center">
+          <div className="pt-3 border-t border-slate-100 dark:border-white/[0.06] text-[10.5px] font-mono text-slate-500 flex justify-between items-center">
             <span>Focus: NACRS Ambulatory Cohorts</span>
             <span className="text-rose-600 dark:text-rose-400 font-bold uppercase">System-Level Analysis</span>
           </div>
         </div>
 
-        {/* Right: Five Research Objectives (7 Cols) */}
-        <div className={`lg:col-span-7 p-6 rounded-3xl border border-t-4 border-t-indigo-600 space-y-4 shadow-sm ${isDarkMode ? 'border-slate-800 bg-slate-900/90' : 'border-slate-200 bg-white'
-          }`}>
+        {/* Right: Five Research Objectives */}
+        <div className="lg:col-span-7 p-6 rounded-2xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#111e35] space-y-4 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 font-mono block">Academic Framework</span>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">Five Core Research Objectives</h3>
+              <span className="text-[10.5px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 font-mono block">
+                Analytical Framework
+              </span>
+              <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+                Five Core Research Objectives
+              </h3>
             </div>
-            <span className="text-xs font-mono font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 px-2.5 py-1 rounded-lg border border-indigo-200 dark:border-indigo-800">
-              01 → 05 Structured Pipeline
+            <span className="text-[11px] font-mono font-semibold text-blue-600 dark:text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-full border border-blue-500/20">
+              01 → 05 Pipeline
             </span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-            <div className="p-3 rounded-xl bg-indigo-50/60 dark:bg-indigo-950/40 border border-indigo-200/70 dark:border-indigo-900/50 space-y-1">
-              <span className="font-bold text-indigo-700 dark:text-indigo-300 font-mono flex items-center gap-1.5">
-                <Clock size={14} /> 01. EXPLAIN (Factors)
+            <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.05] space-y-1">
+              <span className="font-semibold text-blue-600 dark:text-blue-400 font-mono flex items-center gap-1.5 text-xs">
+                <Clock size={13} /> 01. Explain Stay Drivers
               </span>
               <p className="text-[11px] text-slate-600 dark:text-slate-300 font-normal leading-relaxed">
                 Quantify how triage acuity, age groups, sex, and visit outcomes drive variation in reported ED length of stay.
               </p>
             </div>
 
-            <div className="p-3 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/40 border border-emerald-200/70 dark:border-emerald-900/50 space-y-1">
-              <span className="font-bold text-emerald-700 dark:text-emerald-300 font-mono flex items-center gap-1.5">
-                <Activity size={14} /> 02. MEASURE (TEM Burden)
+            <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.05] space-y-1">
+              <span className="font-semibold text-emerald-600 dark:text-emerald-400 font-mono flex items-center gap-1.5 text-xs">
+                <Activity size={13} /> 02. Measure TEM Burden
               </span>
               <p className="text-[11px] text-slate-600 dark:text-slate-300 font-normal leading-relaxed">
-                Compute <strong className="font-semibold">Total ED-Minutes (TEM)</strong> = Visit Volume × Median LOS to evaluate cumulative system strain.
+                Compute Total ED-Minutes (TEM) = Visit Volume × Median LOS to evaluate cumulative longitudinal resource strain.
               </p>
             </div>
 
-            <div className="p-3 rounded-xl bg-sky-50/60 dark:bg-sky-950/40 border border-sky-200/70 dark:border-sky-900/50 space-y-1">
-              <span className="font-bold text-sky-700 dark:text-sky-300 font-mono flex items-center gap-1.5">
-                <Cpu size={14} /> 03. MODEL (Regressions)
+            <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.05] space-y-1">
+              <span className="font-semibold text-purple-600 dark:text-purple-400 font-mono flex items-center gap-1.5 text-xs">
+                <Cpu size={13} /> 03. WLS Regression
               </span>
               <p className="text-[11px] text-slate-600 dark:text-slate-300 font-normal leading-relaxed">
-                Execute multivariate regressions to isolate independent predictor effects across age, triage, and fiscal years.
+                Execute weighted least squares regressions to isolate the independent effect of urgency scores on stay duration.
               </p>
             </div>
 
-            <div className="p-3 rounded-xl bg-amber-50/60 dark:bg-amber-950/40 border border-amber-200/70 dark:border-amber-900/50 space-y-1">
-              <span className="font-bold text-amber-700 dark:text-amber-300 font-mono flex items-center gap-1.5">
-                <Users size={14} /> 04. SEGMENT (High-Burden)
+            <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.05] space-y-1">
+              <span className="font-semibold text-amber-600 dark:text-amber-400 font-mono flex items-center gap-1.5 text-xs">
+                <Users size={13} /> 04. High-Burden Cohorts
               </span>
               <p className="text-[11px] text-slate-600 dark:text-slate-300 font-normal leading-relaxed">
-                Identify combinations of triage, age, and complaints driving disproportionate resource utilization.
+                Identify combinations of triage level, age segment, and clinical complaints creating disproportionate bed occupancy.
               </p>
             </div>
 
-            <div className="p-3 rounded-xl bg-violet-50/60 dark:bg-violet-950/40 border border-violet-200/70 dark:border-violet-900/50 sm:col-span-2 space-y-1">
-              <span className="font-bold text-violet-700 dark:text-violet-300 font-mono flex items-center gap-1.5">
-                <TrendingUp size={14} /> 05. TREND & FORECAST (Near-Term Horizon)
+            <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.05] sm:col-span-2 space-y-1">
+              <span className="font-semibold text-cyan-600 dark:text-cyan-400 font-mono flex items-center gap-1.5 text-xs">
+                <TrendingUp size={13} /> 05. Longitudinal Forecasting
               </span>
               <p className="text-[11px] text-slate-600 dark:text-slate-300 font-normal leading-relaxed">
-                Analyze 19-year longitudinal trajectories and project 1–2 fiscal year directions for proactive hospital capacity planning.
+                Analyze 19-year longitudinal trajectories and forecast near-term demand using Simple Exponential Smoothing (SES) with 95% confidence bands.
               </p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* ── 4. INTERACTIVE DEEP-DIVE TABS: HYPOTHESES / PIPELINE / ARCHITECTURE ─ */}
-      <div className={`p-6 sm:p-8 rounded-3xl border space-y-6 shadow-sm ${isDarkMode ? 'border-slate-800 bg-slate-900/90 text-white' : 'border-slate-200 bg-white text-slate-900'
-        }`}>
-
-        {/* Tab Navigation Switcher */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 dark:border-slate-800 pb-4">
+      {/* ── 4. INTERACTIVE DEEP-DIVE TABS ───────────────────────────────────── */}
+      <div className="p-6 sm:p-8 rounded-2xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#111e35] space-y-6 shadow-sm">
+        {/* Tab Navigation */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-white/[0.06] pb-4">
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 font-mono block">
-              Interactive System Deep-Dive
+            <span className="text-[10.5px] font-mono font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 block">
+              Analytical Verification
             </span>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+            <h3 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100">
               Scientific Rigor, Data Pipeline & Architecture
             </h3>
           </div>
 
-          <div className="flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs font-semibold">
+          <div className="flex items-center p-1 rounded-xl bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08] text-xs font-medium">
             <button
+              type="button"
               onClick={() => setActiveTab('hypotheses')}
-              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${activeTab === 'hypotheses'
-                  ? 'bg-indigo-600 text-white shadow-xs'
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                activeTab === 'hypotheses'
+                  ? 'bg-blue-600 text-white shadow-xs font-semibold'
                   : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-                }`}
+              }`}
             >
-              <BarChart3 size={14} />
+              <BarChart3 size={13} />
               <span>5 Hypotheses (H1–H5)</span>
             </button>
 
             <button
+              type="button"
               onClick={() => setActiveTab('pipeline')}
-              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${activeTab === 'pipeline'
-                  ? 'bg-indigo-600 text-white shadow-xs'
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                activeTab === 'pipeline'
+                  ? 'bg-blue-600 text-white shadow-xs font-semibold'
                   : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-                }`}
+              }`}
             >
-              <Workflow size={14} />
+              <Workflow size={13} />
               <span>7-Stage Pipeline</span>
             </button>
 
             <button
+              type="button"
               onClick={() => setActiveTab('architecture')}
-              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${activeTab === 'architecture'
-                  ? 'bg-indigo-600 text-white shadow-xs'
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                activeTab === 'architecture'
+                  ? 'bg-blue-600 text-white shadow-xs font-semibold'
                   : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-                }`}
+              }`}
             >
-              <Layers size={14} />
+              <Layers size={13} />
               <span>Tech Stack</span>
             </button>
           </div>
@@ -340,15 +337,19 @@ export default function AboutProject({ onReset, isDarkMode = false, onBeginPrep 
                   title: 'CTAS Triage Acuity & LOS',
                   question: 'Does median ED stay differ across CTAS urgency levels (1–5)?',
                   method: 'Weighted Kruskal-Wallis & Dunn Post-Hoc',
-                  status: '✅ Reject H₀ (p < .0001)',
-                  finding: 'CTAS I Resuscitation (4.60h / 276m) and CTAS II Emergent (4.80h / 288m) exhibit substantially longer reported stays than CTAS V Non-Urgent (1.33h / 80m) (ε² = 0.7251).',
+                  badge: 'Reject H₀',
+                  pVal: 'p < 0.0001',
+                  variant: 'reject' as const,
+                  finding: 'CTAS I Resuscitation (4.60h / 276m) and CTAS II Emergent (4.80h / 288m) exhibit substantially longer stays than CTAS V Non-Urgent (1.33h / 80m) (ε² = 0.7251).',
                 },
                 {
                   tag: 'H2',
                   title: 'Admission Status & LOS',
                   question: 'Does length of stay differ between admitted and non-admitted visits?',
                   method: 'Weighted Mann-Whitney U Test',
-                  status: '✅ Reject H₀ (p < .0001)',
+                  badge: 'Reject H₀',
+                  pVal: 'p < 0.0001',
+                  variant: 'reject' as const,
                   finding: 'Admitted visits follow significantly longer aggregate stay durations (10.60h median stay vs. 2.50h for non-admitted visits; rb = 0.9981).',
                 },
                 {
@@ -356,7 +357,9 @@ export default function AboutProject({ onReset, isDarkMode = false, onBeginPrep 
                   title: 'WLS Regression Predictors of LOS',
                   question: 'Does CTAS urgency score predict reported median stay duration?',
                   method: 'Weighted Least Squares (WLS) Regression',
-                  status: '✅ Reject H₀ (R² = 0.6256, p < .0001)',
+                  badge: 'Reject H₀',
+                  pVal: 'R² = 0.6256',
+                  variant: 'reject' as const,
                   finding: 'Urgency score significantly predicts reported stay duration (β₁ = -73.92 min/unit / -1.23 h/unit, R² = 0.6256, N = 174.2M visits).',
                 },
                 {
@@ -364,7 +367,9 @@ export default function AboutProject({ onReset, isDarkMode = false, onBeginPrep 
                   title: 'Patient Age Group & LOS',
                   question: 'Does reported median stay differ across broad age categories?',
                   method: 'Weighted Kruskal-Wallis & Dunn Post-Hoc',
-                  status: '✅ Reject H₀ (p < .0001)',
+                  badge: 'Reject H₀',
+                  pVal: 'p < 0.0001',
+                  variant: 'reject' as const,
                   finding: 'Older Adults 65+ (4.17h / 250m) experience longer aggregate stays than pediatric patients (2.05h / 123m) (ε² = 0.7218).',
                 },
                 {
@@ -372,38 +377,38 @@ export default function AboutProject({ onReset, isDarkMode = false, onBeginPrep 
                   title: 'Patient Sex & Visit Disposition',
                   question: 'Is patient sex significantly associated with ED admission outcome?',
                   method: 'Pearson Chi-Square Test (N = 175.8M)',
-                  status: '✅ Reject H₀ (p < .0001 · V = 0.0102)',
-                  finding: 'Statistically significant due to massive sample size (χ² = 18,164.97, N = 175.76M), with negligible practical effect (Cramér\'s V = 0.0102; Female 9.95% vs Male 10.56% admission).',
+                  badge: 'Reject H₀ (Negligible)',
+                  pVal: 'V = 0.0102',
+                  variant: 'negligible' as const,
+                  finding: 'Statistically significant due to massive sample size (χ² = 18,164.97, N = 175.76M), with negligible practical effect (Cramér\'s V = 0.0102; Female 9.95% vs Male 10.56%).',
                 },
               ].map((h) => (
-                <div key={h.tag} className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-2 flex flex-col justify-between">
+                <div key={h.tag} className="p-4 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.06] space-y-2 flex flex-col justify-between">
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="px-2 py-0.5 rounded text-xs font-bold font-mono bg-indigo-100 dark:bg-indigo-900/60 text-indigo-800 dark:text-indigo-200">
+                      <span className="px-2 py-0.5 rounded text-xs font-bold font-mono bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
                         {h.tag}
                       </span>
-                      <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 font-bold">
-                        {h.status}
-                      </span>
+                      <StatBadge label={h.badge} sublabel={h.pVal} variant={h.variant} />
                     </div>
-                    <h4 className="text-xs font-bold text-slate-900 dark:text-white">{h.title}</h4>
-                    <p className="text-[11px] text-slate-600 dark:text-slate-300 font-normal leading-snug">
+                    <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100">{h.title}</h4>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
                       "{h.question}"
                     </p>
-                    <p className="text-[10px] text-indigo-600 dark:text-indigo-300 bg-indigo-50/50 dark:bg-indigo-950/40 p-2 rounded-lg leading-relaxed">
-                      💡 {h.finding}
+                    <p className="text-[11px] text-slate-700 dark:text-slate-300 bg-white dark:bg-white/[0.03] border border-slate-200/60 dark:border-white/[0.04] p-2 rounded-lg leading-relaxed font-normal">
+                      {h.finding}
                     </p>
                   </div>
-                  <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 block pt-2 border-t border-slate-200/60 dark:border-slate-700/60">
-                    🔬 Method: {h.method}
+                  <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500 block pt-2 border-t border-slate-200/60 dark:border-white/[0.04]">
+                    Method: {h.method}
                   </span>
                 </div>
               ))}
 
-              <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-500/10 via-sky-500/10 to-transparent border border-indigo-200 dark:border-indigo-800 flex flex-col justify-center items-center text-center space-y-2">
-                <Sparkles size={24} className="text-indigo-600 dark:text-indigo-400" />
-                <span className="text-xs font-bold text-slate-900 dark:text-white">Empirical Biostatistical Engine</span>
-                <span className="text-[10px] text-slate-500 dark:text-slate-400">All 5 hypotheses verified with rigorous non-parametric tests, Dunn post-hoc contrasts &amp; WLS models.</span>
+              <div className="p-4 rounded-xl bg-blue-500/[0.04] border border-blue-500/20 flex flex-col justify-center items-center text-center space-y-2">
+                <Sparkles size={22} className="text-blue-500" />
+                <span className="text-xs font-bold text-slate-900 dark:text-slate-100">Empirical Biostatistical Engine</span>
+                <span className="text-[11px] text-slate-500 dark:text-slate-400">All 5 hypotheses verified with non-parametric tests, Dunn post-hoc contrasts &amp; WLS models.</span>
               </div>
             </div>
           </div>
@@ -414,16 +419,16 @@ export default function AboutProject({ onReset, isDarkMode = false, onBeginPrep 
           <div className="space-y-4 animate-fade-in">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
               {[
-                { stage: '1. About Project', desc: 'Overview, clinical problem statement, academic framework, and 5 pre-specified hypotheses.' },
+                { stage: '1. About Project', desc: 'Clinical problem statement, academic framework, and 5 pre-specified hypotheses.' },
                 { stage: '2. Prep & Quality Engine', desc: 'Unit harmonization (hours/min), deduplication, schema validation, and cohort cleaning.' },
                 { stage: '3. Dataset Explorer', desc: 'Interactive cohort exploration across triage acuity, life-stage groups, and 19 fiscal years.' },
-                { stage: '4. Hypothesis Testing & Stats', desc: 'Evaluates H1–H5 with Kruskal-Wallis, Mann-Whitney U, WLS regression, Dunn post-hoc, and ERBI forecasting.' },
+                { stage: '4. Hypothesis Testing', desc: 'Evaluates H1–H5 with Kruskal-Wallis, Mann-Whitney U, WLS regression, and ERBI forecasting.' },
                 { stage: '5. Executive Dashboard', desc: 'KPI cards, interactive custom visual builder, H1–H5 visual suite, and operational charts.' },
                 { stage: '6. Strategic Insights', desc: 'Executive decision matrix, policy recommendations, and hospital capacity planning directives.' },
                 { stage: '7. Reports & Export', desc: 'Comprehensive audit trail, methodology documentation, and PDF executive summary dossier exports.' },
               ].map((s, idx) => (
-                <div key={idx} className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-1">
-                  <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400 block text-xs">{s.stage}</span>
+                <div key={idx} className="p-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.06] space-y-1">
+                  <span className="font-mono font-semibold text-blue-600 dark:text-blue-400 block text-xs">{s.stage}</span>
                   <p className="text-[11px] text-slate-600 dark:text-slate-300 font-normal leading-relaxed">{s.desc}</p>
                 </div>
               ))}
@@ -434,52 +439,48 @@ export default function AboutProject({ onReset, isDarkMode = false, onBeginPrep 
         {/* TAB 3: TECH STACK & ARCHITECTURE */}
         {activeTab === 'architecture' && (
           <div className="space-y-6 animate-fade-in text-xs">
-            {/* Live Backend Introspection Card */}
             <ArchitecturePipelineCard isDarkMode={isDarkMode} />
 
-            {/* Core Tech Stack Specifications */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-1">
-                <span className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5 font-mono">
-                  <Code size={14} className="text-indigo-600" /> FRONTEND
+              <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.06] space-y-1">
+                <span className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5 font-mono">
+                  <Code size={13} className="text-blue-500" /> FRONTEND
                 </span>
-                <span className="font-bold text-indigo-700 dark:text-indigo-300 block">React 18/19 + TypeScript + Vite</span>
-                <p className="text-[11px] text-slate-500 leading-snug">Tailwind CSS v4, Recharts visuals, Lucide icons, responsive dashboard layouts.</p>
+                <span className="font-semibold text-blue-600 dark:text-blue-400 block text-xs">React 18/19 + TypeScript + Vite</span>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">Tailwind CSS v4, Recharts visuals, Lucide icons, responsive executive layouts.</p>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-1">
-                <span className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5 font-mono">
-                  <Server size={14} className="text-emerald-600" /> BACKEND
+              <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.06] space-y-1">
+                <span className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5 font-mono">
+                  <Server size={13} className="text-emerald-500" /> BACKEND
                 </span>
-                <span className="font-bold text-emerald-700 dark:text-emerald-300 block">FastAPI + Python 3.12</span>
-                <p className="text-[11px] text-slate-500 leading-snug">SciPy, Statsmodels, Pandas statistical inference engine, Pydantic contracts.</p>
+                <span className="font-semibold text-emerald-600 dark:text-emerald-400 block text-xs">FastAPI + Python 3.12</span>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">SciPy, Statsmodels, Pandas biostatistical engine, strict Pydantic contracts.</p>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-1">
-                <span className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5 font-mono">
-                  <Database size={14} className="text-sky-600" /> DATABASE
+              <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.06] space-y-1">
+                <span className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5 font-mono">
+                  <Database size={13} className="text-purple-500" /> DATABASE
                 </span>
-                <span className="font-bold text-sky-700 dark:text-sky-300 block">SQLite WAL Analytical Store</span>
-                <p className="text-[11px] text-slate-500 leading-snug">Thread-safe repository pattern containing 8,685 rows across 6 CIHI tables.</p>
+                <span className="font-semibold text-purple-600 dark:text-purple-400 block text-xs">SQLite WAL Analytical Store</span>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">Thread-safe repository pattern containing 8,685 rows across 6 CIHI tables.</p>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-1">
-                <span className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5 font-mono">
-                  <ShieldCheck size={14} className="text-amber-600" /> TESTING &amp; QA
+              <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.06] space-y-1">
+                <span className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5 font-mono">
+                  <ShieldCheck size={13} className="text-amber-500" /> TESTING &amp; QA
                 </span>
-                <span className="font-bold text-amber-700 dark:text-amber-300 block">Automated Test Suites</span>
-                <p className="text-[11px] text-slate-500 leading-snug">Exhaustive automated coverage across statistical calculations and REST endpoints.</p>
+                <span className="font-semibold text-amber-600 dark:text-amber-400 block text-xs">Automated Test Suites</span>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">Automated test coverage across statistical equations and REST API endpoints.</p>
               </div>
             </div>
 
-            {/* Unidirectional Data Pipeline Flow Diagram */}
-            <div className={`p-4 sm:p-5 rounded-2xl border ${
-              isDarkMode ? 'border-slate-800 bg-slate-900/60' : 'border-slate-200 bg-slate-50/70'
-            }`}>
+            {/* Unidirectional Data Pipeline Flow */}
+            <div className="p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-white/[0.06] bg-slate-50/60 dark:bg-white/[0.01]">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <Workflow size={16} className="text-indigo-600 dark:text-indigo-400" />
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white font-mono">
+                  <Workflow size={15} className="text-blue-500" />
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-900 dark:text-slate-100 font-mono">
                     Unidirectional Clinical Data Pipeline Flow
                   </h4>
                 </div>
@@ -487,36 +488,28 @@ export default function AboutProject({ onReset, isDarkMode = false, onBeginPrep 
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-4 gap-3 text-[11px]">
-                <div className="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/60 space-y-1.5">
-                  <div className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400 font-bold font-mono text-xs">
-                    <span>1. Ingestion</span>
-                  </div>
-                  <p className="text-slate-600 dark:text-slate-300 font-medium">Raw CIHI Excel Workbook</p>
-                  <p className="text-[10px] text-slate-400">Multi-worksheet Excel loaded via openpyxl and seeded into SQLite repository.</p>
+                <div className="p-3 rounded-lg bg-white dark:bg-white/[0.03] border border-slate-200/80 dark:border-white/[0.05] space-y-1">
+                  <div className="text-blue-600 dark:text-blue-400 font-semibold font-mono text-xs">1. Ingestion</div>
+                  <p className="text-slate-700 dark:text-slate-200 font-medium">Raw CIHI Excel Workbook</p>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400">Multi-worksheet Excel loaded via openpyxl and seeded into SQLite repository.</p>
                 </div>
 
-                <div className="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/60 space-y-1.5">
-                  <div className="flex items-center gap-1.5 text-teal-600 dark:text-teal-400 font-bold font-mono text-xs">
-                    <span>2. Preparation</span>
-                  </div>
-                  <p className="text-slate-600 dark:text-slate-300 font-medium">Client-Side Engine</p>
-                  <p className="text-[10px] text-slate-400">Harmonizes units (TEM = Vol × LOS), standardizes CTAS, controls roll-up totals.</p>
+                <div className="p-3 rounded-lg bg-white dark:bg-white/[0.03] border border-slate-200/80 dark:border-white/[0.05] space-y-1">
+                  <div className="text-teal-600 dark:text-teal-400 font-semibold font-mono text-xs">2. Preparation</div>
+                  <p className="text-slate-700 dark:text-slate-200 font-medium">Client-Side Engine</p>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400">Harmonizes units (TEM = Vol × LOS), standardizes CTAS, controls roll-up totals.</p>
                 </div>
 
-                <div className="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/60 space-y-1.5">
-                  <div className="flex items-center gap-1.5 text-purple-600 dark:text-purple-400 font-bold font-mono text-xs">
-                    <span>3. Analytics Core</span>
-                  </div>
-                  <p className="text-slate-600 dark:text-slate-300 font-medium">Biostatistical Verification</p>
-                  <p className="text-[10px] text-slate-400">Weighted Kruskal-Wallis, Mann-Whitney U, Dunn post-hoc, WLS regression, and SES.</p>
+                <div className="p-3 rounded-lg bg-white dark:bg-white/[0.03] border border-slate-200/80 dark:border-white/[0.05] space-y-1">
+                  <div className="text-purple-600 dark:text-purple-400 font-semibold font-mono text-xs">3. Analytics Core</div>
+                  <p className="text-slate-700 dark:text-slate-200 font-medium">Biostatistical Verification</p>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400">Weighted Kruskal-Wallis, Mann-Whitney U, Dunn post-hoc, WLS regression, and SES.</p>
                 </div>
 
-                <div className="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/60 space-y-1.5">
-                  <div className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-bold font-mono text-xs">
-                    <span>4. Delivery</span>
-                  </div>
-                  <p className="text-slate-600 dark:text-slate-300 font-medium">Clinical Decision Support</p>
-                  <p className="text-[10px] text-slate-400">Live Recharts visualization, executive KPI cards, and print-ready PDF reports.</p>
+                <div className="p-3 rounded-lg bg-white dark:bg-white/[0.03] border border-slate-200/80 dark:border-white/[0.05] space-y-1">
+                  <div className="text-amber-600 dark:text-amber-400 font-semibold font-mono text-xs">4. Delivery</div>
+                  <p className="text-slate-700 dark:text-slate-200 font-medium">Clinical Decision Support</p>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400">Live Recharts visualization, executive KPI cards, and print-ready PDF reports.</p>
                 </div>
               </div>
             </div>
@@ -524,15 +517,14 @@ export default function AboutProject({ onReset, isDarkMode = false, onBeginPrep 
         )}
       </div>
 
-      {/* ── 5. GOVERNANCE & DATA DISCLAIMER (COMPACT) ────────────────────────── */}
-      <div className={`p-5 rounded-2xl border border-indigo-200 dark:border-indigo-900/60 flex items-start gap-3.5 text-xs ${isDarkMode ? 'bg-indigo-950/20 text-slate-300' : 'bg-indigo-50/60 text-slate-700'
-        }`}>
-        <ShieldCheck size={20} className="text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5" />
+      {/* ── 5. GOVERNANCE & DATA DISCLAIMER ─────────────────────────────────── */}
+      <div className="p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-white/[0.02] flex items-start gap-3.5 text-xs text-slate-600 dark:text-slate-300">
+        <ShieldCheck size={18} className="text-blue-500 shrink-0 mt-0.5" />
         <div className="space-y-1">
-          <span className="font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-300 text-[11px] font-mono block">
-            🔒 Administrative Data Disclaimer & Ethics Compliance
+          <span className="font-semibold uppercase tracking-wider text-slate-900 dark:text-slate-200 text-[11px] font-mono block">
+            Administrative Data Disclaimer & Ethics Compliance
           </span>
-          <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
             This research platform operates exclusively on de-identified, pre-aggregated administrative health data from the <strong>Canadian Institute for Health Information (CIHI) NACRS</strong>. It is designed for system-level operations analytics and does not diagnose, treat, or predict individual patient outcomes.
           </p>
         </div>
