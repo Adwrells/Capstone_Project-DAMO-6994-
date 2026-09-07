@@ -7,6 +7,43 @@ All notable changes to this project are documented in this file. The format foll
 This file starts at 1.1.0; versions 1.0.0–1.0.4 predate it and are recorded only as git tags,
 each named after the fix or feature it introduced.
 
+## [2.2.2] — 2026-09-07
+
+### Fixed
+- **CI: Backend Test Suite was failing on every push.** A bare `pytest` invocation (what CI
+  runs) walks the whole repo for test discovery and was trying to collect `scratch/test_erbi.py`
+  — an ad-hoc script with no test functions that happens to match the `test_*.py` naming
+  pattern — failing on import with `ModuleNotFoundError: No module named 'backend'`. Added
+  `pytest.ini` scoping discovery to `tests/`, matching the already-documented canonical command,
+  so both CI and any local bare `pytest` run are unaffected by `scratch/` content.
+- **Statistical Analysis stage had no way to reach the Executive Dashboard.** Same bug as the
+  Dataset Explorer fix in 2.2.1: `onNavigateNext` was accepted as a prop but never wired to a
+  button. Added the matching "Proceed to Stage 5" button.
+- **DOCX export produced a file no Word-compatible reader could open.** Selecting "DOCX" in
+  Reports & Export downloaded a file labelled with the real Word MIME type and `.docx`
+  extension, but the payload was still plain text — the same failure mode already correctly
+  avoided for PDF (per the existing code comment: "a real PDF needs an xref table... a text
+  payload labelled application/pdf yields a file no reader can open") but never applied to
+  DOCX. Removed the option rather than build a real OOXML writer for a format not otherwise in
+  scope.
+- **XLSX quick-export button was a mislabeled duplicate of CSV** (called the same CSV handler,
+  downloaded a `.csv` file despite the button saying "XLSX"). Removed.
+- **ZIP quick-export button was permanently non-functional** — wired to
+  `document.getElementById('export-trigger-btn')`, an id that does not exist anywhere in the
+  app, so it only ever showed a deflection message pointing at a feature that isn't there
+  either. Removed. Export is now a single consolidated flow: pick a format, one button
+  generates it.
+- **Exported report text carried stale H1/H2 statistics** inconsistent with the rest of the
+  platform: the "Statistical & Model Estimations" section of the generated report hardcoded H1
+  as `H(4) = 48.74` and H2 as `U = 5.22e14`, versus the canonical ≈126.3M and ≈2.69×10¹² shown
+  on the dashboard and hypothesis suite. Reconciled, and rewrote the exported content as
+  genuine Markdown (proper headings, tables, bold) instead of ASCII-art dividers.
+
+### Added
+- `docs/Reports/App_Screenshots.pdf` — full-page screenshots of all seven platform stages in
+  light mode, captured end-to-end via a scripted browser walkthrough now that both navigation
+  bugs above are fixed.
+
 ## [2.2.1] — 2026-09-07
 
 ### Fixed

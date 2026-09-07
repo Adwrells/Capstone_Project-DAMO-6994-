@@ -28,6 +28,15 @@ dashboard, all reading from a reproducible analytical database.
 
 ## Recent Updates
 
+**v2.2.2** — CI fix, navigation gaps, and export cleanup (see [CHANGELOG.md](CHANGELOG.md)):
+- Fixed the Backend Test Suite CI workflow, which had been failing on every push since a
+  scratch script got swept into pytest's default test discovery.
+- Fixed the Statistical Analysis stage having no button to reach the Executive Dashboard
+  (same class of bug as the Dataset Explorer fix below).
+- Removed a DOCX export option that produced an unopenable file, a duplicate XLSX button, and
+  a permanently non-functional ZIP button; consolidated Reports & Export to one clean flow.
+- Added `docs/Reports/App_Screenshots.pdf`, a full-page walkthrough of all seven stages.
+
 **v2.2.1** — UI/UX correctness pass (see [CHANGELOG.md](CHANGELOG.md) for full detail):
 - Fixed several dashboard/analytics displays that showed static example values instead of the
   computed result (KPI benchmark subtitle, H5 contingency disparity/Cramér's V, longitudinal
