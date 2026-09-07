@@ -29,6 +29,7 @@ dashboard, all reading from a reproducible analytical database.
 ## Recent Updates
 
 **v2.2.2** — CI fix, navigation gaps, and export cleanup (see [CHANGELOG.md](CHANGELOG.md)):
+
 - Fixed the Backend Test Suite CI workflow, which had been failing on every push since a
   scratch script got swept into pytest's default test discovery.
 - Fixed the Statistical Analysis stage having no button to reach the Executive Dashboard
@@ -38,6 +39,7 @@ dashboard, all reading from a reproducible analytical database.
 - Added `docs/Reports/App_Screenshots.pdf`, a full-page walkthrough of all seven stages.
 
 **v2.2.1** — UI/UX correctness pass (see [CHANGELOG.md](CHANGELOG.md) for full detail):
+
 - Fixed several dashboard/analytics displays that showed static example values instead of the
   computed result (KPI benchmark subtitle, H5 contingency disparity/Cramér's V, longitudinal
   trend significance badge).
@@ -50,6 +52,7 @@ dashboard, all reading from a reproducible analytical database.
   no CSS.
 
 **v2.2.0** — Master Capstone Platform Audit & Analytical Consistency Hardening:
+
 - Established a single source of analytical truth across the database, Python analytics engines, FastAPI endpoints, React pages, and PDF export dossier.
 - Reconciled H3 WLS regression parameters to canonical univariate model ($R^2 = 0.6256$, slope $\beta_1 = -73.92\text{ min/score}$ [$-1.232\text{ h/score}$], $p < 0.001$).
 - Reconciled ERBI to canonical $9.32$ score-hours per visit ($1.623\text{B}$ total burden hours), cleanly decoupled from TEM (Total ED-Minutes: $visits \times median\_los\_min$).
@@ -497,7 +500,7 @@ standalone CSV export.
 
 A rebuild produces **8,685 rows** across the six analytical tables:
 
-```
+```text
 ed_visits           5,586     ctas_triage           912
 visit_disposition     936     age_sex               152
 main_problems       1,063     demographics           36
@@ -592,7 +595,7 @@ measured at.
 
 The complexity curve for CTAS urgency shows why degree should not be raised casually:
 
-```
+```text
 degree 1   train R²  0.5877   validation R²  0.6021
 degree 2   train R²  0.6339   validation R²  0.6357
 degree 3   train R²  0.6824   validation R²  0.6834
@@ -682,7 +685,7 @@ space-free path and the default pool is preferred.
 
 ## Project Structure
 
-```
+```text
 ├── index.html              SPA entry point, loads /frontend/src/main.tsx
 ├── frontend/src/           React application — pages, components, services, utilities
 ├── server.ts               Express server (port 3000) — SPA host, dataset preload/upload
@@ -714,7 +717,7 @@ space-free path and the default pool is preferred.
 
 ### File-by-file reference
 
-**Root**
+#### Root
 
 | File | What it does |
 | :--- | :--- |
