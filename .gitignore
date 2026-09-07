@@ -4,6 +4,9 @@ dist/
 coverage/
 .DS_Store
 *.log
+
+# Microsoft Office lock/temp files
+~$*
 .env*
 !.env.example
 .vscode

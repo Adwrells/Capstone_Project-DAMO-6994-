@@ -197,6 +197,29 @@ it themselves.
 
 ---
 
+## 3c. Chapter 5 internal-consistency finding (resolved)
+
+Once the final report text was reviewed directly, the Executive Summary and Chapter 5 were
+found to state **different results for the same hypothesis test** in four places (H1, H2, H3,
+H4) — different H/U-statistics, different effect sizes, and for H3, two structurally different
+regression models. Only H5 was internally consistent.
+
+Cross-checked against the platform's tested, reconciled values (`CHANGELOG.md` [2.2.0],
+`HypothesisEvidenceHub.tsx`, 300-test suite): the Executive Summary already matched the platform
+almost exactly for H1, H2, and H4 — it was specifically Chapter 5's detailed tables that had
+drifted from an earlier draft. H3 was the one case where neither existing version matched the
+platform; the team chose the platform's canonical univariate WLS model (β₁ = −73.92 min/unit,
+R² = 0.6256) over both the Executive Summary's stale value and Chapter 5's unreproducible
+multivariate model.
+
+Full corrected replacement text for every affected subsection is in
+[`hypothesis_corrections.md`](hypothesis_corrections.md). **This is the single highest-value fix
+available before submission** — it affects Interpretation and Insights and Professional
+Structure and Technical Writing directly, and is exactly the kind of cross-reference a rubric
+grader is likely to make.
+
+---
+
 ## 4. What this audit did *not* do
 
 - Did not modify the final report, any grading-relevant data, or statistical results.
