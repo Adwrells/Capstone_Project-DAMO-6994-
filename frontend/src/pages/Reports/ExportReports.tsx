@@ -5,7 +5,7 @@
 
 import React, { useState, useMemo } from 'react';
 import {
-  FileText, ShieldCheck, Printer, Award, Download, Check, RefreshCw, FileCode, Sliders, Eye
+  ShieldCheck, Printer, Award, Download, Check, RefreshCw, Sliders, Eye
 } from 'lucide-react';
 import { printPanelAsPdf } from '../../utils/printToPdf';
 import PageHeader from '../../components/common/PageHeader';
@@ -16,9 +16,6 @@ interface ExportReportsProps {
   qualityScore: number;
   fields: any[];
   aiAnalysisText: string | null;
-  onDownloadCSV: () => void;
-  onDownloadXLSX: () => void;
-  onDownloadZIP: () => void;
   rawData: any[];
   isDarkMode?: boolean;
 }
@@ -30,12 +27,9 @@ export default function ExportReports({
   aiAnalysisText,
   rawData,
   isDarkMode = false,
-  onDownloadCSV,
-  onDownloadXLSX,
-  onDownloadZIP
 }: ExportReportsProps) {
   const [reportName, setReportName] = useState<string>("CIHI_NACRS_ED_Operational_Modeling_Dossier");
-  const [selectedFormat, setSelectedFormat] = useState<'PDF' | 'DOCX' | 'Markdown' | 'CSV' | 'JSON'>('PDF');
+  const [selectedFormat, setSelectedFormat] = useState<'PDF' | 'Markdown' | 'CSV' | 'JSON'>('PDF');
   
   // Section toggle states
   const [includeSummary, setIncludeSummary] = useState<boolean>(true);
@@ -47,74 +41,66 @@ export default function ExportReports({
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const [showSuccessToast, setShowSuccessToast] = useState<boolean>(false);
 
-  // Generate dynamic text report content based on selections
+  // Generate dynamic Markdown report content based on selections
   const reportContent = useMemo(() => {
     let text = "";
-    
-    // Header Stamp
-    text += `========================================================================\n`;
-    text += `       CANADIAN INSTITUTE FOR HEALTH INFORMATION (CIHI) NACRS           \n`;
-    text += `            EMERGENCY DEPARTMENT INTELLIGENCE PORTFOLIO                 \n`;
-    text += `========================================================================\n\n`;
-    text += `REPORT DOSSIER: ${reportName.toUpperCase()}\n`;
-    text += `SOURCE DATASET: ${datasetName}\n`;
-    text += `DATE GENERATED: ${new Date().toISOString().split('T')[0]} (UTC)\n`;
-    text += `CLINICAL COMPLIANCE LEVEL: Grade AAA Certified\n`;
-    text += `------------------------------------------------------------------------\n\n`;
+
+    // Header
+    text += `# Emergency Department Intelligence Portfolio\n\n`;
+    text += `**Canadian Institute for Health Information (CIHI) NACRS**\n\n`;
+    text += `| | |\n|---|---|\n`;
+    text += `| **Report Dossier** | ${reportName} |\n`;
+    text += `| **Source Dataset** | ${datasetName} |\n`;
+    text += `| **Date Generated** | ${new Date().toISOString().split('T')[0]} (UTC) |\n`;
+    text += `| **Clinical Compliance Level** | Grade AAA Certified |\n\n`;
+    text += `---\n\n`;
 
     if (includeSummary) {
-      text += `1. RESEARCH ABSTRACT & EXECUTIVE SUMMARY\n`;
-      text += `------------------------------------------------------------------------\n`;
-      text += `Emergency departments function as the primary safety net of the Canadian healthcare system.\n`;
-      text += `However, unprecedented patient volumes, rising clinical acuity, and systemic bed shortages\n`;
-      text += `have led to chronic ED crowding and prolonged Length of Stay (LOS). Operational leaders\n`;
-      text += `lack real-time predictive systems to forecast daily patient volumes, assess triage bottlenecks\n`;
-      text += `(particularly for CTAS Level 3 'Urgent' cases), and align nurse staffing rosters with patient\n`;
-      text += `complexity. This results in ambulance diversion, increased rates of patients leaving without\n`;
+      text += `## 1. Research Abstract & Executive Summary\n\n`;
+      text += `Emergency departments function as the primary safety net of the Canadian healthcare system. `;
+      text += `However, unprecedented patient volumes, rising clinical acuity, and systemic bed shortages `;
+      text += `have led to chronic ED crowding and prolonged Length of Stay (LOS). Operational leaders `;
+      text += `lack real-time predictive systems to forecast daily patient volumes, assess triage bottlenecks `;
+      text += `(particularly for CTAS Level 3 'Urgent' cases), and align nurse staffing rosters with patient `;
+      text += `complexity. This results in ambulance diversion, increased rates of patients leaving without `;
       text += `being seen (LWBS), and clinical burnout.\n\n`;
     }
 
     if (includeQuality) {
-      text += `2. CLINICAL DATA QUALITY & COHORT HARMONIZATION\n`;
-      text += `------------------------------------------------------------------------\n`;
-      text += `- Total Validated Patient Cohort Size: ${cleanedCount.toLocaleString()} visit records\n`;
-      text += `- Raw Dataset Sourcing: Dataset 1 (2017-2022), Dataset 2 (2003-2022), Dataset 3 (2024-2026)\n`;
-      text += `- Cohort Preparation Integrity Score: ${qualityScore}/100\n`;
-      text += `- Prep Rules Executed: CTAS Acuity Standardization, Missing LOS Imputation, Deduplication\n\n`;
+      text += `## 2. Clinical Data Quality & Cohort Harmonization\n\n`;
+      text += `- **Total Validated Patient Cohort Size:** ${cleanedCount.toLocaleString()} visit records\n`;
+      text += `- **Raw Dataset Sourcing:** Dataset 1 (2017-2022), Dataset 2 (2003-2022), Dataset 3 (2024-2026)\n`;
+      text += `- **Cohort Preparation Integrity Score:** ${qualityScore}/100\n`;
+      text += `- **Prep Rules Executed:** CTAS Acuity Standardization, Missing LOS Imputation, Deduplication\n\n`;
     }
 
     if (includeMethodology) {
-      text += `3. ANALYTICAL MODELING METHODOLOGY\n`;
-      text += `------------------------------------------------------------------------\n`;
-      text += `- H1 (CTAS Acuity): Evaluate reported median LOS across CTAS triage levels (Weighted Kruskal-Wallis & Dunn Post-Hoc, ε²).\n`;
-      text += `- H2 (Admission Pathway): Compare reported median LOS between Admitted and Non-Admitted visits (Weighted Mann-Whitney U, rb).\n`;
-      text += `- H3 (Multi-Attribute Drivers): Model LOS determinants via Weighted Least Squares (WLS) regression with visit-count weights.\n`;
-      text += `- H4 (Life-Stage Variance): Evaluate reported median LOS across broad demographic age categories (Weighted Kruskal-Wallis, ε²).\n`;
-      text += `- H5 (Demographic Association): Test independence of Patient Sex and Visit Disposition (Pearson Chi-Square, Cramér's V).\n`;
-      text += `- Longitudinal Trend & Forecast: Mann-Kendall Monotonic Trend Test and Simple Exponential Smoothing (SES) on Total ED-Minutes (TEM).\n\n`;
+      text += `## 3. Analytical Modeling Methodology\n\n`;
+      text += `- **H1 (CTAS Acuity):** Evaluate reported median LOS across CTAS triage levels (Weighted Kruskal-Wallis & Dunn Post-Hoc, ε²).\n`;
+      text += `- **H2 (Admission Pathway):** Compare reported median LOS between Admitted and Non-Admitted visits (Weighted Mann-Whitney U, rb).\n`;
+      text += `- **H3 (Multi-Attribute Drivers):** Model LOS determinants via Weighted Least Squares (WLS) regression with visit-count weights.\n`;
+      text += `- **H4 (Life-Stage Variance):** Evaluate reported median LOS across broad demographic age categories (Weighted Kruskal-Wallis, ε²).\n`;
+      text += `- **H5 (Demographic Association):** Test independence of Patient Sex and Visit Disposition (Pearson Chi-Square, Cramér's V).\n`;
+      text += `- **Longitudinal Trend & Forecast:** Mann-Kendall Monotonic Trend Test and Simple Exponential Smoothing (SES) on Total ED-Minutes (TEM).\n\n`;
     }
 
     if (includeAIInsights) {
-      text += `4. AI-POWERED CLINICAL INSIGHTS SUMMARY\n`;
-      text += `------------------------------------------------------------------------\n`;
+      text += `## 4. AI-Powered Clinical Insights Summary\n\n`;
       text += `${aiAnalysisText || "CTAS Level 2 (Emergent) visits exhibit the highest median stay duration (3.75h) due to comprehensive diagnostic workups. Inpatient admission is the dominant operational driver of prolonged ED stay, justifying admission-flow optimization."}\n\n`;
     }
 
     if (includeStatistics) {
-      text += `5. STATISTICAL & MODEL ESTIMATIONS\n`;
-      text += `------------------------------------------------------------------------\n`;
-      text += `- H1 (CTAS Acuity): Weighted Kruskal-Wallis H(4) = 48.74, p < 0.001, ε² = 0.7251 (Large effect).\n`;
-      text += `- H2 (Disposition): Weighted Mann-Whitney U = 5.22e14, p < 0.001, rank-biserial rb = 0.9981 (Large effect).\n`;
-      text += `- H3 (WLS Model): Weighted Least Squares Linear Regression, R² = 0.6256 (62.56% model variation), slope = -73.92 min/unit (p < 0.001).\n`;
-      text += `- H4 (Age Demographics): Weighted Kruskal-Wallis H(3) = 111.45, p < 0.001, ε² = 0.7218 (Large effect; Older Adult median 250.0 min vs Pediatric 123.0 min).\n`;
-      text += `- H5 (Equity Association): Pearson Chi-Square χ²(1) = 18,164.97, p < 0.001, Cramér's V = 0.0102 (Negligible effect magnitude).\n`;
-      text += `- Longitudinal Trend: Mann-Kendall Z = 5.5977, p < 0.001, Sen's slope = 550,907 visits/year; SES 5-year forecast.\n`;
-      text += `- Derived Planning Context: Canonical ERBI = 9.32 acuity-weighted score-hours per visit.\n`;
-      text += `------------------------------------------------------------------------\n`;
+      text += `## 5. Statistical & Model Estimations\n\n`;
+      text += `- **H1 (CTAS Acuity):** Weighted Kruskal-Wallis H(4) = 126,319,368.24, p < 0.001, ε² = 0.7251 (Large effect).\n`;
+      text += `- **H2 (Disposition):** Weighted Mann-Whitney U = 2.69 × 10¹², p < 0.001, rank-biserial rb = 0.9981 (Large effect).\n`;
+      text += `- **H3 (WLS Model):** Weighted Least Squares Linear Regression, R² = 0.6256 (62.56% model variation), slope = -73.92 min/unit (p < 0.001).\n`;
+      text += `- **H4 (Age Demographics):** Weighted Kruskal-Wallis H(3) = 126,863,835.84, p < 0.001, ε² = 0.7218 (Large effect; Older Adult median 250.0 min vs Pediatric 123.0 min).\n`;
+      text += `- **H5 (Equity Association):** Pearson Chi-Square χ²(1) = 18,164.97, p < 0.001, Cramér's V = 0.0102 (Negligible effect magnitude).\n`;
+      text += `- **Longitudinal Trend:** Mann-Kendall Z = 5.5977, p < 0.001, Sen's slope = 550,907 visits/year; SES 5-year forecast.\n`;
+      text += `- **Derived Planning Context:** Canonical ERBI = 9.32 acuity-weighted score-hours per visit.\n\n`;
     }
 
-    text += `END OF PORTFOLIO DOSSIER.\n`;
-    text += `========================================================================\n`;
+    text += `---\n\n*End of portfolio dossier.*\n`;
     return text;
   }, [reportName, datasetName, cleanedCount, qualityScore, aiAnalysisText, includeSummary, includeQuality, includeMethodology, includeAIInsights, includeStatistics]);
 
@@ -138,10 +124,7 @@ export default function ExportReports({
       let extension = "txt";
       let payload = reportContent;
 
-      if (selectedFormat === 'DOCX') {
-        blobType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document;";
-        extension = "docx";
-      } else if (selectedFormat === 'Markdown') {
+      if (selectedFormat === 'Markdown') {
         blobType = "text/markdown;charset=utf-8;";
         extension = "md";
       } else if (selectedFormat === 'CSV') {
@@ -244,7 +227,6 @@ export default function ExportReports({
                 className="w-full bg-slate-50 dark:bg-[#131f37] border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-slate-800 dark:text-white focus:outline-hidden cursor-pointer"
               >
                 <option value="PDF">PDF (Portable Document Format)</option>
-                <option value="DOCX">DOCX (Microsoft Word Document)</option>
                 <option value="Markdown">Markdown (.md File)</option>
                 <option value="CSV">CSV (Clean Data Records Only)</option>
                 <option value="JSON">JSON (Complete Analytical Data Object)</option>
@@ -326,42 +308,6 @@ export default function ExportReports({
                   className="w-4 h-4 accent-blue-600 dark:accent-blue-500 cursor-pointer"
                 />
               </label>
-            </div>
-
-            {/* Quick Export Buttons */}
-            <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-              <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide block">
-                Quick Direct Export
-              </label>
-              <div className="grid grid-cols-3 gap-2">
-                <button
-                  onClick={onDownloadCSV}
-                  disabled={!onDownloadCSV}
-                  className="py-2.5 px-2 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 font-semibold text-[11px] flex flex-col items-center gap-1 transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed bg-slate-50/50 dark:bg-[#131f37]"
-                  title="Download cleaned dataset as CSV"
-                >
-                  <Download size={14} />
-                  <span>CSV</span>
-                </button>
-                <button
-                  onClick={onDownloadXLSX}
-                  disabled={!onDownloadXLSX}
-                  className="py-2.5 px-2 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 font-semibold text-[11px] flex flex-col items-center gap-1 transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed bg-slate-50/50 dark:bg-[#131f37]"
-                  title="Download as Excel (XLSX)"
-                >
-                  <FileText size={14} />
-                  <span>XLSX</span>
-                </button>
-                <button
-                  onClick={onDownloadZIP}
-                  disabled={!onDownloadZIP}
-                  className="py-2.5 px-2 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 font-semibold text-[11px] flex flex-col items-center gap-1 transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed bg-slate-50/50 dark:bg-[#131f37]"
-                  title="Download dashboard charts as ZIP archive"
-                >
-                  <FileCode size={14} />
-                  <span>ZIP</span>
-                </button>
-              </div>
             </div>
 
             {/* Export and Print Buttons */}

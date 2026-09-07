@@ -227,42 +227,7 @@ export default function App() {
     setCustomCharts(prev => prev.filter(c => c.id !== id));
   };
 
-  const handleDownloadCSV = () => {
-    if (cleanedData.length === 0) return;
-    const headers = fields.map(f => f.name).join(',');
-    const rows = cleanedData.map(row =>
-      fields.map(f => {
-        const val = row[f.name];
-        if (val === null || val === undefined) return '';
-        const strVal = String(val);
-        return strVal.includes(',') || strVal.includes('\n') ? `"${strVal.replace(/"/g, '""')}"` : strVal;
-      }).join(',')
-    );
-    const content = [headers, ...rows].join('\n');
-    const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `Cleaned_${datasetName?.replace(/\.[^/.]+$/, "") || 'Dataset'}.csv`;
-    link.click();
-  };
 
-  const handleDownloadXLSX = () => {
-    handleDownloadCSV();
-  };
-
-  const handleDownloadZIPArchive = () => {
-    const triggerBtn = document.getElementById('export-trigger-btn');
-    if (triggerBtn) {
-      triggerBtn.click();
-    } else {
-      setNotification({
-        text: "Please generate ZIP archive deliverables directly from the Executive Analytics Dashboard.",
-        type: 'info'
-      });
-      setTimeout(() => setNotification(null), 5000);
-    }
-  };
 
   const resetPlatform = () => {
     setDatasetName(null);
@@ -619,9 +584,6 @@ export default function App() {
             qualityScore={cleaningSummary ? cleaningSummary.finalScore : 94}
             fields={fields}
             aiAnalysisText={aiAnalysis ? aiAnalysis.datasetOverview : null}
-            onDownloadCSV={handleDownloadCSV}
-            onDownloadXLSX={handleDownloadXLSX}
-            onDownloadZIP={handleDownloadZIPArchive}
             rawData={cleanedData}
             isDarkMode={isDarkMode}
           />
