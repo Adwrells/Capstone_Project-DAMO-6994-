@@ -354,7 +354,7 @@ export default function DataTable({
                 >
                   <div className={`flex items-center gap-1
                     ${col.align === 'center' ? 'justify-center' : col.align === 'right' ? 'justify-end' : ''}`}>
-                    <span className="truncate">{col.label}</span>
+                    <span className="truncate" title={col.label}>{col.label}</span>
                     {col.sortable !== false && (
                       <SortIcon col={col.key} sortKey={sortKey} sortDir={sortDir} />
                     )}

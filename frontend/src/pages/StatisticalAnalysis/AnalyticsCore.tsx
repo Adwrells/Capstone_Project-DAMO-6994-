@@ -354,18 +354,24 @@ function ContingencyTableViz({
   rowLabels,
   colLabels,
   totalN,
+  cramersV,
 }: {
   observed: number[][];
   expected: number[][];
   rowLabels: string[];
   colLabels: string[];
   totalN: number;
+  cramersV?: number;
 }) {
   const [hoveredCell, setHoveredCell] = useState<{ r: number; c: number } | null>(null);
   const rowSums = observed.map(r => r.reduce((a, b) => a + b, 0));
   const colSums = Array.from({ length: colLabels.length }, (_, c) =>
     observed.reduce((s, r) => s + (r[c] || 0), 0)
   );
+
+  // Disparity = spread between per-row rates in the second (e.g. "Admitted") column
+  const rowRates = observed.map((r, i) => (rowSums[i] > 0 ? ((r[1] || 0) / rowSums[i]) * 100 : 0));
+  const disparityPct = rowRates.length >= 2 ? Math.abs(Math.max(...rowRates) - Math.min(...rowRates)) : 0;
 
   return (
     <div className="space-y-4">
@@ -393,9 +399,9 @@ function ContingencyTableViz({
         <div className="flex-1 min-w-[150px] max-w-[210px] p-3 rounded-xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200/60 dark:border-blue-800/60 text-center shadow-xs">
           <span className="text-[9px] uppercase font-bold text-blue-700 dark:text-blue-400 block font-mono">Admission Disparity</span>
           <span className="text-sm font-extrabold text-blue-600 dark:text-blue-400 font-mono">
-            Δ 0.62%
+            Δ {disparityPct.toFixed(2)}%
           </span>
-          <span className="text-[9px] text-blue-600/80 font-mono">Cramér's V = 0.0210</span>
+          <span className="text-[9px] text-blue-600/80 font-mono">Cramér's V = {(cramersV ?? 0).toFixed(4)}</span>
         </div>
       </div>
 
@@ -2100,6 +2106,7 @@ export default function AnalyticsCore({ fields, data, onNavigateNext }: Analytic
               rowLabels={h5.res.rowLabels}
               colLabels={h5.res.colLabels}
               totalN={h5.res.totalN}
+              cramersV={h5.res.cramersV}
             />
           </div>
           <TechPanel details={[
@@ -2135,9 +2142,16 @@ export default function AnalyticsCore({ fields, data, onNavigateNext }: Analytic
               </div>
             </div>
             <div className="flex items-center gap-3">
-              {status === 'COMPLETED' ? (
-                <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-bold rounded-full bg-emerald-50 text-[#2E8B57] dark:bg-emerald-950/20 dark:text-[#50b17c]">
-                  <ShieldCheck size={11} /> Statistically Significant Trend (p &lt; 0.0001)
+              {status === 'COMPLETED' && trends ? (
+                <span className={`hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-bold rounded-full ${
+                  trends.mk.p < 0.05
+                    ? 'bg-emerald-50 text-[#2E8B57] dark:bg-emerald-950/20 dark:text-[#50b17c]'
+                    : 'bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400'
+                }`}>
+                  <ShieldCheck size={11} />
+                  {trends.mk.p < 0.05
+                    ? `Statistically Significant Trend (p ${fmtP(trends.mk.p)})`
+                    : `No Significant Trend (p ${fmtP(trends.mk.p)})`}
                 </span>
               ) : (
                 <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-bold rounded-full bg-slate-100 text-slate-500 animate-pulse">
@@ -2169,8 +2183,10 @@ export default function AnalyticsCore({ fields, data, onNavigateNext }: Analytic
                       <span className="text-base font-extrabold text-blue-900 dark:text-white font-mono block mt-0.5">
                         τ = {fmtN(trends.mk.tau, 4)}
                       </span>
-                      <span className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 font-mono block mt-0.5">
-                        p &lt; 0.0001 (Monotonic Upward)
+                      <span className={`text-[9px] font-bold font-mono block mt-0.5 ${
+                        trends.mk.p < 0.05 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'
+                      }`}>
+                        p {fmtP(trends.mk.p)} ({trends.mk.trend === 'increasing' ? 'Monotonic Upward' : trends.mk.trend === 'decreasing' ? 'Monotonic Downward' : 'No Clear Trend'})
                       </span>
                     </div>
 

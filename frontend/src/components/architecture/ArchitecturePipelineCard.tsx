@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Database, Sparkles, BarChart3, RefreshCw, CheckCircle2, HardDrive } from 'lucide-react';
+import { Database, Sparkles, BarChart3, RefreshCw, CheckCircle2, HardDrive, Clock, AlertTriangle } from 'lucide-react';
 import { fetchArchitecturePipelineOverview, ArchitecturePipelineOverview } from '../../services/architectureService';
 
 interface ArchitecturePipelineCardProps {
@@ -126,6 +126,15 @@ export default function ArchitecturePipelineCard({ isDarkMode = false }: Archite
           const stage = stages[key] || {};
           const status = stage.status || (isHealthy ? 'ready' : 'pending');
           const description = stage.description || fallbackDesc;
+          const isReady = status === 'ready';
+          const isPending = status === 'pending';
+          const StatusIcon = isReady ? CheckCircle2 : isPending ? Clock : AlertTriangle;
+          const statusColor = isReady
+            ? 'text-emerald-600 dark:text-emerald-400'
+            : isPending
+            ? 'text-amber-600 dark:text-amber-400'
+            : 'text-rose-600 dark:text-rose-400';
+          const footerLabel = isReady ? 'VERIFIED' : isPending ? 'PENDING' : 'ATTENTION';
 
           return (
             <div
@@ -142,8 +151,8 @@ export default function ArchitecturePipelineCard({ isDarkMode = false }: Archite
                     </div>
                     <span className="text-xs font-bold">{label}</span>
                   </div>
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                    <CheckCircle2 size={12} />
+                  <span className={`text-[10px] font-mono font-bold uppercase tracking-wider flex items-center gap-1 ${statusColor}`}>
+                    <StatusIcon size={12} />
                     <span>{status}</span>
                   </span>
                 </div>
@@ -154,7 +163,7 @@ export default function ArchitecturePipelineCard({ isDarkMode = false }: Archite
 
               <div className="mt-3 pt-2 border-t border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between text-[10px] font-mono text-slate-400">
                 <span>SLO: 99.9%</span>
-                <span className="text-emerald-600 dark:text-emerald-400 font-semibold">VERIFIED</span>
+                <span className={`font-semibold ${statusColor}`}>{footerLabel}</span>
               </div>
             </div>
           );

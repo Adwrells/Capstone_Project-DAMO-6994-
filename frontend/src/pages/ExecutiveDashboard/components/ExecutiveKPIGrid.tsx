@@ -48,7 +48,9 @@ export default function ExecutiveKPIGrid({
       label: 'Reported Median LOS',
       value: fmtLOS(medianLOSHours),
       unit: `${Math.round(medianLOSHours * 60)} min median stay`,
-      subtitle: isLOSOverBenchmark ? '+0.0h over benchmark' : 'CIHI 6-hour benchmark',
+      subtitle: isLOSOverBenchmark
+        ? `+${(medianLOSHours - 6.0).toFixed(1)}h over benchmark`
+        : 'CIHI 6-hour benchmark',
       footer: (
         <span
           className={`flex items-center gap-1 font-semibold ${

@@ -28,6 +28,18 @@ dashboard, all reading from a reproducible analytical database.
 
 ## Recent Updates
 
+**v2.2.1** — UI/UX correctness pass (see [CHANGELOG.md](CHANGELOG.md) for full detail):
+- Fixed several dashboard/analytics displays that showed static example values instead of the
+  computed result (KPI benchmark subtitle, H5 contingency disparity/Cramér's V, longitudinal
+  trend significance badge).
+- Fixed uploaded-file duplicate detection and removed an artificial quality-score floor in
+  `DatasetUpload.tsx`; architecture pipeline stage cards now reflect real stage status instead
+  of always showing "VERIFIED".
+- Accessibility: added missing `aria-label`s on icon-only buttons, wrapped report-chapter
+  checkboxes in `<label>`s, added a tooltip for truncated Data Table column headers.
+- Fixed three invalid Tailwind utility classes (`h-13`, `w-84`, `py-0.2`) that silently produced
+  no CSS.
+
 **v2.2.0** — Master Capstone Platform Audit & Analytical Consistency Hardening:
 - Established a single source of analytical truth across the database, Python analytics engines, FastAPI endpoints, React pages, and PDF export dossier.
 - Reconciled H3 WLS regression parameters to canonical univariate model ($R^2 = 0.6256$, slope $\beta_1 = -73.92\text{ min/score}$ [$-1.232\text{ h/score}$], $p < 0.001$).

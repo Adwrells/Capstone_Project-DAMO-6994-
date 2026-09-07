@@ -291,7 +291,19 @@ export default function DatasetUpload({
 
         // Compute validation
         const missingCount = data.reduce((acc, r) => acc + fields.reduce((fAcc, f) => fAcc + (r[f.name] === null || r[f.name] === undefined ? 1 : 0), 0), 0);
-        
+
+        // Find duplicates
+        const seenRows = new Set();
+        let dupCount = 0;
+        data.forEach(r => {
+          const keyStr = JSON.stringify(r);
+          if (seenRows.has(keyStr)) {
+            dupCount++;
+          } else {
+            seenRows.add(keyStr);
+          }
+        });
+
         setDatasets(prev => prev.map(d => {
           if (d.id === activeUploadId) {
             return {
@@ -302,7 +314,7 @@ export default function DatasetUpload({
               cols: fields.length,
               fileSize: `${Math.round(file.size / 1024)} KB`,
               missing: missingCount,
-              duplicates: 0,
+              duplicates: dupCount,
               dataTypes: fields.map(f => `${f.name} (${f.type})`).slice(0, 3).join(', ') + '...',
               validated: true,
               data,
@@ -556,8 +568,13 @@ export default function DatasetUpload({
 
                 <div className="flex justify-between items-center">
                   <span className="text-slate-500 dark:text-slate-400 font-medium">Quality Score:</span>
-                  <span className="text-[#2E8B57] dark:text-[#50b17c] font-bold font-mono">
-                    {d.uploaded ? `${Math.max(88, 100 - Math.round((d.missing * 3 + d.duplicates * 5) / Math.max(1, d.rows)))}%` : "N/A"}
+                  <span className={`font-bold font-mono ${
+                    !d.uploaded ? 'text-slate-700 dark:text-slate-300' :
+                    Math.max(0, 100 - Math.round((d.missing * 3 + d.duplicates * 5) / Math.max(1, d.rows))) >= 90 ? 'text-[#2E8B57] dark:text-[#50b17c]' :
+                    Math.max(0, 100 - Math.round((d.missing * 3 + d.duplicates * 5) / Math.max(1, d.rows))) >= 70 ? 'text-amber-600 dark:text-amber-400' :
+                    'text-rose-600 dark:text-rose-400'
+                  }`}>
+                    {d.uploaded ? `${Math.max(0, 100 - Math.round((d.missing * 3 + d.duplicates * 5) / Math.max(1, d.rows)))}%` : "N/A"}
                   </span>
                 </div>
 

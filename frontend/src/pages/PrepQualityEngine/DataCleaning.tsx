@@ -268,6 +268,7 @@ export default function DataCleaning({
               onClick={() => setShowInspectionPanel(false)}
               className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition cursor-pointer"
               title="Return to Data Preparation Workspace"
+              aria-label="Return to Data Preparation Workspace"
             >
               <ArrowLeft size={18} />
             </button>
@@ -665,6 +666,8 @@ export default function DataCleaning({
                   onClick={() => setActiveDatasetModal(null)}
                   className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition cursor-pointer"
                   id="close-dataset-modal-btn"
+                  aria-label="Close preview"
+                  title="Close preview"
                 >
                   <XCircle size={20} />
                 </button>
@@ -793,19 +796,19 @@ export default function DataCleaning({
         {pipelineState === 'idle' ? (
           <button
             onClick={executePipeline}
-            className="w-full h-13 rounded-2xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-bold text-sm shadow-md hover:shadow-lg transition flex items-center justify-center gap-2.5 cursor-pointer select-none"
+            className="w-full h-14 rounded-2xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-bold text-sm shadow-md hover:shadow-lg transition flex items-center justify-center gap-2.5 cursor-pointer select-none"
             id="run-prep-pipeline-btn"
           >
             <PlaySquare size={18} />
             <span>Run Automated Data Preparation & Validation Pipeline</span>
           </button>
         ) : pipelineState === 'running' ? (
-          <div className="w-full h-13 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-700 dark:text-indigo-300 font-bold text-sm flex items-center justify-center gap-2">
+          <div className="w-full h-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-700 dark:text-indigo-300 font-bold text-sm flex items-center justify-center gap-2">
             <Loader2 size={18} className="animate-spin" />
             <span>Standardizing & Validating Analytical Datasets...</span>
           </div>
         ) : (
-          <div className="w-full h-13 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold text-sm flex items-center justify-center gap-2">
+          <div className="w-full h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold text-sm flex items-center justify-center gap-2">
             <CheckCircle2 size={18} className="text-emerald-600 dark:text-emerald-400" />
             <span>Analytical Datasets Prepared, Validated & Cached in SQLite Store</span>
           </div>

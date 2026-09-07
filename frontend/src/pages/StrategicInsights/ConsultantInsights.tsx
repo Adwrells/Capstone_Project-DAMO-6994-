@@ -744,7 +744,7 @@ export default function ConsultantInsights({ isLoading: parentLoading, onNavigat
                     <HelpCircle size={15} />
                   </button>
                   {showEvidenceTooltip && (
-                    <div className="absolute left-0 top-7 z-30 w-84 p-4 bg-slate-900 text-white rounded-xl shadow-2xl text-[11px] font-sans font-light leading-relaxed border border-slate-700 animate-fade-in">
+                    <div className="absolute left-0 top-7 z-30 w-80 p-4 bg-slate-900 text-white rounded-xl shadow-2xl text-[11px] font-sans font-light leading-relaxed border border-slate-700 animate-fade-in">
                       <div className="font-bold text-slate-200 mb-1.5 flex items-center gap-1.5">
                         <Info size={14} className="text-sky-400" />
                         Multi-Dimensional Evidence Framework

@@ -152,7 +152,7 @@ export default function DashboardFilters({
               Analysis Controls
             </span>
             {totalActive > 0 && (
-              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold font-mono bg-blue-500/20 text-blue-400 border border-blue-500/30">
+              <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold font-mono bg-blue-500/20 text-blue-400 border border-blue-500/30">
                 {totalActive} active
               </span>
             )}

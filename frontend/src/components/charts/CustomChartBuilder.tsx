@@ -1054,7 +1054,7 @@ export default function CustomChartBuilder({
                 <span className="text-[9px] font-extrabold uppercase tracking-widest text-[#0F4C81] dark:text-[#3B82F6]">
                   AI Analytical Guidance
                 </span>
-                <span className="px-1.5 py-0.2 rounded-full text-[8px] font-extrabold bg-blue-100 dark:bg-blue-950 text-[#0F4C81] dark:text-[#3B82F6] border border-blue-200 dark:border-blue-800">
+                <span className="px-1.5 py-0.5 rounded-full text-[8px] font-extrabold bg-blue-100 dark:bg-blue-950 text-[#0F4C81] dark:text-[#3B82F6] border border-blue-200 dark:border-blue-800">
                   7 Curated Presets
                 </span>
               </div>

@@ -258,7 +258,7 @@ export default function ExportReports({
               </label>
 
               {/* Toggle Summary */}
-              <div className="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-[#131f37]/50 transition">
+              <label className="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-[#131f37]/50 transition cursor-pointer">
                 <div className="text-left space-y-0.5">
                   <span className="text-xs font-bold text-slate-700 dark:text-slate-200 block">1. Research Abstract</span>
                   <span className="text-[9px] text-slate-400 block font-light">Introduction and problem context</span>
@@ -269,10 +269,10 @@ export default function ExportReports({
                   onChange={(e) => setIncludeSummary(e.target.checked)}
                   className="w-4 h-4 accent-blue-600 dark:accent-blue-500 cursor-pointer"
                 />
-              </div>
+              </label>
 
               {/* Toggle Quality */}
-              <div className="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-[#131f37]/50 transition">
+              <label className="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-[#131f37]/50 transition cursor-pointer">
                 <div className="text-left space-y-0.5">
                   <span className="text-xs font-bold text-slate-700 dark:text-slate-200 block">2. Quality & Harmonization</span>
                   <span className="text-[9px] text-slate-400 block font-light">Cohorts, record volume, validation index</span>
@@ -283,10 +283,10 @@ export default function ExportReports({
                   onChange={(e) => setIncludeQuality(e.target.checked)}
                   className="w-4 h-4 accent-blue-600 dark:accent-blue-500 cursor-pointer"
                 />
-              </div>
+              </label>
 
               {/* Toggle Methodology */}
-              <div className="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-[#131f37]/50 transition">
+              <label className="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-[#131f37]/50 transition cursor-pointer">
                 <div className="text-left space-y-0.5">
                   <span className="text-xs font-bold text-slate-700 dark:text-slate-200 block">3. Analytics Methodology</span>
                   <span className="text-[9px] text-slate-400 block font-light">Hypothesis specifications &amp; model definitions</span>
@@ -297,10 +297,10 @@ export default function ExportReports({
                   onChange={(e) => setIncludeMethodology(e.target.checked)}
                   className="w-4 h-4 accent-blue-600 dark:accent-blue-500 cursor-pointer"
                 />
-              </div>
+              </label>
 
               {/* Toggle AI Insights */}
-              <div className="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-[#131f37]/50 transition">
+              <label className="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-[#131f37]/50 transition cursor-pointer">
                 <div className="text-left space-y-0.5">
                   <span className="text-xs font-bold text-slate-700 dark:text-slate-200 block">4. AI Clinical Decisions</span>
                   <span className="text-[9px] text-slate-400 block font-light">Recommendations &amp; operational implications</span>
@@ -311,10 +311,10 @@ export default function ExportReports({
                   onChange={(e) => setIncludeAIInsights(e.target.checked)}
                   className="w-4 h-4 accent-blue-600 dark:accent-blue-500 cursor-pointer"
                 />
-              </div>
+              </label>
 
               {/* Toggle Statistics */}
-              <div className="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-[#131f37]/50 transition">
+              <label className="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-[#131f37]/50 transition cursor-pointer">
                 <div className="text-left space-y-0.5">
                   <span className="text-xs font-bold text-slate-700 dark:text-slate-200 block">5. Parametric Models</span>
                   <span className="text-[9px] text-slate-400 block font-light">WLS regression, Mann-Kendall, SES forecast</span>
@@ -325,7 +325,7 @@ export default function ExportReports({
                   onChange={(e) => setIncludeStatistics(e.target.checked)}
                   className="w-4 h-4 accent-blue-600 dark:accent-blue-500 cursor-pointer"
                 />
-              </div>
+              </label>
             </div>
 
             {/* Quick Export Buttons */}

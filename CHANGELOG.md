@@ -7,6 +7,40 @@ All notable changes to this project are documented in this file. The format foll
 This file starts at 1.1.0; versions 1.0.0–1.0.4 predate it and are recorded only as git tags,
 each named after the fix or feature it introduced.
 
+## [2.2.1] — 2026-09-07
+
+### Fixed
+- **Executive Dashboard KPI subtitle**: the "Reported Median LOS" card's subtitle hardcoded
+  `+0.0h over benchmark` whenever the value exceeded the 6-hour CIHI benchmark, regardless of
+  the actual gap — now computed from the real median LOS (`ExecutiveKPIGrid.tsx`).
+- **H5 contingency panel showed static example numbers**: the "Admission Disparity" stat pill
+  hardcoded `Δ 0.62%` and `Cramér's V = 0.0210` in JSX instead of the values `run_h5`/the
+  client-side mirror actually computed — now derives disparity from the observed contingency
+  table and receives `cramersV` as a prop (`AnalyticsCore.tsx`).
+- **Longitudinal Trend badge always claimed significance**: both the collapsed-header badge and
+  the expanded card unconditionally read "Statistically Significant Trend (p < 0.0001,
+  Monotonic Upward)" regardless of the Mann-Kendall result for the active dataset — now derives
+  significance, p-value, and direction from `trends.mk` (`AnalyticsCore.tsx`).
+- **Manual CSV uploads always reported 0 duplicate records**: `DatasetUpload.tsx`'s demo-dataset
+  path computed real duplicate counts via a `Set`, but the "browse a file" path hardcoded
+  `duplicates: 0`. Applied the same dedup check to uploaded files.
+- **Upload Quality Score floor**: the score was clamped to a minimum of 88% no matter how much
+  missing/duplicate data a file had, and always rendered green. Removed the artificial floor and
+  colour-coded the score (green ≥90, amber ≥70, red below).
+- **Architecture pipeline stage cards always showed "VERIFIED"**: each of the four pipeline
+  stage cards rendered a green checkmark and "VERIFIED" regardless of the stage's actual
+  `status` (`ready`/`pending`/other). Now branches icon, colour, and footer label on status.
+- **Data Table column headers truncated with no way to read the full name**: unlike the data
+  cells (which have a `title` tooltip), truncated header labels like `FISCAL_YEAR_STA…` had
+  none. Added `title={col.label}` (`DataTable.tsx`).
+- **Accessibility**: two icon-only buttons (Prep & Quality Engine's dataset-preview close and
+  full-inspection back button) had only a `title` attribute, not an `aria-label`; the five
+  report-chapter checkboxes in Export Reports weren't wrapped in a `<label>`, so clicking the
+  visible text didn't toggle them and screen readers had no accessible name for each control.
+- **Invalid Tailwind utility classes** that silently generated no CSS: `h-13` → `h-14` (Prep
+  pipeline action button/status bars), `w-84` → `w-80` (Strategic Insights evidence tooltip),
+  `py-0.2` → `py-0.5` (Dashboard Filters "N active" badge, Custom Chart Builder preset badge).
+
 ## [2.2.0] — 2026-09-05
 
 ### Fixed
