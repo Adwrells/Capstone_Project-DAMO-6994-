@@ -7,6 +7,9 @@ coverage/
 
 # Microsoft Office lock/temp files
 ~$*
+
+# Personal working notes — never part of the graded deliverable
+/note.md
 .env*
 !.env.example
 .vscode
