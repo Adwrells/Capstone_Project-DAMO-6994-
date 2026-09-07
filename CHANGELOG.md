@@ -7,6 +7,14 @@ All notable changes to this project are documented in this file. The format foll
 This file starts at 1.1.0; versions 1.0.0–1.0.4 predate it and are recorded only as git tags,
 each named after the fix or feature it introduced.
 
+## [2.2.3] — 2026-09-07
+
+### Fixed
+- Markdown lint warnings in `README.md`: three fenced code blocks (the rebuild row counts,
+  the polynomial-degree complexity curve, and the project structure tree) were missing a
+  language annotation, and a bolded "Root" line under the file-by-file reference was styled
+  as emphasis rather than a proper heading.
+
 ## [2.2.2] — 2026-09-07
 
 ### Fixed
