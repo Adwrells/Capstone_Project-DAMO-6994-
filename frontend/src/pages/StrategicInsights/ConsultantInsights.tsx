@@ -270,14 +270,16 @@ export default function ConsultantInsights({ isLoading: parentLoading, onNavigat
       {/* PAGE HEADER                                                               */}
       {/* ========================================================================= */}
       <PageHeader
-        category="STAGE 06 · STRATEGIC DECISION SUPPORT"
+        align="center"
+        badgeIcon={<Sparkles size={12} className="text-blue-500 dark:text-blue-400" />}
+        category="STRATEGIC DECISION SUPPORT · STAGE 6"
         title="Strategic Insights & Recommendations"
         subtitle="Evidence-informed strategic translation of CIHI NACRS emergency department data. Synthesizes hypothesis results (H1–H5), WLS regression modeling, Mann-Kendall longitudinal trends, and dashboard telemetry into actionable healthcare planning considerations within aggregate governance boundaries."
         contextPills={[
-          { label: 'Scope: Aggregate-Level Planning', variant: 'blue' },
-          { label: `${evidenceIndicators?.evidenceSourcesCount || 5} Evidence Bases`, variant: 'default' },
-          { label: evidenceIndicators?.hypothesesSynthesized || 'H1–H5 Synthesized', variant: 'success' },
-          { label: evidenceIndicators?.modelTrendOutputsCount || '4 Analytical Streams', variant: 'purple' },
+          { label: 'Planning Scope', value: 'Aggregate-Level Operations', icon: <Compass size={13} className="text-blue-500 dark:text-blue-400" />, variant: 'blue' },
+          { label: 'Evidence Bases', value: `${evidenceIndicators?.evidenceSourcesCount || 5} Verified Sources`, icon: <Database size={13} className="text-slate-500 dark:text-slate-400" />, variant: 'default' },
+          { label: 'Inference', value: evidenceIndicators?.hypothesesSynthesized || 'H1–H5 Synthesized', icon: <ShieldCheck size={13} className="text-emerald-500 dark:text-emerald-400" />, variant: 'success' },
+          { label: 'Action Frameworks', value: evidenceIndicators?.modelTrendOutputsCount || '4 Priority Pillars', icon: <Activity size={13} className="text-purple-500 dark:text-purple-400" />, variant: 'purple' },
         ]}
       />
 

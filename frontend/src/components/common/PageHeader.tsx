@@ -34,7 +34,7 @@ export default function PageHeader({
   contextPills,
   action,
   className = '',
-  align = 'left',
+  align = 'center',
   badgeIcon,
 }: PageHeaderProps) {
   if (align === 'center') {

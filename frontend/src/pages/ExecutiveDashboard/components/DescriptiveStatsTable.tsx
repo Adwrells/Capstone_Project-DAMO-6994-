@@ -1,5 +1,5 @@
-import React from 'react';
-import { fmtNum } from './formatters';
+import React, { useState } from 'react';
+import { fmtK, fmtNum } from './formatters';
 
 interface DescriptiveStatsTableProps {
   data: any[];
@@ -28,6 +28,7 @@ export default function DescriptiveStatsTable({
   isDarkMode,
 }: DescriptiveStatsTableProps) {
   const dark = isDarkMode;
+  const [useCompact, setUseCompact] = useState<boolean>(true);
 
   const numCols = fields.filter(f => f.type === 'numeric').map(f => f.name as string);
 
@@ -53,13 +54,33 @@ export default function DescriptiveStatsTable({
     };
   });
 
+  const isYearCol = (colName: string) => /year|fy/i.test(colName);
+
+  const renderVal = (val: number, dp: number = 2, colName: string = '') => {
+    const isYear = isYearCol(colName);
+    const formatted = useCompact
+      ? fmtK(val, dp, { isYear })
+      : isYear
+      ? (Number.isInteger(val) ? String(val) : val.toFixed(1))
+      : fmtNum(val, dp);
+
+    return (
+      <span
+        title={`Exact: ${isYear && Number.isInteger(val) ? String(val) : fmtNum(val, 2)}`}
+        className="cursor-help transition-colors hover:text-blue-500 dark:hover:text-blue-400"
+      >
+        {formatted}
+      </span>
+    );
+  };
+
   return (
     <div
       className={`rounded-2xl border p-6 shadow-xs space-y-4 transition-colors ${
         dark ? 'bg-[#131f37] border-[#1e2d4a]' : 'bg-white border-slate-200'
       }`}
     >
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <span className="text-[9px] font-extrabold uppercase tracking-widest text-[#0F4C81] dark:text-[#3B82F6] block">
             Descriptive Parametric &amp; Non-Parametric Metrics
@@ -69,13 +90,29 @@ export default function DescriptiveStatsTable({
           </h3>
           <p className="text-[10px] text-slate-400">Mean, Median, Dispersion, Interquartile Range, and Pearson Skewness</p>
         </div>
-        <span
-          className={`text-[9px] font-bold px-2.5 py-1 rounded-md border font-mono ${
-            dark ? 'bg-[#182640] border-[#1e2d4a] text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-600'
-          }`}
-        >
-          n = {fmtNum(data.length)} records
-        </span>
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={() => setUseCompact(!useCompact)}
+            className={`text-[9.5px] font-bold font-mono px-2.5 py-1 rounded-lg border transition-all cursor-pointer flex items-center gap-1.5 select-none ${
+              useCompact
+                ? 'bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400 hover:bg-blue-500/20'
+                : 'bg-slate-100 dark:bg-[#182640] border-slate-200 dark:border-[#1e2d4a] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+            }`}
+            title="Toggle between standardized k, M, B notation and exact numbers"
+          >
+            <span className={`w-1.5 h-1.5 rounded-full ${useCompact ? 'bg-blue-500 animate-pulse' : 'bg-slate-400'}`} />
+            {useCompact ? 'Standard: k, M, B' : 'Format: Exact'}
+          </button>
+          <span
+            className={`text-[9px] font-bold px-2.5 py-1 rounded-md border font-mono ${
+              dark ? 'bg-[#182640] border-[#1e2d4a] text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-600'
+            }`}
+            title={`${fmtNum(data.length)} records`}
+          >
+            n = {useCompact ? fmtK(data.length) : fmtNum(data.length)} records
+          </span>
+        </div>
       </div>
 
       {descStats.length === 0 ? (
@@ -119,41 +156,43 @@ export default function DescriptiveStatsTable({
                     {row.col}
                   </td>
                   <td className={`px-3 py-2 font-mono border-b ${dark ? 'border-[#1e2d4a] text-slate-300' : 'border-slate-100 text-slate-700'}`}>
-                    {fmtNum(row.n)}
+                    {renderVal(row.n, 1, 'n')}
                   </td>
                   <td className={`px-3 py-2 font-mono border-b ${dark ? 'border-[#1e2d4a] text-slate-300' : 'border-slate-100 text-slate-700'}`}>
-                    {fmtNum(row.mean, 2)}
+                    {renderVal(row.mean, 2, row.col)}
                   </td>
                   <td className={`px-3 py-2 font-mono border-b font-bold ${dark ? 'border-[#1e2d4a] text-cyan-400' : 'border-slate-100 text-cyan-700'}`}>
-                    {fmtNum(row.median, 2)}
+                    {renderVal(row.median, 2, row.col)}
                   </td>
                   <td className={`px-3 py-2 font-mono border-b ${dark ? 'border-[#1e2d4a] text-slate-300' : 'border-slate-100 text-slate-700'}`}>
-                    {fmtNum(row.stddev, 2)}
+                    {renderVal(row.stddev, 2, row.col)}
                   </td>
                   <td className={`px-3 py-2 font-mono border-b ${dark ? 'border-[#1e2d4a] text-slate-300' : 'border-slate-100 text-slate-700'}`}>
-                    {fmtNum(row.min, 1)}
+                    {renderVal(row.min, 1, row.col)}
                   </td>
                   <td className={`px-3 py-2 font-mono border-b ${dark ? 'border-[#1e2d4a] text-slate-300' : 'border-slate-100 text-slate-700'}`}>
-                    {fmtNum(row.max, 1)}
+                    {renderVal(row.max, 2, row.col)}
                   </td>
                   <td className={`px-3 py-2 font-mono border-b ${dark ? 'border-[#1e2d4a] text-slate-300' : 'border-slate-100 text-slate-700'}`}>
-                    {fmtNum(row.q1, 1)}
+                    {renderVal(row.q1, 1, row.col)}
                   </td>
                   <td className={`px-3 py-2 font-mono border-b ${dark ? 'border-[#1e2d4a] text-slate-300' : 'border-slate-100 text-slate-700'}`}>
-                    {fmtNum(row.q3, 1)}
+                    {renderVal(row.q3, 2, row.col)}
                   </td>
                   <td className={`px-3 py-2 font-mono border-b ${dark ? 'border-[#1e2d4a] text-slate-300' : 'border-slate-100 text-slate-700'}`}>
-                    {fmtNum(row.iqr, 1)}
+                    {renderVal(row.iqr, 2, row.col)}
                   </td>
                   <td
                     className={`px-3 py-2 font-mono border-b font-bold ${
                       dark ? 'border-[#1e2d4a]' : 'border-slate-100'
                     } ${Math.abs(row.skew) > 1 ? 'text-amber-500' : dark ? 'text-slate-300' : 'text-slate-700'}`}
                   >
-                    {fmtNum(row.skew, 3)}
-                    {Math.abs(row.skew) > 1 && (
-                      <span className="ml-1 text-[8px]">{row.skew > 0 ? '▲ Right' : '▼ Left'}</span>
-                    )}
+                    <span title={`Exact Pearson Skewness: ${fmtNum(row.skew, 4)}`}>
+                      {fmtNum(row.skew, 3)}
+                      {Math.abs(row.skew) > 1 && (
+                        <span className="ml-1 text-[8px]">{row.skew > 0 ? '▲ Right' : '▼ Left'}</span>
+                      )}
+                    </span>
                   </td>
                 </tr>
               ))}
@@ -167,7 +206,7 @@ export default function DescriptiveStatsTable({
           dark ? 'bg-[#182640] border-[#1e2d4a] text-slate-300' : 'bg-amber-50 border-amber-100 text-amber-800'
         }`}
       >
-        <strong>Methodological Justification:</strong> Emergency department stay durations exhibit severe positive skewness (skewness &gt; 0.5), validating the selection of non-parametric ranks (Kruskal-Wallis, Mann-Whitney U) and median-based central tendency metrics across all primary capstone hypotheses.
+        <strong>Methodological Justification:</strong> Emergency department stay durations exhibit severe positive skewness (skewness &gt; 0.5), validating the selection of non-parametric ranks (Kruskal-Wallis, Mann-Whitney U) and median-based central tendency metrics across all primary capstone hypotheses. Numbers are standardized to <strong>k (thousands)</strong>, <strong>M (millions)</strong>, and <strong>B (billions)</strong> with calendar year protection (hover any cell for exact value).
       </div>
     </div>
   );

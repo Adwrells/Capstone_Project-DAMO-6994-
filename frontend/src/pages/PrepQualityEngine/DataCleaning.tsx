@@ -1553,10 +1553,11 @@ export default function DataCleaning({
                   executePipeline();
                 }
               }}
-              className="h-10 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.06] dark:hover:bg-white/[0.1] text-slate-700 dark:text-slate-200 text-xs font-bold border border-slate-200/80 dark:border-white/[0.08] transition-all flex items-center gap-2 cursor-pointer select-none"
+              className="h-10 px-5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-md shadow-blue-500/20 hover:shadow-blue-500/35 ring-2 ring-blue-500/30 hover:ring-blue-400/60 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer select-none group"
             >
-              <PlaySquare size={14} />
+              <PlaySquare size={14} className="group-hover:scale-110 transition-transform text-white" />
               <span>Go to Pipeline Execution Control</span>
+              <ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform text-white/80" />
             </button>
           )}
         </div>

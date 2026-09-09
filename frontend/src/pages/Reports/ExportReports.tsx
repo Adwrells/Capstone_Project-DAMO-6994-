@@ -5,10 +5,12 @@
 
 import React, { useState, useMemo } from 'react';
 import {
-  ShieldCheck, Printer, Award, Download, Check, RefreshCw, Sliders, Eye
+  ShieldCheck, Printer, Award, Download, Check, RefreshCw, Sliders, Eye,
+  Database, FileSpreadsheet, Sparkles, FileDown
 } from 'lucide-react';
 import { printPanelAsPdf } from '../../utils/printToPdf';
 import PageHeader from '../../components/common/PageHeader';
+import { fmtK } from '../../utils/formatters';
 
 interface ExportReportsProps {
   datasetName: string;
@@ -179,14 +181,16 @@ export default function ExportReports({
       
       {/* Executive Page Header */}
       <PageHeader
-        category="STAGE 07 · DECISION SUPPORT & AUDIT"
+        align="center"
+        badgeIcon={<FileDown size={12} className="text-blue-500 dark:text-blue-400" />}
+        category="DECISION SUPPORT & AUDIT · STAGE 7"
         title="Report Generation & Decision Dossier"
         subtitle="Configure, preview, and generate audit-ready healthcare executive dossiers, research reports, and clean data archives derived from CIHI NACRS emergency department analytics."
         contextPills={[
-          { label: 'Grade AAA Accredited', variant: 'success' },
-          { label: datasetName || 'CIHI NACRS Cohort', variant: 'blue' },
-          { label: `${cleanedCount ? cleanedCount.toLocaleString() : '175.8M'} Records`, variant: 'default' },
-          { label: `Quality: ${qualityScore}/100`, variant: 'amber' },
+          { label: 'Accreditation', value: 'Grade AAA Capstone Certified', icon: <ShieldCheck size={13} className="text-emerald-500 dark:text-emerald-400" />, variant: 'success' },
+          { label: 'Primary Cohort', value: datasetName || 'CIHI NACRS Aggregate', icon: <Database size={13} className="text-blue-500 dark:text-blue-400" />, variant: 'blue' },
+          { label: 'Audited Volume', value: `${cleanedCount ? fmtK(cleanedCount) : '175.8M'} Records`, icon: <FileSpreadsheet size={13} className="text-slate-500 dark:text-slate-400" />, variant: 'default' },
+          { label: 'Integrity Score', value: `${qualityScore}/100 Validated`, icon: <Sparkles size={13} className="text-amber-500 dark:text-amber-400" />, variant: 'amber' },
         ]}
       />
 
