@@ -314,12 +314,12 @@ export default function DataCleaning({
             <select
               value={inspectionPageSize}
               onChange={e => { setInspectionPageSize(Number(e.target.value)); setInspectionPage(1); }}
-              className="px-2 py-1 rounded-lg border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-white/[0.03] text-slate-900 dark:text-white font-mono text-xs"
+              className="px-2 py-1 rounded-lg border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-mono text-xs cursor-pointer"
             >
-              <option value={25}>25 rows</option>
-              <option value={50}>50 rows</option>
-              <option value={100}>100 rows</option>
-              <option value={250}>250 rows</option>
+              <option value={25} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">25 rows</option>
+              <option value={50} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">50 rows</option>
+              <option value={100} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">100 rows</option>
+              <option value={250} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">250 rows</option>
             </select>
           </div>
         </div>

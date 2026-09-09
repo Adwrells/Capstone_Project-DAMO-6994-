@@ -81,7 +81,7 @@ describe('Capstone Report Data and Integration', () => {
     expect(p?.style.textAlign).toBe('justify');
   });
 
-  it('renders ExportReports component with academic dossier and page controls', () => {
+  it('renders ExportReports component with academic dossier and report controls', () => {
     const { container } = render(
       <ExportReports
         datasetName="CIHI NACRS (2003-2026)"
@@ -94,34 +94,40 @@ describe('Capstone Report Data and Integration', () => {
     expect(screen.getByText('Final Capstone Report & Executive Dossier')).toBeDefined();
     expect(screen.getAllByText('University of Niagara Falls Canada').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Dr. Bilal El Toufaili').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Rajbharath P').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Sufyaan Khan Mohammed').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Amit Raj Dev').length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Rajbharath P/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Sufyaan Khan Mohammed/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Amit Raj Dev/).length).toBeGreaterThan(0);
 
-    // Verify Chapter selection controls
-    expect(screen.getByText('Core (1–9)')).toBeDefined();
-    expect(screen.getByText('All 14')).toBeDefined();
+    // Verify Report view switcher buttons
+    expect(screen.getByRole('button', { name: /Executive Report/i })).toBeDefined();
+    expect(screen.getByRole('button', { name: /Final Report/i })).toBeDefined();
 
-    // Verify page view switcher
-    expect(screen.getByText('Single Page')).toBeDefined();
-    expect(screen.getByText('Continuous Sheets')).toBeDefined();
-
-    // Verify preview sheet container
+    // Verify preview sheet container exists
     const previewSheet = container.querySelector('#report-preview-sheet');
     expect(previewSheet).not.toBeNull();
 
-    // Verify Cover page is shown initially on page 1
+    // Verify Export Document button
+    const exportBtn = screen.getByRole('button', { name: /Download as/i });
+    expect(exportBtn).toBeDefined();
+
+    // Test switching to Final Report view
+    const finalReportBtn = screen.getByRole('button', { name: /Final Report/i });
+    fireEvent.click(finalReportBtn);
+
+    // Verify Cover page in Final Report view
     expect(screen.getByText('Final Capstone Research Report')).toBeDefined();
-
-    // Test flipping to Page 2
-    const nextBtn = screen.getByTitle('Next Page');
-    fireEvent.click(nextBtn);
-    expect(screen.getByText('Page 2 of 69')).toBeDefined();
-
-    // Test switching to Continuous mode
-    const continuousBtn = screen.getByText('Continuous Sheets');
-    fireEvent.click(continuousBtn);
     const pageSheets = container.querySelectorAll('.academic-page-sheet');
-    expect(pageSheets.length).toBeGreaterThan(1);
+    expect(pageSheets.length).toBeGreaterThan(0);
+
+    // Test opening Export Modal
+    fireEvent.click(exportBtn);
+    expect(screen.getByText('Select Report')).toBeDefined();
+    expect(screen.getByText('Which report would you like to download?')).toBeDefined();
+
+    // Select Final Report in modal to advance to step 2 (format selection)
+    const finalReportOption = screen.getByText(/Full 70-page academic report/i);
+    fireEvent.click(finalReportOption);
+    expect(screen.getByText('Select File Format')).toBeDefined();
+    expect(screen.getByText('.docx')).toBeDefined();
   });
 });

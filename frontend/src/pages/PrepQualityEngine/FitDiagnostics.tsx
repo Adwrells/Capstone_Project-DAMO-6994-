@@ -156,10 +156,10 @@ export default function FitDiagnostics({ cleanedData, isDarkMode = false }: FitD
               <select
                 value={feature}
                 onChange={e => setFeature(e.target.value)}
-                className="h-10 px-3 rounded-xl border text-xs bg-slate-50 dark:bg-white/[0.03] border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-slate-100 cursor-pointer font-sans"
+                className="h-10 px-3 rounded-xl border text-xs bg-white dark:bg-slate-900 border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-slate-100 cursor-pointer font-sans"
                 id="fit-feature-select"
               >
-                {columns.map(c => <option key={c} value={c}>{c}</option>)}
+                {columns.map(c => <option key={c} value={c} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">{c}</option>)}
               </select>
             </label>
 
@@ -168,10 +168,10 @@ export default function FitDiagnostics({ cleanedData, isDarkMode = false }: FitD
               <select
                 value={target}
                 onChange={e => setTarget(e.target.value)}
-                className="h-10 px-3 rounded-xl border text-xs bg-slate-50 dark:bg-white/[0.03] border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-slate-100 cursor-pointer font-sans"
+                className="h-10 px-3 rounded-xl border text-xs bg-white dark:bg-slate-900 border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-slate-100 cursor-pointer font-sans"
                 id="fit-target-select"
               >
-                {columns.map(c => <option key={c} value={c}>{c}</option>)}
+                {columns.map(c => <option key={c} value={c} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">{c}</option>)}
               </select>
             </label>
 
@@ -180,10 +180,10 @@ export default function FitDiagnostics({ cleanedData, isDarkMode = false }: FitD
               <select
                 value={degree}
                 onChange={e => setDegree(Number(e.target.value))}
-                className="h-10 px-3 rounded-xl border text-xs bg-slate-50 dark:bg-white/[0.03] border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-slate-100 cursor-pointer font-sans"
+                className="h-10 px-3 rounded-xl border text-xs bg-white dark:bg-slate-900 border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-slate-100 cursor-pointer font-sans"
                 id="fit-degree-select"
               >
-                {[1, 2, 3, 4, 5, 6].map(d => <option key={d} value={d}>{d}</option>)}
+                {[1, 2, 3, 4, 5, 6].map(d => <option key={d} value={d} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">{d}</option>)}
               </select>
             </label>
 

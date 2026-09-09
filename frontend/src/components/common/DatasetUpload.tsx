@@ -413,32 +413,32 @@ export default function DatasetUpload({
   if (loadingState.isProcessing) {
     return (
       <div className="max-w-lg mx-auto py-24 px-6 text-center select-none" id="dataset-upload-loading-view">
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-10 shadow-xl relative overflow-hidden text-white">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-10 shadow-xl relative overflow-hidden text-slate-900 dark:text-white">
           <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-bl-full" />
           
           <div className="flex flex-col items-center justify-center space-y-6">
             <div className="relative">
               <Loader2 size={54} className="text-emerald-500 animate-spin" />
               <div className="absolute inset-0 flex items-center justify-center">
-                <Database size={18} className="text-emerald-400" />
+                <Database size={18} className="text-emerald-500 dark:text-emerald-400" />
               </div>
             </div>
             
             <div className="space-y-2">
-              <h3 className="text-xl font-bold tracking-tight text-white">CIHI Platform Core</h3>
-              <p className="text-xs font-mono tracking-wider text-emerald-400 uppercase">
+              <h3 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">CIHI Platform Core</h3>
+              <p className="text-xs font-mono tracking-wider text-emerald-600 dark:text-emerald-400 uppercase">
                 {loadingState.message}
               </p>
             </div>
 
             <div className="w-full space-y-2">
-              <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+              <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-emerald-500 transition-all duration-75"
                   style={{ width: `${loadingState.percentage}%` }}
                 />
               </div>
-              <div className="flex justify-between text-[10px] font-mono text-slate-400">
+              <div className="flex justify-between text-[10px] font-mono text-slate-500 dark:text-slate-400">
                 <span>SECURE PARSING PIPELINE</span>
                 <span>{loadingState.percentage}%</span>
               </div>
