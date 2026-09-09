@@ -40,13 +40,13 @@ export const AcademicPageSheet: React.FC<AcademicPageSheetProps> = ({
     return runs.map((run, rIdx) => {
       let node: React.ReactNode = run.text;
 
-      // Handle bold / italic
+      // Handle bold / italic — always black text
       if (run.bold && run.italic) {
-        node = <strong className="font-bold italic text-slate-950">{node}</strong>;
+        node = <strong style={{ color: '#0f172a' }} className="font-bold italic">{node}</strong>;
       } else if (run.bold) {
-        node = <strong className="font-bold text-slate-950">{node}</strong>;
+        node = <strong style={{ color: '#0f172a' }} className="font-bold">{node}</strong>;
       } else if (run.italic) {
-        node = <em className="italic text-slate-900">{node}</em>;
+        node = <em style={{ color: '#0f172a' }} className="italic">{node}</em>;
       }
 
       // Handle search query highlight
@@ -54,13 +54,13 @@ export const AcademicPageSheet: React.FC<AcademicPageSheetProps> = ({
         const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
         const parts = run.text.split(regex);
         node = (
-          <span>
+          <span style={{ color: '#0f172a' }}>
             {parts.map((part, pIdx) =>
               part.toLowerCase() === query ? (
                 <mark
                   key={pIdx}
-                  className="bg-amber-200 text-slate-950 font-bold px-0.5 rounded"
-                  style={{ color: '#0f172a' }}
+                  style={{ color: '#0f172a', backgroundColor: '#fde68a' }}
+                  className="font-bold px-0.5 rounded"
                 >
                   {part}
                 </mark>
@@ -71,11 +71,11 @@ export const AcademicPageSheet: React.FC<AcademicPageSheetProps> = ({
           </span>
         );
         if (run.bold && run.italic) {
-          node = <strong className="font-bold italic text-slate-950">{node}</strong>;
+          node = <strong style={{ color: '#0f172a' }} className="font-bold italic">{node}</strong>;
         } else if (run.bold) {
-          node = <strong className="font-bold text-slate-950">{node}</strong>;
+          node = <strong style={{ color: '#0f172a' }} className="font-bold">{node}</strong>;
         } else if (run.italic) {
-          node = <em className="italic text-slate-900">{node}</em>;
+          node = <em style={{ color: '#0f172a' }} className="italic">{node}</em>;
         }
       }
 
@@ -83,18 +83,19 @@ export const AcademicPageSheet: React.FC<AcademicPageSheetProps> = ({
     });
   };
 
-  // Render a paragraph element with academic justification
+  // Render a paragraph element — always black text, justified
   const renderParagraph = (el: ParagraphElement, idx: number) => {
     const isCenter = el.align === 'center';
     const isRight = el.align === 'right';
     const textAlign = isCenter ? 'center' : isRight ? 'right' : 'justify';
+    const blackText: React.CSSProperties = { color: '#0f172a' };
 
     if (el.is_h1) {
       return (
-        <div key={idx} className="pt-3 pb-2 mb-4 border-b-2 border-slate-900">
+        <div key={idx} className="pt-3 pb-2 mb-4" style={{ borderBottom: '2px solid #0f172a' }}>
           <h1
-            style={{ textAlign }}
-            className="font-serif text-lg md:text-xl font-extrabold uppercase tracking-tight text-slate-950 leading-snug"
+            style={{ textAlign, ...blackText }}
+            className="font-serif text-lg md:text-xl font-extrabold uppercase tracking-tight leading-snug"
           >
             {renderRuns(el.runs)}
           </h1>
@@ -106,8 +107,8 @@ export const AcademicPageSheet: React.FC<AcademicPageSheetProps> = ({
       return (
         <div key={idx} className="pt-3 pb-1 mb-2">
           <h2
-            style={{ textAlign: isCenter ? 'center' : 'left' }}
-            className="font-serif text-sm md:text-base font-bold text-slate-950 tracking-tight"
+            style={{ textAlign: isCenter ? 'center' : 'left', ...blackText }}
+            className="font-serif text-sm md:text-base font-bold tracking-tight"
           >
             {renderRuns(el.runs)}
           </h2>
@@ -119,8 +120,8 @@ export const AcademicPageSheet: React.FC<AcademicPageSheetProps> = ({
       return (
         <h3
           key={idx}
-          style={{ textAlign: isCenter ? 'center' : 'left' }}
-          className="font-serif text-xs md:text-sm font-bold text-slate-900 pt-2 pb-1 mb-1.5"
+          style={{ textAlign: isCenter ? 'center' : 'left', ...blackText }}
+          className="font-serif text-xs md:text-sm font-bold pt-2 pb-1 mb-1.5"
         >
           {renderRuns(el.runs)}
         </h3>
@@ -130,47 +131,47 @@ export const AcademicPageSheet: React.FC<AcademicPageSheetProps> = ({
     return (
       <p
         key={idx}
-        style={{
-          textAlign,
-          textJustify: 'inter-word',
-        }}
-        className="font-serif text-slate-900 leading-relaxed mb-3.5"
+        style={{ textAlign, textJustify: 'inter-word', ...blackText }}
+        className="font-serif leading-relaxed mb-3.5"
       >
         {renderRuns(el.runs)}
       </p>
     );
   };
 
-  // Render an academic table
+  // Render an academic table — always black text
   const renderTable = (el: TableElement, idx: number) => {
     return (
       <div
         key={idx}
-        className="my-4 overflow-x-auto border-t-2 border-b-2 border-slate-900 bg-white"
+        className="my-4 overflow-x-auto bg-white"
+        style={{ borderTop: '2px solid #0f172a', borderBottom: '2px solid #0f172a' }}
       >
         <table className="w-full text-left border-collapse text-[11px] font-sans">
           <thead>
-            <tr className="border-b border-slate-400 bg-slate-50 text-slate-950 font-bold">
+            <tr style={{ borderBottom: '1px solid #94a3b8', backgroundColor: '#f8fafc', color: '#0f172a', fontWeight: 'bold' }}>
               {el.headers.map((h, hIdx) => (
                 <th
                   key={hIdx}
-                  className="py-2 px-2.5 uppercase tracking-wider text-[10px] text-slate-900 border-r border-slate-200 last:border-r-0"
+                  style={{ color: '#0f172a', borderRight: '1px solid #e2e8f0' }}
+                  className="py-2 px-2.5 uppercase tracking-wider text-[10px] last:border-r-0"
                 >
                   {h}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-200 text-slate-900 text-[11px]">
+          <tbody className="divide-y divide-slate-200 text-[11px]">
             {el.rows.map((row, rIdx) => (
               <tr
                 key={rIdx}
-                className="hover:bg-slate-50/80 transition-colors even:bg-slate-50/40"
+                style={{ backgroundColor: rIdx % 2 === 1 ? '#f8fafc' : '#fff' }}
               >
                 {row.map((cell, cIdx) => (
                   <td
                     key={cIdx}
-                    className="py-1.5 px-2.5 text-slate-900 border-r border-slate-200/60 last:border-r-0 align-top"
+                    style={{ color: '#0f172a', borderRight: '1px solid #e2e8f060' }}
+                    className="py-1.5 px-2.5 last:border-r-0 align-top"
                   >
                     {cell}
                   </td>
@@ -275,12 +276,15 @@ export const AcademicPageSheet: React.FC<AcademicPageSheetProps> = ({
         backgroundColor: '#ffffff',
       }}
     >
-      {/* Running Academic Header */}
-      <div className="flex items-center justify-between text-[10px] text-slate-500 uppercase tracking-wider pb-2 mb-4 border-b border-slate-300 font-sans select-none shrink-0">
+      {/* Running Academic Header — always black */}
+      <div
+        className="flex items-center justify-between text-[10px] uppercase tracking-wider pb-2 mb-4 font-sans select-none shrink-0"
+        style={{ color: '#64748b', borderBottom: '1px solid #cbd5e1' }}
+      >
         <span className="truncate max-w-[340px]">
           University of Niagara Falls Canada · Master of Data Analytics | DAMO 699
         </span>
-        <span className="font-semibold text-slate-800 truncate max-w-[280px]">
+        <span className="font-semibold truncate max-w-[280px]" style={{ color: '#0f172a' }}>
           {page.chapter}
         </span>
       </div>
@@ -298,12 +302,15 @@ export const AcademicPageSheet: React.FC<AcademicPageSheetProps> = ({
         })}
       </div>
 
-      {/* Running Academic Footer */}
-      <div className="flex items-center justify-between text-[10px] text-slate-500 pt-3 mt-6 border-t border-slate-300 font-sans select-none shrink-0">
+      {/* Running Academic Footer — always black */}
+      <div
+        className="flex items-center justify-between text-[10px] pt-3 mt-6 font-sans select-none shrink-0"
+        style={{ color: '#64748b', borderTop: '1px solid #cbd5e1' }}
+      >
         <span className="truncate max-w-[380px]">
           Length of Stay & Resource Utilization in Canadian Hospitals (CIHI NACRS)
         </span>
-        <span className="font-semibold text-slate-800 font-mono">
+        <span className="font-semibold font-mono" style={{ color: '#0f172a' }}>
           Page {page.pageNumber} of {totalPages}
         </span>
       </div>
