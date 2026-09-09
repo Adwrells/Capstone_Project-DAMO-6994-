@@ -350,7 +350,7 @@ export default function VisitVolumeTrend({ data, isDarkMode }: VisitVolumeTrendP
                   dataKey="ed_visits"
                   position="top"
                   offset={10}
-                  formatter={(v: any, entry: any) => {
+                  formatter={((v: any, entry: any) => {
                     const fy = entry?.payload?.fiscal_year;
                     if (viewMode === 'all') {
                       const num = Number(v);
@@ -362,7 +362,7 @@ export default function VisitVolumeTrend({ data, isDarkMode }: VisitVolumeTrendP
                       return `#${rank} (${fmtK(Number(v))})`;
                     }
                     return '';
-                  }}
+                  }) as any}
                   fill={dark ? '#93C5FD' : '#0F4C81'}
                   fontSize={10.5}
                   fontWeight={700}

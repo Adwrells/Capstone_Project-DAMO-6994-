@@ -6,7 +6,7 @@ import React, { useState, useEffect } from 'react';
 import {
   Database, ShieldCheck, BarChart3, Presentation, Sparkles,
   RefreshCw, CheckCircle2, ChevronLeft, HelpCircle, FileDown,
-  Menu, X, User, Moon, Sun, Activity, AlertTriangle, PlaySquare
+  Menu, X, User, Moon, Sun, Activity, AlertTriangle, PlaySquare, ArrowRight
 } from 'lucide-react';
 import DatasetUpload from './components/common/DatasetUpload';
 import DataCleaning from './pages/PrepQualityEngine/PrepQualityEngine';
@@ -568,8 +568,14 @@ export default function App() {
         ) : (
           <div className="border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-950/20 rounded-xl p-8 text-center space-y-3">
             <p className="text-amber-700 dark:text-amber-400 font-bold text-sm">No Dataset Loaded</p>
-            <p className="text-amber-600 dark:text-amber-500 text-xs font-light">Please run the Prep & Quality Engine stage before viewing Strategic Insights.</p>
-            <button onClick={() => setCurrentSection('clean')} className="mt-2 btn-primary">Go to Prep & Quality Engine →</button>
+            <p className="text-amber-600 dark:text-amber-500 text-xs font-light">Please run the Prep &amp; Quality Engine stage before viewing Strategic Insights.</p>
+            <button
+              onClick={() => setCurrentSection('clean')}
+              className="mt-2 h-10 px-5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-md hover:shadow-blue-500/25 hover:scale-[1.02] active:scale-[0.98] transition-all inline-flex items-center gap-2 cursor-pointer select-none group"
+            >
+              <span>Go to Prep &amp; Quality Engine</span>
+              <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+            </button>
           </div>
         )}
       </div>
@@ -590,8 +596,14 @@ export default function App() {
         ) : (
           <div className="border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-950/20 rounded-xl p-8 text-center space-y-3">
             <p className="text-amber-700 dark:text-amber-400 font-bold text-sm">No Dataset Loaded</p>
-            <p className="text-amber-600 dark:text-amber-500 text-xs font-light">Please run the Prep & Quality Engine stage before generating reports.</p>
-            <button onClick={() => setCurrentSection('clean')} className="mt-2 btn-primary">Go to Prep & Quality Engine →</button>
+            <p className="text-amber-600 dark:text-amber-500 text-xs font-light">Please run the Prep &amp; Quality Engine stage before generating reports.</p>
+            <button
+              onClick={() => setCurrentSection('clean')}
+              className="mt-2 h-10 px-5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-md hover:shadow-blue-500/25 hover:scale-[1.02] active:scale-[0.98] transition-all inline-flex items-center gap-2 cursor-pointer select-none group"
+            >
+              <span>Go to Prep &amp; Quality Engine</span>
+              <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+            </button>
           </div>
         )}
       </div>

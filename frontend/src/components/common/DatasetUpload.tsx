@@ -7,7 +7,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { 
   Upload, Database, FileSpreadsheet, Sparkles, Check, ChevronRight, 
   Loader2, RefreshCw, ShieldCheck, Trash2, CheckCircle2, AlertTriangle, Info,
-  HardDrive, Server
+  HardDrive, Server, ArrowRight
 } from 'lucide-react';
 import { sampleDatasets } from '../../utils/mockDatasets';
 import { PreloadedDataset } from '../../utils/types';
@@ -671,14 +671,14 @@ export default function DatasetUpload({
         <button
           onClick={handleProceed}
           disabled={!canProceed}
-          className={`h-12 px-8 rounded-lg font-semibold text-sm transition-all flex items-center gap-2 cursor-pointer select-none ${
+          className={`h-10 px-6 rounded-xl font-semibold text-xs transition-all flex items-center gap-2 select-none group ${
             canProceed 
-              ? 'bg-[#0F4C81] hover:bg-[#0c3e6b] text-white shadow-md hover:shadow-lg hover:scale-[1.01]' 
-              : 'bg-slate-200 dark:bg-[#182640] text-slate-400 dark:text-slate-600 cursor-not-allowed'
+              ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-blue-500/25 hover:scale-[1.02] active:scale-[0.98] cursor-pointer' 
+              : 'bg-slate-200 dark:bg-white/[0.05] text-slate-400 dark:text-slate-500 cursor-not-allowed border border-slate-300 dark:border-white/[0.08]'
           }`}
         >
-          <span>Validate All & Proceed to Preparation Engine</span>
-          <ChevronRight size={18} />
+          <span>Validate All &amp; Proceed to Preparation Engine</span>
+          <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
         </button>
       </div>
     </div>

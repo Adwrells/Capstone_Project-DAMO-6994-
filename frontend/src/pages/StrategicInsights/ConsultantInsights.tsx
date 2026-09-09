@@ -1144,13 +1144,13 @@ export default function ConsultantInsights({ isLoading: parentLoading, onNavigat
 
       {/* ── WORKFLOW ADVANCEMENT TO STAGE 7 ──────────────────────── */}
       {onNavigateNext && (
-        <div className="mt-8 p-5 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-[#0d172a] flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm text-left">
+        <div className="mt-8 p-4 sm:p-5 rounded-2xl border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-[#111e35] flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm transition-all text-left">
           <div className="space-y-1">
             <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-blue-600 dark:text-blue-400 block">
               Stage 6 · Strategic Insights &amp; Clinical Advisory Complete
             </span>
-            <div className="flex items-center gap-2 text-slate-900 dark:text-white font-bold text-sm">
-              <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />
+            <div className="flex items-center gap-2 text-slate-900 dark:text-white font-bold text-xs sm:text-sm">
+              <CheckCircle2 size={16} className="text-emerald-500 shrink-0" />
               <span>Evidence-to-Action Matrix &amp; 4 Priority Frameworks Synthesized</span>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -1161,10 +1161,10 @@ export default function ConsultantInsights({ isLoading: parentLoading, onNavigat
           <div className="flex items-center gap-3 shrink-0">
             <button
               onClick={onNavigateNext}
-              className="px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm shadow-md transition flex items-center gap-2 cursor-pointer"
+              className="h-10 px-5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-md hover:shadow-blue-500/25 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer select-none group"
             >
               <span>Proceed to Stage 7: Reports &amp; Export</span>
-              <ArrowRight size={16} />
+              <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
             </button>
           </div>
         </div>

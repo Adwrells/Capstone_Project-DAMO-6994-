@@ -19,7 +19,7 @@ import {
   XCircle, FileSpreadsheet, Server, HardDrive, Wifi, Filter, Search,
   ChevronLeft, ChevronRight, Activity, Zap, Check, Eye, ArrowLeft,
   BookOpen, SlidersHorizontal, ArrowUpDown, Clock, BarChart2, Compass,
-  Lock, Workflow, Sparkles, Scale, FileCheck, CheckCircle
+  Lock, Workflow, Sparkles, Scale, FileCheck, CheckCircle, TrendingUp, LayoutDashboard
 } from 'lucide-react';
 import { CleaningSummary, CleaningAction, PreloadedDataset } from '../../utils/types';
 import { fetchSqliteStatus } from '../../services/apiService';
@@ -257,16 +257,14 @@ export default function DataCleaning({
   if (showInspectionPanel) {
     const inspectedFields = mergedPreviewFields.length > 0 ? mergedPreviewFields : (fields.length > 0 ? fields : (preloadedDatasets[0]?.fields || []));
     return (
-      <div className={`space-y-6 text-left font-sans animate-fade-in max-w-7xl mx-auto pb-16 ${isDarkMode ? 'text-white' : 'text-slate-900'}`} id="full-inspection-panel">
+      <div className="space-y-6 text-left font-sans animate-fade-in max-w-7xl mx-auto pb-16" id="full-inspection-panel">
         
         {/* Inspection Header */}
-        <div className={`p-6 rounded-2xl border flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm ${
-          isDarkMode ? 'border-slate-800 bg-slate-900/90' : 'border-slate-200 bg-white'
-        }`}>
+        <div className="p-6 rounded-2xl border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-[#111e35] flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setShowInspectionPanel(false)}
-              className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition cursor-pointer"
+              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.10] text-slate-700 dark:text-slate-300 transition cursor-pointer border border-slate-200/80 dark:border-white/[0.08]"
               title="Return to Data Preparation Workspace"
               aria-label="Return to Data Preparation Workspace"
             >
@@ -274,14 +272,14 @@ export default function DataCleaning({
             </button>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider font-mono px-2 py-0.5 rounded bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border border-indigo-500/25">
+                <span className="text-[10px] font-bold uppercase tracking-wider font-mono px-2 py-0.5 rounded bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
                   FULL COHORT INSPECTION
                 </span>
                 <span className="text-xs font-mono text-slate-400">
                   {inspectedFullData.length} records • {inspectedFields.length} attributes
                 </span>
               </div>
-              <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
+              <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
                 Analytical Dataset Record Explorer
               </h2>
             </div>
@@ -290,7 +288,7 @@ export default function DataCleaning({
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowInspectionPanel(false)}
-              className="h-10 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md transition flex items-center gap-2 cursor-pointer"
+              className="h-10 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-bold text-xs shadow-md transition flex items-center gap-2 cursor-pointer"
             >
               <span>Return to Stage 2 View</span>
               <ArrowRight size={14} />
@@ -299,9 +297,7 @@ export default function DataCleaning({
         </div>
 
         {/* Filter Controls Bar */}
-        <div className={`p-4 rounded-2xl border flex flex-wrap items-center justify-between gap-3 ${
-          isDarkMode ? 'border-slate-800 bg-slate-900/80' : 'border-slate-200 bg-white'
-        }`}>
+        <div className="p-4 rounded-2xl border border-slate-200/80 dark:border-white/[0.06] bg-slate-50/70 dark:bg-white/[0.02] flex flex-wrap items-center justify-between gap-3">
           <div className="relative flex-1 min-w-[240px]">
             <Search size={14} className="absolute left-3 top-3 text-slate-400" />
             <input
@@ -309,16 +305,16 @@ export default function DataCleaning({
               placeholder="Search across all records..."
               value={inspectionSearch}
               onChange={e => { setInspectionSearch(e.target.value); setInspectionPage(1); }}
-              className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500 font-sans"
+              className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-white/[0.03] text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 font-sans"
             />
           </div>
 
-          <div className="flex items-center gap-3 text-xs font-mono text-slate-500">
+          <div className="flex items-center gap-3 text-xs font-mono text-slate-500 dark:text-slate-400">
             <span>Page Size:</span>
             <select
               value={inspectionPageSize}
               onChange={e => { setInspectionPageSize(Number(e.target.value)); setInspectionPage(1); }}
-              className="px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white font-mono text-xs"
+              className="px-2 py-1 rounded-lg border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-white/[0.03] text-slate-900 dark:text-white font-mono text-xs"
             >
               <option value={25}>25 rows</option>
               <option value={50}>50 rows</option>
@@ -329,10 +325,10 @@ export default function DataCleaning({
         </div>
 
         {/* Inspection Table */}
-        <div className="border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-xs bg-white dark:bg-slate-900">
+        <div className="border border-slate-200 dark:border-white/[0.08] rounded-2xl overflow-hidden shadow-xs bg-white dark:bg-[#111e35]">
           <div className="overflow-x-auto max-h-[600px]">
             <table className="w-full text-xs text-left border-collapse font-sans">
-              <thead className="sticky top-0 bg-slate-100 dark:bg-slate-800 font-mono text-[10px] uppercase text-slate-600 dark:text-slate-300 border-b border-slate-200 dark:border-slate-700">
+              <thead className="sticky top-0 bg-slate-100 dark:bg-white/[0.04] font-mono text-[10px] uppercase text-slate-600 dark:text-slate-300 border-b border-slate-200 dark:border-white/[0.08]">
                 <tr>
                   <th className="p-3 whitespace-nowrap">#</th>
                   {inspectedFields.map((f: any, idx: number) => {
@@ -348,7 +344,7 @@ export default function DataCleaning({
                             setInspectionSortDir('asc');
                           }
                         }}
-                        className="p-3 whitespace-nowrap cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 select-none"
+                        className="p-3 whitespace-nowrap cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 select-none"
                       >
                         <div className="flex items-center gap-1.5">
                           <span>{colName}</span>
@@ -359,9 +355,9 @@ export default function DataCleaning({
                   })}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-mono text-slate-700 dark:text-slate-300">
+              <tbody className="divide-y divide-slate-100 dark:divide-white/[0.06] font-mono text-slate-700 dark:text-slate-300">
                 {inspectedPaginatedData.map((row, rIdx) => (
-                  <tr key={rIdx} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition">
+                  <tr key={rIdx} className="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition">
                     <td className="p-3 text-slate-400 whitespace-nowrap">{(inspectionPage - 1) * inspectionPageSize + rIdx + 1}</td>
                     {inspectedFields.map((f: any, fIdx: number) => {
                       const colName = typeof f === 'string' ? f : f.name;
@@ -378,8 +374,8 @@ export default function DataCleaning({
           </div>
 
           {/* Inspection Pagination Footer */}
-          <div className="p-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs font-mono">
-            <span className="text-slate-400">
+          <div className="p-4 bg-slate-50 dark:bg-white/[0.02] border-t border-slate-200 dark:border-white/[0.08] flex items-center justify-between text-xs font-mono">
+            <span className="text-slate-500 dark:text-slate-400">
               Showing Page {inspectionPage} of {inspectionTotalPages} ({inspectedFullData.length} records matching search)
             </span>
 
@@ -387,7 +383,7 @@ export default function DataCleaning({
               <button
                 disabled={inspectionPage === 1}
                 onClick={() => setInspectionPage(p => p - 1)}
-                className="px-3 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 disabled:opacity-40 cursor-pointer"
+                className="px-3 py-1 rounded-lg bg-white dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08] disabled:opacity-40 cursor-pointer text-slate-700 dark:text-slate-300"
               >
                 Previous
               </button>
@@ -395,7 +391,7 @@ export default function DataCleaning({
               <button
                 disabled={inspectionPage === inspectionTotalPages}
                 onClick={() => setInspectionPage(p => p + 1)}
-                className="px-3 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 disabled:opacity-40 cursor-pointer"
+                className="px-3 py-1 rounded-lg bg-white dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08] disabled:opacity-40 cursor-pointer text-slate-700 dark:text-slate-300"
               >
                 Next
               </button>
@@ -408,98 +404,143 @@ export default function DataCleaning({
   }
 
   return (
-    <div className="space-y-12 text-left font-sans animate-fade-in max-w-6xl mx-auto pb-16" id="prep-quality-engine-stage">
+    <div className="space-y-8 text-left font-sans animate-fade-in max-w-6xl mx-auto pb-16" id="prep-quality-engine-stage">
       
       {/* ── 1. STAGE 2 PAGE HEADER ────────────────────────────────────────── */}
       <PageHeader
+        align="center"
+        badgeIcon={<RefreshCw size={12} className="text-blue-500 dark:text-blue-400" />}
         category="DATA PREPARATION & QUALITY ENGINE · STAGE 2"
         title="CIHI NACRS Data Preparation Workspace"
         subtitle="Establishes the validated analytical foundation through unit harmonization, duplicate removal, schema validation, and feature engineering."
         contextPills={[
-          { label: 'Pipeline Rule', value: 'Validate First, Standardize Second', variant: 'blue' },
-          { label: 'Storage', value: 'SQLite WAL Mode', variant: 'default' },
-          { label: 'Cohorts', value: '5 Worksheets', variant: 'default' },
-          { label: 'Data Quality', value: '100% Validated', variant: 'success' },
+          { label: 'Pipeline Rule', value: 'Validate First, Standardize Second', icon: <Compass size={13} className="text-blue-500 dark:text-blue-400" />, variant: 'blue' },
+          { label: 'Storage', value: 'SQLite WAL Analytical Store', icon: <Database size={13} className="text-purple-500 dark:text-purple-400" />, variant: 'purple' },
+          { label: 'Cohorts', value: '5 Worksheets Harmonized', icon: <FileSpreadsheet size={13} className="text-amber-500 dark:text-amber-400" />, variant: 'amber' },
+          { label: 'Quality Audit', value: '100% Validated', icon: <ShieldCheck size={13} className="text-emerald-500 dark:text-emerald-400" />, variant: 'success' },
         ]}
       />
 
 
       {/* ── 2. MASTER HISTORICAL SOURCE & EXTRACTION FLOW ─────────────────── */}
-      <div className={`p-7 rounded-3xl border space-y-6 shadow-sm ${
-        isDarkMode ? 'border-slate-800 bg-slate-900/90 text-white' : 'border-slate-200 bg-white text-slate-900'
-      }`}>
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-4">
-          <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 font-mono block">
-              Data Ingestion Architecture
+      <div className="relative overflow-hidden p-6 sm:p-8 rounded-2xl border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-[#111e35] shadow-sm space-y-6">
+        <div className="absolute top-0 right-1/4 w-96 h-36 bg-blue-500/5 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-white/[0.06] pb-4 relative">
+          <div className="flex items-center gap-3">
+            <span className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 flex items-center justify-center shrink-0 shadow-xs shadow-blue-500/10">
+              <Database size={18} />
             </span>
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-              Master Historical Source: CIHI NACRS Supplementary Data Tables
-            </h2>
+            <div>
+              <span className="text-[10.5px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 font-mono block">
+                Data Ingestion Architecture
+              </span>
+              <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100">
+                Master Historical Source: CIHI NACRS Supplementary Data Tables
+              </h2>
+            </div>
           </div>
-          <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+          <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 self-start sm:self-auto">
             19 Fiscal Years (2003–2004 to 2021–2022)
           </span>
         </div>
 
-        {/* Source File Metadata Card */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs font-mono">
-          <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-1">
-            <span className="text-[10px] text-slate-400 uppercase font-semibold block">Source File</span>
-            <span className="font-bold text-indigo-700 dark:text-indigo-300 block truncate" title="emergency-department-visits-2003-2021-supplementary-data-tables-en.xlsx">
-              emergency-department-visits-2003-2021-supplementary-data-tables-en.xlsx
+        {/* Source File Metadata Card - Tech Stack Card Style */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.06] hover:border-slate-300 dark:hover:border-white/[0.15] hover:-translate-y-0.5 transition-all space-y-1">
+            <span className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5 font-mono">
+              <FileSpreadsheet size={13} className="text-blue-500" /> SOURCE FILE
             </span>
+            <span className="font-semibold text-blue-600 dark:text-blue-400 block text-xs truncate" title="emergency-department-visits-2003-2021-supplementary-data-tables-en.xlsx">
+              emergency-department-visits-2003-2021...
+            </span>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
+              Official CIHI NACRS multi-worksheet Excel workbook.
+            </p>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-1">
-            <span className="text-[10px] text-slate-400 uppercase font-semibold block">Source Type</span>
-            <span className="font-bold text-slate-900 dark:text-white block">Microsoft Excel Workbook (.xlsx)</span>
+          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.06] hover:border-slate-300 dark:hover:border-white/[0.15] hover:-translate-y-0.5 transition-all space-y-1">
+            <span className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5 font-mono">
+              <Layers size={13} className="text-purple-500" /> SOURCE TYPE
+            </span>
+            <span className="font-semibold text-purple-600 dark:text-purple-400 block text-xs">
+              Microsoft Excel Workbook (.xlsx)
+            </span>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
+              Structured multi-tab administrative health records.
+            </p>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-1">
-            <span className="text-[10px] text-slate-400 uppercase font-semibold block">Data Type</span>
-            <span className="font-bold text-slate-900 dark:text-white block">Pre-aggregated CIHI Statistics</span>
+          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.06] hover:border-slate-300 dark:hover:border-white/[0.15] hover:-translate-y-0.5 transition-all space-y-1">
+            <span className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5 font-mono">
+              <Activity size={13} className="text-amber-500" /> DATA SCOPE
+            </span>
+            <span className="font-semibold text-amber-600 dark:text-amber-400 block text-xs">
+              Pre-Aggregated CIHI Statistics
+            </span>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
+              Ambulatory care reporting without direct patient PII/PHI.
+            </p>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-1">
-            <span className="text-[10px] text-slate-400 uppercase font-semibold block">Storage Engine</span>
-            <span className="font-bold text-emerald-600 dark:text-emerald-400 block">SQLite Analytical Database</span>
+          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.06] hover:border-slate-300 dark:hover:border-white/[0.15] hover:-translate-y-0.5 transition-all space-y-1">
+            <span className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5 font-mono">
+              <Server size={13} className="text-emerald-500" /> STORAGE ENGINE
+            </span>
+            <span className="font-semibold text-emerald-600 dark:text-emerald-400 block text-xs">
+              SQLite Analytical Database
+            </span>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
+              Thread-safe WAL repository with 5 registered tables.
+            </p>
           </div>
         </div>
 
         {/* Core Extraction Process Ribbon */}
-        <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/60 space-y-2">
-          <span className="text-[10px] font-mono font-bold uppercase text-slate-500 dark:text-slate-400 block">
-            Core Extraction Process:
-          </span>
-          <div className="flex flex-wrap items-center gap-2 text-xs font-mono font-semibold text-slate-700 dark:text-slate-300">
-            <span className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">Excel Workbook</span>
-            <ArrowRight size={13} className="text-slate-400" />
-            <span className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">Worksheet Identification</span>
-            <ArrowRight size={13} className="text-slate-400" />
-            <span className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">Schema Inspection</span>
-            <ArrowRight size={13} className="text-slate-400" />
-            <span className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">Analytical Table Extraction</span>
-            <ArrowRight size={13} className="text-slate-400" />
-            <span className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">Validation & Standardization</span>
-            <ArrowRight size={13} className="text-slate-400" />
-            <span className="px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300">SQLite Analytical Storage</span>
+        <div className="p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-white/[0.06] bg-slate-50/60 dark:bg-white/[0.01] space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Workflow size={15} className="text-blue-500" />
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-900 dark:text-slate-100 font-mono">
+                Core Extraction Process
+              </span>
+            </div>
+            <span className="text-[10px] font-mono text-slate-400">Automated ETL Pipeline</span>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 text-xs font-mono font-medium text-slate-700 dark:text-slate-300">
+            <span className="px-2.5 py-1 rounded-lg bg-white dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.06]">Excel Workbook</span>
+            <ArrowRight size={13} className="text-blue-500" />
+            <span className="px-2.5 py-1 rounded-lg bg-white dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.06]">Worksheet Identification</span>
+            <ArrowRight size={13} className="text-blue-500" />
+            <span className="px-2.5 py-1 rounded-lg bg-white dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.06]">Schema Inspection</span>
+            <ArrowRight size={13} className="text-blue-500" />
+            <span className="px-2.5 py-1 rounded-lg bg-white dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.06]">Analytical Table Extraction</span>
+            <ArrowRight size={13} className="text-blue-500" />
+            <span className="px-2.5 py-1 rounded-lg bg-white dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.06]">Validation &amp; Standardization</span>
+            <ArrowRight size={13} className="text-emerald-500" />
+            <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-bold">SQLite Analytical Storage</span>
           </div>
         </div>
       </div>
 
       {/* ── 3. FIVE ANALYTICAL DATASETS & AGGREGATE RULES ───────────────────── */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 font-mono block">
-              Approved Aggregate Datasets
+      <div className="relative overflow-hidden p-6 sm:p-8 rounded-2xl border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-[#111e35] shadow-sm space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-white/[0.06] pb-4 relative">
+          <div className="flex items-center gap-3">
+            <span className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 flex items-center justify-center shrink-0 shadow-xs shadow-blue-500/10">
+              <Database size={18} />
             </span>
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-              Five Extracted Analytical Worksheets & SQLite Tables
-            </h2>
+            <div>
+              <span className="text-[10.5px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 font-mono block">
+                Approved Aggregate Datasets
+              </span>
+              <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100">
+                Five Extracted Analytical Worksheets &amp; SQLite Tables
+              </h2>
+            </div>
           </div>
-          <span className="text-xs font-mono text-slate-500 dark:text-slate-400">
+          <span className="text-xs font-mono text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-white/[0.03] px-3 py-1.5 rounded-lg border border-slate-200/80 dark:border-white/[0.06] shrink-0">
             Click any worksheet to inspect live records
           </span>
         </div>
@@ -565,40 +606,38 @@ export default function DataCleaning({
           ].map((item, idx) => (
             <div
               key={idx}
-              className={`w-full md:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.75rem)] p-5 rounded-2xl border space-y-3.5 shadow-2xs transition-all flex flex-col justify-between hover:shadow-md ${
-                isDarkMode ? 'border-slate-800 bg-slate-900/80' : 'border-slate-200 bg-white'
-              }`}
+              className="w-full md:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.75rem)] p-5 rounded-xl border border-slate-200/90 dark:border-white/[0.08] bg-slate-50/70 dark:bg-white/[0.02] hover:border-slate-300 dark:hover:border-white/[0.18] hover:-translate-y-0.5 space-y-3.5 shadow-xs transition-all flex flex-col justify-between"
             >
-              <div className="space-y-2.5">
+              <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-indigo-600 dark:text-indigo-400 px-2 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/20">
+                  <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-blue-600 dark:text-blue-400 px-2.5 py-0.5 rounded-md bg-blue-500/10 border border-blue-500/20">
                     {item.sheetNum} • {item.sheetName}
                   </span>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded flex items-center gap-1 font-mono">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md flex items-center gap-1 font-mono">
                     <HardDrive size={10} /> SQLite
                   </span>
                 </div>
 
-                <div className="space-y-1">
-                  <h3 className="text-sm font-bold text-slate-900 dark:text-white leading-tight">
+                <div className="space-y-1.5">
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 leading-tight">
                     {item.title}
                   </h3>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
-                    Table: <span className="text-slate-700 dark:text-slate-300 font-bold">{item.tableName}</span>
+                    Table: <span className="text-slate-800 dark:text-slate-200 font-semibold">{item.tableName}</span>
                   </p>
-                  <p className="text-[11px] text-slate-600 dark:text-slate-300 font-normal leading-relaxed">
+                  <p className="text-[11.5px] text-slate-600 dark:text-slate-300 font-normal leading-relaxed">
                     {item.focus}
                   </p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 text-[11px] font-mono pt-2 border-t border-slate-100 dark:border-slate-800">
-                  <div className="p-2 rounded bg-slate-50 dark:bg-slate-800/40">
-                    <span className="text-slate-400 text-[9px] uppercase block">Rows</span>
-                    <span className="font-bold text-slate-900 dark:text-white">{item.records}</span>
+                <div className="grid grid-cols-2 gap-2 text-[11px] font-mono pt-2 border-t border-slate-200/60 dark:border-white/[0.06]">
+                  <div className="p-2 rounded-lg bg-white dark:bg-white/[0.02] border border-slate-200/60 dark:border-white/[0.04]">
+                    <span className="text-slate-400 text-[9px] uppercase block font-semibold">Rows</span>
+                    <span className="font-bold text-slate-900 dark:text-slate-100">{item.records}</span>
                   </div>
-                  <div className="p-2 rounded bg-slate-50 dark:bg-slate-800/40">
-                    <span className="text-slate-400 text-[9px] uppercase block">Columns</span>
-                    <span className="font-bold text-slate-900 dark:text-white">{item.cols}</span>
+                  <div className="p-2 rounded-lg bg-white dark:bg-white/[0.02] border border-slate-200/60 dark:border-white/[0.04]">
+                    <span className="text-slate-400 text-[9px] uppercase block font-semibold">Columns</span>
+                    <span className="font-bold text-slate-900 dark:text-slate-100">{item.cols}</span>
                   </div>
                 </div>
               </div>
@@ -627,7 +666,7 @@ export default function DataCleaning({
                   });
                   setModalSearch('');
                 }}
-                className="w-full mt-2 h-9 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 font-bold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer border border-indigo-500/20 select-none"
+                className="w-full mt-2 h-9 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer border border-blue-500/20 select-none"
                 id={`view-worksheet-${idx + 1}-btn`}
               >
                 <Eye size={14} />
@@ -639,20 +678,18 @@ export default function DataCleaning({
 
         {/* ── DATASET PREVIEW MODAL ─────────────────────────────────────── */}
         {activeDatasetModal && (
-          <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
-            <div className={`w-full max-w-5xl rounded-2xl border shadow-2xl overflow-hidden flex flex-col max-h-[85vh] ${
-              isDarkMode ? 'border-slate-800 bg-slate-900 text-white' : 'border-slate-200 bg-white text-slate-900'
-            }`}>
+          <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
+            <div className="w-full max-w-5xl rounded-2xl border border-slate-200/90 dark:border-white/[0.12] bg-white dark:bg-[#0e1726] shadow-2xl overflow-hidden flex flex-col max-h-[85vh] text-slate-900 dark:text-slate-100">
               {/* Modal Header */}
-              <div className="p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/50">
+              <div className="p-5 border-b border-slate-100 dark:border-white/[0.08] flex items-center justify-between bg-slate-50/70 dark:bg-white/[0.02]">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 flex items-center justify-center shrink-0">
                     <Database size={20} />
                   </div>
                   <div>
-                    <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                       {activeDatasetModal.name}
-                      <span className="text-xs font-mono px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-normal">
+                      <span className="text-xs font-mono px-2 py-0.5 rounded bg-slate-200/80 dark:bg-white/[0.08] text-slate-700 dark:text-slate-300 font-normal">
                         Table: {activeDatasetModal.tableName}
                       </span>
                     </h3>
@@ -664,7 +701,7 @@ export default function DataCleaning({
 
                 <button
                   onClick={() => setActiveDatasetModal(null)}
-                  className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition cursor-pointer"
+                  className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.06] transition cursor-pointer"
                   id="close-dataset-modal-btn"
                   aria-label="Close preview"
                   title="Close preview"
@@ -674,7 +711,7 @@ export default function DataCleaning({
               </div>
 
               {/* Search Filter */}
-              <div className="p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/30 flex items-center justify-between gap-4">
+              <div className="p-4 border-b border-slate-100 dark:border-white/[0.06] bg-slate-50/40 dark:bg-white/[0.01] flex items-center justify-between gap-4">
                 <div className="relative flex-1">
                   <Search size={14} className="absolute left-3 top-3 text-slate-400" />
                   <input
@@ -682,7 +719,7 @@ export default function DataCleaning({
                     placeholder={`Search ${activeDatasetModal.name}...`}
                     value={modalSearch}
                     onChange={e => setModalSearch(e.target.value)}
-                    className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500 font-sans"
+                    className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#111e35] text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-500 font-sans"
                   />
                 </div>
 
@@ -694,28 +731,28 @@ export default function DataCleaning({
               {/* Modal Body Table */}
               <div className="p-5 overflow-auto flex-1 max-h-[500px]">
                 {activeDatasetModal.data && activeDatasetModal.data.length > 0 ? (
-                  <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
+                  <div className="border border-slate-200/90 dark:border-white/[0.08] rounded-xl overflow-hidden">
                     <table className="w-full text-xs text-left border-collapse font-sans">
-                      <thead className="sticky top-0 bg-slate-100 dark:bg-slate-800 font-mono text-[10px] uppercase text-slate-600 dark:text-slate-300">
+                      <thead className="sticky top-0 bg-slate-50 dark:bg-[#111e35] font-mono text-[10px] uppercase text-slate-600 dark:text-slate-400 border-b border-slate-200/90 dark:border-white/[0.08]">
                         <tr>
                           {activeDatasetModal.fields.map((f: any, idx: number) => (
-                            <th key={idx} className="p-3 border-b border-slate-200 dark:border-slate-700 whitespace-nowrap">
+                            <th key={idx} className="p-3 whitespace-nowrap">
                               {typeof f === 'string' ? f : f.name}
                             </th>
                           ))}
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-mono text-slate-700 dark:text-slate-300">
+                      <tbody className="divide-y divide-slate-100 dark:divide-white/[0.04] font-mono text-slate-700 dark:text-slate-300">
                         {activeDatasetModal.data
                           .filter(r => !modalSearch || Object.values(r).some(v => String(v).toLowerCase().includes(modalSearch.toLowerCase())))
                           .map((row, rIdx) => (
-                            <tr key={rIdx} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition">
+                            <tr key={rIdx} className="hover:bg-slate-50/80 dark:hover:bg-white/[0.02] transition-colors">
                               {activeDatasetModal.fields.map((f: any, fIdx: number) => {
                                 const keyName = typeof f === 'string' ? f : f.name;
                                 return (
                                   <td key={fIdx} className="p-3 whitespace-nowrap">
                                     {row[keyName] !== undefined && row[keyName] !== null
-                                      ? String(row[keyName]).replace(/â€“|â|–|—/g, '-')
+                                      ? String(row[keyName]).replace(/â€“|â€“|–|—/g, '-')
                                       : '--'}
                                   </td>
                                 );
@@ -733,10 +770,10 @@ export default function DataCleaning({
               </div>
 
               {/* Modal Footer */}
-              <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 flex justify-end">
+              <div className="p-4 border-t border-slate-100 dark:border-white/[0.08] bg-slate-50/70 dark:bg-white/[0.02] flex justify-end">
                 <button
                   onClick={() => setActiveDatasetModal(null)}
-                  className="px-5 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold transition cursor-pointer"
+                  className="px-5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.06] dark:hover:bg-white/[0.1] text-slate-700 dark:text-slate-200 text-xs font-bold border border-slate-200/80 dark:border-white/[0.08] transition cursor-pointer"
                 >
                   Close Preview
                 </button>
@@ -747,22 +784,26 @@ export default function DataCleaning({
       </div>
 
       {/* ── 4. INTERACTIVE PIPELINE CONTROLLER & QUALITY METRICS ────────────── */}
-      <div className={`p-7 rounded-3xl border space-y-6 shadow-sm ${
-        isDarkMode ? 'border-slate-800 bg-slate-900/90 text-white' : 'border-slate-200 bg-white text-slate-900'
-      }`} id="pipeline-execution-panel">
-        
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 font-mono">
-              Pipeline Controller
+      <div className="relative overflow-hidden p-6 sm:p-8 rounded-2xl border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-[#111e35] shadow-sm space-y-6" id="pipeline-execution-panel">
+        <div className="absolute -top-24 -right-24 w-80 h-80 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/[0.06] pb-4 relative">
+          <div className="flex items-center gap-3">
+            <span className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 flex items-center justify-center shrink-0 shadow-xs shadow-blue-500/10">
+              <PlaySquare size={18} />
             </span>
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-              Data Preparation Execution Control
-            </h2>
+            <div>
+              <span className="text-[10.5px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 font-mono block">
+                Pipeline Controller
+              </span>
+              <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100">
+                Data Preparation Execution Control
+              </h2>
+            </div>
           </div>
 
           {pipelineState === 'completed' && (
-            <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 flex items-center gap-1.5">
+            <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-full border border-emerald-500/20 flex items-center gap-1.5 shrink-0">
               <CheckCircle size={14} /> Pipeline Executed
             </span>
           )}
@@ -770,22 +811,22 @@ export default function DataCleaning({
 
         {/* Progress Bar Display */}
         {pipelineState !== 'idle' && (
-          <div className="space-y-2 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+          <div className="space-y-2 p-4 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.06]">
             <div className="flex items-center justify-between text-xs font-mono">
-              <span className="font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
+              <span className="font-bold text-blue-600 dark:text-blue-400 flex items-center gap-2">
                 {pipelineState === 'running' ? (
-                  <Loader2 size={14} className="animate-spin text-indigo-600" />
+                  <Loader2 size={14} className="animate-spin text-blue-600 dark:text-blue-400" />
                 ) : (
-                  <CheckCircle2 size={14} className="text-emerald-600" />
+                  <CheckCircle2 size={14} className="text-emerald-600 dark:text-emerald-400" />
                 )}
                 {pipelineStepMessage}
               </span>
-              <span className="font-bold text-slate-900 dark:text-white">{pipelineProgress}%</span>
+              <span className="font-bold text-slate-900 dark:text-slate-100">{pipelineProgress}%</span>
             </div>
             
-            <div className="w-full h-2.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+            <div className="w-full h-2.5 bg-slate-200/80 dark:bg-white/[0.08] rounded-full overflow-hidden">
               <div 
-                className="h-full bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-500 transition-all duration-300" 
+                className="h-full bg-gradient-to-r from-blue-500 via-sky-500 to-emerald-500 transition-all duration-300" 
                 style={{ width: `${pipelineProgress}%` }}
               />
             </div>
@@ -796,21 +837,21 @@ export default function DataCleaning({
         {pipelineState === 'idle' ? (
           <button
             onClick={executePipeline}
-            className="w-full h-14 rounded-2xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-bold text-sm shadow-md hover:shadow-lg transition flex items-center justify-center gap-2.5 cursor-pointer select-none"
+            className="w-full h-12 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2.5 cursor-pointer select-none"
             id="run-prep-pipeline-btn"
           >
             <PlaySquare size={18} />
-            <span>Run Automated Data Preparation & Validation Pipeline</span>
+            <span>Run Automated Data Preparation &amp; Validation Pipeline</span>
           </button>
         ) : pipelineState === 'running' ? (
-          <div className="w-full h-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-700 dark:text-indigo-300 font-bold text-sm flex items-center justify-center gap-2">
+          <div className="w-full h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 font-bold text-sm flex items-center justify-center gap-2">
             <Loader2 size={18} className="animate-spin" />
-            <span>Standardizing & Validating Analytical Datasets...</span>
+            <span>Standardizing &amp; Validating Analytical Datasets...</span>
           </div>
         ) : (
-          <div className="w-full h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold text-sm flex items-center justify-center gap-2">
+          <div className="w-full h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold text-sm flex items-center justify-center gap-2">
             <CheckCircle2 size={18} className="text-emerald-600 dark:text-emerald-400" />
-            <span>Analytical Datasets Prepared, Validated & Cached in SQLite Store</span>
+            <span>Analytical Datasets Prepared, Validated &amp; Cached in SQLite Store</span>
           </div>
         )}
 
@@ -827,15 +868,15 @@ export default function DataCleaning({
             ].map((item, idx) => (
               <div
                 key={idx}
-                className="p-3 rounded-xl border text-center space-y-0.5 transition-all duration-300 bg-emerald-500/10 dark:bg-emerald-950/30 border-emerald-500/25"
+                className="p-3.5 rounded-xl border border-emerald-500/25 bg-emerald-500/5 dark:bg-emerald-950/20 text-center space-y-1 transition-all duration-300 hover:border-emerald-500/40"
               >
-                <span className="text-[9px] uppercase block font-semibold tracking-wider text-emerald-700 dark:text-emerald-300">
+                <span className="text-[9.5px] uppercase block font-semibold tracking-wider text-emerald-700 dark:text-emerald-300">
                   {item.label}
                 </span>
-                <span className="text-lg font-bold block text-emerald-600 dark:text-emerald-400">
+                <span className="text-xl font-bold block text-emerald-600 dark:text-emerald-400 font-mono">
                   {item.value}
                 </span>
-                <span className="text-[9px] block font-sans text-emerald-600/90 dark:text-emerald-400/90">
+                <span className="text-[10px] block font-sans text-emerald-700/80 dark:text-emerald-300/80">
                   {item.sub}
                 </span>
               </div>
@@ -845,18 +886,23 @@ export default function DataCleaning({
       </div>
 
       {/* ── 5. DATA QUALITY FRAMEWORK (5 VALIDATION DIMENSIONS) ─────────────── */}
-      <div className={`p-7 rounded-3xl border space-y-5 shadow-sm ${
-        isDarkMode ? 'border-slate-800 bg-slate-900/90 text-white' : 'border-slate-200 bg-white text-slate-900'
-      }`}>
-        <div className="space-y-1">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 font-mono block">
-            Quality Assurance
-          </span>
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-            Data Quality Framework: Five Validation Dimensions
-          </h2>
+      <div className="relative overflow-hidden p-6 sm:p-8 rounded-2xl border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-[#111e35] shadow-sm space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-white/[0.06] pb-4 relative">
+          <div className="flex items-center gap-3">
+            <span className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 flex items-center justify-center shrink-0 shadow-xs shadow-blue-500/10">
+              <ShieldCheck size={18} />
+            </span>
+            <div>
+              <span className="text-[10.5px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 font-mono block">
+                Quality Assurance
+              </span>
+              <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100">
+                Data Quality Framework: Five Validation Dimensions
+              </h2>
+            </div>
+          </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 font-normal">
-            Data quality is evaluated using explicit validation checks rather than unsupported quality scores.
+            Explicit validation checks rather than unsupported quality scores
           </p>
         </div>
 
@@ -895,29 +941,29 @@ export default function DataCleaning({
           ].map((dim, idx) => (
             <div
               key={idx}
-              className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-2"
+              className="p-4 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.06] hover:border-slate-300 dark:hover:border-white/[0.15] hover:-translate-y-0.5 transition-all space-y-2.5"
             >
               <div className="flex items-center justify-between">
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-indigo-100 dark:bg-indigo-900/60 text-indigo-800 dark:text-indigo-200">
+                <span className="px-2.5 py-0.5 rounded-md text-[10px] font-bold font-mono bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
                   DIMENSION {dim.num}
                 </span>
                 <CheckCircle2 size={14} className="text-emerald-600 dark:text-emerald-400" />
               </div>
-              <h3 className="text-xs font-bold text-slate-900 dark:text-white">{dim.title}</h3>
-              <p className="text-[11px] text-slate-600 dark:text-slate-300 font-normal leading-relaxed">
+              <h3 className="text-xs font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wide">{dim.title}</h3>
+              <p className="text-[11.5px] text-slate-600 dark:text-slate-300 font-normal leading-relaxed">
                 {dim.desc}
               </p>
-              <span className="text-[10px] font-mono text-indigo-700 dark:text-indigo-300 font-semibold block pt-1 border-t border-slate-200/60 dark:border-slate-700/60">
+              <span className="text-[10px] font-mono text-blue-600 dark:text-blue-400 font-semibold block pt-2 border-t border-slate-200/60 dark:border-white/[0.06]">
                 Output: {dim.output}
               </span>
             </div>
           ))}
 
           {/* Readiness Summary Card */}
-          <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-500/10 via-emerald-500/10 to-transparent border border-indigo-200 dark:border-indigo-800 flex flex-col justify-center items-center text-center space-y-2">
-            <ShieldCheck size={26} className="text-emerald-600 dark:text-emerald-400" />
-            <h3 className="text-xs font-bold text-slate-900 dark:text-white">Analysis-Ready Verification</h3>
-            <p className="text-[10px] text-slate-500 dark:text-slate-400">
+          <div className="p-4 rounded-xl bg-gradient-to-br from-blue-500/10 via-emerald-500/10 to-transparent border border-blue-500/20 dark:border-emerald-500/20 flex flex-col justify-center items-center text-center space-y-2">
+            <ShieldCheck size={28} className="text-emerald-600 dark:text-emerald-400" />
+            <h3 className="text-xs font-bold text-slate-900 dark:text-slate-100">Analysis-Ready Verification</h3>
+            <p className="text-[10.5px] text-slate-500 dark:text-slate-400 leading-relaxed max-w-xs">
               A dataset is considered analysis-ready only after all 5 validation dimensions have been successfully reviewed.
             </p>
           </div>
@@ -925,33 +971,36 @@ export default function DataCleaning({
       </div>
 
       {/* ── 6. DATA QUALITY STATUS: ANALYTICAL READINESS CHECK ───────────────── */}
-      <div className={`p-7 rounded-3xl border space-y-5 shadow-sm ${
-        isDarkMode ? 'border-slate-800 bg-slate-900/90 text-white' : 'border-slate-200 bg-white text-slate-900'
-      }`}>
-        <div className="flex items-center justify-between">
-          <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 font-mono block">
-              Validation Matrix
+      <div className="relative overflow-hidden p-6 sm:p-8 rounded-2xl border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-[#111e35] shadow-sm space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-white/[0.06] pb-4 relative">
+          <div className="flex items-center gap-3">
+            <span className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-xs shadow-emerald-500/10">
+              <CheckCircle2 size={18} />
             </span>
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-              Analytical Readiness Check Matrix
-            </h2>
+            <div>
+              <span className="text-[10.5px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 font-mono block">
+                Validation Matrix
+              </span>
+              <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100">
+                Analytical Readiness Check Matrix
+              </h2>
+            </div>
           </div>
-          <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
+          <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 shrink-0">
             10 / 10 Requirements Satisfied
           </span>
         </div>
 
-        <div className="border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden">
+        <div className="border border-slate-200/90 dark:border-white/[0.08] rounded-xl overflow-hidden">
           <table className="w-full text-xs text-left border-collapse font-sans">
-            <thead className="bg-slate-100 dark:bg-slate-800 font-mono text-[10px] uppercase text-slate-600 dark:text-slate-300 border-b border-slate-200 dark:border-slate-700">
+            <thead className="bg-slate-50 dark:bg-white/[0.03] font-mono text-[10px] uppercase text-slate-600 dark:text-slate-400 border-b border-slate-200/90 dark:border-white/[0.08]">
               <tr>
                 <th className="p-3">Validation Area</th>
                 <th className="p-3">Analytical Requirement</th>
                 <th className="p-3 text-right">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-mono text-slate-700 dark:text-slate-300">
+            <tbody className="divide-y divide-slate-100 dark:divide-white/[0.04] font-mono text-slate-700 dark:text-slate-300">
               {[
                 { area: 'Required Columns', req: 'Present and correctly identified across all 5 tables' },
                 { area: 'Data Types', req: 'Suitable for statistical inference and modeling' },
@@ -964,11 +1013,11 @@ export default function DataCleaning({
                 { area: 'Visit Counts', req: 'Validated and verified before statistical weighting' },
                 { area: 'Analytical Scope', req: 'Confirmed before hypothesis testing and regression' },
               ].map((row, i) => (
-                <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition">
-                  <td className="p-3 font-bold text-slate-900 dark:text-white">{row.area}</td>
-                  <td className="p-3 text-slate-600 dark:text-slate-300">{row.req}</td>
+                <tr key={i} className="hover:bg-slate-50/80 dark:hover:bg-white/[0.02] transition-colors">
+                  <td className="p-3 font-bold text-slate-900 dark:text-slate-100">{row.area}</td>
+                  <td className="p-3 text-slate-600 dark:text-slate-300 font-sans">{row.req}</td>
                   <td className="p-3 text-right font-bold text-emerald-600 dark:text-emerald-400">
-                    <span className="inline-flex items-center gap-1">
+                    <span className="inline-flex items-center gap-1 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
                       <Check size={12} /> Verified
                     </span>
                   </td>
@@ -980,200 +1029,477 @@ export default function DataCleaning({
       </div>
 
       {/* ── 7. SEVEN-STEP DATA PREPARATION WORKFLOW ─────────────────────────── */}
-      <div className={`p-7 rounded-3xl border space-y-6 shadow-sm ${
-        isDarkMode ? 'border-slate-800 bg-slate-900/90 text-white' : 'border-slate-200 bg-white text-slate-900'
-      }`}>
-        <div className="space-y-1">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 font-mono block">
-            Methodological Steps
+      <div className="relative overflow-hidden p-6 sm:p-8 rounded-2xl border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-[#111e35] shadow-sm space-y-6">
+        <div className="absolute top-0 right-1/4 w-96 h-36 bg-blue-500/5 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-white/[0.06] pb-4 relative">
+          <div className="flex items-center gap-3">
+            <span className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 flex items-center justify-center shrink-0 shadow-xs shadow-blue-500/10">
+              <Layers size={18} />
+            </span>
+            <div>
+              <span className="text-[10.5px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 font-mono block">
+                Methodological Steps
+              </span>
+              <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100">
+                Data Preparation Workflow (Steps 1 to 7)
+              </h2>
+            </div>
+          </div>
+          <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 self-start sm:self-auto">
+            7 Reproducible Stages (ETL &amp; FE Pipeline)
           </span>
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-            Data Preparation Workflow (Steps 1 to 7)
-          </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 font-normal">
-            Seven reproducible stages executing schema inspection, standardization, category control, and feature engineering.
-          </p>
         </div>
 
-        <div className="space-y-3.5 text-xs">
+        <p className="text-xs text-slate-600 dark:text-slate-300 font-normal leading-relaxed -mt-2">
+          Seven reproducible stages executing schema inspection, standardization, category aggregation control, and analytical feature engineering.
+        </p>
+
+        {/* 7 Workflow Step Cards - Vertically Stacked with Tech Stack Badges & Metadata Chips */}
+        <div className="space-y-2.5 text-xs">
           {[
             {
-              step: 'Step 1',
+              step: 'STEP 01',
+              num: '01',
               title: 'Schema Inspection',
-              desc: 'Inspect dimensions, column schemas, data types, sample records, and missing-value patterns to confirm structure before transformation.'
+              tag: 'Structural Verification',
+              desc: 'Inspect dimensions, column schemas, data types, sample records, and missing-value patterns to confirm structure before transformation.',
+              icon: <Search size={14} className="text-blue-500" />,
+              color: 'blue',
+              chips: ['5 Registered Worksheets', 'DataType Validation', 'Zero Schema Drift'],
             },
             {
-              step: 'Step 2',
+              step: 'STEP 02',
+              num: '02',
               title: 'Column Standardization',
-              desc: 'Standardize column references to snake_case (e.g., "Visit Disposition" -> visit_disposition, "Main Problem" -> main_problem, "Median LOS Hours" -> median_los_hours).'
+              tag: 'snake_case Normalization',
+              desc: 'Standardize column references to canonical snake_case (e.g., "Visit Disposition" → visit_disposition, "Main Problem" → main_problem, "Median LOS Hours" → median_los_hours).',
+              icon: <SlidersHorizontal size={14} className="text-purple-500" />,
+              color: 'purple',
+              chips: ['visit_disposition', 'main_problem', 'median_los_hours', 'visit_volume'],
             },
             {
-              step: 'Step 3',
+              step: 'STEP 03',
+              num: '03',
               title: 'Unit Harmonization',
-              desc: 'Standardize length-of-stay measures before calculations (Hours -> Minutes) for Total ED-Minutes (TEM) and cross-dataset comparisons.'
+              tag: 'Hours → Minutes Conversion',
+              desc: 'Standardize length-of-stay measures before calculations (Hours → Minutes) for Total ED-Minutes (TEM) and cross-dataset comparisons.',
+              icon: <Clock size={14} className="text-amber-500" />,
+              color: 'amber',
+              chips: ['LOS Conversion (×60)', '90th Percentile Baseline', 'TEM Calculations Ready'],
             },
             {
-              step: 'Step 4',
+              step: 'STEP 04',
+              num: '04',
               title: 'Aggregate Category Handling',
-              desc: 'Exclude roll-up categories ("Total" in disposition, "Any" in main problems) from detailed comparisons to prevent double-counting.'
+              tag: 'Double-Count Elimination',
+              desc: 'Exclude roll-up categories ("Total" in disposition, "Any" in main problems) from detailed comparisons to prevent double-counting.',
+              icon: <Filter size={14} className="text-emerald-500" />,
+              color: 'emerald',
+              chips: ["Exclude 'Total' Roll-Ups", "Exclude 'Any' Aggregates", 'Independent Sub-Cohorts'],
             },
             {
-              step: 'Step 5',
+              step: 'STEP 05',
+              num: '05',
               title: 'Missing Value Assessment',
-              desc: 'Assess required analytical fields, missing numerical values, and missing category labels without applying unexamined blanket imputations.'
+              tag: 'Zero Blanket Imputation',
+              desc: 'Assess required analytical fields, missing numerical values, and missing category labels without applying unexamined blanket imputations.',
+              icon: <AlertTriangle size={14} className="text-sky-500" />,
+              color: 'sky',
+              chips: ['0 Mandatory Missing', 'Explicit Null Decisioning', 'CIHI Protocol Compliance'],
             },
             {
-              step: 'Step 6',
+              step: 'STEP 06',
+              num: '06',
               title: 'Duplicate Assessment',
-              desc: 'Check potential duplicates using complete analytical row structures, recognizing that aggregate data legitimately contains repeated category values.'
+              tag: 'Row-Hash Deduplication',
+              desc: 'Check potential duplicates using complete analytical row structures, recognizing that aggregate data legitimately contains repeated category values.',
+              icon: <CheckSquare size={14} className="text-indigo-500" />,
+              color: 'indigo',
+              chips: ['Composite Key Integrity', '0 Unintended Duplicates', 'Multi-Year Validation'],
             },
             {
-              step: 'Step 7',
+              step: 'STEP 07',
+              num: '07',
               title: 'Analytical Feature Engineering',
-              desc: 'Engineer derived variables with clear definitions: Total ED-Minutes (TEM = Volume × Median LOS), Pandemic Period Indicator (2020-2022), and CTAS Ordinal Encoding (1 to 5).'
+              tag: 'TEM & Feature Store Generation',
+              desc: 'Engineer derived variables with clear definitions: Total ED-Minutes (TEM = Volume × Median LOS), Pandemic Period Indicator (2020–2022), and CTAS Ordinal Encoding (1 to 5).',
+              icon: <Sparkles size={14} className="text-rose-500" />,
+              color: 'rose',
+              chips: ['TEM = Volume × Median LOS', 'Pandemic Flag (2020–2022)', 'CTAS Ordinal (1–5)'],
             },
           ].map((st, idx) => (
             <div
               key={idx}
-              className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 flex items-start gap-3.5"
+              className="p-3.5 sm:p-4 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.06] hover:border-slate-300 dark:hover:border-white/[0.15] hover:-translate-y-0.5 transition-all space-y-2"
             >
-              <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 flex items-center justify-center shrink-0 font-mono font-bold text-xs">
-                {idx + 1}
-              </div>
-              <div className="space-y-0.5">
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">{st.step}:</span>
-                  <h3 className="font-bold text-slate-900 dark:text-white text-xs">{st.title}</h3>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div className="flex items-center gap-2.5">
+                  <span className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 font-mono font-bold text-xs ${
+                    st.color === 'blue' ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20' :
+                    st.color === 'purple' ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20' :
+                    st.color === 'amber' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20' :
+                    st.color === 'emerald' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' :
+                    st.color === 'sky' ? 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20' :
+                    st.color === 'indigo' ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20' :
+                    'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20'
+                  }`}>
+                    {st.num}
+                  </span>
+                  <span className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5 font-mono text-xs">
+                    {st.icon}
+                    <span className={
+                      st.color === 'blue' ? 'text-blue-600 dark:text-blue-400' :
+                      st.color === 'purple' ? 'text-purple-600 dark:text-purple-400' :
+                      st.color === 'amber' ? 'text-amber-600 dark:text-amber-400' :
+                      st.color === 'emerald' ? 'text-emerald-600 dark:text-emerald-400' :
+                      st.color === 'sky' ? 'text-sky-600 dark:text-sky-400' :
+                      st.color === 'indigo' ? 'text-indigo-600 dark:text-indigo-400' :
+                      'text-rose-600 dark:text-rose-400'
+                    }>{st.step}:</span>
+                    <span className="text-slate-900 dark:text-slate-100 font-semibold">{st.title}</span>
+                  </span>
                 </div>
-                <p className="text-[11px] text-slate-600 dark:text-slate-300 font-normal leading-relaxed">
-                  {st.desc}
-                </p>
+
+                <span className={`text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-md border self-start sm:self-auto ${
+                  st.color === 'blue' ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20' :
+                  st.color === 'purple' ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20' :
+                  st.color === 'amber' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20' :
+                  st.color === 'emerald' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' :
+                  st.color === 'sky' ? 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20' :
+                  st.color === 'indigo' ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20' :
+                  'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20'
+                }`}>
+                  {st.tag}
+                </span>
+              </div>
+
+              <p className="text-[11.5px] text-slate-600 dark:text-slate-300 font-normal leading-relaxed pl-0 sm:pl-9">
+                {st.desc}
+              </p>
+
+              <div className="flex flex-wrap items-center gap-1.5 pl-0 sm:pl-9 pt-0.5">
+                {st.chips.map((chip, cIdx) => (
+                  <span
+                    key={cIdx}
+                    className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-slate-100 dark:bg-white/[0.04] text-slate-600 dark:text-slate-400 border border-slate-200/80 dark:border-white/[0.06]"
+                  >
+                    {chip}
+                  </span>
+                ))}
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Methodological Execution Pipeline Trail (Matching Picture 3's Bottom Section) */}
+        <div className="p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-white/[0.06] bg-slate-50/60 dark:bg-white/[0.01] space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Workflow size={15} className="text-blue-500" />
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-900 dark:text-slate-100 font-mono">
+                Methodological Execution Trail
+              </span>
+            </div>
+            <span className="text-[10px] font-mono text-slate-400">Deterministic ETL Sequence</span>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 text-xs font-mono font-medium text-slate-700 dark:text-slate-300">
+            <span className="px-2.5 py-1 rounded-lg bg-white dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.06]">01. Schema Inspection</span>
+            <ArrowRight size={13} className="text-blue-500" />
+            <span className="px-2.5 py-1 rounded-lg bg-white dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.06]">02. Column Standards</span>
+            <ArrowRight size={13} className="text-blue-500" />
+            <span className="px-2.5 py-1 rounded-lg bg-white dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.06]">03. Unit Harmonization</span>
+            <ArrowRight size={13} className="text-blue-500" />
+            <span className="px-2.5 py-1 rounded-lg bg-white dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.06]">04. Category Filtering</span>
+            <ArrowRight size={13} className="text-blue-500" />
+            <span className="px-2.5 py-1 rounded-lg bg-white dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.06]">05. Missing Assessment</span>
+            <ArrowRight size={13} className="text-blue-500" />
+            <span className="px-2.5 py-1 rounded-lg bg-white dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.06]">06. Duplicate Validation</span>
+            <ArrowRight size={13} className="text-emerald-500" />
+            <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-bold">07. Feature Store Ready</span>
+          </div>
         </div>
       </div>
 
       {/* ── 8. BEFORE -> AFTER ANALYTICAL TRANSFORMATION RIBBON ─────────────── */}
-      <div className={`p-7 rounded-3xl border space-y-4 shadow-sm ${
-        isDarkMode ? 'border-slate-800 bg-slate-900/90 text-white' : 'border-slate-200 bg-white text-slate-900'
-      }`}>
-        <div className="space-y-1">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 font-mono block">
-            Transformation Trail
+      <div className="relative overflow-hidden p-6 sm:p-8 rounded-2xl border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-[#111e35] shadow-sm space-y-4">
+        <div className="absolute top-0 right-1/4 w-96 h-36 bg-blue-500/5 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-white/[0.06] pb-4 relative">
+          <div className="flex items-center gap-3">
+            <span className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 flex items-center justify-center shrink-0 shadow-xs shadow-blue-500/10">
+              <Workflow size={18} />
+            </span>
+            <div>
+              <span className="text-[10.5px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 font-mono block">
+                Transformation Trail
+              </span>
+              <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100">
+                Before → After Analytical Transformation
+              </h2>
+            </div>
+          </div>
+          <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 self-start sm:self-auto">
+            6 Sequential Transitions
           </span>
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-            Before → After Analytical Transformation
-          </h2>
         </div>
 
-        <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 flex flex-wrap items-center gap-2 text-xs font-mono font-medium text-slate-700 dark:text-slate-300 leading-normal">
-          <span className="font-bold text-indigo-600 dark:text-indigo-400">SOURCE DATA</span>
-          <ArrowRight size={13} className="text-slate-400" />
-          <span>STRUCTURE REVIEW</span>
-          <ArrowRight size={13} className="text-slate-400" />
-          <span>DATA QUALITY VALIDATION</span>
-          <ArrowRight size={13} className="text-slate-400" />
-          <span>STANDARDIZATION</span>
-          <ArrowRight size={13} className="text-slate-400" />
-          <span>AGGREGATE CATEGORY CONTROL</span>
-          <ArrowRight size={13} className="text-slate-400" />
-          <span>FEATURE ENGINEERING</span>
-          <ArrowRight size={13} className="text-slate-400" />
-          <span className="font-bold text-emerald-600 dark:text-emerald-400">VALIDATED DATASETS</span>
+        <div className="p-4 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.06] flex flex-wrap items-center gap-2 text-xs font-mono font-medium text-slate-700 dark:text-slate-300 leading-normal">
+          <span className="font-bold text-blue-600 dark:text-blue-400 bg-blue-500/10 border border-blue-500/20 px-2.5 py-1 rounded-md">SOURCE DATA</span>
+          <ArrowRight size={13} className="text-blue-500/60 dark:text-blue-400/60" />
+          <span className="px-2.5 py-1 rounded-md bg-white dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.06]">STRUCTURE REVIEW</span>
+          <ArrowRight size={13} className="text-blue-500/60 dark:text-blue-400/60" />
+          <span className="px-2.5 py-1 rounded-md bg-white dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.06]">DATA QUALITY VALIDATION</span>
+          <ArrowRight size={13} className="text-blue-500/60 dark:text-blue-400/60" />
+          <span className="px-2.5 py-1 rounded-md bg-white dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.06]">STANDARDIZATION</span>
+          <ArrowRight size={13} className="text-blue-500/60 dark:text-blue-400/60" />
+          <span className="px-2.5 py-1 rounded-md bg-white dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.06]">AGGREGATE CATEGORY CONTROL</span>
+          <ArrowRight size={13} className="text-blue-500/60 dark:text-blue-400/60" />
+          <span className="px-2.5 py-1 rounded-md bg-white dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.06]">FEATURE ENGINEERING</span>
+          <ArrowRight size={13} className="text-emerald-500" />
+          <span className="font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-md">VALIDATED DATASETS</span>
         </div>
       </div>
 
       {/* ── 9. DATA PREPARATION DESIGN PRINCIPLES (5 PRINCIPLES) ────────────── */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-indigo-600 dark:bg-indigo-400" />
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">
-            Data Preparation Design Principles
-          </h2>
+      <div className="relative overflow-hidden p-6 sm:p-8 rounded-2xl border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-[#111e35] shadow-sm space-y-6">
+        <div className="absolute top-0 right-1/4 w-96 h-36 bg-blue-500/5 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-white/[0.06] pb-4 relative">
+          <div className="flex items-center gap-3">
+            <span className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 flex items-center justify-center shrink-0 shadow-xs shadow-blue-500/10">
+              <Sparkles size={18} />
+            </span>
+            <div>
+              <span className="text-[10.5px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 font-mono block">
+                Guiding Framework
+              </span>
+              <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100">
+                Data Preparation Design Principles
+              </h2>
+            </div>
+          </div>
+          <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 self-start sm:self-auto">
+            5 Core Methodological Standards
+          </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
-          {[
-            {
-              title: 'DO NOT TRANSFORM WITHOUT A REASON',
-              desc: 'Every transformation must serve data quality, analytical compatibility, or reproducibility. Unnecessary transformations are avoided.'
-            },
-            {
-              title: 'DO NOT IMPUTE BY DEFAULT',
-              desc: 'Because the project uses aggregate healthcare statistics, missing values are assessed before deciding on treatment. No blanket imputations are applied.'
-            },
-            {
-              title: 'DO NOT DOUBLE-COUNT AGGREGATES',
-              desc: 'Overall categories ("Total", "Any") are not treated as independent detailed categories when they summarize the same observations.'
-            },
-            {
-              title: 'PRESERVE SOURCE MEANING',
-              desc: 'The preparation workflow standardizes data for analysis without changing the meaning of CIHI original reporting categories.'
-            },
-            {
-              title: 'DOCUMENT DERIVED VARIABLES',
-              desc: 'Every engineered analytical variable (TEM, Pandemic Flag, CTAS encodings) is traceable to source fields, transformation logic, and research purpose.'
-            },
-          ].map((principle, idx) => (
-            <div
-              key={idx}
-              className={`p-5 rounded-2xl border space-y-2 shadow-2xs ${
-                isDarkMode ? 'border-slate-800 bg-slate-900/90 text-white' : 'border-slate-200 bg-white text-slate-900'
-              }`}
-            >
-              <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-indigo-600 dark:text-indigo-400 block">
-                Principle 0{idx + 1}
+        {/* 6 Principles Cards (Tech Stack / Picture 3 Card Style) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.06] hover:border-slate-300 dark:hover:border-white/[0.15] hover:-translate-y-0.5 transition-all space-y-1">
+            <span className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5 font-mono">
+              <Scale size={13} className="text-blue-500" /> PRINCIPLE 01
+            </span>
+            <span className="font-semibold text-blue-600 dark:text-blue-400 block text-xs">
+              DO NOT TRANSFORM WITHOUT A REASON
+            </span>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
+              Every transformation must serve data quality, analytical compatibility, or reproducibility. Unnecessary transformations are avoided.
+            </p>
+          </div>
+
+          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.06] hover:border-slate-300 dark:hover:border-white/[0.15] hover:-translate-y-0.5 transition-all space-y-1">
+            <span className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5 font-mono">
+              <AlertTriangle size={13} className="text-purple-500" /> PRINCIPLE 02
+            </span>
+            <span className="font-semibold text-purple-600 dark:text-purple-400 block text-xs">
+              DO NOT IMPUTE BY DEFAULT
+            </span>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
+              Because the project uses aggregate healthcare statistics, missing values are assessed before deciding on treatment. No blanket imputations are applied.
+            </p>
+          </div>
+
+          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.06] hover:border-slate-300 dark:hover:border-white/[0.15] hover:-translate-y-0.5 transition-all space-y-1">
+            <span className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5 font-mono">
+              <Filter size={13} className="text-amber-500" /> PRINCIPLE 03
+            </span>
+            <span className="font-semibold text-amber-600 dark:text-amber-400 block text-xs">
+              DO NOT DOUBLE-COUNT AGGREGATES
+            </span>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
+              Overall categories ("Total", "Any") are not treated as independent detailed categories when they summarize the same observations.
+            </p>
+          </div>
+
+          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.06] hover:border-slate-300 dark:hover:border-white/[0.15] hover:-translate-y-0.5 transition-all space-y-1">
+            <span className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5 font-mono">
+              <BookOpen size={13} className="text-emerald-500" /> PRINCIPLE 04
+            </span>
+            <span className="font-semibold text-emerald-600 dark:text-emerald-400 block text-xs">
+              PRESERVE SOURCE MEANING
+            </span>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
+              The preparation workflow standardizes data for analysis without changing the meaning of CIHI original reporting categories.
+            </p>
+          </div>
+
+          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.06] hover:border-slate-300 dark:hover:border-white/[0.15] hover:-translate-y-0.5 transition-all space-y-1">
+            <span className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5 font-mono">
+              <FileText size={13} className="text-sky-500" /> PRINCIPLE 05
+            </span>
+            <span className="font-semibold text-sky-600 dark:text-sky-400 block text-xs">
+              DOCUMENT DERIVED VARIABLES
+            </span>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
+              Every engineered analytical variable (TEM, Pandemic Flag, CTAS encodings) is traceable to source fields, transformation logic, and research purpose.
+            </p>
+          </div>
+
+          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.06] hover:border-slate-300 dark:hover:border-white/[0.15] hover:-translate-y-0.5 transition-all space-y-1">
+            <span className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5 font-mono">
+              <ShieldCheck size={13} className="text-rose-500" /> MANDATE 06
+            </span>
+            <span className="font-semibold text-rose-600 dark:text-rose-400 block text-xs">
+              REPRODUCIBLE RESEARCH PROTOCOL
+            </span>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
+              Ensures that every ETL procedure, aggregation rule, and schema normalization can be re-executed deterministically from raw files.
+            </p>
+          </div>
+        </div>
+
+        {/* Methodological Integrity Trail Ribbon (Matching Picture 3's Bottom Section) */}
+        <div className="p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-white/[0.06] bg-slate-50/60 dark:bg-white/[0.01] space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Workflow size={15} className="text-blue-500" />
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-900 dark:text-slate-100 font-mono">
+                Methodological Integrity Trail
               </span>
-              <h3 className="text-xs font-bold text-slate-900 dark:text-white leading-tight">{principle.title}</h3>
-              <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed font-normal">{principle.desc}</p>
             </div>
-          ))}
+            <span className="text-[10px] font-mono text-slate-400">Academic Quality Protocol</span>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 text-xs font-mono font-medium text-slate-700 dark:text-slate-300">
+            <span className="px-2.5 py-1 rounded-lg bg-white dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.06]">Source Authenticity</span>
+            <ArrowRight size={13} className="text-blue-500" />
+            <span className="px-2.5 py-1 rounded-lg bg-white dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.06]">Explicit Verification</span>
+            <ArrowRight size={13} className="text-blue-500" />
+            <span className="px-2.5 py-1 rounded-lg bg-white dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.06]">Zero Blanket Imputation</span>
+            <ArrowRight size={13} className="text-blue-500" />
+            <span className="px-2.5 py-1 rounded-lg bg-white dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.06]">Category Disaggregation</span>
+            <ArrowRight size={13} className="text-blue-500" />
+            <span className="px-2.5 py-1 rounded-lg bg-white dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.06]">Feature Traceability</span>
+            <ArrowRight size={13} className="text-emerald-500" />
+            <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-bold">Standardized Analytics Store</span>
+          </div>
         </div>
       </div>
 
       {/* ── 10. STAGE 2 OUTPUT & DATA GOVERNANCE ─────────────────────────────── */}
-      <div className={`p-7 rounded-3xl border space-y-5 shadow-sm ${
-        isDarkMode ? 'border-slate-800 bg-slate-900/90 text-white' : 'border-slate-200 bg-white text-slate-900'
-      }`}>
-        <div className="space-y-1">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 font-mono block">
-            Stage 2 Output
-          </span>
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-            Validated Analytical Foundation for Downstream Workflows
-          </h2>
-        </div>
+      <div className="relative overflow-hidden p-6 sm:p-8 rounded-2xl border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-[#111e35] shadow-sm space-y-6">
+        <div className="absolute top-0 right-1/4 w-96 h-36 bg-blue-500/5 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-xs">
-          {[
-            { title: 'Statistical Analysis', desc: 'H1–H5 hypothesis evaluation' },
-            { title: 'Explanatory Modelling', desc: 'Aggregate predictors & regressions' },
-            { title: 'Resource Utilization', desc: 'Total ED-Minutes & high burden' },
-            { title: 'Longitudinal Analysis', desc: '19-year historical trends' },
-            { title: 'Forecasting', desc: 'Near-term direction projections' },
-            { title: 'Interactive Viz', desc: 'Dashboards & dossiers' },
-          ].map((out, idx) => (
-            <div key={idx} className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-1">
-              <span className="font-bold text-slate-900 dark:text-white block">{out.title}</span>
-              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-normal leading-snug block">{out.desc}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* Governance Disclaimer */}
-        <div className={`p-4 rounded-2xl border border-indigo-200 dark:border-indigo-900/60 flex items-start gap-3 text-xs leading-relaxed ${
-          isDarkMode ? 'bg-indigo-950/20 text-slate-300' : 'bg-indigo-50/50 text-slate-700'
-        }`}>
-          <Lock size={18} className="text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5" />
-          <div className="space-y-1">
-            <span className="font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-300 text-[10px] font-mono block">
-              Data Governance & Limitations Note
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-white/[0.06] pb-4 relative">
+          <div className="flex items-center gap-3">
+            <span className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 flex items-center justify-center shrink-0 shadow-xs shadow-blue-500/10">
+              <FileSpreadsheet size={18} />
             </span>
-            <p className="text-[11px]">
-              This platform processes publicly reported, pre-aggregated NACRS statistics for academic research, aggregate-level analytics, and system pattern analysis. The platform does not contain direct patient identifiers, does not diagnose patients, and does not replace clinical judgment.
+            <div>
+              <span className="text-[10.5px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 font-mono block">
+                Stage 2 Output
+              </span>
+              <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100">
+                Validated Analytical Foundation for Downstream Workflows
+              </h2>
+            </div>
+          </div>
+          <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 self-start sm:self-auto">
+            6 Downstream Analytical Pipelines
+          </span>
+        </div>
+
+        {/* 6 Downstream Output Cards (Tech Stack / Picture 3 Card Style) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 text-xs">
+          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.06] hover:border-slate-300 dark:hover:border-white/[0.15] hover:-translate-y-0.5 transition-all space-y-1">
+            <span className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5 font-mono">
+              <BarChart2 size={13} className="text-blue-500" /> STAGE 3
+            </span>
+            <span className="font-semibold text-blue-600 dark:text-blue-400 block text-xs">
+              Statistical Analysis
+            </span>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
+              H1–H5 hypothesis testing &amp; non-parametric comparison.
             </p>
           </div>
+
+          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.06] hover:border-slate-300 dark:hover:border-white/[0.15] hover:-translate-y-0.5 transition-all space-y-1">
+            <span className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5 font-mono">
+              <Activity size={13} className="text-purple-500" /> STAGE 4
+            </span>
+            <span className="font-semibold text-purple-600 dark:text-purple-400 block text-xs">
+              Explanatory Modelling
+            </span>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
+              Weighted least squares &amp; predictor regressions.
+            </p>
+          </div>
+
+          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.06] hover:border-slate-300 dark:hover:border-white/[0.15] hover:-translate-y-0.5 transition-all space-y-1">
+            <span className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5 font-mono">
+              <Clock size={13} className="text-amber-500" /> STAGE 5
+            </span>
+            <span className="font-semibold text-amber-600 dark:text-amber-400 block text-xs">
+              Resource Utilization
+            </span>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
+              Total ED-Minutes (TEM) &amp; bed occupancy strain.
+            </p>
+          </div>
+
+          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.06] hover:border-slate-300 dark:hover:border-white/[0.15] hover:-translate-y-0.5 transition-all space-y-1">
+            <span className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5 font-mono">
+              <Calendar size={13} className="text-emerald-500" /> STAGE 6
+            </span>
+            <span className="font-semibold text-emerald-600 dark:text-emerald-400 block text-xs">
+              Longitudinal Analysis
+            </span>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
+              19-year historical trends &amp; pandemic era patterns.
+            </p>
+          </div>
+
+          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.06] hover:border-slate-300 dark:hover:border-white/[0.15] hover:-translate-y-0.5 transition-all space-y-1">
+            <span className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5 font-mono">
+              <TrendingUp size={13} className="text-sky-500" /> STAGE 6
+            </span>
+            <span className="font-semibold text-sky-600 dark:text-sky-400 block text-xs">
+              Near-Term Forecasting
+            </span>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
+              Directional projections with 95% confidence intervals.
+            </p>
+          </div>
+
+          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.06] hover:border-slate-300 dark:hover:border-white/[0.15] hover:-translate-y-0.5 transition-all space-y-1">
+            <span className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5 font-mono">
+              <LayoutDashboard size={13} className="text-rose-500" /> STAGE 7
+            </span>
+            <span className="font-semibold text-rose-600 dark:text-rose-400 block text-xs">
+              Interactive Visualization
+            </span>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
+              Executive dossiers, visual drill-downs &amp; dashboards.
+            </p>
+          </div>
+        </div>
+
+        {/* Governance Disclaimer - Styled as Picture 3's bottom section */}
+        <div className="p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-white/[0.06] bg-slate-50/60 dark:bg-white/[0.01] space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Lock size={15} className="text-blue-500" />
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-900 dark:text-slate-100 font-mono">
+                Data Governance &amp; Limitations Note
+              </span>
+            </div>
+            <span className="text-[10px] font-mono text-slate-400">CIHI Research Protocol</span>
+          </div>
+          <p className="text-[11.5px] text-slate-600 dark:text-slate-400 leading-relaxed font-normal">
+            This platform processes publicly reported, pre-aggregated NACRS statistics for academic research, aggregate-level analytics, and system pattern analysis. The platform does not contain direct patient identifiers, does not diagnose patients, and does not replace clinical judgment.
+          </p>
         </div>
       </div>
 
@@ -1185,23 +1511,23 @@ export default function DataCleaning({
       )}
 
       {/* ── 12. STAGE 2 TRANSITION & PROCEED ACTION ─────────────────────────── */}
-      <div className={`p-6 rounded-3xl border shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all ${
+      <div className={`p-4 sm:p-5 rounded-2xl border shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all ${
         pipelineState === 'completed'
-          ? 'bg-emerald-500/10 dark:bg-emerald-950/30 border-emerald-500/30'
-          : 'bg-slate-50 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800'
+          ? 'bg-emerald-500/10 dark:bg-emerald-950/20 border-emerald-500/30'
+          : 'bg-white dark:bg-[#111e35] border-slate-200/90 dark:border-white/[0.08]'
       }`}>
         <div className="space-y-1">
-          <span className="text-[10px] font-bold uppercase tracking-wider font-mono block text-indigo-600 dark:text-indigo-400">
+          <span className="text-[10px] font-bold uppercase tracking-wider font-mono block text-blue-600 dark:text-blue-400">
             Stage 2 · Validation Status
           </span>
           {pipelineState === 'completed' ? (
-            <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-300 font-bold text-sm">
-              <CheckCircle2 size={18} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-300 font-bold text-xs">
+              <CheckCircle2 size={16} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
               <span>Data preparation pipeline completed. Analytical datasets are verified and cached.</span>
             </div>
           ) : (
-            <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400 text-xs font-medium">
-              <Lock size={16} className="text-amber-500 shrink-0" />
+            <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300 text-xs font-medium">
+              <Lock size={15} className="text-amber-500 shrink-0" />
               <span>Please run the <strong>Automated Data Preparation &amp; Validation Pipeline</strong> above before advancing to Stage 3.</span>
             </div>
           )}
@@ -1211,10 +1537,10 @@ export default function DataCleaning({
           {pipelineState === 'completed' ? (
             <button
               onClick={onNavigateNext}
-              className="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-bold text-sm shadow-md hover:shadow-lg transition flex items-center gap-2 cursor-pointer"
+              className="h-10 px-5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-md hover:shadow-blue-500/25 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer select-none group"
             >
               <span>Proceed to Stage 3: Dataset Explorer</span>
-              <ArrowRight size={16} />
+              <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
             </button>
           ) : (
             <button
@@ -1227,7 +1553,7 @@ export default function DataCleaning({
                   executePipeline();
                 }
               }}
-              className="px-5 py-2.5 rounded-2xl bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs transition flex items-center gap-2 cursor-pointer"
+              className="h-10 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.06] dark:hover:bg-white/[0.1] text-slate-700 dark:text-slate-200 text-xs font-bold border border-slate-200/80 dark:border-white/[0.08] transition-all flex items-center gap-2 cursor-pointer select-none"
             >
               <PlaySquare size={14} />
               <span>Go to Pipeline Execution Control</span>

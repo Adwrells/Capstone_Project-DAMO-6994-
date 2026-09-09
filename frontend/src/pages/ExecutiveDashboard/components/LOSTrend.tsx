@@ -379,7 +379,7 @@ export default function LOSTrend({ data, isDarkMode }: LOSTrendProps) {
                   dataKey="los_hours"
                   position="top"
                   offset={10}
-                  formatter={(v: any, entry: any) => {
+                  formatter={((v: any, entry: any) => {
                     const fy = entry?.payload?.fiscal_year;
                     if (viewMode === 'all') {
                       const num = Number(v);
@@ -393,7 +393,7 @@ export default function LOSTrend({ data, isDarkMode }: LOSTrendProps) {
                       return `#${rank} (${Number(v).toFixed(2)}h)`;
                     }
                     return '';
-                  }}
+                  }) as any}
                   fill={dark ? '#FCD34D' : '#D97706'}
                   fontSize={10.5}
                   fontWeight={700}
