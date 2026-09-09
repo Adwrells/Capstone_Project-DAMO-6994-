@@ -276,7 +276,7 @@ export default function ExecutiveDashboard({
       />
 
       {/* ══ 4. SYSTEM OVERVIEW TRENDS ════════════════════════════════════════ */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="space-y-6">
         <VisitVolumeTrend data={activeTrendSeries} isDarkMode={dark} />
         <LOSTrend data={activeTrendSeries} isDarkMode={dark} />
       </div>
