@@ -4,20 +4,172 @@
  *
  * Reports & Export Page — Academic Dossier Studio
  * Continuous page-based document viewer, chapter filtering,
- * and DOCX / PDF / MD export.
+ * and DOCX / PDF export with a report-type chooser modal.
  */
 
 import React, { useState, useMemo, useRef } from 'react';
 import {
   ShieldCheck, Download, RefreshCw, Sliders,
   FileDown, BookOpen, GraduationCap, Building2, User,
-  ChevronRight, CheckCircle2, FileText, Filter,
+  ChevronRight, CheckCircle2, Filter, X, FileText, File,
 } from 'lucide-react';
 import PageHeader from '../../components/common/PageHeader';
-import { fmtK } from '../../utils/formatters';
 import { CAPSTONE_REPORT } from './capstoneReportData';
 import { PAGINATED_REPORT_DATA } from './paginatedReportData';
 import AcademicPageSheet from './AcademicPageSheet';
+
+// ─── Executive Report (MD content provided by user) ──────────────────────────
+const EXECUTIVE_REPORT_MD = `# Explanatory and Predictive Analytics of Emergency Department Length of Stay and Resource Utilization Trends in Canadian Hospitals
+
+**DAMO 699 – Capstone Project | Master of Data Analytics**
+Rajbharath P (NF1016766) · Sufyaan Khan Mohammed (NF1017047) · Amit Raj Dev (NF1021076)
+Group 5 | Supervisor: Dr. Bilal El Toufaili
+University of Niagara Falls Canada | September 2026
+
+---
+
+## Executive Summary
+
+Canadian emergency departments (EDs) operate under sustained pressure from increasing patient volumes, prolonged length of stay (LOS), admission-related boarding, and changing patient demographics. These pressures are not exclusively internal to the ED; they are also influenced by clinical acuity, diagnostic complexity, inpatient capacity, and the characteristics of the population being served. This project develops an evidence-based analytics framework for examining these pressures using 19 years of aggregate Canadian Institute for Health Information (CIHI) National Ambulatory Care Reporting System (NACRS) emergency-department data covering FY 2003/04–FY 2021/22.
+
+The analytical dataset contains 10,685 aggregate reporting rows representing approximately 175.8 million ED encounters. Because the source is aggregate rather than patient-level data and LOS is strongly non-normal, the analysis uses frequency-weighted non-parametric procedures and aggregate-level weighted least squares (WLS) regression. Five pre-specified hypotheses examine relationships between LOS and CTAS acuity, admission status, age, and sex/disposition.
+
+The results identify three major operational signals. First, clinical acuity is strongly associated with reported LOS. The weighted Kruskal–Wallis analysis for CTAS produced H = 35,510,138.077, p < .0001, ε² = 0.7479, with all 10 Bonferroni-adjusted pairwise comparisons significant. Median LOS was highest for CTAS II (4.80 hours) and CTAS I (4.60 hours), followed by CTAS III (3.40 hours), CTAS IV (1.90 hours), and CTAS V (1.33 hours).
+
+Second, admission status is the strongest operational separation observed. Admitted visits had a reported median LOS of 6.10 hours, compared with 2.80 hours for non-admitted visits, with a rank-biserial correlation of 0.9846. This result supports the interpretation that ED throughput is closely connected to downstream inpatient capacity and patient flow.
+
+Third, age is materially associated with LOS. Reported median LOS rises from 2.02 hours for Pediatric & Youth to 4.01 hours for Older Adults, with ε² = 0.7218 and all six pairwise age comparisons significant after Bonferroni adjustment. By contrast, sex and disposition are statistically associated because of the very large dataset, but the practical effect is negligible (χ² = 18,164.97, p < .0001, Cramér's V = 0.0102).
+
+Longitudinal analysis also demonstrates sustained system pressure. Annual ED visits increased from approximately 4.91 million in FY 2003/04 to 13.99 million in FY 2021/22, reaching approximately 15.02 million in FY 2018/19. The Mann–Kendall test indicates a significant upward trend (Z = 5.5977, p < .001) with a Sen's slope of approximately 550.9 thousand visits per year. The project-specific Estimated Emergency Department Resource Burden Index (ERBI) increased from 4.21 to 8.33, with Kendall's τ = 0.9766, p < .0001. Holt's Linear Exponential Smoothing projects ERBI values of 8.65 for FY 2022/23 and 8.98 for FY 2023/24.
+
+The project translates these findings into an interactive decision-support platform and a phased implementation roadmap focused on low-acuity fast-track pathways, inpatient-flow reform, boarding monitoring, geriatric emergency pathways, and continuous analytics governance. The findings are intended for system-level planning and decision support, not individual clinical prediction.
+
+## 1. Research Problem, Objectives, and Questions
+
+### 1.1 Problem Context
+
+ED overcrowding and prolonged LOS are symptoms of broader healthcare-system capacity constraints. ED LOS includes multiple stages of care, including registration, assessment, diagnostic investigation, treatment, disposition, and, for admitted patients, waiting for an inpatient bed. Consequently, a meaningful analysis of ED throughput must consider both conditions within the department and downstream hospital capacity.
+
+**Problem statement:** How can long-term aggregate ED data be transformed into statistically defensible, interpretable, and actionable evidence for understanding LOS, throughput, and resource-utilization pressure in Canadian hospitals?
+
+### 1.2 Objectives
+
+1. Quantify longitudinal changes in ED visit volume and reported LOS.
+2. Identify important relationships between LOS and CTAS acuity, admission status, age, and sex/disposition.
+3. Develop an aggregate-level predictive model and a forward-looking resource-burden forecast.
+4. Translate analytical findings into an interactive decision-support system and operational recommendations.
+
+### 1.3 Hypothesis Framework
+
+| Hypothesis | Research Question | Method |
+|---|---|---|
+| H1 | Does CTAS acuity significantly affect reported ED LOS? | Weighted Kruskal–Wallis + Dunn |
+| H2 | Do admitted visits have longer reported ED LOS than non-admitted visits? | Weighted Mann–Whitney U |
+| H3 | Do CTAS, age group, and disposition predict reported median ED LOS? | Weighted Least Squares regression |
+| H4 | Do broad age cohorts differ in reported ED LOS? | Weighted Kruskal–Wallis + Dunn |
+| H5 | Is patient sex associated with ED disposition? | Pearson Chi-square + Cramér's V |
+
+Significance threshold: α = .05. Effect sizes were emphasized alongside p-values.
+
+## 2. Data and Analytical Methodology
+
+### 2.1 Data Description
+
+The empirical foundation is the CIHI NACRS supplementary emergency-department data for 2003–2022. The compiled analytical dataset represents approximately 175.8 million ED encounters over 19 fiscal years. Source records are aggregate reporting strata rather than individual patient observations.
+
+### 2.2 Statistical Approach
+
+- **H1 and H4:** frequency-weighted Kruskal–Wallis tests followed by Dunn pairwise comparisons with Bonferroni correction.
+- **H2:** frequency-weighted Mann–Whitney U test with rank-biserial correlation.
+- **H3:** aggregate-level WLS regression incorporating CTAS, age group, and disposition.
+- **H5:** Pearson chi-square test with Cramér's V.
+- **Longitudinal trend:** Mann–Kendall trend test and Sen's slope.
+- **Resource forecasting:** Holt's Linear Exponential Smoothing applied to the ERBI series.
+
+## 3. Key Findings
+
+### 3.1 CTAS Acuity and Length of Stay — H1
+
+| CTAS Level | Median LOS |
+|---|---|
+| CTAS I — Resuscitation | 4.60 h |
+| CTAS II — Emergent | 4.80 h |
+| CTAS III — Urgent | 3.40 h |
+| CTAS IV — Less Urgent | 1.90 h |
+| CTAS V — Non-Urgent | 1.33 h |
+
+Weighted Kruskal–Wallis: H = 35,510,138.077, p < .0001, ε² = 0.7479. All 10 pairwise comparisons significant (Bonferroni adjusted).
+
+### 3.2 Admission Status and Length of Stay — H2
+
+Admitted visits: median LOS 6.10 h vs. non-admitted: 2.80 h. Rank-biserial correlation = 0.9846.
+
+### 3.3 Multivariable LOS Model — H3
+
+WLS model adjusted R² = 0.8837. CTAS category and disposition contribute substantially to explaining aggregate variation in reported median LOS.
+
+### 3.4 Age and Length of Stay — H4
+
+| Age Cohort | Median LOS |
+|---|---|
+| Pediatric & Youth | 2.02 h |
+| Young Adult | 2.47 h |
+| Middle Adult | 2.73 h |
+| Older Adult | 4.01 h |
+
+Weighted Kruskal–Wallis: ε² = 0.7218. All six pairwise comparisons significant.
+
+### 3.5 Sex and Disposition — H5
+
+χ² = 18,164.97, df = 1, p < .0001, Cramér's V = 0.0102 (negligible practical effect). Admission rates: female ~9.95%, male ~10.56%.
+
+## 4. Longitudinal Throughput and Resource Burden
+
+ERBI increased from 4.21 (FY 2003/04) to 8.33 (FY 2021/22). Kendall's τ = 0.9766, p < .0001.
+
+| Fiscal Year | ERBI Forecast | 95% Prediction Interval |
+|---|---|---|
+| FY 2022/23 | 8.65 | 6.91–10.39 |
+| FY 2023/24 | 8.98 | 6.84–11.12 |
+
+## 5. Decision-Support Platform
+
+The analytical results were implemented as an interactive web-based decision-support platform using React 19, TypeScript, Recharts, Vite, and a FastAPI backend with 31 REST endpoints.
+
+## 6. Strategic Recommendations
+
+1. **Fast-Track Low-Acuity Care** (Months 1–6) — Rapid-assessment pathways for CTAS IV/V patients.
+2. **Inpatient Flow Reform** (Months 6–18) — Early discharges, discharge lounges, real-time bed visibility.
+3. **Automated Boarding Monitoring** (Months 12–18) — Real-time monitoring with escalation thresholds.
+4. **Geriatric Emergency Pathways** (Months 18–36) — Targeted pathways for older adults.
+5. **Continuous Analytics Governance** (Ongoing) — ERBI monitoring, CIHI data refreshes.
+
+## 7. Limitations and Future Research
+
+The principal limitation is the aggregate nature of the CIHI NACRS data. Results should not be interpreted as the expected LOS of an individual patient. Future research should incorporate patient-level data, richer clinical variables, inpatient/outcome linkages, hospital/geographic identifiers, and machine-learning approaches.
+
+## 8. Conclusion
+
+Canadian ED throughput is a multidimensional system-level problem. CTAS acuity, admission status, and age are the three operationally important dimensions. The longitudinal ERBI trend and two-year forecast provide a forward-looking planning signal. Results support capacity planning, operational analysis, and system-level decision support—not individual clinical decision-making.
+
+## References
+
+Affleck, A., Parks, P., Drummond, A., Unger, B., & Ovens, H. (2013). Emergency department overcrowding and access block. *Canadian Journal of Emergency Medicine, 15*(6), 359–370.
+
+Canadian Institute for Health Information. (2026). *National Ambulatory Care Reporting System (NACRS): Emergency department supplementary data tables, 2003–2022* [Data set]. CIHI.
+
+Hyndman, R. J., & Athanasopoulos, G. (2018). *Forecasting: Principles and practice* (2nd ed.). OTexts.
+
+Li, M. K., McLeod, S. L., et al. (2026). Emergency department overcrowding [CAEP position statement update]. Canadian Association of Emergency Physicians.
+
+Lin, M., Lucas, H. C., Jr., & Shmueli, G. (2013). Research commentary—Too big to fail. *Information Systems Research, 24*(4), 906–917.
+
+OECD. (2023). *Health at a glance 2023*. OECD Publishing.
+`;
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+type ReportType = 'final' | 'executive' | 'both';
+type FileType = 'pdf' | 'docx';
 
 interface ExportReportsProps {
   datasetName: string;
@@ -29,48 +181,342 @@ interface ExportReportsProps {
   isDarkMode?: boolean;
 }
 
-type ExportFormat = 'PDF' | 'Markdown' | 'DOCX';
+// ─── Download Modal ───────────────────────────────────────────────────────────
+interface DownloadModalProps {
+  onClose: () => void;
+  onDownload: (reportType: ReportType, fileType: FileType) => void;
+  isExporting: boolean;
+}
 
-export default function ExportReports({
-  cleanedCount,
-}: ExportReportsProps) {
-  const [reportName, setReportName] = useState<string>('University_of_Niagara_Falls_Capstone_Final_Report_Group5');
-  const [selectedFormat, setSelectedFormat] = useState<ExportFormat>('PDF');
+function DownloadModal({ onClose, onDownload, isExporting }: DownloadModalProps) {
+  const [step, setStep] = useState<'type' | 'format'>('type');
+  const [reportType, setReportType] = useState<ReportType | null>(null);
 
-  // Chapter selection (default: all)
+  const reportOptions: { id: ReportType; label: string; desc: string }[] = [
+    { id: 'final', label: 'Final Report', desc: 'Full 70-page academic report with all chapters, tables, and appendices' },
+    { id: 'executive', label: 'Executive Report', desc: 'Concise summary: findings, recommendations, and key statistics' },
+    { id: 'both', label: 'Both', desc: 'Download Final Report and Executive Report as separate files' },
+  ];
+
+  const fileOptions: { id: FileType; label: string; icon: React.ReactNode }[] = [
+    { id: 'pdf', label: 'PDF', icon: <FileText size={20} className="text-red-500" /> },
+    { id: 'docx', label: 'DOCX', icon: <File size={20} className="text-blue-500" /> },
+  ];
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+      <div className="bg-white dark:bg-[#0f172a] rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 w-full max-w-md overflow-hidden">
+        {/* Modal Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
+          <div className="flex items-center gap-2">
+            <Download size={16} className="text-blue-500" />
+            <h2 className="text-sm font-bold text-slate-900 dark:text-white">
+              {step === 'type' ? 'Select Report' : 'Select File Format'}
+            </h2>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-white transition cursor-pointer"
+          >
+            <X size={15} />
+          </button>
+        </div>
+
+        {/* Step indicator */}
+        <div className="flex items-center gap-2 px-5 pt-4 pb-1">
+          <div className={`h-1.5 flex-1 rounded-full transition-colors ${step === 'type' ? 'bg-blue-500' : 'bg-blue-500'}`} />
+          <div className={`h-1.5 flex-1 rounded-full transition-colors ${step === 'format' ? 'bg-blue-500' : 'bg-slate-200 dark:bg-slate-700'}`} />
+        </div>
+
+        <div className="p-5 space-y-3">
+          {step === 'type' ? (
+            /* Step 1 — Report Type */
+            <>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
+                Which report would you like to download?
+              </p>
+              {reportOptions.map((opt) => (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => {
+                    setReportType(opt.id);
+                    setStep('format');
+                  }}
+                  className="w-full flex items-start gap-3 p-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/30 text-left transition cursor-pointer group"
+                >
+                  <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-950/60 flex items-center justify-center shrink-0 group-hover:bg-blue-200 dark:group-hover:bg-blue-900/60 transition">
+                    <FileDown size={15} className="text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-bold text-slate-900 dark:text-white">{opt.label}</div>
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">{opt.desc}</div>
+                  </div>
+                </button>
+              ))}
+            </>
+          ) : (
+            /* Step 2 — File Type */
+            <>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
+                Select file format for{' '}
+                <span className="font-bold text-slate-900 dark:text-white">
+                  {reportOptions.find((o) => o.id === reportType)?.label}
+                </span>
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                {fileOptions.map((fmt) => (
+                  <button
+                    key={fmt.id}
+                    type="button"
+                    disabled={isExporting}
+                    onClick={() => onDownload(reportType!, fmt.id)}
+                    className="flex flex-col items-center gap-2 py-5 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition cursor-pointer disabled:opacity-60"
+                  >
+                    {isExporting ? (
+                      <RefreshCw size={20} className="text-blue-500 animate-spin" />
+                    ) : (
+                      fmt.icon
+                    )}
+                    <span className="text-sm font-bold text-slate-900 dark:text-white">.{fmt.id}</span>
+                    <span className="text-[10px] text-slate-400">
+                      {fmt.id === 'pdf' ? 'Formatted print layout' : 'Editable Word document'}
+                    </span>
+                  </button>
+                ))}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setStep('type')}
+                className="w-full mt-2 py-2 text-xs text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition cursor-pointer"
+              >
+                ← Back to report selection
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Main Component ───────────────────────────────────────────────────────────
+// ─── Executive Report section parser ─────────────────────────────────────────
+interface ExecSection {
+  id: string;
+  heading: string;
+  level: number; // 1 = #, 2 = ##, 3 = ###
+  lines: string[];
+}
+
+function parseExecSections(md: string): ExecSection[] {
+  const rawLines = md.split('\n');
+  const sections: ExecSection[] = [];
+  let current: ExecSection | null = null;
+
+  for (const line of rawLines) {
+    const h1 = line.match(/^# (.+)/);
+    const h2 = line.match(/^## (.+)/);
+    const h3 = line.match(/^### (.+)/);
+    if (h1 || h2) {
+      if (current) sections.push(current);
+      const heading = (h1 || h2)![1];
+      current = {
+        id: heading.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40),
+        heading,
+        level: h1 ? 1 : 2,
+        lines: [],
+      };
+    } else if (h3 && current) {
+      current.lines.push(line);
+    } else if (current) {
+      current.lines.push(line);
+    }
+  }
+  if (current) sections.push(current);
+  return sections;
+}
+
+const ALL_EXEC_SECTIONS = parseExecSections(EXECUTIVE_REPORT_MD);
+
+// ─── Markdown line renderer ───────────────────────────────────────────────────
+function renderMdLine(line: string, idx: number): React.ReactNode {
+  if (!line.trim()) return <div key={idx} className="h-3" />;
+  if (line.startsWith('---')) return <hr key={idx} style={{ borderColor: '#cbd5e1', margin: '12px 0' }} />;
+
+  // Table row
+  if (line.startsWith('|') && !line.match(/^\|[-: ]+\|/)) {
+    const cells = line.split('|').slice(1, -1).map((c) => c.trim());
+    const isHeader = idx === 0 || false;
+    return (
+      <tr key={idx}>
+        {cells.map((cell, ci) => (
+          <td key={ci} style={{
+            border: '1px solid #94a3b8', padding: '4px 8px',
+            fontWeight: isHeader ? 'bold' : 'normal',
+            color: '#0f172a', fontSize: '11px',
+          }}>{cell}</td>
+        ))}
+      </tr>
+    );
+  }
+  if (line.match(/^\|[-: ]+\|/)) return null;
+
+  // Headings
+  if (line.startsWith('### ')) {
+    return <h3 key={idx} style={{ color: '#0f172a', fontSize: '12px', fontWeight: 'bold', marginTop: '14px', marginBottom: '4px', fontFamily: 'Georgia, serif' }}>{line.slice(4)}</h3>;
+  }
+  if (line.startsWith('## ')) {
+    return <h2 key={idx} style={{ color: '#0f172a', fontSize: '14px', fontWeight: 'bold', marginTop: '20px', marginBottom: '6px', fontFamily: 'Georgia, serif', borderBottom: '1px solid #e2e8f0', paddingBottom: '4px' }}>{line.slice(3)}</h2>;
+  }
+
+  // Bullet
+  if (line.startsWith('- ') || line.startsWith('* ')) {
+    const content = line.slice(2).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*(.+?)\*/g, '<em>$1</em>');
+    return <li key={idx} style={{ color: '#0f172a', fontSize: '12px', marginBottom: '3px', lineHeight: 1.6, fontFamily: 'Georgia, serif' }} dangerouslySetInnerHTML={{ __html: content }} />;
+  }
+  // Numbered list
+  if (line.match(/^\d+\. /)) {
+    const content = line.replace(/^\d+\. /, '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*(.+?)\*/g, '<em>$1</em>');
+    return <li key={idx} style={{ color: '#0f172a', fontSize: '12px', marginBottom: '3px', lineHeight: 1.6, fontFamily: 'Georgia, serif', listStyleType: 'decimal' }} dangerouslySetInnerHTML={{ __html: content }} />;
+  }
+
+  // Normal paragraph — bold/italic inline
+  const html = line
+    .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" style="color:#1d4ed8">$1</a>');
+  return (
+    <p key={idx} style={{
+      color: '#0f172a', fontSize: '12px', lineHeight: 1.7,
+      textAlign: 'justify', marginBottom: '8px',
+      fontFamily: 'Georgia, "Times New Roman", serif',
+    }} dangerouslySetInnerHTML={{ __html: html }} />
+  );
+}
+
+function renderSection(section: ExecSection): React.ReactNode {
+  // Gather lines, detect table blocks
+  const blocks: React.ReactNode[] = [];
+  let tableLines: string[] = [];
+  let inTable = false;
+  let listLines: { line: string; idx: number }[] = [];
+  let inList = false;
+
+  const flushTable = (key: string) => {
+    if (!tableLines.length) return;
+    const rows = tableLines.filter((l) => !l.match(/^\|[-: ]+\|/));
+    const [headerRow, ...dataRows] = rows;
+    const parseRow = (l: string) => l.split('|').slice(1, -1).map((c) => c.trim());
+    blocks.push(
+      <div key={key} style={{ overflowX: 'auto', margin: '10px 0' }}>
+        <table style={{ borderCollapse: 'collapse', width: '100%', fontSize: '11px' }}>
+          <thead>
+            <tr>{parseRow(headerRow || '').map((h, i) => (
+              <th key={i} style={{ border: '1px solid #0f172a', padding: '5px 8px', backgroundColor: '#f1f5f9', color: '#0f172a', textAlign: 'left', fontWeight: 'bold' }}>{h}</th>
+            ))}</tr>
+          </thead>
+          <tbody>
+            {dataRows.map((row, ri) => (
+              <tr key={ri} style={{ backgroundColor: ri % 2 === 1 ? '#f8fafc' : '#fff' }}>
+                {parseRow(row).map((cell, ci) => (
+                  <td key={ci} style={{ border: '1px solid #cbd5e1', padding: '4px 8px', color: '#0f172a' }}>{cell}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+    tableLines = [];
+    inTable = false;
+  };
+
+  const flushList = (key: string) => {
+    if (!listLines.length) return;
+    blocks.push(
+      <ul key={key} style={{ paddingLeft: '20px', margin: '6px 0' }}>
+        {listLines.map(({ line, idx }) => renderMdLine(line, idx))}
+      </ul>
+    );
+    listLines = [];
+    inList = false;
+  };
+
+  section.lines.forEach((line, idx) => {
+    if (line.startsWith('|')) {
+      if (inList) flushList(`list-${idx}`);
+      inTable = true;
+      tableLines.push(line);
+    } else if (line.startsWith('- ') || line.startsWith('* ') || line.match(/^\d+\. /)) {
+      if (inTable) flushTable(`tbl-${idx}`);
+      inList = true;
+      listLines.push({ line, idx });
+    } else {
+      if (inTable) flushTable(`tbl-${idx}`);
+      if (inList) flushList(`list-${idx}`);
+      const node = renderMdLine(line, idx);
+      if (node !== null) blocks.push(node);
+    }
+  });
+  if (inTable) flushTable('tbl-end');
+  if (inList) flushList('list-end');
+
+  return blocks;
+}
+
+export default function ExportReports(_props: ExportReportsProps) {
   const allChapterIds = useMemo(() => CAPSTONE_REPORT.chapters.map((c) => c.id), []);
   const [selectedIds, setSelectedIds] = useState<string[]>(allChapterIds);
 
-  // Export status
+  // Which report to view: executive (default) or final (Word doc)
+  const [viewReport, setViewReport] = useState<'executive' | 'final'>('executive');
+
+  // Executive report section filter
+  const [selectedSectionIds, setSelectedSectionIds] = useState<string[]>(
+    ALL_EXEC_SECTIONS.map((s) => s.id)
+  );
+
   const [isExporting, setIsExporting] = useState<boolean>(false);
+  const [showModal, setShowModal] = useState<boolean>(false);
   const [showSuccessToast, setShowSuccessToast] = useState<string | null>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
-
   const totalPages = PAGINATED_REPORT_DATA.totalPages;
   const chaptersNav = PAGINATED_REPORT_DATA.chapters;
 
-  // Chapter toggle helpers
-  const handleSelectAll = () => setSelectedIds(allChapterIds);
-  const handleClearSelection = () => setSelectedIds([]);
+  const toggleSection = (id: string) =>
+    setSelectedSectionIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
 
-  const toggleChapter = (id: string) => {
+  const visibleSections = useMemo(
+    () => ALL_EXEC_SECTIONS.filter((s) => selectedSectionIds.includes(s.id) && s.level !== 1),
+    [selectedSectionIds]
+  );
+
+  const handleSelectAll = () => {
+    if (viewReport === 'executive') setSelectedSectionIds(ALL_EXEC_SECTIONS.map((s) => s.id));
+    else setSelectedIds(allChapterIds);
+  };
+  const handleClearSelection = () => {
+    if (viewReport === 'executive') setSelectedSectionIds([]);
+    else setSelectedIds([]);
+  };
+  const toggleChapter = (id: string) =>
     setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
     );
-  };
 
-  // Selected chapters list
   const selectedChapters = useMemo(
     () => CAPSTONE_REPORT.chapters.filter((c) => selectedIds.includes(c.id)),
     [selectedIds]
   );
 
-  // Filter paginated pages according to selected chapters
   const visiblePages = useMemo(() => {
-    if (selectedIds.length === allChapterIds.length) {
-      return PAGINATED_REPORT_DATA.pages;
-    }
+    if (selectedIds.length === allChapterIds.length) return PAGINATED_REPORT_DATA.pages;
     return PAGINATED_REPORT_DATA.pages.filter((p) => {
       if (p.isCover) return true;
       const chName = p.chapter.toLowerCase();
@@ -85,159 +531,150 @@ export default function ExportReports({
     });
   }, [selectedIds, allChapterIds.length, selectedChapters]);
 
-  // Compile Markdown for export
-  const compiledMarkdown = useMemo(() => {
-    const meta = CAPSTONE_REPORT.metadata;
-    let text = '';
-    text += `# ${meta.title}\n\n`;
-    text += `**${meta.subtitle}**\n\n`;
-    text += `| Academic Metadata | Specification |\n|---|---|\n`;
-    text += `| **Institution** | ${meta.institution} |\n`;
-    text += `| **Course & Program** | ${meta.course} · ${meta.program} |\n`;
-    text += `| **Faculty Supervisor** | ${meta.supervisor} |\n`;
-    text += `| **Group & Cohort** | ${meta.group} |\n`;
-    text += `| **Authors & Student IDs** | ${meta.authors.map((a) => `${a.name} (${a.id})`).join(', ')} |\n`;
-    text += `| **Submission Date** | ${meta.date} |\n`;
-    text += `| **Audited Cohort** | ${cleanedCount ? fmtK(cleanedCount) : '175.8M'} CIHI NACRS Records |\n\n`;
-    text += `---\n\n`;
-    selectedChapters.forEach((chapter) => {
-      text += `${chapter.markdown}\n\n---\n\n`;
-    });
-    text += `*End of Capstone Final Report Dossier · Group 5 · University of Niagara Falls Canada*\n`;
-    return text;
-  }, [selectedChapters, cleanedCount]);
+  // ── Helpers to build exportable content ────────────────────────────────────
+  const buildDocxHtml = (title: string, mdContent: string) => {
+    const lines = mdContent.split('\n');
+    const body = lines
+      .map((line) => {
+        if (line.startsWith('### ')) return `<h3>${line.slice(4)}</h3>`;
+        if (line.startsWith('## ')) return `<h2>${line.slice(3)}</h2>`;
+        if (line.startsWith('# ')) return `<h1>${line.slice(2)}</h1>`;
+        if (line.startsWith('---')) return `<hr/>`;
+        if (line.trim() === '') return `<br/>`;
+        // table row
+        if (line.startsWith('|')) {
+          const cells = line.split('|').slice(1, -1).map((c) => c.trim());
+          return `<tr>${cells.map((c) => `<td>${c}</td>`).join('')}</tr>`;
+        }
+        line = line.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+        line = line.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        line = line.replace(/\*(.+?)\*/g, '<em>$1</em>');
+        return `<p>${line}</p>`;
+      })
+      .join('');
 
-  // Export handler
-  const handleExportReport = () => {
-    if (selectedFormat === 'PDF') {
-      // Print-to-PDF via browser dialog
-      const printWindow = window.open('', '_blank');
-      if (!printWindow) {
-        setShowSuccessToast('Pop-up blocked. Please allow pop-ups and try again.');
-        setTimeout(() => setShowSuccessToast(null), 4000);
-        return;
-      }
-      const sheetEl = document.getElementById('report-preview-sheet');
-      const htmlContent = sheetEl ? sheetEl.innerHTML : '';
-      printWindow.document.write(`<!DOCTYPE html><html><head>
-        <meta charset="utf-8"/>
-        <title>${reportName}</title>
-        <style>
-          * { margin: 0; padding: 0; box-sizing: border-box; }
-          body { background: #fff; font-family: "Times New Roman", Times, serif; }
-          .academic-page-sheet {
-            page-break-after: always; break-after: page;
-            box-shadow: none !important; border: none !important;
-            margin: 0 auto; width: 816px;
-          }
-          @media print {
-            @page { size: letter; margin: 0; }
-            .academic-page-sheet { page-break-after: always; }
-          }
-        </style>
-      </head><body>${htmlContent}</body></html>`);
-      printWindow.document.close();
-      setTimeout(() => {
-        printWindow.print();
-      }, 500);
-      setShowSuccessToast("Browser print dialog opened! Choose 'Save as PDF'.");
-      setTimeout(() => setShowSuccessToast(null), 4000);
-      return;
-    }
+    return `<!DOCTYPE html>
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+      xmlns:w="urn:schemas-microsoft-com:office:word"
+      xmlns="http://www.w3.org/TR/REC-html40">
+<head><meta charset="utf-8"/><title>${title}</title>
+<!--[if gte mso 9]><xml><w:WordDocument>
+<w:View>Print</w:View><w:Zoom>100</w:Zoom>
+</w:WordDocument></xml><![endif]-->
+<style>
+  body { font-family:"Times New Roman",Times,serif; font-size:12pt; color:#000; margin:2.54cm; line-height:1.5; }
+  h1 { font-size:18pt; text-align:center; page-break-before:always; }
+  h1:first-of-type { page-break-before:avoid; }
+  h2 { font-size:14pt; }
+  h3 { font-size:12pt; }
+  p  { text-align:justify; margin-bottom:6pt; }
+  table { border-collapse:collapse; width:100%; margin:8pt 0; }
+  td,th { border:1px solid #000; padding:4pt 6pt; font-size:10pt; }
+  th { font-weight:bold; background:#f0f0f0; }
+  @page { size:8.5in 11in; margin:1in; }
+</style></head><body>${body}</body></html>`;
+  };
 
+  const triggerDownload = (content: string, filename: string, mimeType: string) => {
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleDownload = (reportType: ReportType, fileType: FileType) => {
     setIsExporting(true);
 
     setTimeout(() => {
-      let blob: Blob;
+      const base = 'UNF_Capstone_Group5';
 
-      if (selectedFormat === 'Markdown') {
-        blob = new Blob([compiledMarkdown], { type: 'text/markdown;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `${reportName}.md`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-        setIsExporting(false);
-        setShowSuccessToast(`Exported '${reportName}.md' successfully!`);
-        setTimeout(() => setShowSuccessToast(null), 4000);
-        return;
+      const doDownload = (title: string, md: string, suffix: string) => {
+        if (fileType === 'pdf') {
+          // Open print window
+          const pw = window.open('', '_blank');
+          if (pw) {
+            pw.document.write(buildDocxHtml(title, md).replace(
+              '<body>', '<body style="margin:2cm; font-family:\'Times New Roman\',serif;">'
+            ));
+            pw.document.close();
+            setTimeout(() => pw.print(), 500);
+          }
+          setShowSuccessToast(`Print dialog opened for ${suffix} — save as PDF.`);
+        } else {
+          triggerDownload(
+            buildDocxHtml(title, md),
+            `${base}_${suffix}.docx`,
+            'application/msword'
+          );
+          setShowSuccessToast(`Downloaded ${base}_${suffix}.docx`);
+        }
+      };
+
+      // Build Final Report MD from paginated data
+      const finalMd = PAGINATED_REPORT_DATA.pages
+        .map((p) =>
+          p.elements
+            .filter((el) => el.type === 'p')
+            .map((el: any) => el.text)
+            .join('\n\n')
+        )
+        .join('\n\n---\n\n');
+
+      if (reportType === 'final') {
+        doDownload(
+          'Final Report — Length of Stay & Resource Utilization in Canadian Hospitals',
+          finalMd,
+          'Final_Report'
+        );
+      } else if (reportType === 'executive') {
+        doDownload(
+          'Executive Report — Length of Stay & Resource Utilization in Canadian Hospitals',
+          EXECUTIVE_REPORT_MD,
+          'Executive_Report'
+        );
+      } else {
+        // Both — trigger sequentially
+        doDownload(
+          'Final Report — Length of Stay & Resource Utilization in Canadian Hospitals',
+          finalMd,
+          'Final_Report'
+        );
+        setTimeout(() => {
+          doDownload(
+            'Executive Report — Length of Stay & Resource Utilization in Canadian Hospitals',
+            EXECUTIVE_REPORT_MD,
+            'Executive_Report'
+          );
+        }, 800);
       }
 
-      if (selectedFormat === 'DOCX') {
-        // Generate a basic RTF/DOCX-like HTML-wrapped file
-        const meta = CAPSTONE_REPORT.metadata;
-        const docHtml = `<!DOCTYPE html><html xmlns:o="urn:schemas-microsoft-com:office:office"
-          xmlns:w="urn:schemas-microsoft-com:office:word"
-          xmlns="http://www.w3.org/TR/REC-html40">
-          <head><meta charset="utf-8"/>
-          <title>${reportName}</title>
-          <!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View>
-          <w:Zoom>100</w:Zoom><w:DoNotOptimizeForBrowser/></w:WordDocument></xml><![endif]-->
-          <style>
-            body { font-family: "Times New Roman", Times, serif; font-size: 12pt; color: #000; margin: 2.54cm; }
-            h1 { font-size: 18pt; font-weight: bold; text-align: center; page-break-before: always; }
-            h2 { font-size: 14pt; font-weight: bold; }
-            h3 { font-size: 12pt; font-weight: bold; }
-            p { text-align: justify; line-height: 1.5; margin-bottom: 6pt; }
-            table { border-collapse: collapse; width: 100%; }
-            td, th { border: 1px solid #000; padding: 4pt 6pt; font-size: 10pt; }
-            th { font-weight: bold; background: #f0f0f0; }
-            @page { size: 8.5in 11in; margin: 1in; }
-          </style></head><body>
-          <h1 style="page-break-before:avoid;">${meta.title}</h1>
-          <p style="text-align:center;"><em>${meta.subtitle}</em></p>
-          <br/>
-          <table><tr><th>Field</th><th>Value</th></tr>
-          <tr><td>Institution</td><td>${meta.institution}</td></tr>
-          <tr><td>Course & Program</td><td>${meta.course} · ${meta.program}</td></tr>
-          <tr><td>Supervisor</td><td>${meta.supervisor}</td></tr>
-          <tr><td>Group</td><td>${meta.group}</td></tr>
-          <tr><td>Authors</td><td>${meta.authors.map((a) => `${a.name} (${a.id})`).join(', ')}</td></tr>
-          <tr><td>Date</td><td>${meta.date}</td></tr>
-          </table>
-          ${selectedChapters.map((ch) => {
-            // Convert markdown to simple HTML
-            const lines = ch.markdown.split('\n');
-            return lines.map((line) => {
-              if (line.startsWith('### ')) return `<h3>${line.slice(4)}</h3>`;
-              if (line.startsWith('## ')) return `<h2>${line.slice(3)}</h2>`;
-              if (line.startsWith('# ')) return `<h1>${line.slice(2)}</h1>`;
-              if (line.startsWith('---')) return `<hr/>`;
-              if (line.trim() === '') return `<br/>`;
-              // Bold/italic
-              line = line.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
-              line = line.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-              line = line.replace(/\*(.+?)\*/g, '<em>$1</em>');
-              return `<p>${line}</p>`;
-            }).join('');
-          }).join('<br/>')}
-          </body></html>`;
-
-        blob = new Blob([docHtml], { type: 'application/msword' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `${reportName}.docx`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-        setIsExporting(false);
-        setShowSuccessToast(`Exported '${reportName}.docx' successfully!`);
-        setTimeout(() => setShowSuccessToast(null), 4000);
-      }
-    }, 600);
+      setIsExporting(false);
+      setShowModal(false);
+      setTimeout(() => setShowSuccessToast(null), 5000);
+    }, 400);
   };
 
   return (
     <div className="space-y-6 pb-12 animate-fade-in">
-      {/* Toast Notification */}
+
+      {/* Download Modal */}
+      {showModal && (
+        <DownloadModal
+          onClose={() => setShowModal(false)}
+          onDownload={handleDownload}
+          isExporting={isExporting}
+        />
+      )}
+
+      {/* Toast */}
       {showSuccessToast && (
-        <div className="fixed bottom-6 right-6 z-50 bg-emerald-600 text-white px-5 py-3 rounded-xl shadow-xl flex items-center gap-3 animate-slide-up border border-emerald-500">
-          <CheckCircle2 size={18} className="text-white shrink-0" />
+        <div className="fixed bottom-6 right-6 z-50 bg-emerald-600 text-white px-5 py-3 rounded-xl shadow-xl flex items-center gap-3 border border-emerald-500">
+          <CheckCircle2 size={18} className="shrink-0" />
           <span className="text-sm font-semibold">{showSuccessToast}</span>
         </div>
       )}
@@ -257,110 +694,47 @@ export default function ExportReports({
       />
 
       {/* Academic Info Banner */}
-      <div className="p-3.5 px-4 rounded-xl border border-blue-900/30 bg-blue-950/20 text-slate-200 shadow-sm">
+      <div className="p-3.5 px-4 rounded-xl border border-blue-900/30 bg-blue-950/20 shadow-sm">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-2 text-xs">
-          <div className="flex items-center gap-2 p-2 rounded-lg bg-blue-900/30 border border-blue-800/40">
-            <Building2 size={15} className="text-blue-400 shrink-0" />
-            <div className="truncate">
-              <span className="text-slate-400 text-[10px] block">Institution</span>
-              <span className="font-bold text-white">University of Niagara Falls Canada</span>
+          {[
+            { icon: <Building2 size={15} className="text-blue-400" />, label: 'Institution', value: 'University of Niagara Falls Canada', cls: 'text-white' },
+            { icon: <GraduationCap size={15} className="text-blue-400" />, label: 'Degree & Course', value: 'MDA · DAMO 699', cls: 'text-white' },
+            { icon: <User size={15} className="text-blue-400" />, label: 'Research Team', value: 'Group 5 (Rajbharath, Sufyaan, Amit)', cls: 'text-white' },
+            { icon: <ShieldCheck size={15} className="text-amber-400" />, label: 'Supervisor', value: 'Dr. Bilal El Toufaili', cls: 'text-amber-300' },
+          ].map((item, i) => (
+            <div key={i} className="flex items-center gap-2 p-2 rounded-lg bg-blue-900/30 border border-blue-800/40">
+              {item.icon}
+              <div className="truncate">
+                <span className="text-slate-400 text-[10px] block">{item.label}</span>
+                <span className={`font-bold ${item.cls}`}>{item.value}</span>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center gap-2 p-2 rounded-lg bg-blue-900/30 border border-blue-800/40">
-            <GraduationCap size={15} className="text-blue-400 shrink-0" />
-            <div className="truncate">
-              <span className="text-slate-400 text-[10px] block">Degree & Course</span>
-              <span className="font-bold text-white">MDA · DAMO 699</span>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 p-2 rounded-lg bg-blue-900/30 border border-blue-800/40">
-            <User size={15} className="text-blue-400 shrink-0" />
-            <div className="truncate">
-              <span className="text-slate-400 text-[10px] block">Research Team</span>
-              <span className="font-bold text-white">Group 5 (Rajbharath, Sufyaan, Amit)</span>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 p-2 rounded-lg bg-blue-900/30 border border-blue-800/40">
-            <ShieldCheck size={15} className="text-amber-400 shrink-0" />
-            <div className="truncate">
-              <span className="text-slate-400 text-[10px] block">Supervisor</span>
-              <span className="font-bold text-amber-300">Dr. Bilal El Toufaili</span>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
 
-      {/* Main Workspace Layout */}
+      {/* Main Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-        {/* ─────────── Left Panel: Config & Chapter Filter ─────────── */}
+        {/* Left Panel */}
         <div className="lg:col-span-3 space-y-4">
 
-          {/* Export Configuration */}
-          <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0f172a] shadow-sm space-y-4">
+          {/* Download Button */}
+          <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0f172a] shadow-sm space-y-3">
             <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
               <Sliders size={15} className="text-blue-500" />
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
-                Export Settings
-              </h3>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">Export</h3>
             </div>
-
-            {/* File name */}
-            <div className="space-y-1.5">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                File Name
-              </label>
-              <input
-                type="text"
-                value={reportName}
-                onChange={(e) => setReportName(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-[#131f37] border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white font-mono focus:outline-none focus:border-blue-500"
-              />
-            </div>
-
-            {/* Format selector — DOCX / PDF / MD only */}
-            <div className="space-y-1.5">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                Export Format
-              </label>
-              <div className="grid grid-cols-3 gap-1.5">
-                {(['PDF', 'DOCX', 'Markdown'] as ExportFormat[]).map((fmt) => (
-                  <button
-                    key={fmt}
-                    type="button"
-                    onClick={() => setSelectedFormat(fmt)}
-                    className={`py-2 rounded-xl text-[11px] font-bold border transition cursor-pointer ${
-                      selectedFormat === fmt
-                        ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
-                        : 'bg-slate-50 dark:bg-[#131f37] text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-blue-400'
-                    }`}
-                  >
-                    {fmt === 'Markdown' ? 'MD' : fmt}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Single Download As button */}
             <button
-              onClick={handleExportReport}
-              disabled={isExporting || selectedIds.length === 0}
-              className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm hover:shadow-md transition cursor-pointer disabled:opacity-50"
+              onClick={() => setShowModal(true)}
+              className="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-sm hover:shadow-md transition cursor-pointer"
             >
-              {isExporting ? (
-                <>
-                  <RefreshCw size={13} className="animate-spin" />
-                  <span>Preparing…</span>
-                </>
-              ) : (
-                <>
-                  <Download size={13} />
-                  <span>
-                    Download as {selectedFormat === 'Markdown' ? '.md' : `.${selectedFormat.toLowerCase()}`}
-                  </span>
-                </>
-              )}
+              <Download size={15} />
+              <span>Download as…</span>
             </button>
+            <p className="text-[10px] text-slate-400 dark:text-slate-500 text-center leading-relaxed">
+              Choose between Final Report, Executive Report, or Both · PDF or DOCX
+            </p>
           </div>
 
           {/* Chapter Filter */}
@@ -368,171 +742,267 @@ export default function ExportReports({
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <div className="flex items-center gap-2">
                 <Filter size={14} className="text-blue-500" />
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
-                  Chapter Filter
-                </h3>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">Chapter Filter</h3>
               </div>
               <span className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800">
                 {selectedIds.length}/{allChapterIds.length}
               </span>
             </div>
 
-            {/* Quick select */}
             <div className="flex gap-1.5">
-              <button
-                type="button"
-                onClick={handleSelectAll}
-                className="flex-1 py-1 rounded-lg text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-blue-50 hover:text-blue-700 dark:hover:bg-blue-950/40 dark:hover:text-blue-400 transition cursor-pointer"
-              >
+              <button type="button" onClick={handleSelectAll}
+                className="flex-1 py-1 rounded-lg text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-blue-50 hover:text-blue-700 transition cursor-pointer">
                 All
               </button>
-              <button
-                type="button"
-                onClick={handleClearSelection}
-                className="flex-1 py-1 rounded-lg text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30 dark:hover:text-red-400 transition cursor-pointer"
-              >
+              <button type="button" onClick={handleClearSelection}
+                className="flex-1 py-1 rounded-lg text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-red-50 hover:text-red-600 transition cursor-pointer">
                 None
               </button>
             </div>
 
-            {/* Chapter list */}
-            <div className="space-y-1 max-h-[400px] overflow-y-auto pr-0.5">
-              {CAPSTONE_REPORT.chapters.map((chapter) => {
-                const isChecked = selectedIds.includes(chapter.id);
-                const matchNav = chaptersNav.find(
-                  (cn) =>
-                    chapter.title.toLowerCase().includes(cn.name.toLowerCase()) ||
-                    cn.name.toLowerCase().includes(chapter.shortTitle.toLowerCase())
-                );
-
-                return (
-                  <div
-                    key={chapter.id}
-                    onClick={() => toggleChapter(chapter.id)}
-                    className={`flex items-center justify-between p-2 rounded-lg text-xs transition cursor-pointer ${
-                      isChecked
-                        ? 'bg-blue-50 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-900/60'
-                        : 'bg-transparent border border-transparent hover:border-slate-200 dark:hover:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900/30'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2 min-w-0">
-                      <input
-                        type="checkbox"
-                        checked={isChecked}
-                        onChange={() => {}}
-                        className="rounded text-blue-600 focus:ring-0 cursor-pointer shrink-0"
-                      />
-                      <div className="truncate">
-                        <div className="font-semibold text-slate-900 dark:text-white truncate text-[11px]">
-                          <span className="text-[9px] font-mono font-bold uppercase text-blue-600 dark:text-blue-400 mr-1">
-                            {chapter.id === 'exec-summary'
-                              ? 'EXEC'
-                              : chapter.id.startsWith('app')
-                              ? chapter.id.toUpperCase()
-                              : `CH${chapter.number}`}
-                          </span>
-                          {chapter.shortTitle}
-                        </div>
-                        {matchNav && (
-                          <div className="text-[10px] text-slate-400 font-mono">
-                            p. {matchNav.startPage}
-                          </div>
-                        )}
-                      </div>
+            <div className="space-y-1 max-h-[420px] overflow-y-auto pr-0.5">
+              {viewReport === 'executive' ? (
+                /* Executive Report section filter */
+                ALL_EXEC_SECTIONS.filter((s) => s.level !== 1).map((section) => {
+                  const isChecked = selectedSectionIds.includes(section.id);
+                  return (
+                    <div
+                      key={section.id}
+                      onClick={() => toggleSection(section.id)}
+                      className={`flex items-center gap-2 p-2 rounded-lg text-xs transition cursor-pointer ${
+                        isChecked
+                          ? 'bg-blue-50 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-900/60'
+                          : 'border border-transparent hover:border-slate-200 dark:hover:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900/30'
+                      }`}
+                    >
+                      <input type="checkbox" checked={isChecked} onChange={() => {}}
+                        className="rounded text-blue-600 focus:ring-0 cursor-pointer shrink-0" />
+                      <span
+                        className={`truncate font-semibold text-[11px] ${
+                          section.level === 1
+                            ? 'text-slate-900 dark:text-white'
+                            : 'text-slate-600 dark:text-slate-400 pl-1'
+                        }`}
+                      >
+                        {section.level === 2 && <span className="text-[9px] mr-1 opacity-50">└</span>}
+                        {section.heading.length > 42 ? section.heading.slice(0, 42) + '…' : section.heading}
+                      </span>
                     </div>
-                    {matchNav && (
-                      <ChevronRight size={12} className="text-slate-400 shrink-0 ml-1" />
-                    )}
-                  </div>
-                );
-              })}
+                  );
+                })
+              ) : (
+                /* Final Report chapter filter */
+                CAPSTONE_REPORT.chapters.map((chapter) => {
+                  const isChecked = selectedIds.includes(chapter.id);
+                  const matchNav = chaptersNav.find(
+                    (cn) =>
+                      chapter.title.toLowerCase().includes(cn.name.toLowerCase()) ||
+                      cn.name.toLowerCase().includes(chapter.shortTitle.toLowerCase())
+                  );
+                  return (
+                    <div
+                      key={chapter.id}
+                      onClick={() => toggleChapter(chapter.id)}
+                      className={`flex items-center justify-between p-2 rounded-lg text-xs transition cursor-pointer ${
+                        isChecked
+                          ? 'bg-blue-50 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-900/60'
+                          : 'border border-transparent hover:border-slate-200 dark:hover:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900/30'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <input type="checkbox" checked={isChecked} onChange={() => {}}
+                          className="rounded text-blue-600 focus:ring-0 cursor-pointer shrink-0" />
+                        <div className="truncate">
+                          <div className="font-semibold text-slate-900 dark:text-white truncate text-[11px]">
+                            <span className="text-[9px] font-mono font-bold uppercase text-blue-600 dark:text-blue-400 mr-1">
+                              {chapter.id === 'exec-summary' ? 'EXEC'
+                                : chapter.id.startsWith('app') ? chapter.id.toUpperCase()
+                                : `CH${chapter.number}`}
+                            </span>
+                            {chapter.shortTitle}
+                          </div>
+                          {matchNav && (
+                            <div className="text-[10px] text-slate-400 font-mono">p. {matchNav.startPage}</div>
+                          )}
+                        </div>
+                      </div>
+                      {matchNav && <ChevronRight size={12} className="text-slate-400 shrink-0 ml-1" />}
+                    </div>
+                  );
+                })
+              )}
             </div>
 
-            {/* Academic integrity note */}
-            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 text-[10px] text-slate-400 dark:text-slate-500 flex items-start gap-1.5">
+            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 text-[10px] text-slate-400 flex items-start gap-1.5">
               <ShieldCheck size={11} className="text-emerald-500 shrink-0 mt-0.5" />
-              <span>
-                DAMO 699 Final Report · University of Niagara Falls Canada · Supervisor: Dr. Bilal El Toufaili
-              </span>
+              <span>DAMO 699 · University of Niagara Falls Canada · Dr. Bilal El Toufaili</span>
             </div>
           </div>
         </div>
 
-        {/* ─────────── Right Panel: Continuous Document Pages ─────────── */}
+        {/* Right Panel */}
         <div className="lg:col-span-9 space-y-3">
 
-          {/* Toolbar: page count info */}
+          {/* Toolbar */}
           <div className="p-3 rounded-2xl border border-slate-200/90 dark:border-slate-800/80 bg-white dark:bg-[#0f172a] shadow-sm flex flex-wrap items-center justify-between gap-3 text-xs">
-            <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
-              <BookOpen size={14} className="text-blue-500" />
-              <span className="font-semibold text-slate-800 dark:text-white">
-                {visiblePages.length}
-              </span>
-              <span>of {totalPages} pages displayed</span>
-              {selectedIds.length < allChapterIds.length && (
-                <span className="ml-1 px-2 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-full font-semibold text-[10px] border border-amber-200 dark:border-amber-800">
-                  {allChapterIds.length - selectedIds.length} chapter(s) filtered out
-                </span>
-              )}
+            {/* View toggle */}
+            <div className="flex items-center bg-slate-100 dark:bg-[#131f37] p-1 rounded-xl border border-slate-200 dark:border-slate-700/80">
+              <button
+                type="button"
+                onClick={() => setViewReport('executive')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer ${
+                  viewReport === 'executive'
+                    ? 'bg-blue-600 text-white shadow-xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                <FileText size={13} />
+                <span>Executive Report</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewReport('final')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer ${
+                  viewReport === 'final'
+                    ? 'bg-blue-600 text-white shadow-xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                <BookOpen size={13} />
+                <span>Final Report</span>
+              </button>
             </div>
-            <div className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400">
-              <FileText size={12} />
-              <span>{selectedChapters.reduce((s, c) => s + (c.wordCount || 0), 0).toLocaleString()} words</span>
+
+            <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+              {viewReport === 'executive' ? (
+                <span>{visibleSections.length} of {ALL_EXEC_SECTIONS.length} sections</span>
+              ) : (
+                <><span className="font-semibold text-slate-800 dark:text-white">{visiblePages.length}</span><span> of {totalPages} pages</span></>
+              )}
             </div>
           </div>
 
-          {/* Reading Canvas — Continuous Sheets */}
+          {/* Canvas */}
           <div
             ref={containerRef}
             className="rounded-2xl border border-slate-200/90 dark:border-slate-800/80 bg-[#d1d5db] dark:bg-[#070b16] p-6 md:p-10 overflow-y-auto flex flex-col items-center shadow-inner select-text"
             style={{ minHeight: '860px', maxHeight: '90vh' }}
           >
-            {/* Print target */}
             <div id="report-preview-sheet" className="w-full flex flex-col items-center">
-
-              {/* Print styles */}
               <style>{`
                 @media print {
                   body * { visibility: hidden !important; }
                   #report-preview-sheet, #report-preview-sheet * { visibility: visible !important; }
-                  #report-preview-sheet {
-                    position: absolute !important;
-                    left: 0 !important; top: 0 !important;
-                    width: 100% !important;
-                    margin: 0 !important; padding: 0 !important;
-                    background: #fff !important;
-                  }
-                  .academic-page-sheet {
-                    page-break-after: always !important;
-                    break-after: page !important;
-                    box-shadow: none !important;
-                    border: none !important;
-                    margin: 0 auto !important;
-                    width: 100% !important;
-                    min-height: 100vh !important;
-                  }
+                  #report-preview-sheet { position:absolute !important; left:0 !important; top:0 !important; width:100% !important; margin:0 !important; padding:0 !important; background:#fff !important; }
+                  .academic-page-sheet { page-break-after:always !important; break-after:page !important; box-shadow:none !important; border:none !important; margin:0 auto !important; width:100% !important; }
                 }
               `}</style>
 
-              {/* Continuous pages stack */}
-              <div className="space-y-8 py-2 w-full flex flex-col items-center">
-                {visiblePages.length === 0 ? (
-                  <div className="text-slate-400 dark:text-slate-600 text-sm py-20 text-center">
-                    <Filter size={32} className="mx-auto mb-3 opacity-40" />
-                    <p>No chapters selected. Use the filter panel to select chapters.</p>
+              {viewReport === 'executive' ? (
+                /* ── Executive Report View ── */
+                <div
+                  className="w-full"
+                  style={{ maxWidth: '816px' }}
+                >
+                  {/* Cover sheet */}
+                  <div
+                    className="bg-white mx-auto mb-8 shadow-2xl border border-slate-300/90"
+                    style={{
+                      width: '816px', minHeight: '200px',
+                      padding: '52px 58px 40px',
+                      fontFamily: '"Times New Roman", Times, Georgia, serif',
+                      color: '#0f172a',
+                    }}
+                  >
+                    <div style={{ textAlign: 'center', borderBottom: '2px solid #0f172a', paddingBottom: '24px', marginBottom: '24px' }}>
+                      <div style={{ fontSize: '11px', fontFamily: 'sans-serif', fontWeight: 'bold', letterSpacing: '2px', textTransform: 'uppercase', color: '#1d4ed8', marginBottom: '6px' }}>
+                        University of Niagara Falls Canada
+                      </div>
+                      <div style={{ fontSize: '10px', fontFamily: 'sans-serif', textTransform: 'uppercase', letterSpacing: '1px', color: '#64748b' }}>
+                        Master of Data Analytics · DAMO 699 – Capstone Project
+                      </div>
+                    </div>
+                    <h1 style={{ textAlign: 'center', fontSize: '20px', fontWeight: 'extrabold', textTransform: 'uppercase', color: '#0f172a', lineHeight: 1.3, marginBottom: '10px' }}>
+                      Explanatory and Predictive Analytics of Emergency Department Length of Stay and Resource Utilization Trends in Canadian Hospitals
+                    </h1>
+                    <p style={{ textAlign: 'center', fontStyle: 'italic', fontSize: '12px', color: '#334155', marginBottom: '24px' }}>
+                      A Frequency-Weighted Biostatistical and Time-Series Analysis of 175.8 Million CIHI NACRS ED Encounters (2003–2022)
+                    </p>
+                    <div style={{ borderTop: '2px solid #0f172a', paddingTop: '16px', textAlign: 'center', fontFamily: 'sans-serif', fontSize: '11px', color: '#475569' }}>
+                      <div style={{ marginBottom: '4px' }}><strong>Group 5:</strong> Rajbharath P (NF1016766) · Sufyaan Khan Mohammed (NF1017047) · Amit Raj Dev (NF1021076)</div>
+                      <div><strong>Supervisor:</strong> Dr. Bilal El Toufaili &nbsp;|&nbsp; September 2026</div>
+                    </div>
                   </div>
-                ) : (
-                  visiblePages.map((page) => (
-                    <AcademicPageSheet
-                      key={page.pageNumber}
-                      page={page}
-                      totalPages={totalPages}
-                      zoom={100}
-                      searchQuery=""
-                    />
-                  ))
-                )}
-              </div>
+
+                  {/* Sections */}
+                  {visibleSections.length === 0 ? (
+                    <div className="text-slate-400 dark:text-slate-600 text-sm py-20 text-center">
+                      <Filter size={32} className="mx-auto mb-3 opacity-40" />
+                      <p>No sections selected.</p>
+                    </div>
+                  ) : (
+                    visibleSections.map((section) => (
+                      <div
+                        key={section.id}
+                        id={`exec-section-${section.id}`}
+                        className="bg-white mx-auto mb-6 shadow-2xl border border-slate-300/90"
+                        style={{
+                          width: '816px',
+                          padding: '44px 58px',
+                          fontFamily: '"Times New Roman", Times, Georgia, serif',
+                          color: '#0f172a',
+                        }}
+                      >
+                        {/* Running header */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px', borderBottom: '1px solid #cbd5e1', paddingBottom: '8px', marginBottom: '20px', fontFamily: 'sans-serif', userSelect: 'none' }}>
+                          <span>University of Niagara Falls Canada · Master of Data Analytics | DAMO 699</span>
+                          <span style={{ color: '#0f172a', fontWeight: 600 }}>Executive Report</span>
+                        </div>
+
+                        {/* Section heading */}
+                        {section.level === 1 ? (
+                          <h1 style={{ fontSize: '18px', fontWeight: 'bold', color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '16px', paddingBottom: '8px', borderBottom: '2px solid #0f172a', fontFamily: 'Georgia, serif' }}>
+                            {section.heading}
+                          </h1>
+                        ) : (
+                          <h2 style={{ fontSize: '15px', fontWeight: 'bold', color: '#0f172a', marginBottom: '12px', paddingBottom: '6px', borderBottom: '1px solid #e2e8f0', fontFamily: 'Georgia, serif' }}>
+                            {section.heading}
+                          </h2>
+                        )}
+
+                        {/* Section content */}
+                        <div>{renderSection(section)}</div>
+
+                        {/* Running footer */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#64748b', borderTop: '1px solid #cbd5e1', paddingTop: '8px', marginTop: '20px', fontFamily: 'sans-serif', userSelect: 'none' }}>
+                          <span>Length of Stay & Resource Utilization in Canadian Hospitals (CIHI NACRS)</span>
+                          <span style={{ color: '#0f172a', fontWeight: 600, fontFamily: 'monospace' }}>Executive Report · Group 5</span>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              ) : (
+                /* ── Final Report View (Word doc pages) ── */
+                <div className="space-y-8 py-2 w-full flex flex-col items-center">
+                  {visiblePages.length === 0 ? (
+                    <div className="text-slate-400 dark:text-slate-600 text-sm py-20 text-center">
+                      <Filter size={32} className="mx-auto mb-3 opacity-40" />
+                      <p>No chapters selected.</p>
+                    </div>
+                  ) : (
+                    visiblePages.map((page) => (
+                      <AcademicPageSheet
+                        key={page.pageNumber}
+                        page={page}
+                        totalPages={totalPages}
+                        zoom={100}
+                        searchQuery=""
+                      />
+                    ))
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
