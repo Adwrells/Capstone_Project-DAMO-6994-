@@ -31,14 +31,16 @@ export default function AboutProject({ onReset, isDarkMode = true, onBeginPrep }
 
       {/* ── 1. PAGE HEADER & EXECUTIVE HERO ─────────────────────────────────── */}
       <PageHeader
+        align="center"
+        badgeIcon={<Sparkles size={12} className="text-blue-500 dark:text-blue-400" />}
         category="EXECUTIVE RESEARCH OVERVIEW · CAPSTONE PLATFORM"
         title="Canadian Emergency Department Analytics Platform"
         subtitle="Explanatory biostatistical modeling of ED Length of Stay (LOS) and longitudinal hospital resource burden using aggregate CIHI NACRS administrative data (2003–2021)."
         contextPills={[
-          { label: 'Program', value: 'Master of Data Analytics', variant: 'blue' },
-          { label: 'Source', value: 'CIHI NACRS Aggregate', variant: 'default' },
-          { label: 'Time Span', value: '19 Fiscal Years', variant: 'default' },
-          { label: 'Quality Audit', value: '100% Validated', variant: 'success' },
+          { label: 'Program', value: 'Master of Data Analytics', icon: <GraduationCap size={13} className="text-blue-500 dark:text-blue-400" />, variant: 'blue' },
+          { label: 'Source', value: 'CIHI NACRS Aggregate', icon: <Database size={13} className="text-slate-500 dark:text-slate-400" />, variant: 'default' },
+          { label: 'Time Span', value: '19 Fiscal Years', icon: <Calendar size={13} className="text-amber-500 dark:text-amber-400" />, variant: 'amber' },
+          { label: 'Quality Audit', value: '100% Validated', icon: <ShieldCheck size={13} className="text-emerald-500 dark:text-emerald-400" />, variant: 'success' },
         ]}
       />
 
