@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { fmtK, fmtNum } from './formatters';
+import DownloadVisualButton from './DownloadVisualButton';
 
 interface DescriptiveStatsTableProps {
   data: any[];
@@ -27,7 +28,9 @@ export default function DescriptiveStatsTable({
   fields,
   isDarkMode,
 }: DescriptiveStatsTableProps) {
-  const dark = isDarkMode;
+  const [overrideTheme, setOverrideTheme] = useState<'light' | 'dark' | null>(null);
+  const dark = overrideTheme !== null ? overrideTheme === 'dark' : isDarkMode;
+  const cardRef = useRef<HTMLDivElement>(null);
   const [useCompact, setUseCompact] = useState<boolean>(true);
 
   const numCols = fields.filter(f => f.type === 'numeric').map(f => f.name as string);
@@ -76,6 +79,7 @@ export default function DescriptiveStatsTable({
 
   return (
     <div
+      ref={cardRef}
       className={`rounded-2xl border p-6 shadow-xs space-y-4 transition-colors ${
         dark ? 'bg-[#131f37] border-[#1e2d4a]' : 'bg-white border-slate-200'
       }`}
@@ -112,6 +116,17 @@ export default function DescriptiveStatsTable({
           >
             n = {useCompact ? fmtK(data.length) : fmtNum(data.length)} records
           </span>
+
+          <DownloadVisualButton
+            cardRef={cardRef}
+            visualTitle="Descriptive_Distributional_Statistics"
+            isDarkMode={dark}
+            onSetTheme={async (theme) => {
+              setOverrideTheme(theme);
+              await new Promise((r) => setTimeout(r, 120));
+            }}
+            onResetTheme={() => setOverrideTheme(null)}
+          />
         </div>
       </div>
 

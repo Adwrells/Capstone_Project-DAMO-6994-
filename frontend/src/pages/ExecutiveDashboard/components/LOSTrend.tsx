@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import {
   ResponsiveContainer,
   LineChart,
@@ -15,6 +15,7 @@ import {
 } from 'recharts';
 import { TrendDataPoint } from './types';
 import { fmtHours, fmtMinutes } from './formatters';
+import DownloadVisualButton from './DownloadVisualButton';
 
 interface LOSTrendProps {
   data: TrendDataPoint[];
@@ -51,7 +52,9 @@ function CustomLOSTooltip({ active, payload, label }: any) {
 }
 
 export default function LOSTrend({ data, isDarkMode }: LOSTrendProps) {
-  const dark = isDarkMode;
+  const [overrideTheme, setOverrideTheme] = useState<'light' | 'dark' | null>(null);
+  const dark = overrideTheme !== null ? overrideTheme === 'dark' : isDarkMode;
+  const cardRef = useRef<HTMLDivElement>(null);
   const [viewMode, setViewMode] = useState<'all' | 'top3' | 'top5'>('all');
   const [chartType, setChartType] = useState<'trend' | 'bar'>('trend');
 
@@ -88,6 +91,7 @@ export default function LOSTrend({ data, isDarkMode }: LOSTrendProps) {
 
   return (
     <div
+      ref={cardRef}
       className={`w-full rounded-2xl border p-6 shadow-xs space-y-4 transition-colors flex flex-col justify-between ${
         dark ? 'bg-[#131f37] border-[#1e2d4a]' : 'bg-white border-slate-200'
       }`}
@@ -143,6 +147,18 @@ export default function LOSTrend({ data, isDarkMode }: LOSTrendProps) {
             >
               Units: Duration (Hours)
             </span>
+
+            {/* JPEG Download Button with Night/Light Mode */}
+            <DownloadVisualButton
+              cardRef={cardRef}
+              visualTitle="CIHI_Reported_Median_LOS_Trend_Visual_B"
+              isDarkMode={dark}
+              onSetTheme={async (theme) => {
+                setOverrideTheme(theme);
+                await new Promise((r) => setTimeout(r, 120));
+              }}
+              onResetTheme={() => setOverrideTheme(null)}
+            />
           </div>
         </div>
 

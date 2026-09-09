@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import {
   ResponsiveContainer,
   AreaChart,
@@ -14,6 +14,7 @@ import {
 } from 'recharts';
 import { TrendDataPoint } from './types';
 import { fmtK, fmtNum } from './formatters';
+import DownloadVisualButton from './DownloadVisualButton';
 
 interface VisitVolumeTrendProps {
   data: TrendDataPoint[];
@@ -43,7 +44,9 @@ function CustomVolumeTooltip({ active, payload, label }: any) {
 }
 
 export default function VisitVolumeTrend({ data, isDarkMode }: VisitVolumeTrendProps) {
-  const dark = isDarkMode;
+  const [overrideTheme, setOverrideTheme] = useState<'light' | 'dark' | null>(null);
+  const dark = overrideTheme !== null ? overrideTheme === 'dark' : isDarkMode;
+  const cardRef = useRef<HTMLDivElement>(null);
   const [viewMode, setViewMode] = useState<'all' | 'top3' | 'top5'>('all');
   const [chartType, setChartType] = useState<'trend' | 'bar'>('trend');
 
@@ -80,6 +83,7 @@ export default function VisitVolumeTrend({ data, isDarkMode }: VisitVolumeTrendP
 
   return (
     <div
+      ref={cardRef}
       className={`w-full rounded-2xl border p-6 shadow-xs space-y-4 transition-colors flex flex-col justify-between ${
         dark ? 'bg-[#131f37] border-[#1e2d4a]' : 'bg-white border-slate-200'
       }`}
@@ -135,6 +139,18 @@ export default function VisitVolumeTrend({ data, isDarkMode }: VisitVolumeTrendP
             >
               Units: Total Visits (Millions)
             </span>
+
+            {/* JPEG Download Button with Night/Light Mode */}
+            <DownloadVisualButton
+              cardRef={cardRef}
+              visualTitle="CIHI_ED_Visit_Volume_Trend_Visual_A"
+              isDarkMode={dark}
+              onSetTheme={async (theme) => {
+                setOverrideTheme(theme);
+                await new Promise((r) => setTimeout(r, 120));
+              }}
+              onResetTheme={() => setOverrideTheme(null)}
+            />
           </div>
         </div>
 

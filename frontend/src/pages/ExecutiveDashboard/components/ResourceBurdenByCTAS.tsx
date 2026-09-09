@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import {
   ResponsiveContainer,
   BarChart,
@@ -12,6 +12,7 @@ import {
 } from 'recharts';
 import { Zap, Info } from 'lucide-react';
 import { fmtK } from './formatters';
+import DownloadVisualButton from './DownloadVisualButton';
 
 interface ResourceBurdenByCTASProps {
   isDarkMode: boolean;
@@ -56,22 +57,37 @@ function CustomBurdenTooltip({ active, payload }: any) {
 }
 
 export default function ResourceBurdenByCTAS({ isDarkMode }: ResourceBurdenByCTASProps) {
-  const dark = isDarkMode;
+  const [overrideTheme, setOverrideTheme] = useState<'light' | 'dark' | null>(null);
+  const dark = overrideTheme !== null ? overrideTheme === 'dark' : isDarkMode;
+  const cardRef = useRef<HTMLDivElement>(null);
 
   return (
     <div
+      ref={cardRef}
       className={`rounded-2xl border p-6 shadow-xs space-y-4 transition-colors flex flex-col justify-between h-full ${
         dark ? 'bg-[#131f37] border-[#1e2d4a]' : 'bg-white border-slate-200'
       }`}
     >
       <div className="space-y-1">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-2">
           <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#0F4C81] dark:text-[#3B82F6] block">
             Operational Modeling · Primary Visual
           </span>
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9.5px] font-bold bg-purple-50 text-purple-700 dark:bg-purple-950/30 dark:text-purple-400 border border-purple-200 dark:border-purple-800">
-            <Zap size={11} /> Highest Estimated Burden: CTAS III (52.3%)
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9.5px] font-bold bg-purple-50 text-purple-700 dark:bg-purple-950/30 dark:text-purple-400 border border-purple-200 dark:border-purple-800">
+              <Zap size={11} /> Highest: CTAS III (52.3%)
+            </span>
+            <DownloadVisualButton
+              cardRef={cardRef}
+              visualTitle="Operational_Resource_Burden_by_CTAS"
+              isDarkMode={dark}
+              onSetTheme={async (theme) => {
+                setOverrideTheme(theme);
+                await new Promise((r) => setTimeout(r, 120));
+              }}
+              onResetTheme={() => setOverrideTheme(null)}
+            />
+          </div>
         </div>
         <h3 className={`text-base font-extrabold ${dark ? 'text-white' : 'text-slate-900'}`}>
           Estimated Resource Burden by CTAS

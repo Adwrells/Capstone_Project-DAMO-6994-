@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   ResponsiveContainer,
   BarChart,
@@ -12,6 +12,7 @@ import {
 } from 'recharts';
 import { Activity, Stethoscope } from 'lucide-react';
 import { fmtK, fmtHours } from './formatters';
+import DownloadVisualButton from './DownloadVisualButton';
 
 interface TopMainProblemsProps {
   isDarkMode: boolean;
@@ -29,7 +30,9 @@ const MAIN_PROBLEMS_DATA = [
 
 export default function TopMainProblems({ isDarkMode }: TopMainProblemsProps) {
   const [metric, setMetric] = useState<'visits' | 'los'>('visits');
-  const dark = isDarkMode;
+  const [overrideTheme, setOverrideTheme] = useState<'light' | 'dark' | null>(null);
+  const dark = overrideTheme !== null ? overrideTheme === 'dark' : isDarkMode;
+  const cardRef = useRef<HTMLDivElement>(null);
 
   const sortedData = [...MAIN_PROBLEMS_DATA].sort((a, b) =>
     metric === 'visits' ? b.visits - a.visits : b.los_hours - a.los_hours
@@ -37,6 +40,7 @@ export default function TopMainProblems({ isDarkMode }: TopMainProblemsProps) {
 
   return (
     <div
+      ref={cardRef}
       className={`rounded-2xl border p-6 shadow-xs space-y-4 transition-colors flex flex-col justify-between h-full ${
         dark ? 'bg-[#131f37] border-[#1e2d4a]' : 'bg-white border-slate-200'
       }`}
@@ -55,30 +59,43 @@ export default function TopMainProblems({ isDarkMode }: TopMainProblemsProps) {
             </p>
           </div>
 
-          {/* Metric Switcher */}
-          <div className="flex items-center gap-1 p-0.5 rounded-lg border border-slate-200 dark:border-[#1e2d4a] bg-slate-50 dark:bg-[#182640]">
-            <button
-              type="button"
-              onClick={() => setMetric('visits')}
-              className={`px-2.5 py-1 rounded-md text-[10px] font-bold cursor-pointer transition ${
-                metric === 'visits'
-                  ? 'bg-[#0F4C81] text-white shadow-2xs'
-                  : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
-              }`}
-            >
-              ED Visits
-            </button>
-            <button
-              type="button"
-              onClick={() => setMetric('los')}
-              className={`px-2.5 py-1 rounded-md text-[10px] font-bold cursor-pointer transition ${
-                metric === 'los'
-                  ? 'bg-[#0F4C81] text-white shadow-2xs'
-                  : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
-              }`}
-            >
-              Median LOS
-            </button>
+          {/* Metric Switcher & Download Button */}
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 p-0.5 rounded-lg border border-slate-200 dark:border-[#1e2d4a] bg-slate-50 dark:bg-[#182640]">
+              <button
+                type="button"
+                onClick={() => setMetric('visits')}
+                className={`px-2.5 py-1 rounded-md text-[10px] font-bold cursor-pointer transition ${
+                  metric === 'visits'
+                    ? 'bg-[#0F4C81] text-white shadow-2xs'
+                    : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
+                }`}
+              >
+                ED Visits
+              </button>
+              <button
+                type="button"
+                onClick={() => setMetric('los')}
+                className={`px-2.5 py-1 rounded-md text-[10px] font-bold cursor-pointer transition ${
+                  metric === 'los'
+                    ? 'bg-[#0F4C81] text-white shadow-2xs'
+                    : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
+                }`}
+              >
+                Median LOS
+              </button>
+            </div>
+
+            <DownloadVisualButton
+              cardRef={cardRef}
+              visualTitle="Clinical_Profiling_Top_Main_Problems"
+              isDarkMode={dark}
+              onSetTheme={async (theme) => {
+                setOverrideTheme(theme);
+                await new Promise((r) => setTimeout(r, 120));
+              }}
+              onResetTheme={() => setOverrideTheme(null)}
+            />
           </div>
         </div>
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import {
   ResponsiveContainer,
   BarChart,
@@ -12,6 +12,7 @@ import {
 } from 'recharts';
 import StatBadge from '../../../components/common/StatBadge';
 import AnalyticalTakeaway from '../../../components/common/AnalyticalTakeaway';
+import DownloadVisualButton from './DownloadVisualButton';
 
 interface H1CTASLOSProps {
   isDarkMode: boolean;
@@ -26,10 +27,13 @@ const CTAS_ORDERED_DATA = [
 ];
 
 export default function H1CTASLOS({ isDarkMode }: H1CTASLOSProps) {
-  const dark = isDarkMode;
+  const [overrideTheme, setOverrideTheme] = useState<'light' | 'dark' | null>(null);
+  const dark = overrideTheme !== null ? overrideTheme === 'dark' : isDarkMode;
+  const cardRef = useRef<HTMLDivElement>(null);
 
   return (
     <div
+      ref={cardRef}
       className={`rounded-2xl border p-5 shadow-xs space-y-3 transition-colors flex flex-col justify-between h-full ${
         dark ? 'bg-[#111e35] border-white/[0.08]' : 'bg-white border-slate-200'
       }`}
@@ -39,7 +43,19 @@ export default function H1CTASLOS({ isDarkMode }: H1CTASLOSProps) {
           <span className="text-[10.5px] font-mono font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
             HYPOTHESIS H1 · WEIGHTED KRUSKAL-WALLIS
           </span>
-          <StatBadge label="Reject H₀" sublabel="p < 0.0001" variant="reject" />
+          <div className="flex items-center gap-2">
+            <StatBadge label="Reject H₀" sublabel="p < 0.0001" variant="reject" />
+            <DownloadVisualButton
+              cardRef={cardRef}
+              visualTitle="H1_CTAS_Triage_LOS_Kruskal_Wallis"
+              isDarkMode={dark}
+              onSetTheme={async (theme) => {
+                setOverrideTheme(theme);
+                await new Promise((r) => setTimeout(r, 120));
+              }}
+              onResetTheme={() => setOverrideTheme(null)}
+            />
+          </div>
         </div>
         <h3 className={`text-base font-semibold ${dark ? 'text-slate-100' : 'text-slate-900'}`}>
           Reported Median LOS Across CTAS Triage Levels
