@@ -30,6 +30,105 @@ const THEME_COLORS = [
   '#8B5CF6', '#06B6D4', '#EC4899', '#14B8A6', '#6366F1'
 ];
 
+/**
+ * Clean column names into professional, human-readable titles.
+ */
+export const formatAxisTitle = (col?: string): string => {
+  if (!col) return '';
+  const c = col.trim();
+  const lower = c.toLowerCase();
+
+  const map: Record<string, string> = {
+    'median_los_hours': 'Median LOS (Hours)',
+    'median_length_of_stay_min': 'Median LOS (Minutes)',
+    'length_of_stay': 'Length of Stay (Hours)',
+    'length of stay (hours)': 'Length of Stay (Hours)',
+    'los_hours': 'LOS (Hours)',
+    'los_min': 'LOS (Minutes)',
+    'ed_visits': 'ED Visits',
+    'total_visits': 'Total ED Visits',
+    'total ed minutes': 'Total ED Minutes',
+    'visits': 'Visits',
+    'visit count': 'Visit Count',
+    'resource cost ($)': 'Resource Cost ($)',
+    'triage_level': 'Triage Level (CTAS)',
+    'ctas_level': 'CTAS Acuity Level',
+    'ctas level': 'CTAS Acuity Level',
+    'ctas': 'CTAS Level',
+    'fiscal_year': 'Fiscal Year',
+    'fiscal year': 'Fiscal Year',
+    'fiscal_year_start': 'Fiscal Year',
+    'year': 'Fiscal Year',
+    'province': 'Province / Territory',
+    'visit_disposition': 'Discharge Disposition',
+    'visit disposition': 'Discharge Disposition',
+    'disposition': 'Discharge Disposition',
+    'age_group': 'Age Cohort',
+    'age': 'Patient Age',
+    'main_problem': 'Chief Complaint / Diagnosis',
+    'admit_via_ambulance': 'Ambulance Arrival',
+    'erbi_score': 'ERBI Burden Score',
+    'burden_hours': 'Burden Hours'
+  };
+
+  if (map[lower]) return map[lower];
+  if (!lower.includes('_') && /[A-Z]/.test(c)) return c;
+
+  return c
+    .split(/[_\s]+/)
+    .map(word => {
+      const wLower = word.toLowerCase();
+      if (wLower === 'ed') return 'ED';
+      if (wLower === 'los') return 'LOS';
+      if (wLower === 'ctas') return 'CTAS';
+      if (wLower === 'id') return 'ID';
+      if (wLower === 'cihi') return 'CIHI';
+      if (wLower === 'nacrs') return 'NACRS';
+      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    })
+    .join(' ');
+};
+
+/**
+ * Format numbers with professional magnitude scaling (B, M, k, or standard decimals).
+ */
+export const formatYValue = (value: number, unitFormat?: CustomVisualization['unitFormat']): string => {
+  if (value === 0) return '0';
+  const abs = Math.abs(value);
+
+  if (unitFormat === 'raw') {
+    return value.toLocaleString(undefined, { maximumFractionDigits: 1 });
+  }
+  if (unitFormat === 'currency') {
+    if (abs >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(1)}B`;
+    if (abs >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
+    if (abs >= 1_000) return `$${(value / 1_000).toFixed(1)}k`;
+    return `$${value.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
+  }
+  if (unitFormat === 'percentage') {
+    return `${value.toFixed(1)}%`;
+  }
+  if (unitFormat === 'billions') {
+    return `${(value / 1_000_000_000).toFixed(2)}B`;
+  }
+  if (unitFormat === 'millions') {
+    return `${(value / 1_000_000).toFixed(1)}M`;
+  }
+  if (unitFormat === 'thousands') {
+    // Prevent awkward formats like 38000.0k by promoting to M
+    if (abs >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
+    return `${(value / 1_000).toFixed(1)}k`;
+  }
+
+  // Auto-scaling (default)
+  if (abs >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(1)}B`;
+  if (abs >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
+  if (abs >= 10_000) return `${(value / 1_000).toFixed(1)}k`;
+  if (abs >= 1_000) return `${(value / 1_000).toFixed(1)}k`;
+  if (Number.isInteger(value)) return value.toString();
+  return value.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 1 });
+};
+
 export default function CustomChartCard({
   chart,
   data,
@@ -45,8 +144,8 @@ export default function CustomChartCard({
   const showLegend = chart.showLegend !== false;
   const showDataLabels = chart.showDataLabels !== false;
   const xAxisLabelRotation = chart.xAxisLabelRotation || 0;
-  const fontSize = chart.fontSize || 10;
-  const legendPosition = chart.legendPosition || 'bottom';
+  const fontSize = chart.fontSize || 9.5;
+  const hasMultiSeries = Boolean(chart.enableTrendLine || chart.enableMovingAverage);
 
   // Group data by X Axis and apply Y Axis aggregation logic
   const chartData = useMemo(() => {
@@ -84,8 +183,31 @@ export default function CustomChartCard({
       };
     });
 
-    if (chart.topN && chart.topN > 0) {
+    // Handle Top N filtering
+    if (chart.topN && chart.topN > 0 && chart.topN < rawList.length) {
       rawList = rawList.sort((a, b) => b.value - a.value).slice(0, chart.topN);
+    }
+
+    // Chronological & Clinical sorting
+    const isTemporal = /year|fiscal|date|month|period|time/i.test(chart.xAxisColumn);
+    const isCtas = /triage|ctas|acuity/i.test(chart.xAxisColumn);
+
+    if (isTemporal) {
+      // Sort chronologically ascending (e.g. 2003-2004 -> 2021-2022)
+      rawList = rawList.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }));
+    } else if (isCtas) {
+      const getCtasRank = (name: string): number => {
+        const s = name.toLowerCase();
+        if (s.includes('resuscitation') || s.includes('ctas i ') || s.includes('ctas 1') || s.includes('level 1') || s.startsWith('1')) return 1;
+        if (s.includes('emergent') || s.includes('ctas ii ') || s.includes('ctas 2') || s.includes('level 2') || s.startsWith('2')) return 2;
+        if (s.includes('urgent') && !s.includes('less') && !s.includes('non')) return 3;
+        if (s.includes('ctas iii') || s.includes('ctas 3') || s.includes('level 3') || s.startsWith('3')) return 3;
+        if (s.includes('less urgent') || s.includes('less-urgent') || s.includes('ctas iv') || s.includes('ctas 4') || s.includes('level 4') || s.startsWith('4')) return 4;
+        if (s.includes('non-urgent') || s.includes('non urgent') || s.includes('ctas v') || s.includes('ctas 5') || s.includes('level 5') || s.startsWith('5')) return 5;
+        if (s.includes('unknown') || s.includes('missing')) return 6;
+        return 99;
+      };
+      rawList = rawList.sort((a, b) => getCtasRank(a.name) - getCtasRank(b.name));
     }
 
     return rawList;
@@ -163,19 +285,73 @@ export default function CustomChartCard({
     };
   }, [chartData]);
 
-  // Value formatting utility
-  const formatYValue = (value: number) => {
-    if (chart.unitFormat === 'raw') return value.toString();
-    if (chart.unitFormat === 'currency') return `$${value.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
-    if (chart.unitFormat === 'percentage') return `${value}%`;
-    if (chart.unitFormat === 'thousands') return `${(value / 1000).toFixed(1)}k`;
-    if (chart.unitFormat === 'millions') return `${(value / 1000000).toFixed(2)}M`;
-    if (chart.unitFormat === 'billions') return `${(value / 1000000000).toFixed(2)}B`;
+  // Smart Data Label Renderer: perfectly centered horizontally and vertically positioned
+  const renderSmartDataLabel = (props: any) => {
+    const { x, y, width, value, index } = props;
+    if (value === undefined || value === null) return null;
+    if (!showDataLabels) return null;
 
-    if (Math.abs(value) >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(1)}B`;
-    if (Math.abs(value) >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
-    if (Math.abs(value) >= 1_000) return `${(value / 1_000).toFixed(1)}k`;
-    return value.toLocaleString(undefined, { maximumFractionDigits: 1 });
+    const totalPoints = chartData.length;
+    // For series longer than 7 items, only display Peak, Trough, Start, and End to avoid congestion
+    if (totalPoints > 7) {
+      const isMax = summary && value === summary.maxVal;
+      const isMin = summary && value === summary.minVal;
+      const isLast = index === totalPoints - 1;
+      const isFirst = index === 0;
+
+      if (!isMax && !isMin && !isLast && !isFirst) {
+        return null;
+      }
+    }
+
+    const formatted = formatYValue(Number(value), chart.unitFormat);
+    // When width is present (Bar/Column), center horizontally at x + width / 2; otherwise x is already the center point
+    const posX = width !== undefined && width !== null ? x + width / 2 : x;
+    const posY = y - 7;
+
+    return (
+      <text
+        x={posX}
+        y={posY}
+        fill={dark ? '#f1f5f9' : '#1e293b'}
+        fontSize={9}
+        fontWeight={700}
+        fontFamily="system-ui, -apple-system, sans-serif"
+        textAnchor="middle"
+      >
+        {formatted}
+      </text>
+    );
+  };
+
+  // Smart Data Label Renderer for horizontal bar layouts
+  const renderSmartVerticalBarLabel = (props: any) => {
+    const { x, y, width, height, value, index } = props;
+    if (value === undefined || value === null) return null;
+    if (!showDataLabels) return null;
+
+    const totalPoints = chartData.length;
+    if (totalPoints > 8) {
+      const isMax = summary && value === summary.maxVal;
+      const isMin = summary && value === summary.minVal;
+      const isLast = index === totalPoints - 1;
+      if (!isMax && !isMin && !isLast) return null;
+    }
+
+    const formatted = formatYValue(Number(value), chart.unitFormat);
+    return (
+      <text
+        x={x + width + 6}
+        y={y + height / 2 + 3.5}
+        fill={dark ? '#f1f5f9' : '#1e293b'}
+        fontSize={8.5}
+        fontWeight={700}
+        fontFamily="system-ui, -apple-system, sans-serif"
+        textAnchor="start"
+      >
+        {formatted}
+      </text>
+    );
   };
 
   return (
@@ -236,72 +412,97 @@ export default function CustomChartCard({
         {chartData.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-slate-400 text-xs">
             <AlertCircle size={24} className="mb-2 text-slate-400" />
-            <span>No data available for {chart.xAxisColumn} × {chart.yAxisColumn}.</span>
+            <span>No data available for {formatAxisTitle(chart.xAxisColumn)} × {formatAxisTitle(chart.yAxisColumn)}.</span>
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={290}>
             {chart.type === 'Column' ? (
-              <ComposedChart data={mergedChartData} margin={{ left: 10, right: 15, top: 15, bottom: 15 }}>
-                {showGridlines && <CartesianGrid strokeDasharray="3 3" stroke={dark ? '#334155' : '#f1f5f9'} />}
+              <ComposedChart data={mergedChartData} margin={{ left: 16, right: 20, top: hasMultiSeries ? 14 : 26, bottom: 42 }}>
+                {showGridlines && <CartesianGrid strokeDasharray="3 3" stroke={dark ? '#1e293b' : '#f1f5f9'} />}
                 <XAxis
                   dataKey="name"
-                  stroke={dark ? '#94a3b8' : '#475569'}
+                  stroke={dark ? '#94a3b8' : '#64748b'}
                   fontSize={fontSize}
-                  angle={xAxisLabelRotation}
-                  textAnchor={xAxisLabelRotation > 0 ? 'start' : 'middle'}
-                  height={xAxisLabelRotation > 0 ? 55 : 38}
+                  angle={xAxisLabelRotation !== 0 ? xAxisLabelRotation : (chartData.length > 5 ? -25 : 0)}
+                  textAnchor={xAxisLabelRotation > 0 ? 'start' : (xAxisLabelRotation < 0 || chartData.length > 5 ? 'end' : 'middle')}
+                  height={46}
+                  interval={chartData.length > 14 ? 'preserveStartEnd' : 0}
+                  tickMargin={6}
+                  tickFormatter={(v: any) => {
+                    const str = String(v ?? '');
+                    return str.length > 18 ? str.substring(0, 16) + '…' : str;
+                  }}
                   label={{
-                    value: chart.xAxisColumn,
+                    value: formatAxisTitle(chart.xAxisColumn),
                     position: 'insideBottom',
-                    offset: -10,
-                    fill: dark ? '#94a3b8' : '#475569',
+                    offset: -8,
+                    fill: dark ? '#94a3b8' : '#64748b',
                     fontSize: 9.5,
                     fontWeight: 700,
-                    fontFamily: 'monospace'
+                    fontFamily: 'system-ui, -apple-system, sans-serif'
                   }}
                 />
                 <YAxis
-                  stroke={dark ? '#94a3b8' : '#475569'}
+                  stroke={dark ? '#94a3b8' : '#64748b'}
                   fontSize={fontSize}
-                  tickFormatter={formatYValue}
-                  width={60}
+                  tickFormatter={(v) => formatYValue(Number(v), chart.unitFormat)}
+                  domain={[
+                    0,
+                    (dataMax: number) => {
+                      if (!dataMax || !isFinite(dataMax) || dataMax <= 0) return 'auto';
+                      const padding = dataMax * 0.15;
+                      return Number((dataMax + (padding > 0.4 ? padding : 0.4)).toFixed(1));
+                    }
+                  ]}
+                  width={68}
                   label={{
-                    value: `${chart.yAxisColumn} (${chart.aggregation})`,
+                    value: `${formatAxisTitle(chart.yAxisColumn)} (${chart.aggregation})`,
                     angle: -90,
                     position: 'insideLeft',
-                    offset: 0,
-                    fill: dark ? '#94a3b8' : '#475569',
-                    fontSize: 9.5,
-                    fontWeight: 700,
-                    fontFamily: 'monospace'
+                    offset: 12,
+                    style: {
+                      textAnchor: 'middle',
+                      fill: dark ? '#94a3b8' : '#64748b',
+                      fontSize: 9.5,
+                      fontWeight: 700,
+                      fontFamily: 'system-ui, -apple-system, sans-serif'
+                    }
                   }}
                 />
                 <Tooltip
-                  formatter={(value: any) => [formatYValue(Number(value)), chart.yAxisColumn]}
+                  formatter={(value: any, name: any) => {
+                    let seriesName = formatAxisTitle(chart.yAxisColumn);
+                    if (name === 'trendValue') seriesName = 'Regression Trend';
+                    else if (name === 'maValue') seriesName = '3-Period Moving Avg';
+                    return [formatYValue(Number(value), chart.unitFormat), seriesName];
+                  }}
                   contentStyle={{
                     backgroundColor: dark ? '#1e293b' : '#ffffff',
                     border: dark ? '1px solid #334155' : '1px solid #e2e8f0',
-                    borderRadius: '8px'
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                    fontSize: '11px',
+                    fontWeight: 500
                   }}
                 />
-                {showLegend && (
+                {showLegend && hasMultiSeries && (
                   <Legend
-                    verticalAlign={legendPosition === 'top' || legendPosition === 'bottom' ? legendPosition : 'bottom'}
-                    align={legendPosition === 'left' || legendPosition === 'right' ? legendPosition : 'center'}
-                    height={36}
+                    verticalAlign="top"
+                    align="right"
+                    height={24}
+                    wrapperStyle={{
+                      paddingBottom: 6,
+                      fontSize: 10,
+                      fontWeight: 600,
+                      fontFamily: 'system-ui, -apple-system, sans-serif'
+                    }}
                   />
                 )}
                 <Bar dataKey="value" fill={chartColor} radius={[4, 4, 0, 0]}>
                   {showDataLabels && (
                     <LabelList
                       dataKey="value"
-                      position="top"
-                      offset={6}
-                      formatter={(v: any) => formatYValue(Number(v))}
-                      fill={dark ? '#E2E8F0' : '#1E293B'}
-                      fontSize={8.5}
-                      fontWeight={700}
-                      fontFamily="monospace"
+                      content={renderSmartDataLabel}
                     />
                   )}
                 </Bar>
@@ -316,67 +517,91 @@ export default function CustomChartCard({
                 )}
               </ComposedChart>
             ) : chart.type === 'Bar' ? (
-              <ComposedChart data={mergedChartData} layout="vertical" margin={{ left: 20, right: 40, top: 10, bottom: 15 }}>
-                {showGridlines && <CartesianGrid strokeDasharray="3 3" stroke={dark ? '#334155' : '#f1f5f9'} />}
+              <ComposedChart data={mergedChartData} layout="vertical" margin={{ left: 16, right: 42, top: hasMultiSeries ? 14 : 26, bottom: 40 }}>
+                {showGridlines && <CartesianGrid strokeDasharray="3 3" stroke={dark ? '#1e293b' : '#f1f5f9'} />}
                 <XAxis
                   type="number"
-                  stroke={dark ? '#94a3b8' : '#475569'}
+                  stroke={dark ? '#94a3b8' : '#64748b'}
                   fontSize={fontSize}
-                  tickFormatter={formatYValue}
-                  height={35}
+                  tickFormatter={(v) => formatYValue(Number(v), chart.unitFormat)}
+                  domain={[
+                    0,
+                    (dataMax: number) => {
+                      if (!dataMax || !isFinite(dataMax) || dataMax <= 0) return 'auto';
+                      const padding = dataMax * 0.15;
+                      return Number((dataMax + (padding > 0.4 ? padding : 0.4)).toFixed(1));
+                    }
+                  ]}
+                  height={40}
                   label={{
-                    value: `${chart.yAxisColumn} (${chart.aggregation})`,
+                    value: `${formatAxisTitle(chart.yAxisColumn)} (${chart.aggregation})`,
                     position: 'insideBottom',
-                    offset: -10,
-                    fill: dark ? '#94a3b8' : '#475569',
+                    offset: -6,
+                    fill: dark ? '#94a3b8' : '#64748b',
                     fontSize: 9.5,
                     fontWeight: 700,
-                    fontFamily: 'monospace'
+                    fontFamily: 'system-ui, -apple-system, sans-serif'
                   }}
                 />
                 <YAxis
                   dataKey="name"
                   type="category"
-                  stroke={dark ? '#94a3b8' : '#475569'}
+                  stroke={dark ? '#94a3b8' : '#64748b'}
                   fontSize={fontSize}
-                  width={85}
+                  width={95}
+                  tickMargin={6}
+                  tickFormatter={(v: any) => {
+                    const str = String(v ?? '');
+                    return str.length > 18 ? str.substring(0, 16) + '…' : str;
+                  }}
                   label={{
-                    value: chart.xAxisColumn,
+                    value: formatAxisTitle(chart.xAxisColumn),
                     angle: -90,
                     position: 'insideLeft',
-                    offset: -10,
-                    fill: dark ? '#94a3b8' : '#475569',
-                    fontSize: 9.5,
-                    fontWeight: 700,
-                    fontFamily: 'monospace'
+                    offset: 12,
+                    style: {
+                      textAnchor: 'middle',
+                      fill: dark ? '#94a3b8' : '#64748b',
+                      fontSize: 9.5,
+                      fontWeight: 700,
+                      fontFamily: 'system-ui, -apple-system, sans-serif'
+                    }
                   }}
                 />
                 <Tooltip
-                  formatter={(value: any) => [formatYValue(Number(value)), chart.yAxisColumn]}
+                  formatter={(value: any, name: any) => {
+                    let seriesName = formatAxisTitle(chart.yAxisColumn);
+                    if (name === 'trendValue') seriesName = 'Regression Trend';
+                    else if (name === 'maValue') seriesName = '3-Period Moving Avg';
+                    return [formatYValue(Number(value), chart.unitFormat), seriesName];
+                  }}
                   contentStyle={{
                     backgroundColor: dark ? '#1e293b' : '#ffffff',
                     border: dark ? '1px solid #334155' : '1px solid #e2e8f0',
-                    borderRadius: '8px'
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                    fontSize: '11px',
+                    fontWeight: 500
                   }}
                 />
-                {showLegend && (
+                {showLegend && hasMultiSeries && (
                   <Legend
-                    verticalAlign={legendPosition === 'top' || legendPosition === 'bottom' ? legendPosition : 'bottom'}
-                    align={legendPosition === 'left' || legendPosition === 'right' ? legendPosition : 'center'}
-                    height={36}
+                    verticalAlign="top"
+                    align="right"
+                    height={24}
+                    wrapperStyle={{
+                      paddingBottom: 6,
+                      fontSize: 10,
+                      fontWeight: 600,
+                      fontFamily: 'system-ui, -apple-system, sans-serif'
+                    }}
                   />
                 )}
                 <Bar dataKey="value" fill={chartColor} radius={[0, 4, 4, 0]}>
                   {showDataLabels && (
                     <LabelList
                       dataKey="value"
-                      position="right"
-                      offset={6}
-                      formatter={(v: any) => formatYValue(Number(v))}
-                      fill={dark ? '#E2E8F0' : '#1E293B'}
-                      fontSize={8.5}
-                      fontWeight={700}
-                      fontFamily="monospace"
+                      content={renderSmartVerticalBarLabel}
                     />
                   )}
                 </Bar>
@@ -391,67 +616,92 @@ export default function CustomChartCard({
                 )}
               </ComposedChart>
             ) : chart.type === 'Line' ? (
-              <ComposedChart data={mergedChartData} margin={{ left: 10, right: 15, top: 15, bottom: 15 }}>
-                {showGridlines && <CartesianGrid strokeDasharray="3 3" stroke={dark ? '#334155' : '#f1f5f9'} />}
+              <ComposedChart data={mergedChartData} margin={{ left: 16, right: 20, top: hasMultiSeries ? 14 : 26, bottom: 42 }}>
+                {showGridlines && <CartesianGrid strokeDasharray="3 3" stroke={dark ? '#1e293b' : '#f1f5f9'} />}
                 <XAxis
                   dataKey="name"
-                  stroke={dark ? '#94a3b8' : '#475569'}
+                  stroke={dark ? '#94a3b8' : '#64748b'}
                   fontSize={fontSize}
-                  angle={xAxisLabelRotation}
-                  textAnchor={xAxisLabelRotation > 0 ? 'start' : 'middle'}
-                  height={xAxisLabelRotation > 0 ? 55 : 38}
+                  angle={xAxisLabelRotation !== 0 ? xAxisLabelRotation : (chartData.length > 5 ? -25 : 0)}
+                  textAnchor={xAxisLabelRotation > 0 ? 'start' : (xAxisLabelRotation < 0 || chartData.length > 5 ? 'end' : 'middle')}
+                  height={46}
+                  interval={chartData.length > 14 ? 'preserveStartEnd' : 0}
+                  tickMargin={6}
+                  tickFormatter={(v: any) => {
+                    const str = String(v ?? '');
+                    return str.length > 18 ? str.substring(0, 16) + '…' : str;
+                  }}
                   label={{
-                    value: chart.xAxisColumn,
+                    value: formatAxisTitle(chart.xAxisColumn),
                     position: 'insideBottom',
-                    offset: -10,
-                    fill: dark ? '#94a3b8' : '#475569',
+                    offset: -8,
+                    fill: dark ? '#94a3b8' : '#64748b',
                     fontSize: 9.5,
                     fontWeight: 700,
-                    fontFamily: 'monospace'
+                    fontFamily: 'system-ui, -apple-system, sans-serif'
                   }}
                 />
                 <YAxis
-                  stroke={dark ? '#94a3b8' : '#475569'}
+                  stroke={dark ? '#94a3b8' : '#64748b'}
                   fontSize={fontSize}
-                  tickFormatter={formatYValue}
-                  width={60}
+                  tickFormatter={(v) => formatYValue(Number(v), chart.unitFormat)}
+                  domain={[
+                    0,
+                    (dataMax: number) => {
+                      if (!dataMax || !isFinite(dataMax) || dataMax <= 0) return 'auto';
+                      const padding = dataMax * 0.15;
+                      return Number((dataMax + (padding > 0.4 ? padding : 0.4)).toFixed(1));
+                    }
+                  ]}
+                  width={68}
                   label={{
-                    value: `${chart.yAxisColumn} (${chart.aggregation})`,
+                    value: `${formatAxisTitle(chart.yAxisColumn)} (${chart.aggregation})`,
                     angle: -90,
                     position: 'insideLeft',
-                    offset: 0,
-                    fill: dark ? '#94a3b8' : '#475569',
-                    fontSize: 9.5,
-                    fontWeight: 700,
-                    fontFamily: 'monospace'
+                    offset: 12,
+                    style: {
+                      textAnchor: 'middle',
+                      fill: dark ? '#94a3b8' : '#64748b',
+                      fontSize: 9.5,
+                      fontWeight: 700,
+                      fontFamily: 'system-ui, -apple-system, sans-serif'
+                    }
                   }}
                 />
                 <Tooltip
-                  formatter={(value: any) => [formatYValue(Number(value)), chart.yAxisColumn]}
+                  formatter={(value: any, name: any) => {
+                    let seriesName = formatAxisTitle(chart.yAxisColumn);
+                    if (name === 'trendValue') seriesName = 'Regression Trend';
+                    else if (name === 'maValue') seriesName = '3-Period Moving Avg';
+                    return [formatYValue(Number(value), chart.unitFormat), seriesName];
+                  }}
                   contentStyle={{
                     backgroundColor: dark ? '#1e293b' : '#ffffff',
                     border: dark ? '1px solid #334155' : '1px solid #e2e8f0',
-                    borderRadius: '8px'
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                    fontSize: '11px',
+                    fontWeight: 500
                   }}
                 />
-                {showLegend && (
+                {showLegend && hasMultiSeries && (
                   <Legend
-                    verticalAlign={legendPosition === 'top' || legendPosition === 'bottom' ? legendPosition : 'bottom'}
-                    align={legendPosition === 'left' || legendPosition === 'right' ? legendPosition : 'center'}
-                    height={36}
+                    verticalAlign="top"
+                    align="right"
+                    height={24}
+                    wrapperStyle={{
+                      paddingBottom: 6,
+                      fontSize: 10,
+                      fontWeight: 600,
+                      fontFamily: 'system-ui, -apple-system, sans-serif'
+                    }}
                   />
                 )}
                 <Line type="monotone" dataKey="value" stroke={chartColor} strokeWidth={2.5} dot={{ r: 3.5, fill: chartColor }}>
                   {showDataLabels && (
                     <LabelList
                       dataKey="value"
-                      position="top"
-                      offset={6}
-                      formatter={(v: any) => formatYValue(Number(v))}
-                      fill={dark ? '#E2E8F0' : '#1E293B'}
-                      fontSize={8.5}
-                      fontWeight={700}
-                      fontFamily="monospace"
+                      content={renderSmartDataLabel}
                     />
                   )}
                 </Line>
@@ -466,67 +716,92 @@ export default function CustomChartCard({
                 )}
               </ComposedChart>
             ) : chart.type === 'Area' ? (
-              <ComposedChart data={mergedChartData} margin={{ left: 10, right: 15, top: 15, bottom: 15 }}>
-                {showGridlines && <CartesianGrid strokeDasharray="3 3" stroke={dark ? '#334155' : '#f1f5f9'} />}
+              <ComposedChart data={mergedChartData} margin={{ left: 16, right: 20, top: hasMultiSeries ? 14 : 26, bottom: 42 }}>
+                {showGridlines && <CartesianGrid strokeDasharray="3 3" stroke={dark ? '#1e293b' : '#f1f5f9'} />}
                 <XAxis
                   dataKey="name"
-                  stroke={dark ? '#94a3b8' : '#475569'}
+                  stroke={dark ? '#94a3b8' : '#64748b'}
                   fontSize={fontSize}
-                  angle={xAxisLabelRotation}
-                  textAnchor={xAxisLabelRotation > 0 ? 'start' : 'middle'}
-                  height={xAxisLabelRotation > 0 ? 55 : 38}
+                  angle={xAxisLabelRotation !== 0 ? xAxisLabelRotation : (chartData.length > 5 ? -25 : 0)}
+                  textAnchor={xAxisLabelRotation > 0 ? 'start' : (xAxisLabelRotation < 0 || chartData.length > 5 ? 'end' : 'middle')}
+                  height={46}
+                  interval={chartData.length > 14 ? 'preserveStartEnd' : 0}
+                  tickMargin={6}
+                  tickFormatter={(v: any) => {
+                    const str = String(v ?? '');
+                    return str.length > 18 ? str.substring(0, 16) + '…' : str;
+                  }}
                   label={{
-                    value: chart.xAxisColumn,
+                    value: formatAxisTitle(chart.xAxisColumn),
                     position: 'insideBottom',
-                    offset: -10,
-                    fill: dark ? '#94a3b8' : '#475569',
+                    offset: -8,
+                    fill: dark ? '#94a3b8' : '#64748b',
                     fontSize: 9.5,
                     fontWeight: 700,
-                    fontFamily: 'monospace'
+                    fontFamily: 'system-ui, -apple-system, sans-serif'
                   }}
                 />
                 <YAxis
-                  stroke={dark ? '#94a3b8' : '#475569'}
+                  stroke={dark ? '#94a3b8' : '#64748b'}
                   fontSize={fontSize}
-                  tickFormatter={formatYValue}
-                  width={60}
+                  tickFormatter={(v) => formatYValue(Number(v), chart.unitFormat)}
+                  domain={[
+                    0,
+                    (dataMax: number) => {
+                      if (!dataMax || !isFinite(dataMax) || dataMax <= 0) return 'auto';
+                      const padding = dataMax * 0.15;
+                      return Number((dataMax + (padding > 0.4 ? padding : 0.4)).toFixed(1));
+                    }
+                  ]}
+                  width={68}
                   label={{
-                    value: `${chart.yAxisColumn} (${chart.aggregation})`,
+                    value: `${formatAxisTitle(chart.yAxisColumn)} (${chart.aggregation})`,
                     angle: -90,
                     position: 'insideLeft',
-                    offset: 0,
-                    fill: dark ? '#94a3b8' : '#475569',
-                    fontSize: 9.5,
-                    fontWeight: 700,
-                    fontFamily: 'monospace'
+                    offset: 12,
+                    style: {
+                      textAnchor: 'middle',
+                      fill: dark ? '#94a3b8' : '#64748b',
+                      fontSize: 9.5,
+                      fontWeight: 700,
+                      fontFamily: 'system-ui, -apple-system, sans-serif'
+                    }
                   }}
                 />
                 <Tooltip
-                  formatter={(value: any) => [formatYValue(Number(value)), chart.yAxisColumn]}
+                  formatter={(value: any, name: any) => {
+                    let seriesName = formatAxisTitle(chart.yAxisColumn);
+                    if (name === 'trendValue') seriesName = 'Regression Trend';
+                    else if (name === 'maValue') seriesName = '3-Period Moving Avg';
+                    return [formatYValue(Number(value), chart.unitFormat), seriesName];
+                  }}
                   contentStyle={{
                     backgroundColor: dark ? '#1e293b' : '#ffffff',
                     border: dark ? '1px solid #334155' : '1px solid #e2e8f0',
-                    borderRadius: '8px'
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                    fontSize: '11px',
+                    fontWeight: 500
                   }}
                 />
-                {showLegend && (
+                {showLegend && hasMultiSeries && (
                   <Legend
-                    verticalAlign={legendPosition === 'top' || legendPosition === 'bottom' ? legendPosition : 'bottom'}
-                    align={legendPosition === 'left' || legendPosition === 'right' ? legendPosition : 'center'}
-                    height={36}
+                    verticalAlign="top"
+                    align="right"
+                    height={24}
+                    wrapperStyle={{
+                      paddingBottom: 6,
+                      fontSize: 10,
+                      fontWeight: 600,
+                      fontFamily: 'system-ui, -apple-system, sans-serif'
+                    }}
                   />
                 )}
                 <Area type="monotone" dataKey="value" stroke={chartColor} fill={chartColor} fillOpacity={0.2}>
                   {showDataLabels && (
                     <LabelList
                       dataKey="value"
-                      position="top"
-                      offset={6}
-                      formatter={(v: any) => formatYValue(Number(v))}
-                      fill={dark ? '#E2E8F0' : '#1E293B'}
-                      fontSize={8.5}
-                      fontWeight={700}
-                      fontFamily="monospace"
+                      content={renderSmartDataLabel}
                     />
                   )}
                 </Area>
@@ -544,9 +819,9 @@ export default function CustomChartCard({
               <RadarChart cx="50%" cy="50%" outerRadius="75%" data={chartData}>
                 <PolarGrid stroke={dark ? '#334155' : '#e2e8f0'} />
                 <PolarAngleAxis dataKey="name" stroke={dark ? '#cbd5e1' : '#475569'} fontSize={fontSize} />
-                <PolarRadiusAxis stroke={dark ? '#94a3b8' : '#64748b'} fontSize={8} />
-                <Radar name={chart.yAxisColumn} dataKey="value" stroke={chartColor} fill={chartColor} fillOpacity={0.25} />
-                <Tooltip formatter={(v) => formatYValue(Number(v))} />
+                <PolarRadiusAxis stroke={dark ? '#94a3b8' : '#64748b'} fontSize={8} tickFormatter={(v) => formatYValue(Number(v), chart.unitFormat)} />
+                <Radar name={formatAxisTitle(chart.yAxisColumn)} dataKey="value" stroke={chartColor} fill={chartColor} fillOpacity={0.25} />
+                <Tooltip formatter={(v) => formatYValue(Number(v), chart.unitFormat)} />
               </RadarChart>
             ) : (
               <PieChart>
@@ -562,7 +837,7 @@ export default function CustomChartCard({
                     <Cell key={`cell-${index}`} fill={THEME_COLORS[index % THEME_COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip formatter={(value) => formatYValue(Number(value))} />
+                <Tooltip formatter={(value) => [formatYValue(Number(value), chart.unitFormat), formatAxisTitle(chart.yAxisColumn)]} />
                 {showLegend && <Legend verticalAlign="bottom" height={36} />}
               </PieChart>
             )}
@@ -574,12 +849,12 @@ export default function CustomChartCard({
       {summary && (
         <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-[10px] font-mono">
           <div className="text-slate-500 dark:text-slate-400">
-            Top Segment: <strong className="text-slate-800 dark:text-slate-200">{summary.maxName}</strong> ({formatYValue(summary.maxVal)})
+            Top Segment: <strong className="text-slate-800 dark:text-slate-200">{summary.maxName}</strong> ({formatYValue(summary.maxVal, chart.unitFormat)})
             <span className="mx-2 text-slate-300 dark:text-slate-700">|</span>
-            Mean: <strong className="text-slate-800 dark:text-slate-200">{formatYValue(summary.mean)}</strong>
+            Mean: <strong className="text-slate-800 dark:text-slate-200">{formatYValue(summary.mean, chart.unitFormat)}</strong>
           </div>
           <div className="text-slate-400 dark:text-slate-500">
-            {chart.xAxisColumn} × {chart.yAxisColumn}
+            {formatAxisTitle(chart.xAxisColumn)} × {formatAxisTitle(chart.yAxisColumn)}
           </div>
         </div>
       )}

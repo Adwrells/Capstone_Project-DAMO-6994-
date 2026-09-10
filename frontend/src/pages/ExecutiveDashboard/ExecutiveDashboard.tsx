@@ -39,7 +39,7 @@ import { DashboardKPIs, TrendDataPoint, FilterState } from './components/types';
 
 import { fetchDashboardKPIs, fetchDashboardTrends } from '../../services/apiService';
 import { KPIItem, CustomVisualization } from '../../utils/types';
-import { Sparkles, X, PlusCircle, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Sparkles, X, ArrowRight, CheckCircle2 } from 'lucide-react';
 
 interface ExecutiveDashboardProps {
   datasetName: string;
@@ -310,21 +310,11 @@ export default function ExecutiveDashboard({
       {/* ══ 4B. COMMITTED CUSTOM VISUALS ROW ═════════════════════════════════ */}
       {localCustomCharts.length > 0 && (
         <div className="space-y-6" id="committed-visuals-section">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <SectionHeader
-              category="CUSTOM ANALYTICS STUDIO · USER-COMMITTED VISUALS"
-              title={`Committed Visuals & Custom Analyses (${localCustomCharts.length})`}
-              right="Interactive Live Cross-Cuts"
-            />
-            <button
-              type="button"
-              onClick={() => setIsVisualBuilderOpen(true)}
-              className="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs hover:shadow-blue-500/25 transition flex items-center gap-1.5 cursor-pointer self-start sm:self-auto shrink-0"
-            >
-              <PlusCircle size={13} />
-              <span>Add Another Visual</span>
-            </button>
-          </div>
+          <SectionHeader
+            category="CUSTOM ANALYTICS STUDIO · USER-COMMITTED VISUALS"
+            title={`Committed Visuals & Custom Analyses (${localCustomCharts.length})`}
+            right="Interactive Live Cross-Cuts"
+          />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {localCustomCharts.map(chart => (
