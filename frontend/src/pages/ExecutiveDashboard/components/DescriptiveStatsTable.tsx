@@ -60,16 +60,16 @@ export default function DescriptiveStatsTable({
   const isYearCol = (colName: string) => /year|fy/i.test(colName);
 
   const renderVal = (val: number, dp: number = 2, colName: string = '') => {
-    const isYear = isYearCol(colName);
+    const isYear = isYearCol(colName) && Number.isInteger(val) && val >= 1900 && val <= 2100;
     const formatted = useCompact
       ? fmtK(val, dp, { isYear })
       : isYear
-      ? (Number.isInteger(val) ? String(val) : val.toFixed(1))
+      ? String(val)
       : fmtNum(val, dp);
 
     return (
       <span
-        title={`Exact: ${isYear && Number.isInteger(val) ? String(val) : fmtNum(val, 2)}`}
+        title={`Exact: ${isYear ? String(val) : fmtNum(val, 2)}`}
         className="cursor-help transition-colors hover:text-blue-500 dark:hover:text-blue-400"
       >
         {formatted}
@@ -89,12 +89,14 @@ export default function DescriptiveStatsTable({
           <span className="text-[9px] font-extrabold uppercase tracking-widest text-[#0F4C81] dark:text-[#3B82F6] block">
             Descriptive Parametric &amp; Non-Parametric Metrics
           </span>
-          <h3 className={`text-sm font-extrabold ${dark ? 'text-white' : 'text-slate-900'}`}>
+          <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
             Distributional Statistics for Key Numeric Variables
           </h3>
-          <p className="text-[10px] text-slate-400">Mean, Median, Dispersion, Interquartile Range, and Pearson Skewness</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            Mean, Median, Dispersion, Interquartile Range, and Pearson Skewness
+          </p>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2 flex-wrap">
           <button
             type="button"
             onClick={() => setUseCompact(!useCompact)}
@@ -133,16 +135,16 @@ export default function DescriptiveStatsTable({
       {descStats.length === 0 ? (
         <p className="text-center py-6 text-xs text-slate-400">No numeric columns detected in the active dataset.</p>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-[11px] border-collapse">
+        <div className="overflow-x-auto rounded-xl border border-slate-300 dark:border-slate-700/80 shadow-xs bg-[var(--surface-card)]">
+          <table className="w-full text-[11px] border-collapse" role="grid">
             <thead>
-              <tr className={dark ? 'bg-[#182640]' : 'bg-slate-50'}>
-                {['Variable', 'N', 'Mean', 'Median', 'Std Dev', 'Min', 'Max', 'Q1', 'Q3', 'IQR', 'Skewness'].map(h => (
+              <tr className={dark ? 'bg-[#0f172a]' : 'bg-slate-100'}>
+                {['Variable', 'N', 'Mean', 'Median', 'Std Dev', 'Min', 'Max', 'Q1', 'Q3', 'IQR', 'Skewness'].map((h, hIdx, arr) => (
                   <th
                     key={h}
-                    className={`px-3 py-2 text-left text-[9px] font-bold uppercase tracking-wider border-b ${
-                      dark ? 'border-[#1e2d4a] text-slate-400' : 'border-slate-200 text-slate-500'
-                    }`}
+                    className={`px-3 py-2.5 text-center text-[9.5px] font-bold uppercase tracking-wider border-b-2 ${
+                      dark ? 'border-slate-700 text-slate-300' : 'border-slate-300 text-slate-600'
+                    } ${hIdx < arr.length - 1 ? (dark ? 'border-r border-slate-700' : 'border-r border-slate-300') : ''}`}
                   >
                     {h}
                   </th>
@@ -153,54 +155,56 @@ export default function DescriptiveStatsTable({
               {descStats.map((row, i) => (
                 <tr
                   key={row.col}
-                  className={`transition ${
+                  className={`transition-colors border-b ${
+                    dark ? 'border-slate-800' : 'border-slate-200'
+                  } ${
                     i % 2 === 0
                       ? dark
                         ? 'bg-[#0f1d33]'
                         : 'bg-white'
                       : dark
                       ? 'bg-[#131f37]'
-                      : 'bg-slate-50/50'
-                  }`}
+                      : 'bg-slate-50/60'
+                  } hover:bg-blue-50/40 dark:hover:bg-blue-950/30`}
                 >
                   <td
-                    className={`px-3 py-2 font-semibold border-b max-w-[140px] truncate ${
-                      dark ? 'border-[#1e2d4a] text-slate-200' : 'border-slate-100 text-slate-800'
+                    className={`px-3 py-2 font-semibold text-center max-w-[140px] truncate ${
+                      dark ? 'border-r border-slate-800 text-slate-200' : 'border-r border-slate-200 text-slate-800'
                     }`}
                   >
                     {row.col}
                   </td>
-                  <td className={`px-3 py-2 font-mono border-b ${dark ? 'border-[#1e2d4a] text-slate-300' : 'border-slate-100 text-slate-700'}`}>
+                  <td className={`px-3 py-2 font-mono text-center ${dark ? 'border-r border-slate-800 text-slate-300' : 'border-r border-slate-200 text-slate-700'}`}>
                     {renderVal(row.n, 1, 'n')}
                   </td>
-                  <td className={`px-3 py-2 font-mono border-b ${dark ? 'border-[#1e2d4a] text-slate-300' : 'border-slate-100 text-slate-700'}`}>
+                  <td className={`px-3 py-2 font-mono text-center ${dark ? 'border-r border-slate-800 text-slate-300' : 'border-r border-slate-200 text-slate-700'}`}>
                     {renderVal(row.mean, 2, row.col)}
                   </td>
-                  <td className={`px-3 py-2 font-mono border-b font-bold ${dark ? 'border-[#1e2d4a] text-cyan-400' : 'border-slate-100 text-cyan-700'}`}>
+                  <td className={`px-3 py-2 font-mono text-center font-bold ${dark ? 'border-r border-slate-800 text-cyan-400' : 'border-r border-slate-200 text-cyan-700'}`}>
                     {renderVal(row.median, 2, row.col)}
                   </td>
-                  <td className={`px-3 py-2 font-mono border-b ${dark ? 'border-[#1e2d4a] text-slate-300' : 'border-slate-100 text-slate-700'}`}>
+                  <td className={`px-3 py-2 font-mono text-center ${dark ? 'border-r border-slate-800 text-slate-300' : 'border-r border-slate-200 text-slate-700'}`}>
                     {renderVal(row.stddev, 2, row.col)}
                   </td>
-                  <td className={`px-3 py-2 font-mono border-b ${dark ? 'border-[#1e2d4a] text-slate-300' : 'border-slate-100 text-slate-700'}`}>
+                  <td className={`px-3 py-2 font-mono text-center ${dark ? 'border-r border-slate-800 text-slate-300' : 'border-r border-slate-200 text-slate-700'}`}>
                     {renderVal(row.min, 1, row.col)}
                   </td>
-                  <td className={`px-3 py-2 font-mono border-b ${dark ? 'border-[#1e2d4a] text-slate-300' : 'border-slate-100 text-slate-700'}`}>
+                  <td className={`px-3 py-2 font-mono text-center ${dark ? 'border-r border-slate-800 text-slate-300' : 'border-r border-slate-200 text-slate-700'}`}>
                     {renderVal(row.max, 2, row.col)}
                   </td>
-                  <td className={`px-3 py-2 font-mono border-b ${dark ? 'border-[#1e2d4a] text-slate-300' : 'border-slate-100 text-slate-700'}`}>
+                  <td className={`px-3 py-2 font-mono text-center ${dark ? 'border-r border-slate-800 text-slate-300' : 'border-r border-slate-200 text-slate-700'}`}>
                     {renderVal(row.q1, 1, row.col)}
                   </td>
-                  <td className={`px-3 py-2 font-mono border-b ${dark ? 'border-[#1e2d4a] text-slate-300' : 'border-slate-100 text-slate-700'}`}>
+                  <td className={`px-3 py-2 font-mono text-center ${dark ? 'border-r border-slate-800 text-slate-300' : 'border-r border-slate-200 text-slate-700'}`}>
                     {renderVal(row.q3, 2, row.col)}
                   </td>
-                  <td className={`px-3 py-2 font-mono border-b ${dark ? 'border-[#1e2d4a] text-slate-300' : 'border-slate-100 text-slate-700'}`}>
+                  <td className={`px-3 py-2 font-mono text-center ${dark ? 'border-r border-slate-800 text-slate-300' : 'border-r border-slate-200 text-slate-700'}`}>
                     {renderVal(row.iqr, 2, row.col)}
                   </td>
                   <td
-                    className={`px-3 py-2 font-mono border-b font-bold ${
-                      dark ? 'border-[#1e2d4a]' : 'border-slate-100'
-                    } ${Math.abs(row.skew) > 1 ? 'text-amber-500' : dark ? 'text-slate-300' : 'text-slate-700'}`}
+                    className={`px-3 py-2 font-mono text-center font-bold ${
+                      Math.abs(row.skew) > 1 ? 'text-amber-500' : dark ? 'text-slate-300' : 'text-slate-700'
+                    }`}
                   >
                     <span title={`Exact Pearson Skewness: ${fmtNum(row.skew, 4)}`}>
                       {fmtNum(row.skew, 3)}

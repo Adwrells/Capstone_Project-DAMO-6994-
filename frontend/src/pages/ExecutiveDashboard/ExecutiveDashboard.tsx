@@ -32,6 +32,7 @@ import ResourceBurdenTrend from './components/ResourceBurdenTrend';
 import HypothesisEvidenceHub from './components/HypothesisEvidenceHub';
 import DescriptiveStatsTable from './components/DescriptiveStatsTable';
 import CustomChartBuilder from '../../components/charts/CustomChartBuilder';
+import CustomChartCard from './components/CustomChartCard';
 import SectionHeader from '../../components/common/SectionHeader';
 
 import { DashboardKPIs, TrendDataPoint, FilterState } from './components/types';
@@ -98,22 +99,47 @@ export default function ExecutiveDashboard({
 
   // ── Visual Studio / Custom Chart Builder State ─────────────────────────────
   const [isVisualBuilderOpen, setIsVisualBuilderOpen] = useState(false);
-  const [localCustomCharts, setLocalCustomCharts] = useState<CustomVisualization[]>(customCharts || []);
+  const [localCustomCharts, setLocalCustomCharts] = useState<CustomVisualization[]>(() => {
+    if (customCharts && customCharts.length > 0) return customCharts;
+    try {
+      const saved = localStorage.getItem('healthcare_analytics_custom_charts');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return [];
+  });
 
   useEffect(() => {
-    if (customCharts) {
+    if (customCharts && customCharts.length > 0) {
       setLocalCustomCharts(customCharts);
     }
   }, [customCharts]);
 
   const handleAddCustomChart = (chart: CustomVisualization) => {
-    setLocalCustomCharts(prev => [...prev, chart]);
+    setLocalCustomCharts(prev => {
+      const updated = [...prev, chart];
+      try {
+        localStorage.setItem('healthcare_analytics_custom_charts', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
     onAddChart?.(chart);
     setIsVisualBuilderOpen(false);
+
+    // Smoothly scroll down to the committed visual row
+    setTimeout(() => {
+      const el = document.getElementById('committed-visuals-section');
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 120);
   };
 
   const handleRemoveCustomChart = (id: string) => {
-    setLocalCustomCharts(prev => prev.filter(c => c.id !== id));
+    setLocalCustomCharts(prev => {
+      const updated = prev.filter(c => c.id !== id);
+      try {
+        localStorage.setItem('healthcare_analytics_custom_charts', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
     onRemoveChart?.(id);
   };
 
@@ -280,6 +306,39 @@ export default function ExecutiveDashboard({
         <VisitVolumeTrend data={activeTrendSeries} isDarkMode={dark} />
         <LOSTrend data={activeTrendSeries} isDarkMode={dark} />
       </div>
+
+      {/* ══ 4B. COMMITTED CUSTOM VISUALS ROW ═════════════════════════════════ */}
+      {localCustomCharts.length > 0 && (
+        <div className="space-y-6" id="committed-visuals-section">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <SectionHeader
+              category="CUSTOM ANALYTICS STUDIO · USER-COMMITTED VISUALS"
+              title={`Committed Visuals & Custom Analyses (${localCustomCharts.length})`}
+              right="Interactive Live Cross-Cuts"
+            />
+            <button
+              type="button"
+              onClick={() => setIsVisualBuilderOpen(true)}
+              className="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs hover:shadow-blue-500/25 transition flex items-center gap-1.5 cursor-pointer self-start sm:self-auto shrink-0"
+            >
+              <PlusCircle size={13} />
+              <span>Add Another Visual</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {localCustomCharts.map(chart => (
+              <CustomChartCard
+                key={chart.id}
+                chart={chart}
+                data={filteredData.length ? filteredData : data}
+                isDarkMode={dark}
+                onRemove={handleRemoveCustomChart}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ══ 5. HYPOTHESIS ANALYSIS SUITE (H1 – H5) ═══════════════════════════ */}
       <div className="space-y-6">

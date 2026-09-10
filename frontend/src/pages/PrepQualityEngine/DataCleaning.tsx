@@ -299,13 +299,14 @@ export default function DataCleaning({
         {/* Filter Controls Bar */}
         <div className="p-4 rounded-2xl border border-slate-200/80 dark:border-white/[0.06] bg-slate-50/70 dark:bg-white/[0.02] flex flex-wrap items-center justify-between gap-3">
           <div className="relative flex-1 min-w-[240px]">
-            <Search size={14} className="absolute left-3 top-3 text-slate-400" />
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
             <input
               type="text"
               placeholder="Search across all records..."
               value={inspectionSearch}
               onChange={e => { setInspectionSearch(e.target.value); setInspectionPage(1); }}
               className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-white/[0.03] text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 font-sans"
+              style={{ paddingLeft: '36px' }}
             />
           </div>
 
@@ -713,13 +714,14 @@ export default function DataCleaning({
               {/* Search Filter */}
               <div className="p-4 border-b border-slate-100 dark:border-white/[0.06] bg-slate-50/40 dark:bg-white/[0.01] flex items-center justify-between gap-4">
                 <div className="relative flex-1">
-                  <Search size={14} className="absolute left-3 top-3 text-slate-400" />
+                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                   <input
                     type="text"
                     placeholder={`Search ${activeDatasetModal.name}...`}
                     value={modalSearch}
                     onChange={e => setModalSearch(e.target.value)}
                     className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#111e35] text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-500 font-sans"
+                    style={{ paddingLeft: '36px' }}
                   />
                 </div>
 
