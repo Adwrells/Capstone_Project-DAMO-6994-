@@ -9,14 +9,11 @@
 
 import React, { useState, useMemo, useRef } from 'react';
 import {
-  ShieldCheck, Download, RefreshCw, Sliders,
-  FileDown, BookOpen, GraduationCap, Building2, User,
-  ChevronRight, CheckCircle2, Filter, X, FileText, File,
+  ShieldCheck, Download, Sliders, RefreshCw,
+  FileDown, GraduationCap, Building2, User,
+  CheckCircle2, Filter, X, FileText,
 } from 'lucide-react';
 import PageHeader from '../../components/common/PageHeader';
-import { CAPSTONE_REPORT } from './capstoneReportData';
-import { PAGINATED_REPORT_DATA } from './paginatedReportData';
-import AcademicPageSheet from './AcademicPageSheet';
 
 // ─── Executive Report (MD content provided by user) ──────────────────────────
 const EXECUTIVE_REPORT_MD = `# Explanatory and Predictive Analytics of Emergency Department Length of Stay and Resource Utilization Trends in Canadian Hospitals
@@ -169,7 +166,6 @@ OECD. (2023). *Health at a glance 2023*. OECD Publishing.
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type ReportType = 'final' | 'executive' | 'both';
-type FileType = 'pdf' | 'docx';
 
 interface ExportReportsProps {
   datasetName: string;
@@ -181,26 +177,34 @@ interface ExportReportsProps {
   isDarkMode?: boolean;
 }
 
-// ─── Download Modal ───────────────────────────────────────────────────────────
+// ─── Download Modal (PDF format only) ─────────────────────────────────────────
 interface DownloadModalProps {
   onClose: () => void;
-  onDownload: (reportType: ReportType, fileType: FileType) => void;
+  onDownload: (reportType: ReportType) => void;
   isExporting: boolean;
 }
 
 function DownloadModal({ onClose, onDownload, isExporting }: DownloadModalProps) {
-  const [step, setStep] = useState<'type' | 'format'>('type');
-  const [reportType, setReportType] = useState<ReportType | null>(null);
-
-  const reportOptions: { id: ReportType; label: string; desc: string }[] = [
-    { id: 'final', label: 'Final Report', desc: 'Full 70-page academic report with all chapters, tables, and appendices' },
-    { id: 'executive', label: 'Executive Report', desc: 'Concise summary: findings, recommendations, and key statistics' },
-    { id: 'both', label: 'Both', desc: 'Download Final Report and Executive Report as separate files' },
-  ];
-
-  const fileOptions: { id: FileType; label: string; icon: React.ReactNode }[] = [
-    { id: 'pdf', label: 'PDF', icon: <FileText size={20} className="text-red-500" /> },
-    { id: 'docx', label: 'DOCX', icon: <File size={20} className="text-blue-500" /> },
+  const reportOptions: { id: ReportType; label: string; desc: string; badge: string; isPrimary?: boolean }[] = [
+    {
+      id: 'final',
+      label: 'Final Report (PDF)',
+      desc: 'Official 70-page academic capstone report (Final Report Capstone Project.pdf)',
+      badge: '1.6 MB · PDF',
+      isPrimary: true,
+    },
+    {
+      id: 'executive',
+      label: 'Executive Report (PDF)',
+      desc: 'Concise summary: biostatistical findings, models, and strategic recommendations in printable PDF',
+      badge: 'PDF',
+    },
+    {
+      id: 'both',
+      label: 'Both Reports (PDF)',
+      desc: 'Download both the Final Report PDF (1.6 MB) and Executive Report PDF',
+      badge: '2 PDFs',
+    },
   ];
 
   return (
@@ -211,7 +215,7 @@ function DownloadModal({ onClose, onDownload, isExporting }: DownloadModalProps)
           <div className="flex items-center gap-2">
             <Download size={16} className="text-blue-500" />
             <h2 className="text-sm font-bold text-slate-900 dark:text-white">
-              {step === 'type' ? 'Select Report' : 'Select File Format'}
+              Download Report (PDF Format)
             </h2>
           </div>
           <button
@@ -222,79 +226,44 @@ function DownloadModal({ onClose, onDownload, isExporting }: DownloadModalProps)
           </button>
         </div>
 
-        {/* Step indicator */}
-        <div className="flex items-center gap-2 px-5 pt-4 pb-1">
-          <div className={`h-1.5 flex-1 rounded-full transition-colors ${step === 'type' ? 'bg-blue-500' : 'bg-blue-500'}`} />
-          <div className={`h-1.5 flex-1 rounded-full transition-colors ${step === 'format' ? 'bg-blue-500' : 'bg-slate-200 dark:bg-slate-700'}`} />
-        </div>
-
         <div className="p-5 space-y-3">
-          {step === 'type' ? (
-            /* Step 1 — Report Type */
-            <>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
-                Which report would you like to download?
-              </p>
-              {reportOptions.map((opt) => (
-                <button
-                  key={opt.id}
-                  type="button"
-                  onClick={() => {
-                    setReportType(opt.id);
-                    setStep('format');
-                  }}
-                  className="w-full flex items-start gap-3 p-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/30 text-left transition cursor-pointer group"
-                >
-                  <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-950/60 flex items-center justify-center shrink-0 group-hover:bg-blue-200 dark:group-hover:bg-blue-900/60 transition">
-                    <FileDown size={15} className="text-blue-600 dark:text-blue-400" />
-                  </div>
-                  <div>
-                    <div className="text-sm font-bold text-slate-900 dark:text-white">{opt.label}</div>
-                    <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">{opt.desc}</div>
-                  </div>
-                </button>
-              ))}
-            </>
-          ) : (
-            /* Step 2 — File Type */
-            <>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
-                Select file format for{' '}
-                <span className="font-bold text-slate-900 dark:text-white">
-                  {reportOptions.find((o) => o.id === reportType)?.label}
-                </span>
-              </p>
-              <div className="grid grid-cols-2 gap-3">
-                {fileOptions.map((fmt) => (
-                  <button
-                    key={fmt.id}
-                    type="button"
-                    disabled={isExporting}
-                    onClick={() => onDownload(reportType!, fmt.id)}
-                    className="flex flex-col items-center gap-2 py-5 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition cursor-pointer disabled:opacity-60"
-                  >
-                    {isExporting ? (
-                      <RefreshCw size={20} className="text-blue-500 animate-spin" />
-                    ) : (
-                      fmt.icon
-                    )}
-                    <span className="text-sm font-bold text-slate-900 dark:text-white">.{fmt.id}</span>
-                    <span className="text-[10px] text-slate-400">
-                      {fmt.id === 'pdf' ? 'Formatted print layout' : 'Editable Word document'}
-                    </span>
-                  </button>
-                ))}
-              </div>
+          <div className="flex items-center gap-2 p-2.5 rounded-xl bg-blue-50/80 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-800/60 text-xs text-blue-800 dark:text-blue-300">
+            <FileText size={15} className="text-blue-600 dark:text-blue-400 shrink-0" />
+            <span>Reports are downloaded exclusively in <strong>PDF format</strong>.</span>
+          </div>
 
+          <div className="space-y-2.5 pt-1">
+            {reportOptions.map((opt) => (
               <button
+                key={opt.id}
                 type="button"
-                onClick={() => setStep('type')}
-                className="w-full mt-2 py-2 text-xs text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition cursor-pointer"
+                disabled={isExporting}
+                onClick={() => onDownload(opt.id)}
+                className={`w-full flex items-start gap-3 p-3.5 rounded-xl border-2 text-left transition cursor-pointer group disabled:opacity-60 ${
+                  opt.isPrimary
+                    ? 'border-blue-400 dark:border-blue-600 bg-blue-50/50 dark:bg-blue-950/20 hover:border-blue-600 dark:hover:border-blue-400'
+                    : 'border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 hover:bg-slate-50 dark:hover:bg-slate-900/40'
+                }`}
               >
-                ← Back to report selection
+                <div className="w-9 h-9 rounded-lg bg-red-100 dark:bg-red-950/60 flex items-center justify-center shrink-0 group-hover:bg-red-200 dark:group-hover:bg-red-900/60 transition mt-0.5">
+                  {isExporting ? (
+                    <RefreshCw size={16} className="text-red-600 dark:text-red-400 animate-spin" />
+                  ) : (
+                    <FileText size={18} className="text-red-600 dark:text-red-400" />
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-sm font-bold text-slate-900 dark:text-white">{opt.label}</span>
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 shrink-0">
+                      {opt.badge}
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">{opt.desc}</div>
+                </div>
               </button>
-            </>
-          )}
+            ))}
+          </div>
         </div>
       </div>
     </div>
@@ -468,12 +437,6 @@ function renderSection(section: ExecSection): React.ReactNode {
 }
 
 export default function ExportReports(_props: ExportReportsProps) {
-  const allChapterIds = useMemo(() => CAPSTONE_REPORT.chapters.map((c) => c.id), []);
-  const [selectedIds, setSelectedIds] = useState<string[]>(allChapterIds);
-
-  // Which report to view: executive (default) or final (Word doc)
-  const [viewReport, setViewReport] = useState<'executive' | 'final'>('executive');
-
   // Executive report section filter
   const [selectedSectionIds, setSelectedSectionIds] = useState<string[]>(
     ALL_EXEC_SECTIONS.map((s) => s.id)
@@ -484,8 +447,6 @@ export default function ExportReports(_props: ExportReportsProps) {
   const [showSuccessToast, setShowSuccessToast] = useState<string | null>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const totalPages = PAGINATED_REPORT_DATA.totalPages;
-  const chaptersNav = PAGINATED_REPORT_DATA.chapters;
 
   const toggleSection = (id: string) =>
     setSelectedSectionIds((prev) =>
@@ -498,41 +459,14 @@ export default function ExportReports(_props: ExportReportsProps) {
   );
 
   const handleSelectAll = () => {
-    if (viewReport === 'executive') setSelectedSectionIds(ALL_EXEC_SECTIONS.map((s) => s.id));
-    else setSelectedIds(allChapterIds);
+    setSelectedSectionIds(ALL_EXEC_SECTIONS.map((s) => s.id));
   };
   const handleClearSelection = () => {
-    if (viewReport === 'executive') setSelectedSectionIds([]);
-    else setSelectedIds([]);
+    setSelectedSectionIds([]);
   };
-  const toggleChapter = (id: string) =>
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
-
-  const selectedChapters = useMemo(
-    () => CAPSTONE_REPORT.chapters.filter((c) => selectedIds.includes(c.id)),
-    [selectedIds]
-  );
-
-  const visiblePages = useMemo(() => {
-    if (selectedIds.length === allChapterIds.length) return PAGINATED_REPORT_DATA.pages;
-    return PAGINATED_REPORT_DATA.pages.filter((p) => {
-      if (p.isCover) return true;
-      const chName = p.chapter.toLowerCase();
-      return selectedChapters.some(
-        (sc) =>
-          chName.includes(sc.shortTitle.toLowerCase()) ||
-          sc.title.toLowerCase().includes(chName) ||
-          (p.chapter === 'Executive Summary' && sc.id === 'exec-summary') ||
-          p.chapter === 'Table of Contents' ||
-          (p.chapter.startsWith('Appendix') && sc.id.startsWith('app'))
-      );
-    });
-  }, [selectedIds, allChapterIds.length, selectedChapters]);
 
   // ── Helpers to build exportable content ────────────────────────────────────
-  const buildDocxHtml = (title: string, mdContent: string) => {
+  const buildExecutivePdfHtml = (title: string, mdContent: string) => {
     const lines = mdContent.split('\n');
     const body = lines
       .map((line) => {
@@ -554,109 +488,72 @@ export default function ExportReports(_props: ExportReportsProps) {
       .join('');
 
     return `<!DOCTYPE html>
-<html xmlns:o="urn:schemas-microsoft-com:office:office"
-      xmlns:w="urn:schemas-microsoft-com:office:word"
-      xmlns="http://www.w3.org/TR/REC-html40">
+<html>
 <head><meta charset="utf-8"/><title>${title}</title>
-<!--[if gte mso 9]><xml><w:WordDocument>
-<w:View>Print</w:View><w:Zoom>100</w:Zoom>
-</w:WordDocument></xml><![endif]-->
 <style>
-  body { font-family:"Times New Roman",Times,serif; font-size:12pt; color:#000; margin:2.54cm; line-height:1.5; }
-  h1 { font-size:18pt; text-align:center; page-break-before:always; }
-  h1:first-of-type { page-break-before:avoid; }
-  h2 { font-size:14pt; }
-  h3 { font-size:12pt; }
-  p  { text-align:justify; margin-bottom:6pt; }
-  table { border-collapse:collapse; width:100%; margin:8pt 0; }
-  td,th { border:1px solid #000; padding:4pt 6pt; font-size:10pt; }
-  th { font-weight:bold; background:#f0f0f0; }
-  @page { size:8.5in 11in; margin:1in; }
+  @page { size: 8.5in 11in; margin: 1in; }
+  body { font-family: "Times New Roman", Times, Georgia, serif; font-size: 11pt; color: #0f172a; margin: 0; line-height: 1.6; }
+  h1 { font-size: 16pt; text-align: center; margin-bottom: 12pt; text-transform: uppercase; border-bottom: 2px solid #0f172a; padding-bottom: 8pt; }
+  h2 { font-size: 13pt; margin-top: 16pt; margin-bottom: 6pt; border-bottom: 1px solid #cbd5e1; padding-bottom: 4pt; }
+  h3 { font-size: 11.5pt; margin-top: 12pt; margin-bottom: 4pt; }
+  p  { text-align: justify; margin-bottom: 6pt; }
+  table { border-collapse: collapse; width: 100%; margin: 10pt 0; font-size: 9.5pt; }
+  td, th { border: 1px solid #94a3b8; padding: 5pt 7pt; }
+  th { font-weight: bold; background: #f1f5f9; text-align: left; }
+  hr { border: none; border-top: 1px solid #cbd5e1; margin: 16pt 0; }
+  @media print {
+    body { margin: 0; }
+  }
 </style></head><body>${body}</body></html>`;
   };
 
-  const triggerDownload = (content: string, filename: string, mimeType: string) => {
-    const blob = new Blob([content], { type: mimeType });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  };
-
-  const handleDownload = (reportType: ReportType, fileType: FileType) => {
+  const handleDownload = (reportType: ReportType) => {
     setIsExporting(true);
 
     setTimeout(() => {
-      const base = 'UNF_Capstone_Group5';
-
-      const doDownload = (title: string, md: string, suffix: string) => {
-        if (fileType === 'pdf') {
-          // Open print window
-          const pw = window.open('', '_blank');
-          if (pw) {
-            pw.document.write(buildDocxHtml(title, md).replace(
-              '<body>', '<body style="margin:2cm; font-family:\'Times New Roman\',serif;">'
-            ));
-            pw.document.close();
-            setTimeout(() => pw.print(), 500);
-          }
-          setShowSuccessToast(`Print dialog opened for ${suffix} — save as PDF.`);
-        } else {
-          triggerDownload(
-            buildDocxHtml(title, md),
-            `${base}_${suffix}.docx`,
-            'application/msword'
-          );
-          setShowSuccessToast(`Downloaded ${base}_${suffix}.docx`);
-        }
+      // 1. Download official Final Report Capstone Project.pdf
+      const downloadFinalReportPdf = () => {
+        const link = document.createElement('a');
+        link.href = '/reports/Final Report Capstone Project.pdf';
+        link.download = 'Final Report Capstone Project.pdf';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setShowSuccessToast('Downloaded Final Report Capstone Project.pdf (1.6 MB Complete Academic Report)');
       };
 
-      // Build Final Report MD from paginated data
-      const finalMd = PAGINATED_REPORT_DATA.pages
-        .map((p) =>
-          p.elements
-            .filter((el) => el.type === 'p')
-            .map((el: any) => el.text)
-            .join('\n\n')
-        )
-        .join('\n\n---\n\n');
+      // 2. Download / Print Executive Report PDF
+      const downloadExecutiveReportPdf = () => {
+        const pw = window.open('', '_blank');
+        if (pw) {
+          pw.document.write(
+            buildExecutivePdfHtml(
+              'Executive Report — Length of Stay & Resource Utilization in Canadian Hospitals',
+              EXECUTIVE_REPORT_MD
+            )
+          );
+          pw.document.close();
+          setTimeout(() => pw.print(), 500);
+        }
+        setShowSuccessToast('Print dialog opened — save Executive Report as PDF.');
+      };
 
       if (reportType === 'final') {
-        doDownload(
-          'Final Report — Length of Stay & Resource Utilization in Canadian Hospitals',
-          finalMd,
-          'Final_Report'
-        );
+        downloadFinalReportPdf();
       } else if (reportType === 'executive') {
-        doDownload(
-          'Executive Report — Length of Stay & Resource Utilization in Canadian Hospitals',
-          EXECUTIVE_REPORT_MD,
-          'Executive_Report'
-        );
+        downloadExecutiveReportPdf();
       } else {
-        // Both — trigger sequentially
-        doDownload(
-          'Final Report — Length of Stay & Resource Utilization in Canadian Hospitals',
-          finalMd,
-          'Final_Report'
-        );
+        // Both reports
+        downloadFinalReportPdf();
         setTimeout(() => {
-          doDownload(
-            'Executive Report — Length of Stay & Resource Utilization in Canadian Hospitals',
-            EXECUTIVE_REPORT_MD,
-            'Executive_Report'
-          );
+          downloadExecutiveReportPdf();
         }, 800);
       }
 
       setIsExporting(false);
       setShowModal(false);
       setTimeout(() => setShowSuccessToast(null), 5000);
-    }, 400);
+    }, 300);
   };
 
   return (
@@ -723,29 +620,29 @@ export default function ExportReports(_props: ExportReportsProps) {
           <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0f172a] shadow-sm space-y-3">
             <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
               <Sliders size={15} className="text-blue-500" />
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">Export</h3>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">Export (PDF)</h3>
             </div>
             <button
               onClick={() => setShowModal(true)}
               className="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-sm hover:shadow-md transition cursor-pointer"
             >
               <Download size={15} />
-              <span>Download as…</span>
+              <span>Download Report (PDF)…</span>
             </button>
             <p className="text-[10px] text-slate-400 dark:text-slate-500 text-center leading-relaxed">
-              Choose between Final Report, Executive Report, or Both · PDF or DOCX
+              PDF format only · Final Report (1.6 MB) or Executive Report
             </p>
           </div>
 
-          {/* Chapter Filter */}
+          {/* Section Filter */}
           <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0f172a] shadow-sm space-y-3">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <div className="flex items-center gap-2">
                 <Filter size={14} className="text-blue-500" />
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">Chapter Filter</h3>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">Section Filter</h3>
               </div>
               <span className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800">
-                {selectedIds.length}/{allChapterIds.length}
+                {visibleSections.length}/{ALL_EXEC_SECTIONS.filter((s) => s.level !== 1).length}
               </span>
             </div>
 
@@ -761,76 +658,33 @@ export default function ExportReports(_props: ExportReportsProps) {
             </div>
 
             <div className="space-y-1 max-h-[420px] overflow-y-auto pr-0.5">
-              {viewReport === 'executive' ? (
-                /* Executive Report section filter */
-                ALL_EXEC_SECTIONS.filter((s) => s.level !== 1).map((section) => {
-                  const isChecked = selectedSectionIds.includes(section.id);
-                  return (
-                    <div
-                      key={section.id}
-                      onClick={() => toggleSection(section.id)}
-                      className={`flex items-center gap-2 p-2 rounded-lg text-xs transition cursor-pointer ${
-                        isChecked
-                          ? 'bg-blue-50 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-900/60'
-                          : 'border border-transparent hover:border-slate-200 dark:hover:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900/30'
+              {ALL_EXEC_SECTIONS.filter((s) => s.level !== 1).map((section) => {
+                const isChecked = selectedSectionIds.includes(section.id);
+                return (
+                  <div
+                    key={section.id}
+                    onClick={() => toggleSection(section.id)}
+                    className={`flex items-center gap-2 p-2 rounded-lg text-xs transition cursor-pointer ${
+                      isChecked
+                        ? 'bg-blue-50 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-900/60'
+                        : 'border border-transparent hover:border-slate-200 dark:hover:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900/30'
+                    }`}
+                  >
+                    <input type="checkbox" checked={isChecked} onChange={() => {}}
+                      className="rounded text-blue-600 focus:ring-0 cursor-pointer shrink-0" />
+                    <span
+                      className={`truncate font-semibold text-[11px] ${
+                        section.level === 1
+                          ? 'text-slate-900 dark:text-white'
+                          : 'text-slate-600 dark:text-slate-400 pl-1'
                       }`}
                     >
-                      <input type="checkbox" checked={isChecked} onChange={() => {}}
-                        className="rounded text-blue-600 focus:ring-0 cursor-pointer shrink-0" />
-                      <span
-                        className={`truncate font-semibold text-[11px] ${
-                          section.level === 1
-                            ? 'text-slate-900 dark:text-white'
-                            : 'text-slate-600 dark:text-slate-400 pl-1'
-                        }`}
-                      >
-                        {section.level === 2 && <span className="text-[9px] mr-1 opacity-50">└</span>}
-                        {section.heading.length > 42 ? section.heading.slice(0, 42) + '…' : section.heading}
-                      </span>
-                    </div>
-                  );
-                })
-              ) : (
-                /* Final Report chapter filter */
-                CAPSTONE_REPORT.chapters.map((chapter) => {
-                  const isChecked = selectedIds.includes(chapter.id);
-                  const matchNav = chaptersNav.find(
-                    (cn) =>
-                      chapter.title.toLowerCase().includes(cn.name.toLowerCase()) ||
-                      cn.name.toLowerCase().includes(chapter.shortTitle.toLowerCase())
-                  );
-                  return (
-                    <div
-                      key={chapter.id}
-                      onClick={() => toggleChapter(chapter.id)}
-                      className={`flex items-center justify-between p-2 rounded-lg text-xs transition cursor-pointer ${
-                        isChecked
-                          ? 'bg-blue-50 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-900/60'
-                          : 'border border-transparent hover:border-slate-200 dark:hover:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900/30'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2 min-w-0">
-                        <input type="checkbox" checked={isChecked} onChange={() => {}}
-                          className="rounded text-blue-600 focus:ring-0 cursor-pointer shrink-0" />
-                        <div className="truncate">
-                          <div className="font-semibold text-slate-900 dark:text-white truncate text-[11px]">
-                            <span className="text-[9px] font-mono font-bold uppercase text-blue-600 dark:text-blue-400 mr-1">
-                              {chapter.id === 'exec-summary' ? 'EXEC'
-                                : chapter.id.startsWith('app') ? chapter.id.toUpperCase()
-                                : `CH${chapter.number}`}
-                            </span>
-                            {chapter.shortTitle}
-                          </div>
-                          {matchNav && (
-                            <div className="text-[10px] text-slate-400 font-mono">p. {matchNav.startPage}</div>
-                          )}
-                        </div>
-                      </div>
-                      {matchNav && <ChevronRight size={12} className="text-slate-400 shrink-0 ml-1" />}
-                    </div>
-                  );
-                })
-              )}
+                      {section.level === 2 && <span className="text-[9px] mr-1 opacity-50">└</span>}
+                      {section.heading.length > 42 ? section.heading.slice(0, 42) + '…' : section.heading}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
 
             <div className="pt-2 border-t border-slate-100 dark:border-slate-800 text-[10px] text-slate-400 flex items-start gap-1.5">
@@ -845,40 +699,16 @@ export default function ExportReports(_props: ExportReportsProps) {
 
           {/* Toolbar */}
           <div className="p-3 rounded-2xl border border-slate-200/90 dark:border-slate-800/80 bg-white dark:bg-[#0f172a] shadow-sm flex flex-wrap items-center justify-between gap-3 text-xs">
-            {/* View toggle */}
-            <div className="flex items-center bg-slate-100 dark:bg-[#131f37] p-1 rounded-xl border border-slate-200 dark:border-slate-700/80">
-              <button
-                type="button"
-                onClick={() => setViewReport('executive')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer ${
-                  viewReport === 'executive'
-                    ? 'bg-blue-600 text-white shadow-xs'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white shadow-xs">
                 <FileText size={13} />
                 <span>Executive Report</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewReport('final')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer ${
-                  viewReport === 'final'
-                    ? 'bg-blue-600 text-white shadow-xs'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                <BookOpen size={13} />
-                <span>Final Report</span>
-              </button>
+              </div>
             </div>
 
             <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
-              {viewReport === 'executive' ? (
-                <span>{visibleSections.length} of {ALL_EXEC_SECTIONS.length} sections</span>
-              ) : (
-                <><span className="font-semibold text-slate-800 dark:text-white">{visiblePages.length}</span><span> of {totalPages} pages</span></>
-              )}
+              <span className="font-semibold text-slate-800 dark:text-white">{visibleSections.length}</span>
+              <span> of {ALL_EXEC_SECTIONS.filter((s) => s.level !== 1).length} sections</span>
             </div>
           </div>
 
@@ -898,111 +728,89 @@ export default function ExportReports(_props: ExportReportsProps) {
                 }
               `}</style>
 
-              {viewReport === 'executive' ? (
-                /* ── Executive Report View ── */
+              {/* ── Executive Report View ── */}
+              <div
+                className="w-full"
+                style={{ maxWidth: '816px' }}
+              >
+                {/* Cover sheet */}
                 <div
-                  className="w-full"
-                  style={{ maxWidth: '816px' }}
+                  className="bg-white mx-auto mb-8 shadow-2xl border border-slate-300/90"
+                  style={{
+                    width: '816px', minHeight: '200px',
+                    padding: '52px 58px 40px',
+                    fontFamily: '"Times New Roman", Times, Georgia, serif',
+                    color: '#0f172a',
+                  }}
                 >
-                  {/* Cover sheet */}
-                  <div
-                    className="bg-white mx-auto mb-8 shadow-2xl border border-slate-300/90"
-                    style={{
-                      width: '816px', minHeight: '200px',
-                      padding: '52px 58px 40px',
-                      fontFamily: '"Times New Roman", Times, Georgia, serif',
-                      color: '#0f172a',
-                    }}
-                  >
-                    <div style={{ textAlign: 'center', borderBottom: '2px solid #0f172a', paddingBottom: '24px', marginBottom: '24px' }}>
-                      <div style={{ fontSize: '11px', fontFamily: 'sans-serif', fontWeight: 'bold', letterSpacing: '2px', textTransform: 'uppercase', color: '#1d4ed8', marginBottom: '6px' }}>
-                        University of Niagara Falls Canada
-                      </div>
-                      <div style={{ fontSize: '10px', fontFamily: 'sans-serif', textTransform: 'uppercase', letterSpacing: '1px', color: '#64748b' }}>
-                        Master of Data Analytics · DAMO 699 – Capstone Project
-                      </div>
+                  <div style={{ textAlign: 'center', borderBottom: '2px solid #0f172a', paddingBottom: '24px', marginBottom: '24px' }}>
+                    <div style={{ fontSize: '11px', fontFamily: 'sans-serif', fontWeight: 'bold', letterSpacing: '2px', textTransform: 'uppercase', color: '#1d4ed8', marginBottom: '6px' }}>
+                      University of Niagara Falls Canada
                     </div>
-                    <h1 style={{ textAlign: 'center', fontSize: '20px', fontWeight: 'extrabold', textTransform: 'uppercase', color: '#0f172a', lineHeight: 1.3, marginBottom: '10px' }}>
-                      Explanatory and Predictive Analytics of Emergency Department Length of Stay and Resource Utilization Trends in Canadian Hospitals
-                    </h1>
-                    <p style={{ textAlign: 'center', fontStyle: 'italic', fontSize: '12px', color: '#334155', marginBottom: '24px' }}>
-                      A Frequency-Weighted Biostatistical and Time-Series Analysis of 175.8 Million CIHI NACRS ED Encounters (2003–2022)
-                    </p>
-                    <div style={{ borderTop: '2px solid #0f172a', paddingTop: '16px', textAlign: 'center', fontFamily: 'sans-serif', fontSize: '11px', color: '#475569' }}>
-                      <div style={{ marginBottom: '4px' }}><strong>Group 5:</strong> Rajbharath P (NF1016766) · Sufyaan Khan Mohammed (NF1017047) · Amit Raj Dev (NF1021076)</div>
-                      <div><strong>Supervisor:</strong> Dr. Bilal El Toufaili &nbsp;|&nbsp; September 2026</div>
+                    <div style={{ fontSize: '10px', fontFamily: 'sans-serif', textTransform: 'uppercase', letterSpacing: '1px', color: '#64748b' }}>
+                      Master of Data Analytics · DAMO 699 – Capstone Project
                     </div>
                   </div>
+                  <h1 style={{ textAlign: 'center', fontSize: '20px', fontWeight: 'extrabold', textTransform: 'uppercase', color: '#0f172a', lineHeight: 1.3, marginBottom: '10px' }}>
+                    Explanatory and Predictive Analytics of Emergency Department Length of Stay and Resource Utilization Trends in Canadian Hospitals
+                  </h1>
+                  <p style={{ textAlign: 'center', fontStyle: 'italic', fontSize: '12px', color: '#334155', marginBottom: '24px' }}>
+                    A Frequency-Weighted Biostatistical and Time-Series Analysis of 175.8 Million CIHI NACRS ED Encounters (2003–2022)
+                  </p>
+                  <div style={{ borderTop: '2px solid #0f172a', paddingTop: '16px', textAlign: 'center', fontFamily: 'sans-serif', fontSize: '11px', color: '#475569' }}>
+                    <div style={{ marginBottom: '4px' }}><strong>Group 5:</strong> Rajbharath P (NF1016766) · Sufyaan Khan Mohammed (NF1017047) · Amit Raj Dev (NF1021076)</div>
+                    <div><strong>Supervisor:</strong> Dr. Bilal El Toufaili &nbsp;|&nbsp; September 2026</div>
+                  </div>
+                </div>
 
-                  {/* Sections */}
-                  {visibleSections.length === 0 ? (
-                    <div className="text-slate-400 dark:text-slate-600 text-sm py-20 text-center">
-                      <Filter size={32} className="mx-auto mb-3 opacity-40" />
-                      <p>No sections selected.</p>
-                    </div>
-                  ) : (
-                    visibleSections.map((section) => (
-                      <div
-                        key={section.id}
-                        id={`exec-section-${section.id}`}
-                        className="bg-white mx-auto mb-6 shadow-2xl border border-slate-300/90"
-                        style={{
-                          width: '816px',
-                          padding: '44px 58px',
-                          fontFamily: '"Times New Roman", Times, Georgia, serif',
-                          color: '#0f172a',
-                        }}
-                      >
-                        {/* Running header */}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px', borderBottom: '1px solid #cbd5e1', paddingBottom: '8px', marginBottom: '20px', fontFamily: 'sans-serif', userSelect: 'none' }}>
-                          <span>University of Niagara Falls Canada · Master of Data Analytics | DAMO 699</span>
-                          <span style={{ color: '#0f172a', fontWeight: 600 }}>Executive Report</span>
-                        </div>
-
-                        {/* Section heading */}
-                        {section.level === 1 ? (
-                          <h1 style={{ fontSize: '18px', fontWeight: 'bold', color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '16px', paddingBottom: '8px', borderBottom: '2px solid #0f172a', fontFamily: 'Georgia, serif' }}>
-                            {section.heading}
-                          </h1>
-                        ) : (
-                          <h2 style={{ fontSize: '15px', fontWeight: 'bold', color: '#0f172a', marginBottom: '12px', paddingBottom: '6px', borderBottom: '1px solid #e2e8f0', fontFamily: 'Georgia, serif' }}>
-                            {section.heading}
-                          </h2>
-                        )}
-
-                        {/* Section content */}
-                        <div>{renderSection(section)}</div>
-
-                        {/* Running footer */}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#64748b', borderTop: '1px solid #cbd5e1', paddingTop: '8px', marginTop: '20px', fontFamily: 'sans-serif', userSelect: 'none' }}>
-                          <span>Length of Stay & Resource Utilization in Canadian Hospitals (CIHI NACRS)</span>
-                          <span style={{ color: '#0f172a', fontWeight: 600, fontFamily: 'monospace' }}>Executive Report · Group 5</span>
-                        </div>
+                {/* Sections */}
+                {visibleSections.length === 0 ? (
+                  <div className="text-slate-400 dark:text-slate-600 text-sm py-20 text-center">
+                    <Filter size={32} className="mx-auto mb-3 opacity-40" />
+                    <p>No sections selected.</p>
+                  </div>
+                ) : (
+                  visibleSections.map((section) => (
+                    <div
+                      key={section.id}
+                      id={`exec-section-${section.id}`}
+                      className="bg-white mx-auto mb-6 shadow-2xl border border-slate-300/90"
+                      style={{
+                        width: '816px',
+                        padding: '44px 58px',
+                        fontFamily: '"Times New Roman", Times, Georgia, serif',
+                        color: '#0f172a',
+                      }}
+                    >
+                      {/* Running header */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px', borderBottom: '1px solid #cbd5e1', paddingBottom: '8px', marginBottom: '20px', fontFamily: 'sans-serif', userSelect: 'none' }}>
+                        <span>University of Niagara Falls Canada · Master of Data Analytics | DAMO 699</span>
+                        <span style={{ color: '#0f172a', fontWeight: 600 }}>Executive Report</span>
                       </div>
-                    ))
-                  )}
-                </div>
-              ) : (
-                /* ── Final Report View (Word doc pages) ── */
-                <div className="space-y-8 py-2 w-full flex flex-col items-center">
-                  {visiblePages.length === 0 ? (
-                    <div className="text-slate-400 dark:text-slate-600 text-sm py-20 text-center">
-                      <Filter size={32} className="mx-auto mb-3 opacity-40" />
-                      <p>No chapters selected.</p>
+
+                      {/* Section heading */}
+                      {section.level === 1 ? (
+                        <h1 style={{ fontSize: '18px', fontWeight: 'bold', color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '16px', paddingBottom: '8px', borderBottom: '2px solid #0f172a', fontFamily: 'Georgia, serif' }}>
+                          {section.heading}
+                        </h1>
+                      ) : (
+                        <h2 style={{ fontSize: '15px', fontWeight: 'bold', color: '#0f172a', marginBottom: '12px', paddingBottom: '6px', borderBottom: '1px solid #e2e8f0', fontFamily: 'Georgia, serif' }}>
+                          {section.heading}
+                        </h2>
+                      )}
+
+                      {/* Section content */}
+                      <div>{renderSection(section)}</div>
+
+                      {/* Running footer */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#64748b', borderTop: '1px solid #cbd5e1', paddingTop: '8px', marginTop: '20px', fontFamily: 'sans-serif', userSelect: 'none' }}>
+                        <span>Length of Stay & Resource Utilization in Canadian Hospitals (CIHI NACRS)</span>
+                        <span style={{ color: '#0f172a', fontWeight: 600, fontFamily: 'monospace' }}>Executive Report · Group 5</span>
+                      </div>
                     </div>
-                  ) : (
-                    visiblePages.map((page) => (
-                      <AcademicPageSheet
-                        key={page.pageNumber}
-                        page={page}
-                        totalPages={totalPages}
-                        zoom={100}
-                        searchQuery=""
-                      />
-                    ))
-                  )}
-                </div>
-              )}
+                  ))
+                )}
+              </div>
             </div>
           </div>
         </div>
