@@ -133,16 +133,14 @@ export default function FitDiagnostics({ cleanedData, isDarkMode = false }: FitD
       </div>
 
       {/* ── HEADER & CONTROLS ─────────────────────────────────────────────── */}
-      <div className={`p-6 rounded-2xl border shadow-sm print-hide ${
-        isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-slate-200 bg-white'
-      }`}>
+      <div className="p-6 rounded-2xl border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-[#111e35] shadow-sm print-hide">
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5">
           <div className="space-y-1">
-            <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-bold text-xs uppercase tracking-wider font-mono">
-              <GitCompare size={16} />
+            <div className="inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 font-bold text-xs uppercase tracking-wider font-mono bg-blue-500/10 border border-blue-500/20 px-2.5 py-0.5 rounded-md">
+              <GitCompare size={15} />
               <span>Post-Cleaning Model Validation</span>
             </div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">
               Overfitting &amp; Underfitting Diagnostics
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 font-light max-w-2xl">
@@ -154,48 +152,48 @@ export default function FitDiagnostics({ cleanedData, isDarkMode = false }: FitD
 
           <div className="flex flex-wrap items-end gap-3">
             <label className="flex flex-col gap-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Predictor</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 font-mono">Predictor</span>
               <select
                 value={feature}
                 onChange={e => setFeature(e.target.value)}
-                className="h-10 px-3 rounded-lg border text-sm bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white cursor-pointer"
+                className="h-10 px-3 rounded-xl border text-xs bg-white dark:bg-slate-900 border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-slate-100 cursor-pointer font-sans"
                 id="fit-feature-select"
               >
-                {columns.map(c => <option key={c} value={c}>{c}</option>)}
+                {columns.map(c => <option key={c} value={c} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">{c}</option>)}
               </select>
             </label>
 
             <label className="flex flex-col gap-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Target</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 font-mono">Target</span>
               <select
                 value={target}
                 onChange={e => setTarget(e.target.value)}
-                className="h-10 px-3 rounded-lg border text-sm bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white cursor-pointer"
+                className="h-10 px-3 rounded-xl border text-xs bg-white dark:bg-slate-900 border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-slate-100 cursor-pointer font-sans"
                 id="fit-target-select"
               >
-                {columns.map(c => <option key={c} value={c}>{c}</option>)}
+                {columns.map(c => <option key={c} value={c} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">{c}</option>)}
               </select>
             </label>
 
             <label className="flex flex-col gap-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Degree</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 font-mono">Degree</span>
               <select
                 value={degree}
                 onChange={e => setDegree(Number(e.target.value))}
-                className="h-10 px-3 rounded-lg border text-sm bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white cursor-pointer"
+                className="h-10 px-3 rounded-xl border text-xs bg-white dark:bg-slate-900 border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-slate-100 cursor-pointer font-sans"
                 id="fit-degree-select"
               >
-                {[1, 2, 3, 4, 5, 6].map(d => <option key={d} value={d}>{d}</option>)}
+                {[1, 2, 3, 4, 5, 6].map(d => <option key={d} value={d} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">{d}</option>)}
               </select>
             </label>
 
             <button
               onClick={runDiagnostics}
               disabled={isRunning || !feature || !target}
-              className="h-10 px-6 rounded-lg bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white font-bold text-sm shadow-md transition-all flex items-center gap-2 cursor-pointer select-none"
+              className="h-10 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.99] disabled:opacity-40 text-white font-bold text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer select-none"
               id="run-fit-diagnostics-btn"
             >
-              {isRunning ? <Loader2 size={16} className="animate-spin" /> : <PlaySquare size={16} />}
+              {isRunning ? <Loader2 size={15} className="animate-spin" /> : <PlaySquare size={15} />}
               <span>{isRunning ? 'Evaluating…' : 'Run Diagnostics'}</span>
             </button>
           </div>
@@ -247,25 +245,21 @@ export default function FitDiagnostics({ cleanedData, isDarkMode = false }: FitD
               { label: 'Generalization Gap', value: result.diagnosis.generalization_gap.toFixed(3), sub: 'train − holdout', Icon: GitCompare },
               { label: '5-Fold CV R²', value: result.cross_validation!.mean_r2.toFixed(3), sub: `± ${result.cross_validation!.std_r2.toFixed(3)}`, Icon: Activity }
             ].map(card => (
-              <div key={card.label} className={`p-5 rounded-2xl border shadow-sm ${
-                isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-slate-200 bg-white'
-              }`}>
+              <div key={card.label} className="p-4 rounded-xl border border-slate-200/90 dark:border-white/[0.08] bg-slate-50 dark:bg-white/[0.02] shadow-xs hover:border-slate-300 dark:hover:border-white/[0.15] transition-all">
                 <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 mb-2">
                   <card.Icon size={14} />
-                  <span className="text-[10px] font-bold uppercase tracking-wider">{card.label}</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider font-mono">{card.label}</span>
                 </div>
-                <div className="text-2xl font-bold text-slate-900 dark:text-white font-mono">{card.value}</div>
-                <div className="text-[11px] text-slate-400 mt-0.5">{card.sub}</div>
+                <div className="text-2xl font-bold text-slate-900 dark:text-slate-100 font-mono">{card.value}</div>
+                <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{card.sub}</div>
               </div>
             ))}
           </div>
 
           {/* ── LEARNING CURVE + COMPLEXITY CURVE ───────────────────────────── */}
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            <div className={`p-6 rounded-2xl border shadow-sm print-block ${
-              isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-slate-200 bg-white'
-            }`}>
-              <h4 className="font-bold text-sm text-slate-900 dark:text-white mb-1">Learning Curve</h4>
+            <div className="p-6 rounded-2xl border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-[#111e35] shadow-sm print-block">
+              <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100 mb-1">Learning Curve</h4>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-4">
                 Error against training sample size. Curves that converge high = underfitting;
                 a persistent gap = overfitting.
@@ -279,19 +273,17 @@ export default function FitDiagnostics({ cleanedData, isDarkMode = false }: FitD
                     label={{ value: 'RMSE', angle: -90, position: 'insideLeft', fontSize: 10, fill: axisStroke }} />
                   <Tooltip contentStyle={tooltipStyle} />
                   <Legend wrapperStyle={{ fontSize: '11px' }} />
-                  <Line type="monotone" dataKey="train_rmse" name="Training error" stroke="#6366f1" strokeWidth={2} dot={{ r: 3 }} />
+                  <Line type="monotone" dataKey="train_rmse" name="Training error" stroke="#3b82f6" strokeWidth={2} dot={{ r: 3 }} />
                   <Line type="monotone" dataKey="validation_rmse" name="Validation error" stroke="#f59e0b" strokeWidth={2} dot={{ r: 3 }} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
 
-            <div className={`p-6 rounded-2xl border shadow-sm print-block ${
-              isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-slate-200 bg-white'
-            }`}>
-              <h4 className="font-bold text-sm text-slate-900 dark:text-white mb-1">
+            <div className="p-6 rounded-2xl border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-[#111e35] shadow-sm print-block">
+              <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100 mb-1">
                 Model Complexity Curve
                 {result.optimal_degree != null && (
-                  <span className="ml-2 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
+                  <span className="ml-2 text-[11px] font-medium text-emerald-600 dark:text-emerald-400 font-mono">
                     best validation at degree {result.optimal_degree}
                   </span>
                 )}
@@ -312,7 +304,7 @@ export default function FitDiagnostics({ cleanedData, isDarkMode = false }: FitD
                   {result.optimal_degree != null && (
                     <ReferenceLine x={result.optimal_degree} stroke="#10b981" strokeDasharray="4 4" />
                   )}
-                  <Line type="monotone" dataKey="train_r2" name="Training R²" stroke="#6366f1" strokeWidth={2} dot={{ r: 3 }} />
+                  <Line type="monotone" dataKey="train_r2" name="Training R²" stroke="#3b82f6" strokeWidth={2} dot={{ r: 3 }} />
                   <Line type="monotone" dataKey="validation_r2" name="Validation R²" stroke="#f59e0b" strokeWidth={2} dot={{ r: 3 }} />
                 </LineChart>
               </ResponsiveContainer>
@@ -321,10 +313,8 @@ export default function FitDiagnostics({ cleanedData, isDarkMode = false }: FitD
 
           {/* ── PREDICTED VS ACTUAL + RESIDUALS ─────────────────────────────── */}
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            <div className={`p-6 rounded-2xl border shadow-sm print-block ${
-              isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-slate-200 bg-white'
-            }`}>
-              <h4 className="font-bold text-sm text-slate-900 dark:text-white mb-1">Predicted vs Actual</h4>
+            <div className="p-6 rounded-2xl border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-[#111e35] shadow-sm print-block">
+              <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100 mb-1">Predicted vs Actual</h4>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-4">
                 Holdout points scattering further from the diagonal than training points is
                 the signature of overfitting.
@@ -336,16 +326,14 @@ export default function FitDiagnostics({ cleanedData, isDarkMode = false }: FitD
                   <YAxis type="number" dataKey="predicted" name="Predicted" stroke={axisStroke} fontSize={11} />
                   <Tooltip contentStyle={tooltipStyle} cursor={{ strokeDasharray: '3 3' }} />
                   <Legend wrapperStyle={{ fontSize: '11px' }} />
-                  <Scatter name="Training" data={result.scatter!.filter(p => p.split === 'train')} fill="#6366f1" fillOpacity={0.5} />
+                  <Scatter name="Training" data={result.scatter!.filter(p => p.split === 'train')} fill="#3b82f6" fillOpacity={0.6} />
                   <Scatter name="Holdout" data={result.scatter!.filter(p => p.split === 'holdout')} fill="#f59e0b" fillOpacity={0.7} />
                 </ScatterChart>
               </ResponsiveContainer>
             </div>
 
-            <div className={`p-6 rounded-2xl border shadow-sm print-block ${
-              isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-slate-200 bg-white'
-            }`}>
-              <h4 className="font-bold text-sm text-slate-900 dark:text-white mb-1">Residual Plot</h4>
+            <div className="p-6 rounded-2xl border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-[#111e35] shadow-sm print-block">
+              <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100 mb-1">Residual Plot</h4>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-4">
                 Residuals should scatter randomly around zero. Visible curvature means the
                 model is too simple for the relationship.
@@ -358,7 +346,7 @@ export default function FitDiagnostics({ cleanedData, isDarkMode = false }: FitD
                   <Tooltip contentStyle={tooltipStyle} cursor={{ strokeDasharray: '3 3' }} />
                   <Legend wrapperStyle={{ fontSize: '11px' }} />
                   <ReferenceLine y={0} stroke="#10b981" strokeWidth={1.5} />
-                  <Scatter name="Training" data={result.residuals!.filter(p => p.split === 'train')} fill="#6366f1" fillOpacity={0.5} />
+                  <Scatter name="Training" data={result.residuals!.filter(p => p.split === 'train')} fill="#3b82f6" fillOpacity={0.6} />
                   <Scatter name="Holdout" data={result.residuals!.filter(p => p.split === 'holdout')} fill="#f59e0b" fillOpacity={0.7} />
                 </ScatterChart>
               </ResponsiveContainer>
@@ -367,12 +355,10 @@ export default function FitDiagnostics({ cleanedData, isDarkMode = false }: FitD
 
           {/* ── DATA QUALITY FOOTNOTE ───────────────────────────────────────── */}
           {result.data_quality && (
-            <div className={`p-4 rounded-xl border text-[11px] flex flex-wrap gap-x-6 gap-y-2 print-block ${
-              isDarkMode ? 'border-slate-800 bg-slate-900/60 text-slate-400' : 'border-slate-200 bg-slate-50 text-slate-600'
-            }`}>
-              <span><strong className="text-slate-900 dark:text-white">{result.data_quality.usable_rows}</strong> usable rows of {result.data_quality.total_rows}</span>
-              <span><strong className="text-slate-900 dark:text-white">{result.data_quality.dropped_missing}</strong> dropped — missing or imputed</span>
-              <span><strong className="text-slate-900 dark:text-white">{result.data_quality.dropped_non_numeric}</strong> dropped — non-numeric</span>
+            <div className="p-4 rounded-xl border border-slate-200/80 dark:border-white/[0.06] bg-slate-50 dark:bg-white/[0.02] text-[11px] flex flex-wrap gap-x-6 gap-y-2 print-block text-slate-600 dark:text-slate-400">
+              <span><strong className="text-slate-900 dark:text-slate-100">{result.data_quality.usable_rows}</strong> usable rows of {result.data_quality.total_rows}</span>
+              <span><strong className="text-slate-900 dark:text-slate-100">{result.data_quality.dropped_missing}</strong> dropped — missing or imputed</span>
+              <span><strong className="text-slate-900 dark:text-slate-100">{result.data_quality.dropped_non_numeric}</strong> dropped — non-numeric</span>
               <span>Imputed placeholders are excluded from the fit so they cannot pass as observations.</span>
             </div>
           )}

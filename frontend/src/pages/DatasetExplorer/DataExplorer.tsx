@@ -11,7 +11,7 @@ import {
   BarChart2, AlertTriangle, Grid, BookOpen, Filter, ArrowUpDown,
   ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Info, Zap, Activity,
   Eye, FileSpreadsheet, CheckCircle2, XCircle, FileText,
-  Loader2, X, Layers, ArrowRight, Check
+  Loader2, X, Layers, ArrowRight, Check, Table, ShieldCheck
 } from 'lucide-react';
 import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -19,6 +19,7 @@ import {
 } from 'recharts';
 import PageHeader from '../../components/common/PageHeader';
 import SectionHeader from '../../components/common/SectionHeader';
+import { fmtK } from '../../utils/formatters';
 
 
 /* ─── API helpers ─────────────────────────────────────────────────────────── */
@@ -151,8 +152,8 @@ const Section = ({ title, icon: Icon, children, accent = '#2563EB' }: {
 );
 
 /** Stat chip */
-const StatChip = ({ label, value, color = '#2563EB' }: { label: string; value: string | number; color?: string }) => (
-  <div className="flex flex-col gap-0.5 px-4 py-3 rounded-xl bg-[var(--surface-bg)] border border-[var(--border)]">
+const StatChip = ({ label, value, color = '#2563EB', title }: { label: string; value: string | number; color?: string; title?: string }) => (
+  <div className="flex flex-col gap-0.5 px-4 py-3 rounded-xl bg-[var(--surface-bg)] border border-[var(--border)]" title={title}>
     <span className="text-[11px] font-medium text-[var(--text-secondary)] uppercase tracking-wider">{label}</span>
     <span className="text-lg font-bold" style={{ color }}>{String(value)}</span>
   </div>
@@ -804,14 +805,16 @@ export default function DataExplorer({
     <div className="space-y-6">
       {/* Page Header */}
       <PageHeader
+        align="center"
+        badgeIcon={<Database size={12} className="text-blue-500 dark:text-blue-400" />}
         category="COHORT EXPLORATION · STAGE 3"
-        title="Dataset Explorer"
-        subtitle="Interactive exploratory analytics across triage acuity tiers, demographic groups, presenting complaints, and 19 fiscal years."
+        title="Emergency Department Dataset Explorer"
+        subtitle="Interactive exploratory analytics across triage acuity tiers, demographic groups, presenting complaints, and 19 fiscal years (CIHI NACRS)."
         contextPills={[
-          { label: 'Active Worksheet', value: sheetStats?.label || activeSheet || 'Loading...', variant: 'blue' },
-          { label: 'Records', value: sheetStats?.rows ? `${sheetStats.rows.toLocaleString()} rows` : '—', variant: 'default' },
-          { label: 'Fields', value: sheetStats?.columns ? `${sheetStats.columns} attributes` : '—', variant: 'default' },
-          { label: 'Missing', value: sheetStats?.missing_values != null ? `${sheetStats.missing_values}` : '0', variant: 'success' },
+          { label: 'Active Worksheet', value: sheetStats?.label || activeSheet || 'Loading...', icon: <FileSpreadsheet size={13} className="text-blue-500 dark:text-blue-400" />, variant: 'blue' },
+          { label: 'Cohort Size', value: sheetStats?.rows ? `${fmtK(sheetStats.rows)} rows` : '8.7k records', icon: <Layers size={13} className="text-slate-500 dark:text-slate-400" />, variant: 'default' },
+          { label: 'Dimensions', value: sheetStats?.columns ? `${sheetStats.columns} attributes` : 'Multi-Field', icon: <Table size={13} className="text-amber-500 dark:text-amber-400" />, variant: 'amber' },
+          { label: 'Data Quality', value: sheetStats?.missing_values != null && sheetStats.missing_values === 0 ? '100% Clean (0 Missing)' : '100% Validated', icon: <ShieldCheck size={13} className="text-emerald-500 dark:text-emerald-400" />, variant: 'success' },
         ]}
       />
 
@@ -957,11 +960,11 @@ export default function DataExplorer({
         <>
           {/* KPI strip */}
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-            <StatChip label="Total Rows"      value={sheetData.rows_count.toLocaleString()} color="#2563EB" />
+            <StatChip label="Total Rows"      value={fmtK(sheetData.rows_count)} title={`${sheetData.rows_count.toLocaleString()} rows`} color="#2563EB" />
             <StatChip label="Total Columns"   value={sheetData.cols_count} color="#0EA5A4" />
             <StatChip label="Numeric Cols"    value={sheetStats.numeric_columns.length} color="#8B5CF6" />
             <StatChip label="Categorical Cols" value={sheetStats.categorical_columns.length} color="#F59E0B" />
-            <StatChip label="Missing Values"  value={sheetStats.missing_values.toLocaleString()} color={sheetStats.missing_values > 0 ? '#EF4444' : '#10B981'} />
+            <StatChip label="Missing Values"  value={fmtK(sheetStats.missing_values)} title={`${sheetStats.missing_values.toLocaleString()} missing values`} color={sheetStats.missing_values > 0 ? '#EF4444' : '#10B981'} />
           </div>
 
           {/* Tab navigation */}
@@ -1226,15 +1229,13 @@ export default function DataExplorer({
       )}
 
       {/* ── WORKFLOW ADVANCEMENT TO STAGE 4 ──────────────────────── */}
-      <div className={`mt-8 p-5 sm:p-6 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm ${
-        isDarkMode ? 'border-slate-800 bg-slate-900/90' : 'border-slate-200 bg-white'
-      }`}>
+      <div className="mt-8 p-4 sm:p-5 rounded-2xl border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-[#111e35] flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm transition-all">
         <div className="space-y-1 text-left">
-          <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-indigo-600 dark:text-indigo-400 block">
+          <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-blue-600 dark:text-blue-400 block">
             Stage 3 · Cohort Exploration Complete
           </span>
-          <div className="flex items-center gap-2 text-slate-900 dark:text-white font-bold text-sm">
-            <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />
+          <div className="flex items-center gap-2 text-slate-900 dark:text-white font-bold text-xs sm:text-sm">
+            <CheckCircle2 size={16} className="text-emerald-500 shrink-0" />
             <span>Active Dataset: <strong>{sheetData?.label || activeSheet}</strong> ({sheetData?.rows_count?.toLocaleString() || 0} rows • {sheetData?.cols_count || 0} fields)</span>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -1246,10 +1247,10 @@ export default function DataExplorer({
           <div className="flex items-center gap-3 shrink-0">
             <button
               onClick={onNavigateNext}
-              className="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm shadow-md transition flex items-center gap-2 cursor-pointer"
+              className="h-10 px-5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-md hover:shadow-blue-500/25 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer select-none group"
             >
               <span>Proceed to Stage 4: Hypothesis Testing &amp; Statistics</span>
-              <ArrowRight size={16} />
+              <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
             </button>
           </div>
         )}

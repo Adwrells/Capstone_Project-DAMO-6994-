@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import {
   ResponsiveContainer,
   ComposedChart,
@@ -13,6 +13,7 @@ import {
 } from 'recharts';
 import { TrendingUp, ShieldCheck } from 'lucide-react';
 import { fmtK } from './formatters';
+import DownloadVisualButton from './DownloadVisualButton';
 
 interface ResourceBurdenTrendProps {
   isDarkMode: boolean;
@@ -69,10 +70,13 @@ function CustomTrendTooltip({ active, payload, label }: any) {
 }
 
 export default function ResourceBurdenTrend({ isDarkMode }: ResourceBurdenTrendProps) {
-  const dark = isDarkMode;
+  const [overrideTheme, setOverrideTheme] = useState<'light' | 'dark' | null>(null);
+  const dark = overrideTheme !== null ? overrideTheme === 'dark' : isDarkMode;
+  const cardRef = useRef<HTMLDivElement>(null);
 
   return (
     <div
+      ref={cardRef}
       className={`rounded-2xl border p-6 shadow-xs space-y-4 transition-colors flex flex-col justify-between h-full ${
         dark ? 'bg-[#131f37] border-[#1e2d4a]' : 'bg-white border-slate-200'
       }`}
@@ -90,9 +94,21 @@ export default function ResourceBurdenTrend({ isDarkMode }: ResourceBurdenTrendP
               Mann-Kendall Monotonic Test (Z = 5.5977, p &lt; 0.001) · Simple Exponential Smoothing (SES) with 95% Prediction Intervals
             </p>
           </div>
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9.5px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
-            <ShieldCheck size={11} /> Statistically Significant Trend
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9.5px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+              <ShieldCheck size={11} /> Statistically Significant
+            </span>
+            <DownloadVisualButton
+              cardRef={cardRef}
+              visualTitle="Longitudinal_Resource_Burden_Trend_Forecast"
+              isDarkMode={dark}
+              onSetTheme={async (theme) => {
+                setOverrideTheme(theme);
+                await new Promise((r) => setTimeout(r, 120));
+              }}
+              onResetTheme={() => setOverrideTheme(null)}
+            />
+          </div>
         </div>
 
         <div className="h-[235px] pt-2 w-full">

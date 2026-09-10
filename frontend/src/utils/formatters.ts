@@ -6,21 +6,72 @@
  */
 
 /**
- * Formats large numeric counts into compact SI units (e.g. 1.25M, 34.5k).
+ * Helper to format compact numbers with suffix, respecting maximum decimal precision
+ * and dropping unnecessary trailing zeroes (e.g. 175.8M instead of 175.80M, 10k instead of 10.0k, 6.39M).
  */
-export function fmtK(n: number | null | undefined): string {
-  if (n === null || n === undefined || !Number.isFinite(Number(n))) return '—';
-  const num = Number(n);
-  const abs = Math.abs(num);
-  if (abs >= 1_000_000_000) return `${(num / 1_000_000_000).toFixed(2)}B`;
-  if (abs >= 1_000_000) return `${(num / 1_000_000).toFixed(2)}M`;
-  if (abs >= 1_000) return `${(num / 1_000).toFixed(1)}k`;
-  return num.toFixed(abs < 10 && !Number.isInteger(num) ? 2 : 0);
+function formatCompactWithSuffix(val: number, divisor: number, suffix: string, maxDp: number = 2): string {
+  const scaled = val / divisor;
+  const fixed = scaled.toFixed(maxDp);
+  const trimmed = fixed.replace(/(\.[0-9]*[1-9])0+$/, '$1').replace(/\.0+$/, '');
+  return `${trimmed}${suffix}`;
 }
 
 /**
- * Semantic alias for compact number formatting.
+ * Formats numeric values into standardized compact SI notation using k, M, and B.
+ * - Billions (B): e.g. 1.25B (values >= 1,000,000,000)
+ * - Millions (M): e.g. 6.39M, 175.8M (values >= 1,000,000)
+ * - Thousands (k): e.g. 61.27k, 371.61k, 7.3k (values >= 1,000)
+ * - Under 1,000: preserves decimals or integer format (e.g. 95, 2.50, 163.52, 0.13)
+ * - Preserves calendar years (e.g. 2003-2022) when specified or detected.
  */
+export function fmtK(
+  n: number | null | undefined,
+  dp: number = 2,
+  options?: {
+    isYear?: boolean;
+    forceExact?: boolean;
+  }
+): string {
+  if (n === null || n === undefined || !Number.isFinite(Number(n))) return '—';
+  const num = Number(n);
+
+  // Protect calendar years (e.g. 2003 to 2022) from SI suffix formatting or unwanted commas
+  if (options?.isYear || (num >= 1900 && num <= 2100 && options?.isYear !== false && Number.isInteger(num))) {
+    return String(num);
+  }
+
+  if (options?.forceExact) {
+    return num.toLocaleString('en-US', {
+      minimumFractionDigits: Number.isInteger(num) ? 0 : Math.min(dp, 2),
+      maximumFractionDigits: dp,
+    });
+  }
+
+  const abs = Math.abs(num);
+
+  if (abs >= 1_000_000_000) {
+    return formatCompactWithSuffix(num, 1_000_000_000, 'B', dp);
+  }
+  if (abs >= 1_000_000) {
+    return formatCompactWithSuffix(num, 1_000_000, 'M', dp);
+  }
+  if (abs >= 1_000) {
+    return formatCompactWithSuffix(num, 1_000, 'k', dp);
+  }
+
+  // Under 1,000
+  if (Number.isInteger(num)) return num.toString();
+  if (abs < 0.01 && num !== 0) return num.toFixed(3);
+  return num.toLocaleString('en-US', {
+    minimumFractionDigits: abs < 10 ? Math.min(dp, 2) : 0,
+    maximumFractionDigits: dp,
+  });
+}
+
+/**
+ * Semantic aliases for standardized compact number formatting.
+ */
+export const fmtCompact = fmtK;
 export const formatCompactNumber = fmtK;
 
 /**
@@ -107,6 +158,7 @@ export function fmtStat(val: number | null | undefined, dp: number = 2): string 
   const num = Number(val);
   const abs = Math.abs(num);
   if (abs >= 1e12) return `${(num / 1e12).toFixed(dp)} × 10¹²`;
+  if (abs >= 1e9) return `${(num / 1e9).toFixed(dp)}B`;
   if (abs >= 1e8) return `${(num / 1e8).toFixed(dp)} × 10⁸`;
   if (abs >= 1e6) return `${(num / 1e6).toFixed(dp)}M`;
   if (abs >= 1e3) return `${(num / 1e3).toFixed(dp)}k`;

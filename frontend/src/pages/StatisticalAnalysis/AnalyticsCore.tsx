@@ -8,7 +8,8 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import {
-  ChevronRight, ChevronDown, ChevronUp, Info, ShieldCheck, Clock, Cpu, FileText, TrendingUp, ArrowRight, CheckCircle2
+  ChevronRight, ChevronDown, ChevronUp, Info, ShieldCheck, Clock, Cpu, FileText, TrendingUp, ArrowRight, CheckCircle2,
+  BarChart3, Target, Scale
 } from 'lucide-react';
 import {
   ResponsiveContainer, ComposedChart, Line, Area,
@@ -16,6 +17,7 @@ import {
 } from 'recharts';
 import PageHeader from '../../components/common/PageHeader';
 import SectionHeader from '../../components/common/SectionHeader';
+import { fmtK } from '../../utils/formatters';
 
 
 // ─── INTERFACES ──────────────────────────────────────────────────────────────
@@ -379,7 +381,9 @@ function ContingencyTableViz({
       <div className="flex flex-wrap justify-center items-stretch gap-3">
         <div className="flex-1 min-w-[150px] max-w-[210px] p-3 rounded-xl bg-slate-50 dark:bg-[#0f1d33] border border-slate-200 dark:border-[#1e2d4a] text-center shadow-xs">
           <span className="text-[9px] uppercase font-bold text-slate-400 block font-mono">Total Cohort (N)</span>
-          <span className="text-sm font-extrabold text-slate-900 dark:text-white font-mono">{totalN.toLocaleString()}</span>
+          <span className="text-sm font-extrabold text-slate-900 dark:text-white font-mono cursor-help" title={`${totalN.toLocaleString()} visits`}>
+            {fmtK(totalN)}
+          </span>
           <span className="text-[9px] text-slate-500 block">100% NACRS Visits</span>
         </div>
         <div className="flex-1 min-w-[150px] max-w-[210px] p-3 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-800/60 text-center shadow-xs">
@@ -387,14 +391,18 @@ function ContingencyTableViz({
           <span className="text-sm font-extrabold text-emerald-600 dark:text-emerald-400 font-mono">
             {totalN > 0 ? ((colSums[0] / totalN) * 100).toFixed(2) : 0}%
           </span>
-          <span className="text-[9px] text-emerald-600/80 font-mono">{(colSums[0] || 0).toLocaleString()} visits</span>
+          <span className="text-[9px] text-emerald-600/80 font-mono cursor-help" title={`${(colSums[0] || 0).toLocaleString()} visits`}>
+            {fmtK(colSums[0] || 0)} visits
+          </span>
         </div>
         <div className="flex-1 min-w-[150px] max-w-[210px] p-3 rounded-xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200/60 dark:border-rose-800/60 text-center shadow-xs">
           <span className="text-[9px] uppercase font-bold text-rose-700 dark:text-rose-400 block font-mono">Admitted Inpatient</span>
           <span className="text-sm font-extrabold text-rose-600 dark:text-rose-400 font-mono">
             {totalN > 0 ? ((colSums[1] / totalN) * 100).toFixed(2) : 0}%
           </span>
-          <span className="text-[9px] text-rose-600/80 font-mono">{(colSums[1] || 0).toLocaleString()} visits</span>
+          <span className="text-[9px] text-rose-600/80 font-mono cursor-help" title={`${(colSums[1] || 0).toLocaleString()} visits`}>
+            {fmtK(colSums[1] || 0)} visits
+          </span>
         </div>
         <div className="flex-1 min-w-[150px] max-w-[210px] p-3 rounded-xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200/60 dark:border-blue-800/60 text-center shadow-xs">
           <span className="text-[9px] uppercase font-bold text-blue-700 dark:text-blue-400 block font-mono">Admission Disparity</span>
@@ -1803,23 +1811,25 @@ export default function AnalyticsCore({ fields, data, onNavigateNext }: Analytic
 
       {/* Page Header */}
       <PageHeader
+        align="center"
+        badgeIcon={<BarChart3 size={12} className="text-blue-500 dark:text-blue-400" />}
         category="BIOSTATISTICAL INFERENCE · STAGE 4"
         title="Hypothesis Testing & Statistical Analysis"
         subtitle="Weighted non-parametric hypothesis tests, weighted least squares (WLS) regressions, and Mann-Kendall longitudinal forecasting with Simple Exponential Smoothing (SES)."
         contextPills={[
-          { label: 'Solvers', value: 'Weighted Non-Parametric', variant: 'blue' },
-          { label: 'Significance', value: 'α = 0.05 (Two-Sided)', variant: 'default' },
-          { label: 'Hypotheses', value: 'H1–H5 Evaluated', variant: 'purple' },
-          { label: 'Convergence', value: status === 'COMPLETED' ? '100% Validated' : 'Computing...', variant: status === 'COMPLETED' ? 'success' : 'amber' },
+          { label: 'Solvers', value: 'Weighted Non-Parametric', icon: <Cpu size={13} className="text-blue-500 dark:text-blue-400" />, variant: 'blue' },
+          { label: 'Significance', value: 'α = 0.05 (Two-Sided)', icon: <Scale size={13} className="text-slate-500 dark:text-slate-400" />, variant: 'default' },
+          { label: 'Hypotheses', value: 'H1–H5 Evaluated', icon: <Target size={13} className="text-purple-500 dark:text-purple-400" />, variant: 'purple' },
+          { label: 'Convergence', value: status === 'COMPLETED' ? '100% Validated' : 'Computing...', icon: <ShieldCheck size={13} className="text-emerald-500 dark:text-emerald-400" />, variant: status === 'COMPLETED' ? 'success' : 'amber' },
         ]}
         action={
           <button
             onClick={handleReRun}
             disabled={status === 'EXECUTING'}
             id="rerun-pipeline-btn"
-            className="btn-primary text-xs cursor-pointer flex items-center gap-1.5"
+            className="h-10 px-5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-md hover:shadow-blue-500/25 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer select-none group"
           >
-            <Cpu size={14} className={status === 'EXECUTING' ? 'animate-spin' : ''} />
+            <Cpu size={14} className={status === 'EXECUTING' ? 'animate-spin' : 'group-hover:rotate-45 transition-transform'} />
             <span>Re-Run Solvers</span>
           </button>
         }
@@ -2095,7 +2105,7 @@ export default function AnalyticsCore({ fields, data, onNavigateNext }: Analytic
           <div className="flex items-start gap-2.5 px-3.5 py-2.5 bg-blue-50 dark:bg-blue-950/30 rounded-xl border border-blue-200 dark:border-blue-800 text-[11px] text-blue-900 dark:text-blue-200">
             <span className="font-bold shrink-0 text-blue-700 dark:text-blue-400">Contingency Scope &amp; Unit of Analysis:</span>
             <span>
-              2×2 Contingency Table: <strong>Sex (Female, Male)</strong> × <strong>Disposition (Non-Admitted, Admitted)</strong>. Total aggregate visits analyzed = <strong>{h5.res.totalN.toLocaleString()}</strong>. Summary rows and unclassified categories are strictly excluded.
+              2×2 Contingency Table: <strong>Sex (Female, Male)</strong> × <strong>Disposition (Non-Admitted, Admitted)</strong>. Total aggregate visits analyzed = <strong className="cursor-help" title={`${h5.res.totalN.toLocaleString()} visits`}>{fmtK(h5.res.totalN)}</strong> ({h5.res.totalN.toLocaleString()}). Summary rows and unclassified categories are strictly excluded.
             </span>
           </div>
           <div className="space-y-2">
@@ -2260,13 +2270,13 @@ export default function AnalyticsCore({ fields, data, onNavigateNext }: Analytic
       </div>
 
       {/* ── WORKFLOW ADVANCEMENT TO STAGE 5 ──────────────────────── */}
-      <div className="mt-8 p-5 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/90 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm text-left">
+      <div className="mt-8 p-4 sm:p-5 rounded-2xl border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-[#111e35] flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm transition-all text-left">
         <div className="space-y-1">
-          <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-indigo-600 dark:text-indigo-400 block">
+          <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-blue-600 dark:text-blue-400 block">
             Stage 4 · Hypothesis Testing &amp; Statistical Verification Complete
           </span>
-          <div className="flex items-center gap-2 text-slate-900 dark:text-white font-bold text-sm">
-            <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />
+          <div className="flex items-center gap-2 text-slate-900 dark:text-white font-bold text-xs sm:text-sm">
+            <CheckCircle2 size={16} className="text-emerald-500 shrink-0" />
             <span>All 5 Hypotheses Evaluated (H1–H5 Significant at p &lt; .0001 • WLS R² = 0.6256)</span>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -2278,10 +2288,10 @@ export default function AnalyticsCore({ fields, data, onNavigateNext }: Analytic
           <div className="flex items-center gap-3 shrink-0">
             <button
               onClick={onNavigateNext}
-              className="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm shadow-md transition flex items-center gap-2 cursor-pointer"
+              className="h-10 px-5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-md hover:shadow-blue-500/25 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer select-none group"
             >
               <span>Proceed to Stage 5: Executive Dashboard</span>
-              <ArrowRight size={16} />
+              <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
             </button>
           </div>
         )}

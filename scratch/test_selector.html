@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+.bg-white {
+  background-color: rgb(255, 255, 255);
+}
+.dark\:bg-navy {
+  &:where(.dark, .dark *) {
+    background-color: rgb(17, 30, 53);
+  }
+}
+</style>
+</head>
+<body>
+  <div id="wrapper">
+    <div id="target" class="bg-white dark:bg-navy">Hello</div>
+  </div>
+  <div id="result"></div>
+  <script>
+    const el = document.getElementById('target');
+    const colorLight = getComputedStyle(el).backgroundColor;
+    document.getElementById('wrapper').className = 'dark';
+    const colorDark = getComputedStyle(el).backgroundColor;
+    const res = 'LIGHT: ' + colorLight + ' | DARK: ' + colorDark;
+    document.getElementById('result').textContent = res;
+    console.log(res);
+  </script>
+</body>
+</html>

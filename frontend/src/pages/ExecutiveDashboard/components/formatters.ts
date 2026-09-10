@@ -5,6 +5,7 @@
 
 export {
   fmtK,
+  fmtCompact,
   fmtNum,
   fmtPct,
   fmtHours,

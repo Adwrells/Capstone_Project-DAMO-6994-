@@ -209,6 +209,18 @@ export default function ConsultantInsights({ isLoading: parentLoading, onNavigat
     loadData();
   }, []);
 
+  useEffect(() => {
+    if (data && typeof window !== 'undefined' && window.location.hash) {
+      setTimeout(() => {
+        const id = window.location.hash.replace('#', '');
+        const el = document.getElementById(id);
+        if (el) {
+          el.scrollIntoView({ behavior: 'instant', block: 'center' });
+        }
+      }, 100);
+    }
+  }, [data]);
+
   if (loading || parentLoading) {
     return (
       <div className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl p-16 text-center flex flex-col items-center justify-center space-y-4 shadow-sm animate-pulse" id="insights-loading">
@@ -270,14 +282,16 @@ export default function ConsultantInsights({ isLoading: parentLoading, onNavigat
       {/* PAGE HEADER                                                               */}
       {/* ========================================================================= */}
       <PageHeader
-        category="STAGE 06 · STRATEGIC DECISION SUPPORT"
+        align="center"
+        badgeIcon={<Sparkles size={12} className="text-blue-500 dark:text-blue-400" />}
+        category="STRATEGIC DECISION SUPPORT · STAGE 6"
         title="Strategic Insights & Recommendations"
         subtitle="Evidence-informed strategic translation of CIHI NACRS emergency department data. Synthesizes hypothesis results (H1–H5), WLS regression modeling, Mann-Kendall longitudinal trends, and dashboard telemetry into actionable healthcare planning considerations within aggregate governance boundaries."
         contextPills={[
-          { label: 'Scope: Aggregate-Level Planning', variant: 'blue' },
-          { label: `${evidenceIndicators?.evidenceSourcesCount || 5} Evidence Bases`, variant: 'default' },
-          { label: evidenceIndicators?.hypothesesSynthesized || 'H1–H5 Synthesized', variant: 'success' },
-          { label: evidenceIndicators?.modelTrendOutputsCount || '4 Analytical Streams', variant: 'purple' },
+          { label: 'Planning Scope', value: 'Aggregate-Level Operations', icon: <Compass size={13} className="text-blue-500 dark:text-blue-400" />, variant: 'blue' },
+          { label: 'Evidence Bases', value: `${evidenceIndicators?.evidenceSourcesCount || 5} Verified Sources`, icon: <Database size={13} className="text-slate-500 dark:text-slate-400" />, variant: 'default' },
+          { label: 'Inference', value: evidenceIndicators?.hypothesesSynthesized || 'H1–H5 Synthesized', icon: <ShieldCheck size={13} className="text-emerald-500 dark:text-emerald-400" />, variant: 'success' },
+          { label: 'Action Frameworks', value: evidenceIndicators?.modelTrendOutputsCount || '4 Priority Pillars', icon: <Activity size={13} className="text-purple-500 dark:text-purple-400" />, variant: 'purple' },
         ]}
       />
 
@@ -355,11 +369,11 @@ export default function ConsultantInsights({ isLoading: parentLoading, onNavigat
                 className="p-4.5 rounded-2xl bg-slate-50/80 dark:bg-[#131f37]/60 border border-slate-200 dark:border-slate-800 space-y-3 flex flex-col justify-between hover:shadow-xs transition-shadow"
               >
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono font-extrabold px-2.5 py-0.5 rounded-md bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300/60 dark:border-slate-700">
+                  <div className="flex items-start justify-between gap-1.5 flex-wrap">
+                    <span className="text-[9.5px] font-mono font-extrabold px-2 py-0.5 rounded-md bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300/60 dark:border-slate-700 shrink-0">
                       TAKEAWAY {takeaway.number}
                     </span>
-                    <span className="text-[10px] font-mono text-slate-400 font-bold">{takeaway.evidence}</span>
+                    <span className="text-[9.5px] font-mono text-slate-500 dark:text-slate-400 font-semibold text-right">{takeaway.evidence}</span>
                   </div>
                   <h4 className="text-xs font-bold text-slate-900 dark:text-white leading-snug">
                     {takeaway.title}
@@ -1129,14 +1143,17 @@ export default function ConsultantInsights({ isLoading: parentLoading, onNavigat
           metadata="Governance Integrity"
         />
 
-        <div className="p-6 sm:p-7 rounded-2xl bg-[#080d19] text-white border border-slate-800/90 space-y-3 text-left shadow-lg">
-          <div className="flex items-center gap-2 text-[#3B82F6]">
-            <Sparkles size={16} />
-            <span id="section-08-title" className="text-xs font-mono font-extrabold uppercase tracking-wider">
+        <div className="relative overflow-hidden p-6 sm:p-7 rounded-2xl bg-gradient-to-br from-blue-50/80 via-white to-slate-50/60 dark:from-[#0B132B] dark:to-[#111E35] border-l-4 border-l-blue-600 dark:border-l-blue-500 border-y border-r border-slate-200/90 dark:border-slate-800/90 space-y-3.5 text-left shadow-sm">
+          {/* Subtle Ambient Glow */}
+          <div className="absolute top-0 right-0 w-80 h-32 bg-blue-500/5 dark:bg-blue-500/10 rounded-full blur-2xl pointer-events-none" />
+
+          <div className="relative inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-blue-500/10 dark:bg-blue-500/15 border border-blue-500/25 text-blue-700 dark:text-blue-400 text-[10.5px] font-mono font-bold uppercase tracking-wider">
+            <Sparkles size={13} className="text-blue-600 dark:text-blue-400" />
+            <span id="section-08-title">
               Governance &amp; Executive Summary
             </span>
           </div>
-          <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-light">
+          <p className="relative text-xs sm:text-sm text-slate-800 dark:text-slate-200 leading-relaxed font-normal">
             {finalConclusion}
           </p>
         </div>
@@ -1144,13 +1161,13 @@ export default function ConsultantInsights({ isLoading: parentLoading, onNavigat
 
       {/* ── WORKFLOW ADVANCEMENT TO STAGE 7 ──────────────────────── */}
       {onNavigateNext && (
-        <div className="mt-8 p-5 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-[#0d172a] flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm text-left">
+        <div className="mt-8 p-4 sm:p-5 rounded-2xl border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-[#111e35] flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm transition-all text-left">
           <div className="space-y-1">
             <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-blue-600 dark:text-blue-400 block">
               Stage 6 · Strategic Insights &amp; Clinical Advisory Complete
             </span>
-            <div className="flex items-center gap-2 text-slate-900 dark:text-white font-bold text-sm">
-              <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />
+            <div className="flex items-center gap-2 text-slate-900 dark:text-white font-bold text-xs sm:text-sm">
+              <CheckCircle2 size={16} className="text-emerald-500 shrink-0" />
               <span>Evidence-to-Action Matrix &amp; 4 Priority Frameworks Synthesized</span>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -1161,10 +1178,10 @@ export default function ConsultantInsights({ isLoading: parentLoading, onNavigat
           <div className="flex items-center gap-3 shrink-0">
             <button
               onClick={onNavigateNext}
-              className="px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm shadow-md transition flex items-center gap-2 cursor-pointer"
+              className="h-10 px-5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-md hover:shadow-blue-500/25 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer select-none group"
             >
               <span>Proceed to Stage 7: Reports &amp; Export</span>
-              <ArrowRight size={16} />
+              <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
             </button>
           </div>
         </div>

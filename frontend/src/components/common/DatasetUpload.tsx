@@ -7,7 +7,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { 
   Upload, Database, FileSpreadsheet, Sparkles, Check, ChevronRight, 
   Loader2, RefreshCw, ShieldCheck, Trash2, CheckCircle2, AlertTriangle, Info,
-  HardDrive, Server
+  HardDrive, Server, ArrowRight
 } from 'lucide-react';
 import { sampleDatasets } from '../../utils/mockDatasets';
 import { PreloadedDataset } from '../../utils/types';
@@ -413,32 +413,32 @@ export default function DatasetUpload({
   if (loadingState.isProcessing) {
     return (
       <div className="max-w-lg mx-auto py-24 px-6 text-center select-none" id="dataset-upload-loading-view">
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-10 shadow-xl relative overflow-hidden text-white">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-10 shadow-xl relative overflow-hidden text-slate-900 dark:text-white">
           <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-bl-full" />
           
           <div className="flex flex-col items-center justify-center space-y-6">
             <div className="relative">
               <Loader2 size={54} className="text-emerald-500 animate-spin" />
               <div className="absolute inset-0 flex items-center justify-center">
-                <Database size={18} className="text-emerald-400" />
+                <Database size={18} className="text-emerald-500 dark:text-emerald-400" />
               </div>
             </div>
             
             <div className="space-y-2">
-              <h3 className="text-xl font-bold tracking-tight text-white">CIHI Platform Core</h3>
-              <p className="text-xs font-mono tracking-wider text-emerald-400 uppercase">
+              <h3 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">CIHI Platform Core</h3>
+              <p className="text-xs font-mono tracking-wider text-emerald-600 dark:text-emerald-400 uppercase">
                 {loadingState.message}
               </p>
             </div>
 
             <div className="w-full space-y-2">
-              <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+              <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-emerald-500 transition-all duration-75"
                   style={{ width: `${loadingState.percentage}%` }}
                 />
               </div>
-              <div className="flex justify-between text-[10px] font-mono text-slate-400">
+              <div className="flex justify-between text-[10px] font-mono text-slate-500 dark:text-slate-400">
                 <span>SECURE PARSING PIPELINE</span>
                 <span>{loadingState.percentage}%</span>
               </div>
@@ -671,14 +671,14 @@ export default function DatasetUpload({
         <button
           onClick={handleProceed}
           disabled={!canProceed}
-          className={`h-12 px-8 rounded-lg font-semibold text-sm transition-all flex items-center gap-2 cursor-pointer select-none ${
+          className={`h-10 px-6 rounded-xl font-semibold text-xs transition-all flex items-center gap-2 select-none group ${
             canProceed 
-              ? 'bg-[#0F4C81] hover:bg-[#0c3e6b] text-white shadow-md hover:shadow-lg hover:scale-[1.01]' 
-              : 'bg-slate-200 dark:bg-[#182640] text-slate-400 dark:text-slate-600 cursor-not-allowed'
+              ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-blue-500/25 hover:scale-[1.02] active:scale-[0.98] cursor-pointer' 
+              : 'bg-slate-200 dark:bg-white/[0.05] text-slate-400 dark:text-slate-500 cursor-not-allowed border border-slate-300 dark:border-white/[0.08]'
           }`}
         >
-          <span>Validate All & Proceed to Preparation Engine</span>
-          <ChevronRight size={18} />
+          <span>Validate All &amp; Proceed to Preparation Engine</span>
+          <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
         </button>
       </div>
     </div>
