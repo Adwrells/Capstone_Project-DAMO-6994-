@@ -10,6 +10,8 @@ coverage/
 
 # Personal working notes — never part of the graded deliverable
 /note.md
+/EC2-MULTI-APP-DEPLOY.md
+/DOCKER-COMMANDS.md
 .env*
 !.env.example
 .vscode

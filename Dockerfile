@@ -32,10 +32,21 @@ RUN npm run build
 # Ensure the uploads directory exists (since it's in .gitignore)
 RUN mkdir -p uploads
 
+# Run as an unprivileged user rather than root — neither service needs root, and the base
+# image already ships a "node" user/group for exactly this. Ownership must be set before
+# switching, since everything above (including npm install/build) ran as root.
+RUN chown -R node:node /app
+USER node
+
 # This single image serves both the Node server and the FastAPI backend — docker-compose.yml
 # builds it twice, once per service, overriding CMD below with `command:` so each container
 # runs one process. `docker run` directly (no compose) gets this default, Node-only behavior;
 # see docker-compose.yml's `python` service for the `uvicorn backend.main:app` equivalent.
 EXPOSE 3000 8000
+
+# Lets `docker ps`/`docker compose ps` and any restart policy see a hung server as unhealthy
+# instead of "running" forever. Checks whichever port this container's CMD actually serves.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+    CMD node -e "require('http').get('http://127.0.0.1:' + (process.env.PORT || process.env.API_PORT || 3000) + '/', r => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))"
 
 CMD ["npm", "start"]

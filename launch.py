@@ -8,6 +8,11 @@ runs the test suite as a smoke check, then starts both servers:
     FastAPI    → http://localhost:8000   (analytics, model diagnostics, dataset persistence)
 
 Run from the repository root: python launch.py
+
+Pass -y or --yes (or set LAUNCH_AUTO_YES=1) to reclaim a blocked port without asking —
+useful for a manual deploy run over SSH where you already know you want it, same as it
+already happens automatically inside a container or CI. Without any of those, an
+interactive prompt still auto-proceeds after 15s of silence rather than hanging forever.
 """
 
 import os
@@ -22,6 +27,16 @@ import shutil
 NODE_PORT = int(os.getenv("PORT", "3000"))
 VITE_HMR_PORT = 24678
 API_PORT = int(os.getenv("API_PORT", "8000"))
+
+# Explicit override for "clean a blocked port and go" — distinct from the in_container()/CI
+# auto-detection below. Some automation (a provisioning script, an orchestrator that attaches
+# a pseudo-TTY) looks interactive to isatty() but has nobody there to answer a prompt; this
+# flag (or the env var, for compose/systemd where passing argv is awkward) settles it without
+# relying on environment detection at all.
+AUTO_YES = (
+    "-y" in sys.argv[1:] or "--yes" in sys.argv[1:]
+    or os.getenv("LAUNCH_AUTO_YES", "").lower() in ("1", "true", "yes")
+)
 
 # Resolve everything against the script's own directory rather than the caller's cwd.
 # Every backend module imports `backend.*`, which only resolves from the repository root,
@@ -65,6 +80,41 @@ def run_command(command, check=True):
     return result
 
 
+def _input_with_timeout(prompt, timeout):
+    """input() that gives up after `timeout` seconds instead of blocking forever.
+
+    Returns the typed line, or None if nothing arrived in time — kept distinct from an
+    explicit blank Enter (returns "") so the caller can tell "no answer at all" apart from
+    "answered with the default". Cross-platform: select() on stdin doesn't work on Windows,
+    so that side polls msvcrt.kbhit() and builds the line up a keystroke at a time instead.
+    """
+    print(prompt, end="", flush=True)
+    if IS_WINDOWS:
+        import msvcrt
+        start = time.time()
+        buf = ""
+        while time.time() - start < timeout:
+            if msvcrt.kbhit():
+                ch = msvcrt.getwche()
+                if ch in ("\r", "\n"):
+                    print()
+                    return buf
+                if ch == "\b":
+                    buf = buf[:-1]
+                else:
+                    buf += ch
+            time.sleep(0.05)
+        print()
+        return None
+    else:
+        import select
+        ready, _, _ = select.select([sys.stdin], [], [], timeout)
+        if ready:
+            return sys.stdin.readline().rstrip("\n")
+        print()
+        return None
+
+
 def port_in_use(port):
     """True when something is already listening on the port."""
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
@@ -86,12 +136,19 @@ def free_port(port, label):
     print("  A previous server is still running. Because server.ts does not hot-reload,")
     print("  leaving it running would serve stale backend code against a fresh frontend.")
 
-    if is_interactive():
+    if AUTO_YES:
+        print("  --yes/-y (or LAUNCH_AUTO_YES) set — reclaiming the port automatically.")
+    elif is_interactive():
         try:
-            answer = input(f"  Stop the process holding port {port}? [Y/n] ").strip().lower()
-        except (EOFError, KeyboardInterrupt):
+            answer = _input_with_timeout(
+                f"  Stop the process holding port {port}? [Y/n] (auto-yes in 15s) ", timeout=15
+            )
+        except KeyboardInterrupt:
+            # An explicit Ctrl+C is a deliberate "no" — distinct from silence, which isn't.
             answer = "n"
-        if answer not in ("", "y", "yes"):
+        if answer is None:
+            print(f"  No response in 15s — reclaiming port {port} automatically so startup doesn't hang.")
+        elif answer.strip().lower() not in ("", "y", "yes"):
             print(f"  Leaving port {port} alone. Startup will fail with EADDRINUSE.")
             return False
     else:
