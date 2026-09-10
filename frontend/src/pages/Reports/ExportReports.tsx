@@ -34,13 +34,13 @@ Canadian emergency departments (EDs) operate under sustained pressure from incre
 
 The analytical dataset contains 10,685 aggregate reporting rows representing approximately 175.8 million ED encounters. Because the source is aggregate rather than patient-level data and LOS is strongly non-normal, the analysis uses frequency-weighted non-parametric procedures and aggregate-level weighted least squares (WLS) regression. Five pre-specified hypotheses examine relationships between LOS and CTAS acuity, admission status, age, and sex/disposition.
 
-The results identify three major operational signals. First, clinical acuity is strongly associated with reported LOS. The weighted Kruskal–Wallis analysis for CTAS produced H = 35,510,138.077, p < .0001, ε² = 0.7479, with all 10 Bonferroni-adjusted pairwise comparisons significant. Median LOS was highest for CTAS II (4.80 hours) and CTAS I (4.60 hours), followed by CTAS III (3.40 hours), CTAS IV (1.90 hours), and CTAS V (1.33 hours).
+The results identify three major operational signals. First, clinical acuity is strongly associated with reported LOS. The weighted Kruskal–Wallis analysis for CTAS produced H = 126,319,368.24, p < .0001, ε² = 0.7251, with all 10 Bonferroni-adjusted pairwise comparisons significant. Median LOS was highest for CTAS II (4.80 hours) and CTAS I (4.60 hours), followed by CTAS III (3.40 hours), CTAS IV (1.90 hours), and CTAS V (1.33 hours).
 
-Second, admission status is the strongest operational separation observed. Admitted visits had a reported median LOS of 6.10 hours, compared with 2.80 hours for non-admitted visits, with a rank-biserial correlation of 0.9846. This result supports the interpretation that ED throughput is closely connected to downstream inpatient capacity and patient flow.
+Second, admission status is the strongest operational separation observed. Admitted visits had a reported median LOS of 10.60 hours, compared with 2.50 hours for non-admitted visits, with a rank-biserial correlation of 0.9981. This result supports the interpretation that ED throughput is closely connected to downstream inpatient capacity and patient flow.
 
-Third, age is materially associated with LOS. Reported median LOS rises from 2.02 hours for Pediatric & Youth to 4.01 hours for Older Adults, with ε² = 0.7218 and all six pairwise age comparisons significant after Bonferroni adjustment. By contrast, sex and disposition are statistically associated because of the very large dataset, but the practical effect is negligible (χ² = 18,164.97, p < .0001, Cramér's V = 0.0102).
+Third, age is materially associated with LOS. Reported median LOS rises from 2.05 hours for Pediatric & Youth to 4.17 hours for Older Adults, with ε² = 0.7218 and all six pairwise age comparisons significant after Bonferroni adjustment. By contrast, sex and disposition are statistically associated because of the very large dataset, but the practical effect is negligible (χ² = 18,164.97, p < .0001, Cramér's V = 0.0102).
 
-Longitudinal analysis also demonstrates sustained system pressure. Annual ED visits increased from approximately 4.91 million in FY 2003/04 to 13.99 million in FY 2021/22, reaching approximately 15.02 million in FY 2018/19. The Mann–Kendall test indicates a significant upward trend (Z = 5.5977, p < .001) with a Sen's slope of approximately 550.9 thousand visits per year. The project-specific Estimated Emergency Department Resource Burden Index (ERBI) increased from 4.21 to 8.33, with Kendall's τ = 0.9766, p < .0001. Holt's Linear Exponential Smoothing projects ERBI values of 8.65 for FY 2022/23 and 8.98 for FY 2023/24.
+Longitudinal analysis also demonstrates sustained system pressure. Annual ED visits increased from approximately 4.91 million in FY 2003/04 to 13.99 million in FY 2021/22, reaching approximately 15.02 million in FY 2018/19. The Mann–Kendall test indicates a significant upward trend (Z = 5.5977, p < .001) with a Sen's slope of approximately 550.9 thousand visits per year. The project-specific Estimated Emergency Department Resource Burden Index (ERBI) increased from 5.21 to 9.32, with Kendall's τ = 0.9766, p < .0001. Simple Exponential Smoothing (SES) projects ERBI values of 9.32 for FY 2022/23 and 9.32 for FY 2023/24.
 
 The project translates these findings into an interactive decision-support platform and a phased implementation roadmap focused on low-acuity fast-track pathways, inpatient-flow reform, boarding monitoring, geriatric emergency pathways, and continuous analytics governance. The findings are intended for system-level planning and decision support, not individual clinical prediction.
 
@@ -84,7 +84,7 @@ The empirical foundation is the CIHI NACRS supplementary emergency-department da
 - **H3:** aggregate-level WLS regression incorporating CTAS, age group, and disposition.
 - **H5:** Pearson chi-square test with Cramér's V.
 - **Longitudinal trend:** Mann–Kendall trend test and Sen's slope.
-- **Resource forecasting:** Holt's Linear Exponential Smoothing applied to the ERBI series.
+- **Resource forecasting:** Simple Exponential Smoothing (SES) applied to the ERBI series.
 
 ## 3. Key Findings
 
@@ -98,11 +98,11 @@ The empirical foundation is the CIHI NACRS supplementary emergency-department da
 | CTAS IV — Less Urgent | 1.90 h |
 | CTAS V — Non-Urgent | 1.33 h |
 
-Weighted Kruskal–Wallis: H = 35,510,138.077, p < .0001, ε² = 0.7479. All 10 pairwise comparisons significant (Bonferroni adjusted).
+Weighted Kruskal–Wallis: H = 126,319,368.24, p < .0001, ε² = 0.7251. All 10 pairwise comparisons significant (Bonferroni adjusted).
 
 ### 3.2 Admission Status and Length of Stay — H2
 
-Admitted visits: median LOS 6.10 h vs. non-admitted: 2.80 h. Rank-biserial correlation = 0.9846.
+Admitted visits: median LOS 10.60 h vs. non-admitted: 2.50 h. Rank-biserial correlation = 0.9981.
 
 ### 3.3 Multivariable LOS Model — H3
 
@@ -125,12 +125,12 @@ Weighted Kruskal–Wallis: ε² = 0.7218. All six pairwise comparisons significa
 
 ## 4. Longitudinal Throughput and Resource Burden
 
-ERBI increased from 4.21 (FY 2003/04) to 8.33 (FY 2021/22). Kendall's τ = 0.9766, p < .0001.
+ERBI increased from 5.21 (FY 2003/04) to 9.32 (FY 2021/22). Kendall's τ = 0.9766, p < .0001.
 
 | Fiscal Year | ERBI Forecast | 95% Prediction Interval |
 |---|---|---|
-| FY 2022/23 | 8.65 | 6.91–10.39 |
-| FY 2023/24 | 8.98 | 6.84–11.12 |
+| FY 2022/23 | 9.32 | 6.91–10.39 |
+| FY 2023/24 | 9.32 | 6.84–11.12 |
 
 ## 5. Decision-Support Platform
 

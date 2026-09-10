@@ -438,7 +438,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
       "elements": [
         {
           "type": "p",
-          "text": "Executive Summary ..................................................................................................................... 4Chapter 1: Problem Analysis and Strategic Context ................................................................ 61.1 The Canadian Emergency Care Landscape ............................................................................. 61.2 Access Block and Mechanics of Length of Stay ..................................................................... 61.3 Problem Statement ................................................................................................................... 71.4 Objectives and Scope ............................................................................................................... 71.5 Canonical Hypothesis Registry ................................................................................................ 8Chapter 2: Analytics Lifecycle and Project Methodology ....................................................... 92.1 A Ten-Stage Analytics Lifecycle ............................................................................................. 92.2 Why Non-Parametric Methods .............................................................................................. 102.3 Protection from the Ecological Fallacy .................................................................................. 11Chapter 3: Data Collection, Inventory and Preparation ....................................................... 123.1 Data Provenance .................................................................................................................... 123.2 Database Structure ................................................................................................................. 123.3 Cleaning and Quality Control ................................................................................................ 123.4 Feature Engineering ............................................................................................................... 133.5 Data Isolation and Reproducibility ........................................................................................ 14Chapter 4: Exploratory Data Analysis and Descriptive Profiling …………………………. 154.1 Nineteen Years of Volume Growth ....................................................................................... 154.2 Acuity and Admission Profiles .............................................................................................. 164.3 Age and Sex ........................................................................................................................... 164.4 Clinical Case Mix .................................................................................................................. 17Chapter 5: Statistical Hypothesis Testing and Diagnostic Inference………………………. 195.1 Overview of the Hypothesis Testing Framework .................................................................. 195.2 Hypothesis 1: Reported Median ED LOS Across CTAS Triage Levels…………………… 195.3 Hypothesis 2: Reported Median ED LOS for Admitted vs. Non-Admitted Visits…………. 225.4 Hypothesis 3: Weighted Least Squares Regression of Reported Median ED LOS………… 245.5 Hypothesis 4: Reported Median ED LOS Across Broad Patient Age Categories………….. 275.6 Hypothesis 5: Patient Sex and ED Visit Disposition Association………………………….. 305.8 Statistical and Operational Implications ................................................................................ 335.9 Conclusion ............................................................................................................................. 34Chapter 6: Time-Series Trend Analysis and Throughput Forecasting……………………. 356.2 Holt's Linear Exponential Smoothing Forecast ..................................................................... 366.3 Estimated Resource Burden Index ......................................................................................... 37Chapter 7: Data Visualization and Decision Support Systems .............................................. 417.1 Dashboard Architecture ......................................................................................................... 417.2 Hypothesis Testing Dashboard Views .................................................................................. 427.3 Resource-Burden and Presenting-Problem Views ................................................................ 467.4 Dashboard Audiences and Interaction Modes ....................................................................... 517.5 Interactive Filtering and Decision Support ............................................................................ 517.6 Interactive Visual Studio and AI-Assisted Chart Design ………………………………….. 52Chapter 8: Findings, Synthesis, and Critical Discussion ....................................................... 558.1 An Operational Triad ............................................................................................................. 558.2 Comparison with Existing Literature ..................................................................................... 568.3 Methodological Strengths ...................................................................................................... 578.4 Limitations ............................................................................................................................. 58Chapter 9: Strategic Recommendations and Implementation Roadmap………………….. 599.1 Restating the Core Findings ................................................................................................... 599.2 Tiered Recommendations ...................................................................................................... 609.3 Strategic Implementation Roadmap ....................................................................................... 639.4 Measuring Implementation Success ...................................................................................... 649.5 Closing Note .......................................................................................................................... 64References .................................................................................................................................... 66Appendix A: System Validation and Testing Evidence .............................................................. 69Appendix B: Rubric Alignment Checklist ................................................................................... 72Appendix C: Analytics Lifecycle Evidence Log ......................................................................... 73",
+          "text": "Executive Summary ..................................................................................................................... 4Chapter 1: Problem Analysis and Strategic Context ................................................................ 61.1 The Canadian Emergency Care Landscape ............................................................................. 61.2 Access Block and Mechanics of Length of Stay ..................................................................... 61.3 Problem Statement ................................................................................................................... 71.4 Objectives and Scope ............................................................................................................... 71.5 Canonical Hypothesis Registry ................................................................................................ 8Chapter 2: Analytics Lifecycle and Project Methodology ....................................................... 92.1 A Ten-Stage Analytics Lifecycle ............................................................................................. 92.2 Why Non-Parametric Methods .............................................................................................. 102.3 Protection from the Ecological Fallacy .................................................................................. 11Chapter 3: Data Collection, Inventory and Preparation ....................................................... 123.1 Data Provenance .................................................................................................................... 123.2 Database Structure ................................................................................................................. 123.3 Cleaning and Quality Control ................................................................................................ 123.4 Feature Engineering ............................................................................................................... 133.5 Data Isolation and Reproducibility ........................................................................................ 14Chapter 4: Exploratory Data Analysis and Descriptive Profiling …………………………. 154.1 Nineteen Years of Volume Growth ....................................................................................... 154.2 Acuity and Admission Profiles .............................................................................................. 164.3 Age and Sex ........................................................................................................................... 164.4 Clinical Case Mix .................................................................................................................. 17Chapter 5: Statistical Hypothesis Testing and Diagnostic Inference………………………. 195.1 Overview of the Hypothesis Testing Framework .................................................................. 195.2 Hypothesis 1: Reported Median ED LOS Across CTAS Triage Levels…………………… 195.3 Hypothesis 2: Reported Median ED LOS for Admitted vs. Non-Admitted Visits…………. 225.4 Hypothesis 3: Weighted Least Squares Regression of Reported Median ED LOS………… 245.5 Hypothesis 4: Reported Median ED LOS Across Broad Patient Age Categories………….. 275.6 Hypothesis 5: Patient Sex and ED Visit Disposition Association………………………….. 305.8 Statistical and Operational Implications ................................................................................ 335.9 Conclusion ............................................................................................................................. 34Chapter 6: Time-Series Trend Analysis and Throughput Forecasting……………………. 356.2 Simple Exponential Smoothing (SES) Forecast ..................................................................... 366.3 Estimated Resource Burden Index ......................................................................................... 37Chapter 7: Data Visualization and Decision Support Systems .............................................. 417.1 Dashboard Architecture ......................................................................................................... 417.2 Hypothesis Testing Dashboard Views .................................................................................. 427.3 Resource-Burden and Presenting-Problem Views ................................................................ 467.4 Dashboard Audiences and Interaction Modes ....................................................................... 517.5 Interactive Filtering and Decision Support ............................................................................ 517.6 Interactive Visual Studio and AI-Assisted Chart Design ………………………………….. 52Chapter 8: Findings, Synthesis, and Critical Discussion ....................................................... 558.1 An Operational Triad ............................................................................................................. 558.2 Comparison with Existing Literature ..................................................................................... 568.3 Methodological Strengths ...................................................................................................... 578.4 Limitations ............................................................................................................................. 58Chapter 9: Strategic Recommendations and Implementation Roadmap………………….. 599.1 Restating the Core Findings ................................................................................................... 599.2 Tiered Recommendations ...................................................................................................... 609.3 Strategic Implementation Roadmap ....................................................................................... 639.4 Measuring Implementation Success ...................................................................................... 649.5 Closing Note .......................................................................................................................... 64References .................................................................................................................................... 66Appendix A: System Validation and Testing Evidence .............................................................. 69Appendix B: Rubric Alignment Checklist ................................................................................... 72Appendix C: Analytics Lifecycle Evidence Log ......................................................................... 73",
           "align": "justify",
           "runs": [
             {
@@ -937,7 +937,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
               "italic": false
             },
             {
-              "text": "6.2 Holt's Linear Exponential Smoothing Forecast ............",
+              "text": "6.2 Simple Exponential Smoothing (SES) Forecast ............",
               "bold": false,
               "italic": false
             },
@@ -3707,7 +3707,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
           "rows": [
             [
               "Kruskal–Wallis H",
-              "35,510,138.077"
+              "126,319,368.24"
             ],
             [
               "p-value",
@@ -3715,7 +3715,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
             ],
             [
               "Effect size (ε²)",
-              "0.7479"
+              "0.7251"
             ],
             [
               "Significant pairwise comparisons",
@@ -3725,11 +3725,11 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
         },
         {
           "type": "p",
-          "text": "The very low p-value is highly suggestive that the null hypothesis is incorrect. The high ε² value (0.7479) suggests that there is a significant difference between the median ED LOS by CTAS level in the overall sample. The 10 out of 10 possible pairwise comparisons were statistically significant following Bonferroni correction.",
+          "text": "The very low p-value is highly suggestive that the null hypothesis is incorrect. The high ε² value (0.7251) suggests that there is a significant difference between the median ED LOS by CTAS level in the overall sample. The 10 out of 10 possible pairwise comparisons were statistically significant following Bonferroni correction.",
           "align": "justify",
           "runs": [
             {
-              "text": "The very low p-value is highly suggestive that the null hypothesis is incorrect. The high ε² value (0.7479) suggests that there is a significant difference between the median ED LOS by CTAS level in the overall sample. The 10 out of 10 possible pairwise comparisons were statistically significant following Bonferroni correction.",
+              "text": "The very low p-value is highly suggestive that the null hypothesis is incorrect. The high ε² value (0.7251) suggests that there is a significant difference between the median ED LOS by CTAS level in the overall sample. The 10 out of 10 possible pairwise comparisons were statistically significant following Bonferroni correction.",
               "bold": false,
               "italic": false
             }
@@ -4259,7 +4259,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
           "rows": [
             [
               "Mann–Whitney U",
-              "1,124,848,860,923.5"
+              "2.69 × 10¹²"
             ],
             [
               "p-value, two-sided",
@@ -4267,7 +4267,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
             ],
             [
               "Rank-biserial correlation (rᵦ)",
-              "0.9846"
+              "0.9981"
             ],
             [
               "Reported median difference",
@@ -4300,12 +4300,12 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
           "rows": [
             [
               "Non-Admitted",
-              "2.80 hours",
+              "2.50 hours",
               "1.9–3.8 hours"
             ],
             [
               "Admitted",
-              "6.10 hours",
+              "10.60 hours",
               "4.1–8.3 hours"
             ]
           ]
@@ -4347,7 +4347,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
         },
         {
           "type": "p",
-          "text": "The median ED LOS for patients seen in the ED who are admitted is 6.10 hours vs. 2.80 hours for those who are not admitted. This difference is based on an extremely large rank-biserial correlation of 0.9846.",
+          "text": "The median ED LOS for patients seen in the ED who are admitted is 10.60 hours vs. 2.50 hours for those who are not admitted. This difference is based on an extremely large rank-biserial correlation of 0.9981.",
           "align": "justify",
           "runs": [
             {
@@ -4356,7 +4356,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
               "italic": false
             },
             {
-              "text": "The median ED LOS for patients seen in the ED who are admitted is 6.10 hours vs. 2.80 hours for those who are not admitted. This difference is based on an extremely large rank-biserial correlation of 0.9846.",
+              "text": "The median ED LOS for patients seen in the ED who are admitted is 10.60 hours vs. 2.50 hours for those who are not admitted. This difference is based on an extremely large rank-biserial correlation of 0.9981.",
               "bold": false,
               "italic": false
             }
@@ -5801,7 +5801,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
           "rows": [
             [
               "Pediatric & Youth",
-              "2.02 hours",
+              "2.05 hours",
               "1.9–2.1 hours"
             ],
             [
@@ -5816,7 +5816,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
             ],
             [
               "Older Adult",
-              "4.01 hours",
+              "4.17 hours",
               "3.7–4.2 hours"
             ]
           ]
@@ -5845,11 +5845,11 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
         },
         {
           "type": "p",
-          "text": "The median ED LOS for Older Adult is 4.01 hours and the median ED LOS for Pediatric & Youth is 2.02 hours.",
+          "text": "The median ED LOS for Older Adult is 4.17 hours and the median ED LOS for Pediatric & Youth is 2.05 hours.",
           "align": "justify",
           "runs": [
             {
-              "text": "The median ED LOS for Older Adult is 4.01 hours and the median ED LOS for Pediatric & Youth is 2.02 hours.",
+              "text": "The median ED LOS for Older Adult is 4.17 hours and the median ED LOS for Pediatric & Youth is 2.05 hours.",
               "bold": false,
               "italic": false
             }
@@ -5895,11 +5895,11 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
         },
         {
           "type": "p",
-          "text": "The gap is particularly stark for older people. The Pediatric & Youth cohort reported a median ED LOS of 2.02 hours compared to their reported median of 4.01 hours in the Pediatric & Youth cohort.",
+          "text": "The gap is particularly stark for older people. The Pediatric & Youth cohort reported a median ED LOS of 2.05 hours compared to a reported median of 4.17 hours in the Older Adult cohort.",
           "align": "justify",
           "runs": [
             {
-              "text": "The gap is particularly stark for older people. The Pediatric & Youth cohort reported a median ED LOS of 2.02 hours compared to their reported median of 4.01 hours in the Pediatric & Youth cohort.",
+              "text": "The gap is particularly stark for older people. The Pediatric & Youth cohort reported a median ED LOS of 2.05 hours compared to a reported median of 4.17 hours in the Older Adult cohort.",
               "bold": false,
               "italic": false
             }
@@ -6699,15 +6699,15 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
             [
               "H1",
               "Weighted Kruskal–Wallis + Dunn",
-              "H = 35,510,138.077, p < .0001",
-              "ε² = 0.7479",
+              "H = 126,319,368.24, p < .0001",
+              "ε² = 0.7251",
               "Large CTAS-related difference"
             ],
             [
               "H2",
               "Weighted Mann–Whitney U",
               "U = 1.125 × 10¹², p < .0001",
-              "rᵦ = 0.9846",
+              "rᵦ = 0.9981",
               "Very strong admission-related difference"
             ],
             [
@@ -6769,11 +6769,11 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
         },
         {
           "type": "p",
-          "text": "First, CTAS category is strongly associated with reported ED LOS. The H1 analysis produces an epsilon-squared value of 0.7479, with every pairwise CTAS comparison reaching statistical significance.",
+          "text": "First, CTAS category is strongly associated with reported ED LOS. The H1 analysis produces an epsilon-squared value of 0.7251, with every pairwise CTAS comparison reaching statistical significance.",
           "align": "justify",
           "runs": [
             {
-              "text": "First, CTAS category is strongly associated with reported ED LOS. The H1 analysis produces an epsilon-squared value of 0.7479, with every pairwise CTAS comparison reaching statistical significance.",
+              "text": "First, CTAS category is strongly associated with reported ED LOS. The H1 analysis produces an epsilon-squared value of 0.7251, with every pairwise CTAS comparison reaching statistical significance.",
               "bold": false,
               "italic": false
             }
@@ -6784,11 +6784,11 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
         },
         {
           "type": "p",
-          "text": "Second, visit disposition produces one of the clearest differences in reported ED LOS. The admitted cohort has a median of 6.10 hours compared with 2.80 hours for the non-admitted cohort, accompanied by a rank-biserial correlation of 0.9846.",
+          "text": "Second, visit disposition produces one of the clearest differences in reported ED LOS. The admitted cohort has a median of 10.60 hours compared with 2.50 hours for the non-admitted cohort, accompanied by a rank-biserial correlation of 0.9981.",
           "align": "justify",
           "runs": [
             {
-              "text": "Second, visit disposition produces one of the clearest differences in reported ED LOS. The admitted cohort has a median of 6.10 hours compared with 2.80 hours for the non-admitted cohort, accompanied by a rank-biserial correlation of 0.9846.",
+              "text": "Second, visit disposition produces one of the clearest differences in reported ED LOS. The admitted cohort has a median of 10.60 hours compared with 2.50 hours for the non-admitted cohort, accompanied by a rank-biserial correlation of 0.9981.",
               "bold": false,
               "italic": false
             }
@@ -6799,11 +6799,11 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
         },
         {
           "type": "p",
-          "text": "Third, age category has a substantial relationship with reported ED LOS. Older adults have the highest reported median at 4.01 hours, compared with 2.02 hours for the Pediatric & Youth cohort, and all six age-group comparisons are statistically significant.",
+          "text": "Third, age category has a substantial relationship with reported ED LOS. Older adults have the highest reported median at 4.17 hours, compared with 2.05 hours for the Pediatric & Youth cohort, and all six age-group comparisons are statistically significant.",
           "align": "justify",
           "runs": [
             {
-              "text": "Third, age category has a substantial relationship with reported ED LOS. Older adults have the highest reported median at 4.01 hours, compared with 2.02 hours for the Pediatric & Youth cohort, and all six age-group comparisons are statistically significant.",
+              "text": "Third, age category has a substantial relationship with reported ED LOS. Older adults have the highest reported median at 4.17 hours, compared with 2.05 hours for the Pediatric & Youth cohort, and all six age-group comparisons are statistically significant.",
               "bold": false,
               "italic": false
             }
@@ -7166,19 +7166,19 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
             ],
             [
               "FY  2003-2004 ERBI",
-              "4.21",
+              "5.21",
               "Beginning of observed series"
             ],
             [
               "FY  2021-2022 ERBI",
-              "8.33",
+              "9.32",
               "End of observed series"
             ]
           ]
         },
         {
           "type": "p",
-          "text": "The trend seen in the platform reveals a consistent rise in estimated resource burden over the study period. ERBI starts at about 4.21 in FY 2003-2004 and grows steadily along the historical time series up to about 8.33 in FY 2021-2022. There is year-to-year variation in the series, but it is clearly rising and picked up some pace in the pandemic years.",
+          "text": "The trend seen in the platform reveals a consistent rise in estimated resource burden over the study period. ERBI starts at about 5.21 in FY 2003-2004 and grows steadily along the historical time series up to about 9.32 in FY 2021-2022. There is year-to-year variation in the series, but it is clearly rising and picked up some pace in the pandemic years.",
           "align": "justify",
           "runs": [
             {
@@ -7192,7 +7192,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
               "italic": false
             },
             {
-              "text": "The trend seen in the platform reveals a consistent rise in estimated resource burden over the study period. ERBI starts at about 4.21 in FY 2003-2004 and grows steadily along the historical time series up to about 8.33 in FY 2021-2022. There is year-to-year variation in the series, but it is clearly rising and picked up some pace in the pandemic years.",
+              "text": "The trend seen in the platform reveals a consistent rise in estimated resource burden over the study period. ERBI starts at about 5.21 in FY 2003-2004 and grows steadily along the historical time series up to about 9.32 in FY 2021-2022. There is year-to-year variation in the series, but it is clearly rising and picked up some pace in the pandemic years.",
               "bold": false,
               "italic": false
             }
@@ -7250,11 +7250,11 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
         },
         {
           "type": "p",
-          "text": "6.2 Holt's Linear Exponential Smoothing Forecast",
+          "text": "6.2 Simple Exponential Smoothing (SES) Forecast",
           "align": "justify",
           "runs": [
             {
-              "text": "6.2 Holt's Linear Exponential Smoothing Forecast ",
+              "text": "6.2 Simple Exponential Smoothing (SES) Forecast ",
               "bold": true,
               "italic": false
             }
@@ -7265,7 +7265,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
         },
         {
           "type": "p",
-          "text": "The ERBI series was also subjected to Holt’s Linear Exponential Smoothing method for short term forecasts in order to complement the historical trend analysis. Holt's method also includes the underlying level and trend of the time series and is appropriate for a time series that exhibits persistent directional movement, as opposed to a \"simple\" level-only exponential smoothing model. The forecasting capability builds on the nineteen-year ERBI series observed and projects them forward by two fiscal years. The resulting forecast shows further increases in estimates of the burden of emergency department resources following the observation in FY 2021-2022.",
+          "text": "The ERBI series was also subjected to Simple Exponential Smoothing (SES) method for short term forecasts in order to complement the historical trend analysis. the SES method models the underlying level of the time series without an explicit trend component, providing a stable near-term forecast that anchors on the most recently observed values rather than extrapolating the historical slope indefinitely. The forecasting capability builds on the nineteen-year ERBI series observed and projects them forward by two fiscal years. The resulting forecast holds close to the most recently observed level of emergency department resource burden following FY 2021-2022, consistent with the flat point-forecast behavior of the SES method.",
           "align": "justify",
           "runs": [
             {
@@ -7279,12 +7279,12 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
               "italic": false
             },
             {
-              "text": "Holt’s",
+              "text": "Simple Exponential Smoothing (SES)",
               "bold": false,
               "italic": false
             },
             {
-              "text": " Linear Exponential Smoothing method for short term ",
+              "text": " method for short term ",
               "bold": false,
               "italic": false
             },
@@ -7304,7 +7304,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
               "italic": false
             },
             {
-              "text": " complement the historical trend analysis. Holt's method also includes the underlying level and trend of the time series and is appropriate for a time series that exhibits persistent directional movement, as opposed to a \"simple\" level-only exponential smoothing model. The forecasting capability builds on the ",
+              "text": " complement the historical trend analysis. the SES method models the underlying level of the time series without an explicit trend component, providing a stable near-term forecast that anchors on the most recently observed values rather than extrapolating the historical slope indefinitely. The forecasting capability builds on the ",
               "bold": false,
               "italic": false
             },
@@ -7314,7 +7314,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
               "italic": false
             },
             {
-              "text": " ERBI series observed and projects them forward by two fiscal years. The resulting forecast shows further increases in estimates of the burden of emergency department resources following the observation in FY 2021-2022.",
+              "text": " ERBI series observed and projects them forward by two fiscal years. The resulting forecast holds close to the most recently observed level of emergency department resource burden following FY 2021-2022, consistent with the flat point-forecast behavior of the SES method.",
               "bold": false,
               "italic": false
             }
@@ -7348,19 +7348,19 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
           "rows": [
             [
               "FY 2022–2023",
-              "8.65",
+              "9.32",
               "6.91–10.39"
             ],
             [
               "FY 2023–2024",
-              "8.98",
+              "9.32",
               "6.84–11.12"
             ]
           ]
         },
         {
           "type": "p",
-          "text": "The platform generates a forecast of 8.65 ERBI units for FY 2022 - 2023 and 8.98 ERBI units for FY 2023 - 2024. The forecast presents 95% prediction intervals, reflecting the uncertainty of predicting the historical pattern into the future fiscal years. Note. Forecast values are planning estimates based on the models and should be updated as new CIHI aggregate data becomes available. The historical observations and forecast period are clearly distinguished in the platform, with a clear forecast boundary.",
+          "text": "The platform generates a forecast of 9.32 ERBI units for FY 2022 - 2023 and 9.32 ERBI units for FY 2023 - 2024. The forecast presents 95% prediction intervals, reflecting the uncertainty of predicting the historical pattern into the future fiscal years. Note. Forecast values are planning estimates based on the models and should be updated as new CIHI aggregate data becomes available. The historical observations and forecast period are clearly distinguished in the platform, with a clear forecast boundary.",
           "align": "justify",
           "runs": [
             {
@@ -7369,7 +7369,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
               "italic": false
             },
             {
-              "text": "The platform generates a forecast of 8.65 ERBI units for FY 2022 - 2023 and 8.98 ERBI units for FY 2023 - 2024. The forecast ",
+              "text": "The platform generates a forecast of 9.32 ERBI units for FY 2022 - 2023 and 9.32 ERBI units for FY 2023 - 2024. The forecast ",
               "bold": false,
               "italic": false
             },
@@ -7407,7 +7407,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
       "elements": [
         {
           "type": "p",
-          "text": "The solid line is the actual ERBI data for FY 2003 – 2004 to FY 2021 – 2022, and dashed lines indicate the forecasted ERBI data for FY 2022 – 2023 and FY 2023 – 2024. The Mann–Kendall trend analysis shows that the trend in upward movement is likely to persist in the coming years. ERBI increases from 8.33 in FY 2021–2022 to 8.65 in FY 2022–2023, followed by a further projected increase to 8.98 in FY 2023–2024.",
+          "text": "The solid line is the actual ERBI data for FY 2003 – 2004 to FY 2021 – 2022, and dashed lines indicate the forecasted ERBI data for FY 2022 – 2023 and FY 2023 – 2024. The Mann–Kendall trend analysis confirms that the underlying upward trend is statistically significant, and the SES forecast holds the index near its most recently observed level in the near term. ERBI is forecast to remain at approximately 9.32 in FY 2021–2022, FY 2022–2023, and FY 2023–2024, consistent with a simple exponential smoothing model, which carries the latest observed value forward as its point forecast.",
           "align": "justify",
           "runs": [
             {
@@ -7421,7 +7421,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
               "italic": false
             },
             {
-              "text": "years. ERBI increases from 8.33 in FY 2021–2022 to 8.65 in FY 2022–2023, followed by a further projected increase to 8.98 in FY 2023–2024. ",
+              "text": "years. ERBI increases from 9.32 in FY 2021–2022 to 9.32 in FY 2022–2023, followed by a further projected increase to 9.32 in FY 2023–2024. ",
               "bold": false,
               "italic": false
             }
@@ -7534,11 +7534,11 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
       "elements": [
         {
           "type": "p",
-          "text": "The time series of historical ERB demonstrates significant growth in the last nineteen years. The platform reports an ERBI value of 4.21 in FY 2003–2004, increasing progressively to 8.33 in FY 2021–2022. The Mann–Kendall analysis also reveals that this historical increase is statistically significant with the value of τ = 0.9766 and a p value of < .0001. The increase in the resource burden indicated by the project-specific index over time is this pattern. The rise is significant in a planning context as it reflects the need to consider raw numbers of visits as just one component of emergency department pressure.",
+          "text": "The time series of historical ERB demonstrates significant growth in the last nineteen years. The platform reports an ERBI value of 5.21 in FY 2003–2004, increasing progressively to 9.32 in FY 2021–2022. The Mann–Kendall analysis also reveals that this historical increase is statistically significant with the value of τ = 0.9766 and a p value of < .0001. The increase in the resource burden indicated by the project-specific index over time is this pattern. The rise is significant in a planning context as it reflects the need to consider raw numbers of visits as just one component of emergency department pressure.",
           "align": "justify",
           "runs": [
             {
-              "text": "The time series of historical ERB demonstrates significant growth in the last nineteen years. The platform reports an ERBI value of 4.21 in FY 2003–2004, increasing progressively to 8.33 in FY 2021–2022. The Mann–Kendall analysis also reveals that this historical increase is statistically significant with the value of τ = 0.9766 and a p value of < .0001. The increase in the resource burden indicated by the project-specific index over time is this pattern. The rise is significant in a ",
+              "text": "The time series of historical ERB demonstrates significant growth in the last nineteen years. The platform reports an ERBI value of 5.21 in FY 2003–2004, increasing progressively to 9.32 in FY 2021–2022. The Mann–Kendall analysis also reveals that this historical increase is statistically significant with the value of τ = 0.9766 and a p value of < .0001. The increase in the resource burden indicated by the project-specific index over time is this pattern. The rise is significant in a ",
               "bold": false,
               "italic": false
             },
@@ -7554,7 +7554,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
         },
         {
           "type": "p",
-          "text": "The addition of visit duration and acuity gives a further dimension to the measure of cumulative burden on the ED capacity. The platform's longitudinal visualization allows you to see the whole history and the two-year forecast. The historic data series shows the long-term growth of ERBI and the forecast indicates a continuation of this upward trend for the next two years, FY 2023-2024.",
+          "text": "The addition of visit duration and acuity gives a further dimension to the measure of cumulative burden on the ED capacity. The platform's longitudinal visualization allows you to see the whole history and the two-year forecast. The historic data series shows the long-term growth of ERBI, and the forecast holds this elevated level steady for the next two years, through FY 2023-2024.",
           "align": "justify",
           "runs": [
             {
@@ -7706,7 +7706,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
         },
         {
           "type": "p",
-          "text": "Secondly, the Holt forecast continues the upward trend into the near future. ERBI is projected to increase from the observed 8.33 in FY 2021–2022 to 8.65 in FY 2022–2023 and 8.98 in FY 2023–2024. Such estimates suggest that the pressure of the index is not likely to be eliminated right after the historical study period.",
+          "text": "Secondly, the SES forecast carries the historical trend's most recent level into the near future. ERBI is projected to remain near the observed 9.32 in FY 2021–2022 through FY 2022–2023 and FY 2023–2024. Such estimates suggest that the pressure reflected by the index is not likely to ease immediately after the historical study period.",
           "align": "justify",
           "runs": [
             {
@@ -7715,7 +7715,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
               "italic": false
             },
             {
-              "text": "Secondly, the Holt forecast continues the upward trend into the near future. ERBI is projected to increase from the observed 8.33 in FY 2021–2022 to 8.65 in FY 2022–2023 and 8.98 in FY 2023–2024. Such estimates suggest that the pressure of the index is not likely to be eliminated right after the historical study period. ",
+              "text": "Secondly, the SES forecast carries the historical trend's most recent level into the near future. ERBI is projected to remain near the observed 9.32 in FY 2021–2022 through FY 2022–2023 and FY 2023–2024. Such estimates suggest that the pressure reflected by the index is not likely to ease immediately after the historical study period. ",
               "bold": false,
               "italic": false
             }
@@ -7766,11 +7766,11 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
         },
         {
           "type": "p",
-          "text": "The overall trend in the longitudinal analysis shows a gradual and statistically significant rise in the burden of resources in the ED, and the short-term Holt forecast suggests that this will continue to increase after FY 2021-2022. The findings support this project's overall conclusion:",
+          "text": "The overall trend in the longitudinal analysis shows a gradual and statistically significant rise in the burden of resources in the ED, and the short-term SES forecast suggests that this elevated burden will persist after FY 2021-2022. The findings support this project's overall conclusion:",
           "align": "justify",
           "runs": [
             {
-              "text": "The overall trend in the longitudinal analysis shows a gradual and statistically significant rise in the burden of resources in the ED, and the short-term Holt forecast suggests that this will continue to increase after FY 2021-2022. The findings support this project's overall ",
+              "text": "The overall trend in the longitudinal analysis shows a gradual and statistically significant rise in the burden of resources in the ED, and the short-term SES forecast suggests that this elevated burden will persist after FY 2021-2022. The findings support this project's overall ",
               "bold": false,
               "italic": false
             },
@@ -7873,11 +7873,11 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
         },
         {
           "type": "p",
-          "text": "The historical pattern is highly consistent with increasing resource burdens for the nineteen years over which the data were collected (τ = 0.9766, p < .0001). Second, this upward trend is projected into the near term by the Holt forecast. ERBI is projected to increase from the observed 8.33 in FY 2021–2022 to 8.65 in FY 2022–2023 and 8.98 in FY 2023–2024.",
+          "text": "The historical pattern is highly consistent with increasing resource burdens for the nineteen years over which the data were collected (τ = 0.9766, p < .0001). Second, the elevated level reached by this upward trend is projected to persist into the near term by the SES forecast. ERBI is projected to remain near the observed 9.32 in FY 2021–2022 through FY 2022–2023 and FY 2023–2024.",
           "align": "justify",
           "runs": [
             {
-              "text": "The historical pattern is highly consistent with increasing resource burdens for the nineteen years over which the data were collected (τ = 0.9766, p < .0001). Second, this upward trend is projected into the near term by the Holt forecast. ERBI is projected to increase from the observed 8.33 in FY 2021–2022 to 8.65 in FY 2022–2023 and 8.98 in FY 2023–2024.",
+              "text": "The historical pattern is highly consistent with increasing resource burdens for the nineteen years over which the data were collected (τ = 0.9766, p < .0001). Second, the elevated level reached by this upward trend is projected to persist into the near term by the SES forecast. ERBI is projected to remain near the observed 9.32 in FY 2021–2022 through FY 2022–2023 and FY 2023–2024.",
               "bold": false,
               "italic": false
             }
@@ -7945,7 +7945,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
       "elements": [
         {
           "type": "p",
-          "text": "Once new CIHI aggregate data is available, the series should be extended, and the forecasting model should be recalculated. This allows planning decisions to be responsive to changes in the demand for emergency services, case mix and reported length of stay for services at emergency departments. Overall, the longitudinal analysis suggests that the burden on ED has been on an upward trend for many years and statistically significant, and the short-term Holt analysis suggests that this load will continue to increase after FY 21-22.",
+          "text": "Once new CIHI aggregate data is available, the series should be extended, and the forecasting model should be recalculated. This allows planning decisions to be responsive to changes in the demand for emergency services, case mix and reported length of stay for services at emergency departments. Overall, the longitudinal analysis suggests that the burden on ED has been on an upward trend for many years and statistically significant, and the short-term SES analysis suggests that this elevated load will persist after FY 21-22.",
           "align": "justify",
           "runs": [
             {
@@ -7974,7 +7974,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
               "italic": false
             },
             {
-              "text": "the short-term Holt analysis suggests that this load will continue to increase after FY 21-22. ",
+              "text": "the short-term SES analysis suggests that this elevated load will persist after FY 21-22. ",
               "bold": false,
               "italic": false
             }
@@ -9801,7 +9801,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
         },
         {
           "type": "p",
-          "text": "The pattern suggests that there is not a linear relationship between throughput and acuity: the CTAS II and III groups had the longest reported lengths of stay in the dashboard cohort. The platform's H1 result thus indicates the significance of the patients who must go through extensive diagnostic and treatment procedures but do not necessarily fall in the smallest and most critical patient category for resuscitation. The clearest separation is found in H2 where the status for admission is directly compared. The platform gives a median difference of 6.10 hours for the difference in median time between the admitted and non-admitted visits, and an rᵦ effect size of 0.9846, with a median LOS of around 2.80 hours for the non-admitted visits and 6.10 hours for the admitted visits.",
+          "text": "The pattern suggests that there is not a linear relationship between throughput and acuity: the CTAS II and III groups had the longest reported lengths of stay in the dashboard cohort. The platform's H1 result thus indicates the significance of the patients who must go through extensive diagnostic and treatment procedures but do not necessarily fall in the smallest and most critical patient category for resuscitation. The clearest separation is found in H2 where the status for admission is directly compared. The platform gives a median difference of 10.60 hours for the difference in median time between the admitted and non-admitted visits, and an rᵦ effect size of 0.9981, with a median LOS of around 2.50 hours for the non-admitted visits and 10.60 hours for the admitted visits.",
           "align": "justify",
           "runs": [
             {
@@ -9830,7 +9830,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
               "italic": false
             },
             {
-              "text": " the smallest and most critical patient category for resuscitation. The clearest separation is found in H2 where the status for admission is directly compared. The platform gives a median difference of 6.10 hours for the difference in median time between the admitted and non-admitted visits, and an rᵦ effect size of 0.9846, with a median LOS of around 2.80 hours for the non-admitted visits and 6.10 hours for the admitted visits. ",
+              "text": " the smallest and most critical patient category for resuscitation. The clearest separation is found in H2 where the status for admission is directly compared. The platform gives a median difference of 10.60 hours for the difference in median time between the admitted and non-admitted visits, and an rᵦ effect size of 0.9981, with a median LOS of around 2.50 hours for the non-admitted visits and 10.60 hours for the admitted visits. ",
               "bold": false,
               "italic": false
             }
@@ -9848,7 +9848,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
       "elements": [
         {
           "type": "p",
-          "text": "The very high effect size means that inpatient admission is highly related to longer emergency department stay. This supports the interpretation that emergency department throughput is not a problem entirely internal to the ED, but that inpatient bed availability and downstream hospital capacity are central factors to the problem. The H4 analysis adds to this structural picture the dimension of demographics. The platform indicates the median LOS for Pediatric & Youth is 2.02 hours, for Young Adults it is 2.47 hours, for Middle Adults it is 2.73 hours and for Older Adults it is 4.01 hours. The weighted Kruskal-Walli’s test results in an effect size of ε2 = 0.7218 and all 6 pairwise comparisons are statistically significant following Bonferroni.",
+          "text": "The very high effect size means that inpatient admission is highly related to longer emergency department stay. This supports the interpretation that emergency department throughput is not a problem entirely internal to the ED, but that inpatient bed availability and downstream hospital capacity are central factors to the problem. The H4 analysis adds to this structural picture the dimension of demographics. The platform indicates the median LOS for Pediatric & Youth is 2.05 hours, for Young Adults it is 2.47 hours, for Middle Adults it is 2.73 hours and for Older Adults it is 4.17 hours. The weighted Kruskal-Walli’s test results in an effect size of ε2 = 0.7218 and all 6 pairwise comparisons are statistically significant following Bonferroni.",
           "align": "justify",
           "runs": [
             {
@@ -9862,7 +9862,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
               "italic": false
             },
             {
-              "text": "Pediatric & Youth is 2.02 hours, for Young Adults it is 2.47 hours, for Middle Adults it is 2.73 hours and for Older Adults it is 4.01 hours. The weighted Kruskal-",
+              "text": "Pediatric & Youth is 2.05 hours, for Young Adults it is 2.47 hours, for Middle Adults it is 2.73 hours and for Older Adults it is 4.17 hours. The weighted Kruskal-",
               "bold": false,
               "italic": false
             },
@@ -10030,7 +10030,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
         },
         {
           "type": "p",
-          "text": "The rᵦ of 0.9846 for this platform suggests that the separation is not just statistically significant because of the large dataset, but also a significant separation in the reported LOS distributions. The age results are also generally consistent with previous studies that have documented the extra demands on the operational aspects of older populations attending A&E departments. The Older Adult cohort reports a median LOS of 4.01 hours, whereas Pediatric & Youth reports 2.02 hours. This difference is large, not just a function of sample size, based on the large H4 effect size in the aggregate reporting data.",
+          "text": "The rᵦ of 0.9981 for this platform suggests that the separation is not just statistically significant because of the large dataset, but also a significant separation in the reported LOS distributions. The age results are also generally consistent with previous studies that have documented the extra demands on the operational aspects of older populations attending A&E departments. The Older Adult cohort reports a median LOS of 4.17 hours, whereas Pediatric & Youth reports 2.05 hours. This difference is large, not just a function of sample size, based on the large H4 effect size in the aggregate reporting data.",
           "align": "justify",
           "runs": [
             {
@@ -10039,7 +10039,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
               "italic": false
             },
             {
-              "text": "The rᵦ of 0.9846 for this platform suggests that the separation is not just statistically significant ",
+              "text": "The rᵦ of 0.9981 for this platform suggests that the separation is not just statistically significant ",
               "bold": false,
               "italic": false
             },
@@ -10049,7 +10049,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
               "italic": false
             },
             {
-              "text": " the large dataset, but also a significant separation in the reported LOS distributions. The age results are also generally consistent with previous studies that have documented the extra demands on the operational aspects of older populations attending A&E departments. The Older Adult cohort reports a median LOS of 4.01 hours, whereas Pediatric & Youth reports 2.02 hours. This difference is large, not just a function of sample size, based on the large H4 effect size in the aggregate reporting data. ",
+              "text": " the large dataset, but also a significant separation in the reported LOS distributions. The age results are also generally consistent with previous studies that have documented the extra demands on the operational aspects of older populations attending A&E departments. The Older Adult cohort reports a median LOS of 4.17 hours, whereas Pediatric & Youth reports 2.05 hours. This difference is large, not just a function of sample size, based on the large H4 effect size in the aggregate reporting data. ",
               "bold": false,
               "italic": false
             }
@@ -10461,11 +10461,11 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
         },
         {
           "type": "p",
-          "text": "The H2 analysis reflects an even greater operational split in admitted vs. non-admitted patients. The platform has a large LOS difference and a rank-biserial correlation of 0.9846, suggesting that prolonged ED occupation is strongly related to admission status. This discovery highlights the need to consider hospital-wide bed availability and downstream flow but not solely in relation to the emergency department.",
+          "text": "The H2 analysis reflects an even greater operational split in admitted vs. non-admitted patients. The platform has a large LOS difference and a rank-biserial correlation of 0.9981, suggesting that prolonged ED occupation is strongly related to admission status. This discovery highlights the need to consider hospital-wide bed availability and downstream flow but not solely in relation to the emergency department.",
           "align": "justify",
           "runs": [
             {
-              "text": "The H2 analysis reflects an even greater operational split in admitted vs. non-admitted patients. The platform has a large LOS difference and a rank-biserial correlation of 0.9846, suggesting that prolonged ED occupation is strongly related to admission status. This discovery highlights the need to consider hospital-wide bed availability and downstream flow but not solely in relation to the emergency department. ",
+              "text": "The H2 analysis reflects an even greater operational split in admitted vs. non-admitted patients. The platform has a large LOS difference and a rank-biserial correlation of 0.9981, suggesting that prolonged ED occupation is strongly related to admission status. This discovery highlights the need to consider hospital-wide bed availability and downstream flow but not solely in relation to the emergency department. ",
               "bold": false,
               "italic": false
             }
@@ -10476,11 +10476,11 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
         },
         {
           "type": "p",
-          "text": "In addition, the H4 analysis classifies older adults as an important population for intervention. The platform reports median LOS of 4.01 hours for Older Adults and 2.02 hours for Pediatric & Youth, resulting in a large effect size of about ε² = 0.7218. In contrast, H5 shows that biological sex does not operate as a concept in practice. The association is statistically significant due to the large size of the sample, but Cramér's V = 0.0102 showing that the effect is very small.",
+          "text": "In addition, the H4 analysis classifies older adults as an important population for intervention. The platform reports median LOS of 4.17 hours for Older Adults and 2.05 hours for Pediatric & Youth, resulting in a large effect size of about ε² = 0.7218. In contrast, H5 shows that biological sex does not operate as a concept in practice. The association is statistically significant due to the large size of the sample, but Cramér's V = 0.0102 showing that the effect is very small.",
           "align": "justify",
           "runs": [
             {
-              "text": "In addition, the H4 analysis classifies older adults as an important population for intervention. The platform reports median LOS of 4.01 hours for Older Adults and 2.02 hours for Pediatric & Youth, resulting in a large effect size of about ε² = 0.7218. In contrast, H5 shows that biological sex does not operate as a concept in practice. The association is statistically significant due to the large size of the sample, but Cramér's V = 0.0102 showing that the effect is very small. ",
+              "text": "In addition, the H4 analysis classifies older adults as an important population for intervention. The platform reports median LOS of 4.17 hours for Older Adults and 2.05 hours for Pediatric & Youth, resulting in a large effect size of about ε² = 0.7218. In contrast, H5 shows that biological sex does not operate as a concept in practice. The association is statistically significant due to the large size of the sample, but Cramér's V = 0.0102 showing that the effect is very small. ",
               "bold": false,
               "italic": false
             }
@@ -10491,11 +10491,11 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
         },
         {
           "type": "p",
-          "text": "It's an additional planning signal in the longitudinal analysis. ERBI increased from 4.21 in FY 2003–2004 to 8.33 in FY 2021–2022, with a Mann–Kendall τ = 0.9766 and p < .0001. The ERBI values for FY 2022–2023 and FY 2023–2024 are then estimated using Holt's Linear Exponential Smoothing as 8.65 and 8.98 respectively.",
+          "text": "It's an additional planning signal in the longitudinal analysis. ERBI increased from 5.21 in FY 2003–2004 to 9.32 in FY 2021–2022, with a Mann–Kendall τ = 0.9766 and p < .0001. The ERBI values for FY 2022–2023 and FY 2023–2024 are then both estimated at 9.32 using Simple Exponential Smoothing (SES), which carries the latest observed value forward as its point forecast.",
           "align": "justify",
           "runs": [
             {
-              "text": "It's an additional planning signal in the longitudinal analysis. ERBI increased from 4.21 in FY 2003–2004 to 8.33 in FY 2021–2022, with a Mann–Kendall τ = 0.9766 and p < .0001. The ERBI values for FY 2022–2023 and FY 2023–2024 are then estimated using Holt's Linear Exponential Smoothing as 8.65 and 8.98 respectively. ",
+              "text": "It's an additional planning signal in the longitudinal analysis. ERBI increased from 5.21 in FY 2003–2004 to 9.32 in FY 2021–2022, with a Mann–Kendall τ = 0.9766 and p < .0001. The ERBI values for FY 2022–2023 and FY 2023–2024 are then both estimated at 9.32 using Simple Exponential Smoothing (SES), which carries the latest observed value forward as its point forecast. ",
               "bold": false,
               "italic": false
             }
@@ -11020,7 +11020,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
         },
         {
           "type": "p",
-          "text": "The H4 analysis categorizes older people as a population that is of special interest in terms of emergency department flow management. The platform records a median LOS of 4.01 hours for Older Adults, significantly longer than the median LOS of 2.02 hours for Pediatric & Youth and has a large effect size.",
+          "text": "The H4 analysis categorizes older people as a population that is of special interest in terms of emergency department flow management. The platform records a median LOS of 4.17 hours for Older Adults, significantly longer than the median LOS of 2.05 hours for Pediatric & Youth and has a large effect size.",
           "align": "justify",
           "runs": [
             {
@@ -11034,7 +11034,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
               "italic": false
             },
             {
-              "text": " older people as a population that is of special interest in terms of emergency department flow management. The platform records a median LOS of 4.01 hours for Older Adults, significantly longer than the median LOS of 2.02 hours for Pediatric & ",
+              "text": " older people as a population that is of special interest in terms of emergency department flow management. The platform records a median LOS of 4.17 hours for Older Adults, significantly longer than the median LOS of 2.05 hours for Pediatric & ",
               "bold": false,
               "italic": false
             },
@@ -11671,7 +11671,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
         },
         {
           "type": "p",
-          "text": "Concurrently, the fact that the effect of biological sex is small, further indicates that not every statistically significant relationship will be an operation priority. The longitudinal analysis provides a much-needed forward-looking perspective. The ERBI rose from 4.21 to 8.33 during the period observed; a very strong positive trend (τ = 0.9766, p < .0001) was detected by the Mann–Kendall test.",
+          "text": "Concurrently, the fact that the effect of biological sex is small, further indicates that not every statistically significant relationship will be an operation priority. The longitudinal analysis provides a much-needed forward-looking perspective. The ERBI rose from 5.21 to 9.32 during the period observed; a very strong positive trend (τ = 0.9766, p < .0001) was detected by the Mann–Kendall test.",
           "align": "justify",
           "runs": [
             {
@@ -11680,7 +11680,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
               "italic": false
             },
             {
-              "text": "Concurrently, the fact that the effect of biological sex is small, further indicates that not every statistically significant relationship will be an operation priority. The longitudinal analysis provides a much-needed forward-looking perspective. The ERBI rose from 4.21 to 8.33 during the period observed; a very strong positive trend (τ = 0.9766, p < .0001) was detected by the Mann–Kendall test. ",
+              "text": "Concurrently, the fact that the effect of biological sex is small, further indicates that not every statistically significant relationship will be an operation priority. The longitudinal analysis provides a much-needed forward-looking perspective. The ERBI rose from 5.21 to 9.32 during the period observed; a very strong positive trend (τ = 0.9766, p < .0001) was detected by the Mann–Kendall test. ",
               "bold": false,
               "italic": false
             }
@@ -11691,7 +11691,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
         },
         {
           "type": "p",
-          "text": "The platform's forecasts for the next two fiscal years are ERBI of 8.65 and 8.98. These findings further highlight the importance of having a capacity planning process that considers the acuity and length of emergency department visits as well as the number of visits. The implementation roadmap for the proposed solution is thus composed of a series of quick assessment pathways, the reform of inpatient flow, automatic boarding monitoring, geriatric emergency management and continuous analytics governance. These interventions create a safe, systematic plan for turning statistical results from this project into measurable operational action.",
+          "text": "The platform's forecasts for the next two fiscal years are ERBI of 9.32 and 9.32. These findings further highlight the importance of having a capacity planning process that considers the acuity and length of emergency department visits as well as the number of visits. The implementation roadmap for the proposed solution is thus composed of a series of quick assessment pathways, the reform of inpatient flow, automatic boarding monitoring, geriatric emergency management and continuous analytics governance. These interventions create a safe, systematic plan for turning statistical results from this project into measurable operational action.",
           "align": "justify",
           "runs": [
             {
@@ -11700,7 +11700,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
               "italic": false
             },
             {
-              "text": "The platform's forecasts for the next two fiscal years are ERBI of 8.65 and 8.98. These findings further highlight the importance of having a capacity planning process that ",
+              "text": "The platform's forecasts for the next two fiscal years are ERBI of 9.32 and 9.32. These findings further highlight the importance of having a capacity planning process that ",
               "bold": false,
               "italic": false
             },
@@ -12568,7 +12568,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
             [
               "H2 — Admission and ED length of stay",
               "Mann–Whitney U test with rank-biserial correlation",
-              "Strong separation between admitted and non-admitted groups; rank-biserial correlation = 0.9846"
+              "Strong separation between admitted and non-admitted groups; rank-biserial correlation = 0.9981"
             ],
             [
               "H3 — Multivariable length-of-stay model",
@@ -12592,8 +12592,8 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
             ],
             [
               "Two-year throughput forecast",
-              "Holt’s Linear Exponential Smoothing",
-              "FY+1 = 8.65; FY+2 = 8.98"
+              "Simple Exponential Smoothing (SES)",
+              "FY+1 = 9.32; FY+2 = 9.32"
             ]
           ]
         },
@@ -12766,7 +12766,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
         },
         {
           "type": "p",
-          "text": "The forecasting component was assessed based upon the historical emergency-resource burden index (ERBI) series of the past 20 years from FY2003-04 to FY2021-22. The historical series rose from around 4.21 to 8.33 in FY2021–22 from FY2003–04. Mann–Kendall analysis showed a significant (p value < .0001) strong positive trend (τ = 0.9766).",
+          "text": "The forecasting component was assessed based upon the historical emergency-resource burden index (ERBI) series of the past 20 years from FY2003-04 to FY2021-22. The historical series rose from around 5.21 to 9.32 in FY2021–22 from FY2003–04. Mann–Kendall analysis showed a significant (p value < .0001) strong positive trend (τ = 0.9766).",
           "align": "justify",
           "runs": [
             {
@@ -12780,7 +12780,7 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
               "italic": false
             },
             {
-              "text": "The historical series rose from around 4.21 to 8.33 in FY2021–22 from FY2003–04. Mann–Kendall analysis showed a significant (p value < .0001) strong positive trend (τ = 0.9766).",
+              "text": "The historical series rose from around 5.21 to 9.32 in FY2021–22 from FY2003–04. Mann–Kendall analysis showed a significant (p value < .0001) strong positive trend (τ = 0.9766).",
               "bold": false,
               "italic": false
             }
@@ -12791,11 +12791,11 @@ export const PAGINATED_REPORT_DATA: CapstonePaginatedData = {
         },
         {
           "type": "p",
-          "text": "The two-year forward projection was then created using Holt's Linear Exponential Smoothing. The subsequent forecast rose from 8.65 to 8.98 for FY+2, suggesting that the upward trend in resource pressure is likely to continue, assuming the historical trend remains unchanged.",
+          "text": "The two-year forward projection was then created using Simple Exponential Smoothing (SES). The subsequent forecast held steady at 9.32 for both FY+1 and FY+2, suggesting that the elevated level of resource pressure is likely to persist, assuming the historical trend remains unchanged.",
           "align": "justify",
           "runs": [
             {
-              "text": "The two-year forward projection was then created using Holt's Linear Exponential Smoothing. The subsequent forecast rose from 8.65 to 8.98 for FY+2, suggesting that the upward trend in resource pressure is likely to continue, assuming the historical trend remains unchanged.",
+              "text": "The two-year forward projection was then created using Simple Exponential Smoothing (SES). The subsequent forecast held steady at 9.32 for both FY+1 and FY+2, suggesting that the elevated level of resource pressure is likely to persist, assuming the historical trend remains unchanged.",
               "bold": false,
               "italic": false
             }
