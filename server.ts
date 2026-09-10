@@ -5,7 +5,15 @@ import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, Type } from "@google/genai";
 import dotenv from "dotenv";
 import { createRequire } from "module";
-const _require = createRequire(import.meta.url);
+// esbuild bundles this file to CJS for production (`npm run build` -> dist/server.cjs),
+// where `require` is already a native global and `import.meta` is empty — calling
+// createRequire(import.meta.url) there crashes on startup with "filename must be a file URL
+// object... Received undefined". `tsx` runs the source directly as real ESM in dev, where the
+// reverse is true: no native `require`, so createRequire(import.meta.url) is what supplies it.
+// `typeof require` is safe in both: it never throws on an undeclared identifier, just reports
+// "undefined" in the ESM case.
+const _require: NodeRequire =
+  typeof require !== "undefined" ? require : createRequire(import.meta.url);
 const XLSX = _require("xlsx") as typeof import("xlsx");
 const BetterSQLite3 = _require("better-sqlite3");
 
