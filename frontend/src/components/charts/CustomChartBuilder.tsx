@@ -1805,13 +1805,21 @@ export default function CustomChartBuilder({
                       {targetValue !== undefined && <ReferenceLine y={targetValue} stroke="#ea580c" strokeDasharray="3 3" label={{ value: 'TARGET THRESHOLD', fill: '#ea580c', fontSize: 8 }} />}
                     </ComposedChart>
                   ) : type === 'Bar' ? (
-                    <ComposedChart data={mergedChartData} layout="vertical" margin={{ left: 16, right: 35, top: (enableTrendLine || enableMovingAverage) ? 12 : 20, bottom: 40 }}>
+                    <ComposedChart data={mergedChartData} layout="vertical" margin={{ left: 16, right: 42, top: (enableTrendLine || enableMovingAverage) ? 14 : 26, bottom: 40 }}>
                       {showGridlines && <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#1e293b' : '#f1f5f9'} />}
                       <XAxis
                         type="number"
                         stroke={isDarkMode ? '#94a3b8' : '#64748b'}
                         fontSize={fontSize}
                         tickFormatter={formatYValue}
+                        domain={[
+                          0,
+                          (dataMax: number) => {
+                            if (!dataMax || !isFinite(dataMax) || dataMax <= 0) return 'auto';
+                            const padding = dataMax * 0.15;
+                            return Number((dataMax + (padding > 0.4 ? padding : 0.4)).toFixed(1));
+                          }
+                        ]}
                         height={40}
                         label={{
                           value: `${formatAxisTitle(yAxis)} (${aggregation})`,
@@ -1887,7 +1895,7 @@ export default function CustomChartBuilder({
                       {targetValue !== undefined && <ReferenceLine x={targetValue} stroke="#ea580c" strokeDasharray="3 3" label={{ value: 'TARGET', fill: '#ea580c', fontSize: 8, position: 'insideTop' }} />}
                     </ComposedChart>
                   ) : type === 'Line' ? (
-                    <ComposedChart data={mergedChartData} margin={{ left: 16, right: 20, top: (enableTrendLine || enableMovingAverage) ? 12 : 20, bottom: 42 }}>
+                    <ComposedChart data={mergedChartData} margin={{ left: 16, right: 20, top: (enableTrendLine || enableMovingAverage) ? 14 : 26, bottom: 42 }}>
                       {showGridlines && <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#1e293b' : '#f1f5f9'} />}
                       <XAxis
                         dataKey="name"
@@ -1916,6 +1924,14 @@ export default function CustomChartBuilder({
                         stroke={isDarkMode ? '#94a3b8' : '#64748b'}
                         fontSize={fontSize}
                         tickFormatter={formatYValue}
+                        domain={[
+                          0,
+                          (dataMax: number) => {
+                            if (!dataMax || !isFinite(dataMax) || dataMax <= 0) return 'auto';
+                            const padding = dataMax * 0.15;
+                            return Number((dataMax + (padding > 0.4 ? padding : 0.4)).toFixed(1));
+                          }
+                        ]}
                         width={68}
                         label={{
                           value: `${formatAxisTitle(yAxis)} (${aggregation})`,
@@ -1970,7 +1986,7 @@ export default function CustomChartBuilder({
                       {targetValue !== undefined && <ReferenceLine y={targetValue} stroke="#ea580c" strokeDasharray="3 3" label={{ value: 'TARGET THRESHOLD', fill: '#ea580c', fontSize: 8 }} />}
                     </ComposedChart>
                   ) : type === 'Area' ? (
-                    <ComposedChart data={mergedChartData} margin={{ left: 16, right: 20, top: (enableTrendLine || enableMovingAverage) ? 12 : 20, bottom: 42 }}>
+                    <ComposedChart data={mergedChartData} margin={{ left: 16, right: 20, top: (enableTrendLine || enableMovingAverage) ? 14 : 26, bottom: 42 }}>
                       {showGridlines && <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#1e293b' : '#f1f5f9'} />}
                       <XAxis
                         dataKey="name"
@@ -1999,6 +2015,14 @@ export default function CustomChartBuilder({
                         stroke={isDarkMode ? '#94a3b8' : '#64748b'}
                         fontSize={fontSize}
                         tickFormatter={formatYValue}
+                        domain={[
+                          0,
+                          (dataMax: number) => {
+                            if (!dataMax || !isFinite(dataMax) || dataMax <= 0) return 'auto';
+                            const padding = dataMax * 0.15;
+                            return Number((dataMax + (padding > 0.4 ? padding : 0.4)).toFixed(1));
+                          }
+                        ]}
                         width={68}
                         label={{
                           value: `${formatAxisTitle(yAxis)} (${aggregation})`,

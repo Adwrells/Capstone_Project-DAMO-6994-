@@ -10,7 +10,7 @@
 import React, { useState, useMemo, useRef } from 'react';
 import {
   ShieldCheck, Download, Sliders, RefreshCw,
-  FileDown, GraduationCap, Building2, User,
+  FileDown,
   CheckCircle2, Filter, X, FileText,
 } from 'lucide-react';
 import PageHeader from '../../components/common/PageHeader';
@@ -589,26 +589,6 @@ export default function ExportReports(_props: ExportReportsProps) {
           { label: 'Supervisor', value: 'Dr. Bilal El Toufaili', variant: 'amber' },
         ]}
       />
-
-      {/* Academic Info Banner */}
-      <div className="p-3.5 px-4 rounded-xl border border-blue-200 dark:border-blue-900/30 bg-blue-50 dark:bg-blue-950/20 shadow-sm">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-2 text-xs">
-          {[
-            { icon: <Building2 size={15} className="text-blue-500" />, label: 'Institution', value: 'University of Niagara Falls Canada', cls: 'text-blue-900 dark:text-white' },
-            { icon: <GraduationCap size={15} className="text-blue-500" />, label: 'Degree & Course', value: 'MDA · DAMO 699', cls: 'text-blue-900 dark:text-white' },
-            { icon: <User size={15} className="text-blue-500" />, label: 'Research Team', value: 'Group 5 (Rajbharath P, Sufyaan Khan Mohammed, Amit Raj Dev)', cls: 'text-blue-900 dark:text-white' },
-            { icon: <ShieldCheck size={15} className="text-amber-500 dark:text-amber-400" />, label: 'Supervisor', value: 'Dr. Bilal El Toufaili', cls: 'text-amber-700 dark:text-amber-300' },
-          ].map((item, i) => (
-            <div key={i} className="flex items-center gap-2 p-2 rounded-lg bg-blue-100/80 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800/40">
-              {item.icon}
-              <div className="truncate">
-                <span className="text-slate-500 dark:text-slate-400 text-[10px] block">{item.label}</span>
-                <span className={`font-bold ${item.cls}`}>{item.value}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
 
       {/* Main Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
