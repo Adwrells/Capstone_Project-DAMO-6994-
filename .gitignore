@@ -12,6 +12,7 @@ coverage/
 /note.md
 /EC2-MULTI-APP-DEPLOY.md
 /DOCKER-COMMANDS.md
+/log.md
 .env*
 !.env.example
 .vscode
@@ -37,9 +38,10 @@ htmlcov/
 
 # ...except the seeded analytical database, which is COMMITTED ON PURPOSE.
 # It is the project's only copy of the ~17,200 cleaned CIHI rows: schema.sql
-# creates the tables but leaves them empty, and load_csv.py cannot refill them
-# (it reads data/optimized/, which does not exist). Deleting this file leaves
-# every dashboard, hypothesis test, and chart with no data.
+# creates the tables but leaves them empty. `python -m backend.database.load_csv`
+# CAN rebuild it (from data/cleaned dataset/*.xlsx, with data/Explorer Dataset/*.csv
+# as fallback) — use that, or `git restore`, to discard runtime writes before a
+# commit. Still committed so a fresh clone has data without needing that rebuild.
 # See README.md → "Database & Data Provenance".
 !backend/database/healthcare.db
 

@@ -1,6 +1,6 @@
 services:
   node:
-    image: ${ECR_REGISTRY}/capstone_project:latest
+    image: ${ECR_REGISTRY}/capstone_project:${IMAGE_TAG:-latest}
     container_name: healthcare_analytics_node
     command: ["npm", "start"]
     ports:
@@ -17,7 +17,7 @@ services:
       - python
 
   python:
-    image: ${ECR_REGISTRY}/capstone_project:latest
+    image: ${ECR_REGISTRY}/capstone_project:${IMAGE_TAG:-latest}
     container_name: healthcare_analytics_python
     command: ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
     expose:
