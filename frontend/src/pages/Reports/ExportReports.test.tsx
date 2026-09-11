@@ -98,10 +98,25 @@ describe('Capstone Report Data and Integration', () => {
     expect(screen.getAllByText(/Sufyaan Khan Mohammed/).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Amit Raj Dev/).length).toBeGreaterThan(0);
 
-    // Verify Executive Report preview is shown
-    expect(screen.getAllByText('Executive Report').length).toBeGreaterThan(0);
-    // Verify Final Report view button is NOT in the toolbar (available exclusively via download)
-    expect(screen.queryByRole('button', { name: /^Final Report$/i })).toBeNull();
+    // Verify Final Report PDF preview is present on the 7th page by default
+    expect(screen.getAllByText(/Final Report Capstone Project\.pdf/i).length).toBeGreaterThan(0);
+    expect(screen.getByText('Final Report (Official PDF)')).toBeDefined();
+
+    // Verify embedded PDF viewer iframe exists
+    const pdfIframe = container.querySelector('iframe[title="Final Report Capstone Project PDF"]');
+    expect(pdfIframe).not.toBeNull();
+    expect(pdfIframe?.getAttribute('src')).toContain('Final%20Report%20Capstone%20Project.pdf');
+
+    // Verify switching to Executive Summary view works
+    const execSummaryBtns = screen.getAllByRole('button', { name: /Executive Summary/i });
+    expect(execSummaryBtns.length).toBeGreaterThan(0);
+    fireEvent.click(execSummaryBtns[0]);
+    expect(screen.getAllByText(/Executive Report/i).length).toBeGreaterThan(0);
+
+    // Switch back to Final Report
+    const finalReportBtn = screen.getByRole('button', { name: /Final Report \(Official PDF\)/i });
+    fireEvent.click(finalReportBtn);
+    expect(container.querySelector('iframe[title="Final Report Capstone Project PDF"]')).not.toBeNull();
 
     // Verify preview sheet container exists
     const previewSheet = container.querySelector('#report-preview-sheet');
@@ -119,7 +134,7 @@ describe('Capstone Report Data and Integration', () => {
     // Verify Final Report PDF option with exact pdf name exists
     const finalReportOption = screen.getByText('Final Report (PDF)');
     expect(finalReportOption).toBeDefined();
-    expect(screen.getByText(/Final Report Capstone Project\.pdf/i)).toBeDefined();
+    expect(screen.getAllByText(/Final Report Capstone Project\.pdf/i).length).toBeGreaterThan(0);
 
     // Verify no Word or DOCX format option exists
     expect(screen.queryByText(/\.docx/i)).toBeNull();

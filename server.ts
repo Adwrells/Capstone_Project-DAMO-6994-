@@ -2089,9 +2089,9 @@ Return strictly JSON matching the response schema.`;
 // Endpoint to download official Final Report Capstone Project.pdf
 app.get("/api/reports/final-pdf", (_req, res) => {
   const possiblePaths = [
+    "C:\\Users\\bhara\\OneDrive\\Desktop\\Final Report Capstone Project.pdf",
     path.join(process.cwd(), "public", "reports", "Final Report Capstone Project.pdf"),
     path.join(process.cwd(), "docs", "Reports", "Final Report Capstone Project.pdf"),
-    "C:\\Users\\bhara\\OneDrive\\Desktop\\Final Report Capstone Project.pdf",
   ];
   for (const p of possiblePaths) {
     if (fs.existsSync(p)) {
