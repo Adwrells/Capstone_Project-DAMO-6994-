@@ -58,6 +58,9 @@ DASHBOARD_ROADMAP.md
 # Local deployment/implementation guide (HTTPS, nginx, AWS) — not for distribution.
 guide_to_implement.md
 
+# Local CI/CD pipeline guide (Docker, GitHub Actions, AWS EC2) — not for distribution.
+guide_cicd_pipeline.md
+
 # ─── Claude Code ────────────────────────────────────────────────────────
 # .claude/ and CLAUDE.md are local-only — kept out of the repo.
 # Files remain on disk; only removed from git tracking.
