@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { CustomVisualization, AggregationOption } from '../../utils/types';
 import { fetchChartBuilderAssistant } from '../../services/apiService';
+import { formatAxisTitle } from '../../pages/ExecutiveDashboard/components/CustomChartCard';
 
 interface CustomChartBuilderProps {
   fields: any[];
@@ -84,7 +85,7 @@ export const CLINICAL_RECOMMENDATIONS: ClinicalRecommendation[] = [
     aggregation: 'Sum',
     showDataLabels: true,
     enableTrendLine: true,
-    unitFormat: 'thousands',
+    unitFormat: 'auto',
     topN: 0,
     insightTip: 'Demonstrates steady annual volume growth (Mann-Kendall upward trend, p < 0.0001) culminating in over 2.89M annual emergency presentations.',
     hypothesisRef: 'System Volume Progression'
@@ -164,7 +165,7 @@ export const CLINICAL_RECOMMENDATIONS: ClinicalRecommendation[] = [
     aggregation: 'Sum',
     showDataLabels: true,
     enableTrendLine: false,
-    unitFormat: 'thousands',
+    unitFormat: 'auto',
     topN: 8,
     insightTip: 'Trauma (31.5M visits) and Unintentional Falls (10.0M visits) dominate emergency encounters, requiring rapid-access orthopaedic imaging pathways.',
     hypothesisRef: 'Diagnostic Volume Ranking'
@@ -433,9 +434,30 @@ export default function CustomChartBuilder({
     });
 
     // Handle Top N filtering
-    if (topN && topN > 0) {
+    if (topN && topN > 0 && topN < rawList.length) {
       // Sort descending first to capture top contributors
       rawList = rawList.sort((a, b) => b.value - a.value).slice(0, topN);
+    }
+
+    // Chronological & Clinical sorting
+    const isTemporal = /year|fiscal|date|month|period|time/i.test(xAxis);
+    const isCtas = /triage|ctas|acuity/i.test(xAxis);
+
+    if (isTemporal) {
+      rawList = rawList.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }));
+    } else if (isCtas) {
+      const getCtasRank = (name: string): number => {
+        const s = name.toLowerCase();
+        if (s.includes('resuscitation') || s.includes('ctas i ') || s.includes('ctas 1') || s.includes('level 1') || s.startsWith('1')) return 1;
+        if (s.includes('emergent') || s.includes('ctas ii ') || s.includes('ctas 2') || s.includes('level 2') || s.startsWith('2')) return 2;
+        if (s.includes('urgent') && !s.includes('less') && !s.includes('non')) return 3;
+        if (s.includes('ctas iii') || s.includes('ctas 3') || s.includes('level 3') || s.startsWith('3')) return 3;
+        if (s.includes('less urgent') || s.includes('less-urgent') || s.includes('ctas iv') || s.includes('ctas 4') || s.includes('level 4') || s.startsWith('4')) return 4;
+        if (s.includes('non-urgent') || s.includes('non urgent') || s.includes('ctas v') || s.includes('ctas 5') || s.includes('level 5') || s.startsWith('5')) return 5;
+        if (s.includes('unknown') || s.includes('missing')) return 6;
+        return 99;
+      };
+      rawList = rawList.sort((a, b) => getCtasRank(a.name) - getCtasRank(b.name));
     }
 
     return rawList;
@@ -522,18 +544,99 @@ export default function CustomChartBuilder({
 
   // Number Formatting utility
   const formatYValue = (value: number) => {
-    if (unitFormat === 'raw') return value.toString();
-    if (unitFormat === 'currency') return `$${value.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
-    if (unitFormat === 'percentage') return `${value}%`;
-    if (unitFormat === 'thousands') return `${(value / 1000).toFixed(1)}k`;
-    if (unitFormat === 'millions') return `${(value / 1000000).toFixed(2)}M`;
-    if (unitFormat === 'billions') return `${(value / 1000000000).toFixed(2)}B`;
+    if (value === 0) return '0';
+    const abs = Math.abs(value);
+
+    if (unitFormat === 'raw') return value.toLocaleString(undefined, { maximumFractionDigits: 1 });
+    if (unitFormat === 'currency') {
+      if (abs >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(1)}B`;
+      if (abs >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
+      if (abs >= 1_000) return `$${(value / 1_000).toFixed(1)}k`;
+      return `$${value.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
+    }
+    if (unitFormat === 'percentage') return `${value.toFixed(1)}%`;
+    if (unitFormat === 'billions') return `${(value / 1_000_000_000).toFixed(2)}B`;
+    if (unitFormat === 'millions') return `${(value / 1_000_000).toFixed(1)}M`;
+    if (unitFormat === 'thousands') {
+      if (abs >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
+      return `${(value / 1000).toFixed(1)}k`;
+    }
 
     // Default 'auto' formatting
-    if (Math.abs(value) >= 1000000000) return `${(value / 1000000000).toFixed(1)}B`;
-    if (Math.abs(value) >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
-    if (Math.abs(value) >= 1000) return `${(value / 1000).toFixed(1)}k`;
-    return value.toLocaleString(undefined, { maximumFractionDigits: 1 });
+    if (abs >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(1)}B`;
+    if (abs >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
+    if (abs >= 10_000) return `${(value / 1_000).toFixed(1)}k`;
+    if (abs >= 1_000) return `${(value / 1_000).toFixed(1)}k`;
+    if (Number.isInteger(value)) return value.toString();
+    return value.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 1 });
+  };
+
+  // Smart Data Label Renderer: prevents congestion by only showing labels on key inflection points for long series
+  const renderSmartDataLabel = (props: any) => {
+    const { x, y, width, value, index } = props;
+    if (value === undefined || value === null) return null;
+    if (!showDataLabels) return null;
+
+    const totalPoints = livePreviewData.length;
+    // For series longer than 7 items, only display Peak, Trough, Start, and End to avoid congestion
+    if (totalPoints > 7) {
+      const isMax = stats && value === stats.maxVal;
+      const isMin = stats && value === stats.minVal;
+      const isLast = index === totalPoints - 1;
+      const isFirst = index === 0;
+
+      if (!isMax && !isMin && !isLast && !isFirst) {
+        return null;
+      }
+    }
+
+    const formatted = formatYValue(Number(value));
+    // When width is present (Bar/Column), center horizontally at x + width / 2; otherwise x is already the center point
+    const posX = width !== undefined && width !== null ? x + width / 2 : x;
+    const posY = y - 7;
+    return (
+      <text
+        x={posX}
+        y={posY}
+        fill={isDarkMode ? '#f1f5f9' : '#1e293b'}
+        fontSize={8.5}
+        fontWeight={700}
+        fontFamily="system-ui, -apple-system, sans-serif"
+        textAnchor="middle"
+      >
+        {formatted}
+      </text>
+    );
+  };
+
+  // Smart Data Label Renderer for horizontal bar layouts
+  const renderSmartVerticalBarLabel = (props: any) => {
+    const { x, y, width, height, value, index } = props;
+    if (value === undefined || value === null) return null;
+    if (!showDataLabels) return null;
+
+    const totalPoints = livePreviewData.length;
+    if (totalPoints > 8) {
+      const isMax = stats && value === stats.maxVal;
+      const isMin = stats && value === stats.minVal;
+      const isLast = index === totalPoints - 1;
+      if (!isMax && !isMin && !isLast) return null;
+    }
+
+    const formatted = formatYValue(Number(value));
+    return (
+      <text
+        x={x + width + 6}
+        y={y + height / 2 + 3.5}
+        fill={isDarkMode ? '#f1f5f9' : '#1e293b'}
+        fontSize={8.5}
+        fontWeight={700}
+        fontFamily="system-ui, -apple-system, sans-serif"
+        textAnchor="start"
+      >
+        {formatted}
+      </text>
+    );
   };
 
   // Conversational Visualizer Assistant Logic (Leverages Gemini server-side agent with robust fallback routing)
@@ -1610,48 +1713,91 @@ export default function CustomChartBuilder({
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
                   {type === 'Column' ? (
-                    <ComposedChart data={mergedChartData} margin={{ left: 10, right: 15, top: 15, bottom: 15 }}>
-                      {showGridlines && <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#334155' : '#f1f5f9'} />}
+                    <ComposedChart data={mergedChartData} margin={{ left: 16, right: 20, top: (enableTrendLine || enableMovingAverage) ? 14 : 26, bottom: 42 }}>
+                      {showGridlines && <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#1e293b' : '#f1f5f9'} />}
                       <XAxis
                         dataKey="name"
-                        stroke={isDarkMode ? '#94a3b8' : '#475569'}
+                        stroke={isDarkMode ? '#94a3b8' : '#64748b'}
                         fontSize={fontSize}
-                        angle={xAxisLabelRotation}
-                        textAnchor={xAxisLabelRotation > 0 ? 'start' : 'middle'}
-                        height={xAxisLabelRotation > 0 ? 55 : 38}
+                        angle={xAxisLabelRotation !== 0 ? xAxisLabelRotation : (livePreviewData.length > 5 ? -25 : 0)}
+                        textAnchor={xAxisLabelRotation > 0 ? 'start' : (xAxisLabelRotation < 0 || livePreviewData.length > 5 ? 'end' : 'middle')}
+                        height={46}
+                        interval={livePreviewData.length > 14 ? 'preserveStartEnd' : 0}
+                        tickMargin={6}
+                        tickFormatter={(v: any) => {
+                          const str = String(v ?? '');
+                          return str.length > 18 ? str.substring(0, 16) + '…' : str;
+                        }}
                         label={{
-                          value: xAxis,
+                          value: formatAxisTitle(xAxis),
                           position: 'insideBottom',
-                          offset: -10,
-                          fill: isDarkMode ? '#94a3b8' : '#475569',
+                          offset: -8,
+                          fill: isDarkMode ? '#94a3b8' : '#64748b',
                           fontSize: 9.5,
                           fontWeight: 700,
-                          fontFamily: 'monospace'
+                          fontFamily: 'system-ui, -apple-system, sans-serif'
                         }}
                       />
                       <YAxis
-                        stroke={isDarkMode ? '#94a3b8' : '#475569'}
+                        stroke={isDarkMode ? '#94a3b8' : '#64748b'}
                         fontSize={fontSize}
                         tickFormatter={formatYValue}
-                        domain={logScale ? ['auto', 'auto'] : undefined}
+                        domain={logScale ? ['auto', 'auto'] : [
+                          0,
+                          (dataMax: number) => {
+                            if (!dataMax || !isFinite(dataMax) || dataMax <= 0) return 'auto';
+                            const padding = dataMax * 0.15;
+                            return Number((dataMax + (padding > 0.4 ? padding : 0.4)).toFixed(1));
+                          }
+                        ]}
                         scale={logScale ? 'log' : 'auto'}
-                        width={60}
+                        width={68}
                         label={{
-                          value: `${yAxis} (${aggregation})`,
+                          value: `${formatAxisTitle(yAxis)} (${aggregation})`,
                           angle: -90,
                           position: 'insideLeft',
-                          offset: 0,
-                          fill: isDarkMode ? '#94a3b8' : '#475569',
-                          fontSize: 9.5,
-                          fontWeight: 700,
-                          fontFamily: 'monospace'
+                          offset: 12,
+                          style: {
+                            textAnchor: 'middle',
+                            fill: isDarkMode ? '#94a3b8' : '#64748b',
+                            fontSize: 9.5,
+                            fontWeight: 700,
+                            fontFamily: 'system-ui, -apple-system, sans-serif'
+                          }
                         }}
                       />
-                      <Tooltip formatter={(value: any) => [formatYValue(Number(value)), yAxis]} contentStyle={{ backgroundColor: isDarkMode ? '#1e293b' : '#ffffff', border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0', borderRadius: '8px' }} />
-                      {showLegend && <Legend verticalAlign={(legendPosition === 'top' || legendPosition === 'bottom') ? legendPosition : 'bottom'} align={(legendPosition === 'left' || legendPosition === 'right') ? legendPosition : 'center'} height={36} />}
+                      <Tooltip
+                        formatter={(value: any, name: any) => {
+                          let seriesName = formatAxisTitle(yAxis);
+                          if (name === 'trendValue') seriesName = 'Regression Trend';
+                          else if (name === 'maValue') seriesName = '3-Period Moving Avg';
+                          return [formatYValue(Number(value)), seriesName];
+                        }}
+                        contentStyle={{
+                          backgroundColor: isDarkMode ? '#1e293b' : '#ffffff',
+                          border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0',
+                          borderRadius: '8px',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                          fontSize: '11px',
+                          fontWeight: 500
+                        }}
+                      />
+                      {showLegend && (enableTrendLine || enableMovingAverage) && (
+                        <Legend
+                          verticalAlign="top"
+                          align="right"
+                          height={24}
+                          wrapperStyle={{
+                            paddingBottom: 6,
+                            fontSize: 10,
+                            fontWeight: 600,
+                            fontFamily: 'system-ui, -apple-system, sans-serif'
+                          }}
+                        />
+                      )}
                       <Bar dataKey="value" fill={chartColor} radius={[3, 3, 0, 0]} onClick={(data) => data && setDrillCategory(data.name)} className="cursor-pointer">
                         {showDataLabels && (
-                          <LabelList dataKey="value" position="top" offset={6} formatter={(v: any) => formatYValue(Number(v))} fill={isDarkMode ? '#E2E8F0' : '#1E293B'} fontSize={8.5} fontWeight={700} fontFamily="monospace" />
+                          <LabelList dataKey="value" content={renderSmartDataLabel} />
                         )}
                       </Bar>
                       {enableTrendLine && <Line type="monotone" dataKey="trendValue" stroke="#f43f5e" strokeWidth={2} dot={false} strokeDasharray="4 4" name="Regression Trend" />}
@@ -1659,46 +1805,89 @@ export default function CustomChartBuilder({
                       {targetValue !== undefined && <ReferenceLine y={targetValue} stroke="#ea580c" strokeDasharray="3 3" label={{ value: 'TARGET THRESHOLD', fill: '#ea580c', fontSize: 8 }} />}
                     </ComposedChart>
                   ) : type === 'Bar' ? (
-                    <ComposedChart data={mergedChartData} layout="vertical" margin={{ left: 20, right: 40, top: 10, bottom: 15 }}>
-                      {showGridlines && <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#334155' : '#f1f5f9'} />}
+                    <ComposedChart data={mergedChartData} layout="vertical" margin={{ left: 16, right: 42, top: (enableTrendLine || enableMovingAverage) ? 14 : 26, bottom: 40 }}>
+                      {showGridlines && <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#1e293b' : '#f1f5f9'} />}
                       <XAxis
                         type="number"
-                        stroke={isDarkMode ? '#94a3b8' : '#475569'}
+                        stroke={isDarkMode ? '#94a3b8' : '#64748b'}
                         fontSize={fontSize}
                         tickFormatter={formatYValue}
-                        height={35}
+                        domain={[
+                          0,
+                          (dataMax: number) => {
+                            if (!dataMax || !isFinite(dataMax) || dataMax <= 0) return 'auto';
+                            const padding = dataMax * 0.15;
+                            return Number((dataMax + (padding > 0.4 ? padding : 0.4)).toFixed(1));
+                          }
+                        ]}
+                        height={40}
                         label={{
-                          value: `${yAxis} (${aggregation})`,
+                          value: `${formatAxisTitle(yAxis)} (${aggregation})`,
                           position: 'insideBottom',
-                          offset: -10,
-                          fill: isDarkMode ? '#94a3b8' : '#475569',
+                          offset: -6,
+                          fill: isDarkMode ? '#94a3b8' : '#64748b',
                           fontSize: 9.5,
                           fontWeight: 700,
-                          fontFamily: 'monospace'
+                          fontFamily: 'system-ui, -apple-system, sans-serif'
                         }}
                       />
                       <YAxis
                         dataKey="name"
                         type="category"
-                        stroke={isDarkMode ? '#94a3b8' : '#475569'}
+                        stroke={isDarkMode ? '#94a3b8' : '#64748b'}
                         fontSize={fontSize}
-                        width={85}
+                        width={95}
+                        tickMargin={6}
+                        tickFormatter={(v: any) => {
+                          const str = String(v ?? '');
+                          return str.length > 18 ? str.substring(0, 16) + '…' : str;
+                        }}
                         label={{
-                          value: xAxis,
+                          value: formatAxisTitle(xAxis),
                           angle: -90,
                           position: 'insideLeft',
-                          offset: -10,
-                          fill: isDarkMode ? '#94a3b8' : '#475569',
-                          fontSize: 9.5,
-                          fontWeight: 700,
-                          fontFamily: 'monospace'
+                          offset: 12,
+                          style: {
+                            textAnchor: 'middle',
+                            fill: isDarkMode ? '#94a3b8' : '#64748b',
+                            fontSize: 9.5,
+                            fontWeight: 700,
+                            fontFamily: 'system-ui, -apple-system, sans-serif'
+                          }
                         }}
                       />
-                      <Tooltip formatter={(value: any) => [formatYValue(Number(value)), yAxis]} contentStyle={{ backgroundColor: isDarkMode ? '#1e293b' : '#ffffff', border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0', borderRadius: '8px' }} />
-                      {showLegend && <Legend verticalAlign={(legendPosition === 'top' || legendPosition === 'bottom') ? legendPosition : 'bottom'} align={(legendPosition === 'left' || legendPosition === 'right') ? legendPosition : 'center'} height={36} />}
+                      <Tooltip
+                        formatter={(value: any, name: any) => {
+                          let seriesName = formatAxisTitle(yAxis);
+                          if (name === 'trendValue') seriesName = 'Regression Trend';
+                          else if (name === 'maValue') seriesName = '3-Period Moving Avg';
+                          return [formatYValue(Number(value)), seriesName];
+                        }}
+                        contentStyle={{
+                          backgroundColor: isDarkMode ? '#1e293b' : '#ffffff',
+                          border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0',
+                          borderRadius: '8px',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                          fontSize: '11px',
+                          fontWeight: 500
+                        }}
+                      />
+                      {showLegend && (enableTrendLine || enableMovingAverage) && (
+                        <Legend
+                          verticalAlign="top"
+                          align="right"
+                          height={24}
+                          wrapperStyle={{
+                            paddingBottom: 6,
+                            fontSize: 10,
+                            fontWeight: 600,
+                            fontFamily: 'system-ui, -apple-system, sans-serif'
+                          }}
+                        />
+                      )}
                       <Bar dataKey="value" fill={chartColor} radius={[0, 3, 3, 0]} onClick={(data) => data && setDrillCategory(data.name)} className="cursor-pointer">
                         {showDataLabels && (
-                          <LabelList dataKey="value" position="right" offset={6} formatter={(v: any) => formatYValue(Number(v))} fill={isDarkMode ? '#E2E8F0' : '#1E293B'} fontSize={8.5} fontWeight={700} fontFamily="monospace" />
+                          <LabelList dataKey="value" content={renderSmartVerticalBarLabel} />
                         )}
                       </Bar>
                       {enableTrendLine && <Line type="monotone" dataKey="trendValue" stroke="#f43f5e" strokeWidth={2} dot={false} strokeDasharray="4 4" name="Regression Trend" />}
@@ -1706,46 +1895,90 @@ export default function CustomChartBuilder({
                       {targetValue !== undefined && <ReferenceLine x={targetValue} stroke="#ea580c" strokeDasharray="3 3" label={{ value: 'TARGET', fill: '#ea580c', fontSize: 8, position: 'insideTop' }} />}
                     </ComposedChart>
                   ) : type === 'Line' ? (
-                    <ComposedChart data={mergedChartData} margin={{ left: 10, right: 15, top: 15, bottom: 15 }}>
-                      {showGridlines && <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#334155' : '#f1f5f9'} />}
+                    <ComposedChart data={mergedChartData} margin={{ left: 16, right: 20, top: (enableTrendLine || enableMovingAverage) ? 14 : 26, bottom: 42 }}>
+                      {showGridlines && <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#1e293b' : '#f1f5f9'} />}
                       <XAxis
                         dataKey="name"
-                        stroke={isDarkMode ? '#94a3b8' : '#475569'}
+                        stroke={isDarkMode ? '#94a3b8' : '#64748b'}
                         fontSize={fontSize}
-                        angle={xAxisLabelRotation}
-                        textAnchor={xAxisLabelRotation > 0 ? 'start' : 'middle'}
-                        height={xAxisLabelRotation > 0 ? 55 : 38}
+                        angle={xAxisLabelRotation !== 0 ? xAxisLabelRotation : (livePreviewData.length > 5 ? -25 : 0)}
+                        textAnchor={xAxisLabelRotation > 0 ? 'start' : (xAxisLabelRotation < 0 || livePreviewData.length > 5 ? 'end' : 'middle')}
+                        height={46}
+                        interval={livePreviewData.length > 14 ? 'preserveStartEnd' : 0}
+                        tickMargin={6}
+                        tickFormatter={(v: any) => {
+                          const str = String(v ?? '');
+                          return str.length > 18 ? str.substring(0, 16) + '…' : str;
+                        }}
                         label={{
-                          value: xAxis,
+                          value: formatAxisTitle(xAxis),
                           position: 'insideBottom',
-                          offset: -10,
-                          fill: isDarkMode ? '#94a3b8' : '#475569',
+                          offset: -8,
+                          fill: isDarkMode ? '#94a3b8' : '#64748b',
                           fontSize: 9.5,
                           fontWeight: 700,
-                          fontFamily: 'monospace'
+                          fontFamily: 'system-ui, -apple-system, sans-serif'
                         }}
                       />
                       <YAxis
-                        stroke={isDarkMode ? '#94a3b8' : '#475569'}
+                        stroke={isDarkMode ? '#94a3b8' : '#64748b'}
                         fontSize={fontSize}
                         tickFormatter={formatYValue}
-                        width={60}
+                        domain={[
+                          0,
+                          (dataMax: number) => {
+                            if (!dataMax || !isFinite(dataMax) || dataMax <= 0) return 'auto';
+                            const padding = dataMax * 0.15;
+                            return Number((dataMax + (padding > 0.4 ? padding : 0.4)).toFixed(1));
+                          }
+                        ]}
+                        width={68}
                         label={{
-                          value: `${yAxis} (${aggregation})`,
+                          value: `${formatAxisTitle(yAxis)} (${aggregation})`,
                           angle: -90,
                           position: 'insideLeft',
-                          offset: 0,
-                          fill: isDarkMode ? '#94a3b8' : '#475569',
-                          fontSize: 9.5,
-                          fontWeight: 700,
-                          fontFamily: 'monospace'
+                          offset: 12,
+                          style: {
+                            textAnchor: 'middle',
+                            fill: isDarkMode ? '#94a3b8' : '#64748b',
+                            fontSize: 9.5,
+                            fontWeight: 700,
+                            fontFamily: 'system-ui, -apple-system, sans-serif'
+                          }
                         }}
                       />
-                      <Tooltip formatter={(value: any) => [formatYValue(Number(value)), yAxis]} contentStyle={{ backgroundColor: isDarkMode ? '#1e293b' : '#ffffff', border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0', borderRadius: '8px' }} />
-                      {showLegend && <Legend verticalAlign={(legendPosition === 'top' || legendPosition === 'bottom') ? legendPosition : 'bottom'} align={(legendPosition === 'left' || legendPosition === 'right') ? legendPosition : 'center'} height={36} />}
+                      <Tooltip
+                        formatter={(value: any, name: any) => {
+                          let seriesName = formatAxisTitle(yAxis);
+                          if (name === 'trendValue') seriesName = 'Regression Trend';
+                          else if (name === 'maValue') seriesName = '3-Period Moving Avg';
+                          return [formatYValue(Number(value)), seriesName];
+                        }}
+                        contentStyle={{
+                          backgroundColor: isDarkMode ? '#1e293b' : '#ffffff',
+                          border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0',
+                          borderRadius: '8px',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                          fontSize: '11px',
+                          fontWeight: 500
+                        }}
+                      />
+                      {showLegend && (enableTrendLine || enableMovingAverage) && (
+                        <Legend
+                          verticalAlign="top"
+                          align="right"
+                          height={24}
+                          wrapperStyle={{
+                            paddingBottom: 6,
+                            fontSize: 10,
+                            fontWeight: 600,
+                            fontFamily: 'system-ui, -apple-system, sans-serif'
+                          }}
+                        />
+                      )}
                       <Line type="monotone" dataKey="value" stroke={chartColor} strokeWidth={2.5} dot={{ r: 3.5, fill: chartColor }} onClick={(data) => data && setDrillCategory(data.name)} className="cursor-pointer">
                         {showDataLabels && (
-                          <LabelList dataKey="value" position="top" offset={6} formatter={(v: any) => formatYValue(Number(v))} fill={isDarkMode ? '#E2E8F0' : '#1E293B'} fontSize={8.5} fontWeight={700} fontFamily="monospace" />
+                          <LabelList dataKey="value" content={renderSmartDataLabel} />
                         )}
                       </Line>
                       {enableTrendLine && <Line type="monotone" dataKey="trendValue" stroke="#f43f5e" strokeWidth={2} dot={false} strokeDasharray="4 4" name="Regression Trend" />}
@@ -1753,46 +1986,90 @@ export default function CustomChartBuilder({
                       {targetValue !== undefined && <ReferenceLine y={targetValue} stroke="#ea580c" strokeDasharray="3 3" label={{ value: 'TARGET THRESHOLD', fill: '#ea580c', fontSize: 8 }} />}
                     </ComposedChart>
                   ) : type === 'Area' ? (
-                    <ComposedChart data={mergedChartData} margin={{ left: 10, right: 15, top: 15, bottom: 15 }}>
-                      {showGridlines && <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#334155' : '#f1f5f9'} />}
+                    <ComposedChart data={mergedChartData} margin={{ left: 16, right: 20, top: (enableTrendLine || enableMovingAverage) ? 14 : 26, bottom: 42 }}>
+                      {showGridlines && <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#1e293b' : '#f1f5f9'} />}
                       <XAxis
                         dataKey="name"
-                        stroke={isDarkMode ? '#94a3b8' : '#475569'}
+                        stroke={isDarkMode ? '#94a3b8' : '#64748b'}
                         fontSize={fontSize}
-                        angle={xAxisLabelRotation}
-                        textAnchor={xAxisLabelRotation > 0 ? 'start' : 'middle'}
-                        height={xAxisLabelRotation > 0 ? 55 : 38}
+                        angle={xAxisLabelRotation !== 0 ? xAxisLabelRotation : (livePreviewData.length > 5 ? -25 : 0)}
+                        textAnchor={xAxisLabelRotation > 0 ? 'start' : (xAxisLabelRotation < 0 || livePreviewData.length > 5 ? 'end' : 'middle')}
+                        height={46}
+                        interval={livePreviewData.length > 14 ? 'preserveStartEnd' : 0}
+                        tickMargin={6}
+                        tickFormatter={(v: any) => {
+                          const str = String(v ?? '');
+                          return str.length > 18 ? str.substring(0, 16) + '…' : str;
+                        }}
                         label={{
-                          value: xAxis,
+                          value: formatAxisTitle(xAxis),
                           position: 'insideBottom',
-                          offset: -10,
-                          fill: isDarkMode ? '#94a3b8' : '#475569',
+                          offset: -8,
+                          fill: isDarkMode ? '#94a3b8' : '#64748b',
                           fontSize: 9.5,
                           fontWeight: 700,
-                          fontFamily: 'monospace'
+                          fontFamily: 'system-ui, -apple-system, sans-serif'
                         }}
                       />
                       <YAxis
-                        stroke={isDarkMode ? '#94a3b8' : '#475569'}
+                        stroke={isDarkMode ? '#94a3b8' : '#64748b'}
                         fontSize={fontSize}
                         tickFormatter={formatYValue}
-                        width={60}
+                        domain={[
+                          0,
+                          (dataMax: number) => {
+                            if (!dataMax || !isFinite(dataMax) || dataMax <= 0) return 'auto';
+                            const padding = dataMax * 0.15;
+                            return Number((dataMax + (padding > 0.4 ? padding : 0.4)).toFixed(1));
+                          }
+                        ]}
+                        width={68}
                         label={{
-                          value: `${yAxis} (${aggregation})`,
+                          value: `${formatAxisTitle(yAxis)} (${aggregation})`,
                           angle: -90,
                           position: 'insideLeft',
-                          offset: 0,
-                          fill: isDarkMode ? '#94a3b8' : '#475569',
-                          fontSize: 9.5,
-                          fontWeight: 700,
-                          fontFamily: 'monospace'
+                          offset: 12,
+                          style: {
+                            textAnchor: 'middle',
+                            fill: isDarkMode ? '#94a3b8' : '#64748b',
+                            fontSize: 9.5,
+                            fontWeight: 700,
+                            fontFamily: 'system-ui, -apple-system, sans-serif'
+                          }
                         }}
                       />
-                      <Tooltip formatter={(value: any) => [formatYValue(Number(value)), yAxis]} contentStyle={{ backgroundColor: isDarkMode ? '#1e293b' : '#ffffff', border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0', borderRadius: '8px' }} />
-                      {showLegend && <Legend verticalAlign={(legendPosition === 'top' || legendPosition === 'bottom') ? legendPosition : 'bottom'} align={(legendPosition === 'left' || legendPosition === 'right') ? legendPosition : 'center'} height={36} />}
+                      <Tooltip
+                        formatter={(value: any, name: any) => {
+                          let seriesName = formatAxisTitle(yAxis);
+                          if (name === 'trendValue') seriesName = 'Regression Trend';
+                          else if (name === 'maValue') seriesName = '3-Period Moving Avg';
+                          return [formatYValue(Number(value)), seriesName];
+                        }}
+                        contentStyle={{
+                          backgroundColor: isDarkMode ? '#1e293b' : '#ffffff',
+                          border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0',
+                          borderRadius: '8px',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                          fontSize: '11px',
+                          fontWeight: 500
+                        }}
+                      />
+                      {showLegend && (enableTrendLine || enableMovingAverage) && (
+                        <Legend
+                          verticalAlign="top"
+                          align="right"
+                          height={24}
+                          wrapperStyle={{
+                            paddingBottom: 6,
+                            fontSize: 10,
+                            fontWeight: 600,
+                            fontFamily: 'system-ui, -apple-system, sans-serif'
+                          }}
+                        />
+                      )}
                       <Area type="monotone" dataKey="value" stroke={chartColor} fill={chartColor} fillOpacity={0.18} onClick={(data) => data && setDrillCategory(data.name)} className="cursor-pointer">
                         {showDataLabels && (
-                          <LabelList dataKey="value" position="top" offset={6} formatter={(v: any) => formatYValue(Number(v))} fill={isDarkMode ? '#E2E8F0' : '#1E293B'} fontSize={8.5} fontWeight={700} fontFamily="monospace" />
+                          <LabelList dataKey="value" content={renderSmartDataLabel} />
                         )}
                       </Area>
                       {enableTrendLine && <Line type="monotone" dataKey="trendValue" stroke="#f43f5e" strokeWidth={2} dot={false} strokeDasharray="4 4" name="Regression Trend" />}

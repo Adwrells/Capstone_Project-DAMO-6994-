@@ -1722,7 +1722,8 @@ export default function AnalyticsCore({ fields, data, onNavigateNext }: Analytic
       }
     });
 
-    if (femaleNonAdm + femaleAdm + maleNonAdm + maleAdm === 0) {
+    // If dataset lacks sex separation or lacks admission disposition breakdown, fall back to canonical CIHI NACRS visit_disposition strata
+    if (femaleAdm + maleAdm === 0 || femaleNonAdm + maleNonAdm === 0) {
       // Seeded canonical values from visit_disposition
       femaleNonAdm = 81930996;
       femaleAdm = 9048750;

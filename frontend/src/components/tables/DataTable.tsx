@@ -231,13 +231,14 @@ export default function DataTable({
 
         {searchable && (
           <div className="relative flex-1 min-w-[180px] max-w-xs">
-            <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" aria-hidden="true" />
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" aria-hidden="true" />
             <input
               type="search"
               value={search}
               onChange={handleSearch}
               placeholder="Search all columns…"
-              className="pl-8 pr-3 py-1.5 text-xs border border-[var(--border)] rounded-lg w-full focus:border-[#2563EB] focus:ring-0 bg-[var(--hover-bg)] placeholder:text-[var(--text-muted)]"
+              className="pl-9 pr-3 py-1.5 text-xs border border-[var(--border)] rounded-lg w-full focus:border-[#2563EB] focus:ring-0 bg-[var(--hover-bg)] placeholder:text-[var(--text-muted)]"
+              style={{ paddingLeft: '36px' }}
               aria-label="Search table data"
             />
           </div>
@@ -346,7 +347,7 @@ export default function DataTable({
                   role="columnheader"
                   aria-sort={sortKey === col.key ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
                   onClick={col.sortable !== false ? () => handleSort(col.key) : undefined}
-                  className={`px-4 py-2.5 bg-[var(--surface-bg)] border-b border-[var(--border)] text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider
+                  className={`px-4 py-2.5 bg-[var(--surface-bg)] border-b-2 border-r border-slate-300 dark:border-slate-700 last:border-r-0 text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider
                     ${col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : 'text-left'}
                     ${col.sortable !== false ? 'cursor-pointer hover:bg-[var(--hover-bg)] select-none transition-colors' : ''}
                     ${col.width ? '' : ''}`}
@@ -397,13 +398,13 @@ export default function DataTable({
                     aria-rowindex={absoluteIndex + 2}
                     aria-selected={selectable ? isSelected : undefined}
                     onClick={() => { if (selectable) toggleRow(absoluteIndex); onRowClick?.(row, absoluteIndex); }}
-                    className={`border-b border-[var(--border)] transition-colors
+                    className={`border-b border-slate-200 dark:border-slate-800 transition-colors
                       ${ri % 2 === 0 ? '' : 'bg-[var(--hover-bg)]'}
                       ${isSelected ? 'bg-[#EFF6FF] dark:bg-blue-950/20' : ''}
                       ${onRowClick || selectable ? 'cursor-pointer hover:bg-[#F5F7FF] dark:hover:bg-slate-800/60' : 'hover:bg-[var(--hover-bg)]'}`}
                   >
                     {selectable && (
-                      <td className="w-10 px-3 py-2.5 text-center" role="gridcell">
+                      <td className="w-10 px-3 py-2.5 text-center border-r border-slate-200 dark:border-slate-800" role="gridcell">
                         <input
                           type="checkbox"
                           checked={isSelected}
@@ -420,7 +421,7 @@ export default function DataTable({
                           key={col.key}
                           role="gridcell"
                           aria-colindex={visibleColumns.indexOf(col) + 1 + (selectable ? 1 : 0)}
-                          className={`px-4 py-2.5 text-[13px] text-[var(--text-primary)]
+                          className={`px-4 py-2.5 text-[13px] text-[var(--text-primary)] border-r border-slate-200 dark:border-slate-800 last:border-r-0
                             ${col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : 'text-left'}`}
                         >
                           {col.render ? (

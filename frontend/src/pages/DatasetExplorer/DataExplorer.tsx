@@ -997,12 +997,19 @@ export default function DataExplorer({
               {sheetStats.numeric_columns.length === 0 ? (
                 <p className="text-sm text-[var(--text-secondary)]">No numeric columns in this worksheet.</p>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm" role="grid">
+                <div className="overflow-x-auto rounded-xl border border-slate-300 dark:border-slate-700/80 shadow-xs bg-[var(--surface-card)]">
+                  <table className="w-full text-sm border-collapse" role="grid">
                     <thead>
-                      <tr className="border-b border-[var(--border)]">
-                        {['Column','Count','Missing','Min','Max','Mean','Median','Std Dev','Q1','Q3'].map(h => (
-                          <th key={h} className="text-left px-3 py-2.5 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider whitespace-nowrap">{h}</th>
+                      <tr className="bg-slate-100 dark:bg-[#0f172a]">
+                        {['Column','Count','Missing','Min','Max','Mean','Median','Std Dev','Q1','Q3'].map((h, hIdx, arr) => (
+                          <th
+                            key={h}
+                            className={`text-center px-3 py-2.5 text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider whitespace-nowrap border-b-2 border-slate-300 dark:border-slate-700 ${
+                              hIdx < arr.length - 1 ? 'border-r border-slate-300 dark:border-slate-700' : ''
+                            }`}
+                          >
+                            {h}
+                          </th>
                         ))}
                       </tr>
                     </thead>
@@ -1011,19 +1018,24 @@ export default function DataExplorer({
                         const s = sheetStats.summary_statistics[col];
                         if (!s) return null;
                         return (
-                          <tr key={col} className={`border-b border-[var(--border)] transition-colors hover:bg-[var(--hover-bg)] ${i % 2 === 0 ? '' : 'bg-[var(--hover-bg)]'}`}>
-                            <td className="px-3 py-2.5 font-medium text-[var(--text-primary)] max-w-[160px] truncate">{col}</td>
-                            <td className="px-3 py-2.5 text-[var(--text-primary)] font-mono">{formatCompact(s.count, col, 'count')}</td>
-                            <td className="px-3 py-2.5">
+                          <tr
+                            key={col}
+                            className={`border-b border-slate-200 dark:border-slate-800 transition-colors hover:bg-blue-50/40 dark:hover:bg-blue-950/30 ${
+                              i % 2 === 0 ? 'bg-transparent' : 'bg-slate-50/60 dark:bg-white/[0.02]'
+                            }`}
+                          >
+                            <td className="px-3 py-2.5 font-medium text-center text-[var(--text-primary)] max-w-[160px] truncate border-r border-slate-200 dark:border-slate-800">{col}</td>
+                            <td className="px-3 py-2.5 text-center text-[var(--text-primary)] font-mono border-r border-slate-200 dark:border-slate-800">{formatCompact(s.count, col, 'count')}</td>
+                            <td className="px-3 py-2.5 text-center border-r border-slate-200 dark:border-slate-800">
                               <span className={`font-medium ${s.missing > 0 ? 'text-[#EF4444]' : 'text-[#10B981]'}`}>{s.missing}</span>
                             </td>
-                            <td className="px-3 py-2.5 text-[var(--text-primary)] font-mono">{formatCompact(s.min, col, 'min')}</td>
-                            <td className="px-3 py-2.5 text-[var(--text-primary)] font-mono">{formatCompact(s.max, col, 'max')}</td>
-                            <td className="px-3 py-2.5 font-medium text-[#2563EB] font-mono">{formatCompact(s.mean, col, 'mean')}</td>
-                            <td className="px-3 py-2.5 text-[var(--text-primary)] font-mono">{formatCompact(s.median, col, 'median')}</td>
-                            <td className="px-3 py-2.5 text-[var(--text-primary)] font-mono">{formatCompact(s.std_dev, col, 'std_dev')}</td>
-                            <td className="px-3 py-2.5 text-[var(--text-primary)] font-mono">{formatCompact(s.q1, col, 'q1')}</td>
-                            <td className="px-3 py-2.5 text-[var(--text-primary)] font-mono">{formatCompact(s.q3, col, 'q3')}</td>
+                            <td className="px-3 py-2.5 text-center text-[var(--text-primary)] font-mono border-r border-slate-200 dark:border-slate-800">{formatCompact(s.min, col, 'min')}</td>
+                            <td className="px-3 py-2.5 text-center text-[var(--text-primary)] font-mono border-r border-slate-200 dark:border-slate-800">{formatCompact(s.max, col, 'max')}</td>
+                            <td className="px-3 py-2.5 text-center font-medium text-[#2563EB] font-mono border-r border-slate-200 dark:border-slate-800">{formatCompact(s.mean, col, 'mean')}</td>
+                            <td className="px-3 py-2.5 text-center text-[var(--text-primary)] font-mono border-r border-slate-200 dark:border-slate-800">{formatCompact(s.median, col, 'median')}</td>
+                            <td className="px-3 py-2.5 text-center text-[var(--text-primary)] font-mono border-r border-slate-200 dark:border-slate-800">{formatCompact(s.std_dev, col, 'std_dev')}</td>
+                            <td className="px-3 py-2.5 text-center text-[var(--text-primary)] font-mono border-r border-slate-200 dark:border-slate-800">{formatCompact(s.q1, col, 'q1')}</td>
+                            <td className="px-3 py-2.5 text-center text-[var(--text-primary)] font-mono">{formatCompact(s.q3, col, 'q3')}</td>
                           </tr>
                         );
                       })}
@@ -1071,33 +1083,45 @@ export default function DataExplorer({
           {/* DATA DICTIONARY */}
           {activeTab === 'dictionary' && (
             <Section title="Data Dictionary" icon={BookOpen} accent="#0EA5A4">
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm" role="grid">
+              <div className="overflow-x-auto rounded-xl border border-slate-300 dark:border-slate-700/80 shadow-xs bg-[var(--surface-card)]">
+                <table className="w-full text-sm border-collapse" role="grid">
                   <thead>
-                    <tr className="border-b border-[var(--border)]">
-                      {['Column Name','Data Type','Unique Values','Missing','Range / Sample Values','Business Description'].map(h => (
-                        <th key={h} className="text-left px-3 py-2 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider whitespace-nowrap">{h}</th>
+                    <tr className="bg-slate-100 dark:bg-[#0f172a]">
+                      {['Column Name','Data Type','Unique Values','Missing','Range / Sample Values','Business Description'].map((h, hIdx, arr) => (
+                        <th
+                          key={h}
+                          className={`text-center px-3 py-2.5 text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider whitespace-nowrap border-b-2 border-slate-300 dark:border-slate-700 ${
+                            hIdx < arr.length - 1 ? 'border-r border-slate-300 dark:border-slate-700' : ''
+                          }`}
+                        >
+                          {h}
+                        </th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
                     {dataDictionary.map((row, i) => (
-                      <tr key={row.name} className={`border-b border-[var(--border)] hover:bg-[var(--hover-bg)] transition-colors ${i % 2 === 0 ? '' : 'bg-[var(--hover-bg)]'}`}>
-                        <td className="px-3 py-2.5 font-mono text-xs text-[var(--text-primary)] font-semibold whitespace-nowrap">{row.name}</td>
-                        <td className="px-3 py-2.5">
+                      <tr
+                        key={row.name}
+                        className={`border-b border-slate-200 dark:border-slate-800 hover:bg-blue-50/40 dark:hover:bg-blue-950/30 transition-colors ${
+                          i % 2 === 0 ? 'bg-transparent' : 'bg-slate-50/60 dark:bg-white/[0.02]'
+                        }`}
+                      >
+                        <td className="px-3 py-2.5 font-mono text-xs text-center text-[var(--text-primary)] font-semibold whitespace-nowrap border-r border-slate-200 dark:border-slate-800">{row.name}</td>
+                        <td className="px-3 py-2.5 text-center border-r border-slate-200 dark:border-slate-800">
                           <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold
                             ${row.type === 'numeric' ? 'bg-[#EFF6FF] dark:bg-blue-950/30 text-[#2563EB] dark:text-blue-400' : 'bg-[#F0FDF4] dark:bg-emerald-950/30 text-[#16A34A] dark:text-emerald-400'}`}>
                             {row.type}
                           </span>
                         </td>
-                        <td className="px-3 py-2.5 text-[var(--text-primary)]">{row.uniqueCount.toLocaleString()}</td>
-                        <td className="px-3 py-2.5">
+                        <td className="px-3 py-2.5 text-center text-[var(--text-primary)] border-r border-slate-200 dark:border-slate-800">{row.uniqueCount.toLocaleString()}</td>
+                        <td className="px-3 py-2.5 text-center border-r border-slate-200 dark:border-slate-800">
                           <span className={row.missing > 0 ? 'text-[#EF4444] font-medium' : 'text-[#10B981]'}>
                             {row.missing}
                           </span>
                         </td>
-                        <td className="px-3 py-2.5 text-[var(--text-secondary)] max-w-[200px] truncate text-xs">{row.range}</td>
-                        <td className="px-3 py-2.5 text-[var(--text-secondary)] text-xs">{row.description}</td>
+                        <td className="px-3 py-2.5 text-center text-[var(--text-secondary)] max-w-[200px] truncate text-xs border-r border-slate-200 dark:border-slate-800">{row.range}</td>
+                        <td className="px-3 py-2.5 text-center text-[var(--text-secondary)] text-xs">{row.description}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -1112,13 +1136,14 @@ export default function DataExplorer({
               {/* Toolbar */}
               <div className="flex items-center gap-3 mb-4 flex-wrap">
                 <div className="relative flex-1 min-w-[200px]">
-                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
+                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
                   <input
                     type="search"
                     placeholder="Search all columns…"
                     value={tableSearch}
                     onChange={e => { setTableSearch(e.target.value); setTablePage(1); }}
-                    className="pl-8 pr-4 py-2 text-sm w-full"
+                    className="pl-9 pr-4 py-2 text-sm w-full"
+                    style={{ paddingLeft: '36px' }}
                     aria-label="Search data table"
                   />
                 </div>
@@ -1128,21 +1153,23 @@ export default function DataExplorer({
               </div>
 
               {/* Table */}
-              <div className="overflow-auto max-h-[480px] rounded-xl border border-[var(--border)]">
-                <table className="w-full text-sm" role="grid">
-                  <thead className="sticky top-0 z-10">
+              <div className="overflow-auto max-h-[500px] rounded-xl border border-slate-300 dark:border-slate-700/80 shadow-xs bg-[var(--surface-card)]">
+                <table className="w-full text-sm border-collapse" role="grid">
+                  <thead className="sticky top-0 z-10 bg-slate-100 dark:bg-[#0f172a] shadow-xs">
                     <tr>
-                      {sheetData.fields.map(f => (
+                      {sheetData.fields.map((f, fIdx) => (
                         <th
                           key={f.name}
                           onClick={() => handleSort(f.name)}
-                          className="px-3 py-2.5 text-left bg-[var(--surface-bg)] border-b border-[var(--border)] text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider whitespace-nowrap cursor-pointer hover:bg-[var(--hover-bg)] select-none transition-colors"
+                          className={`px-3.5 py-3 text-center bg-slate-100 dark:bg-[#0f172a] border-b-2 border-slate-300 dark:border-slate-700 text-[11px] font-bold text-[var(--text-secondary)] uppercase tracking-wider whitespace-nowrap cursor-pointer hover:bg-slate-200/80 dark:hover:bg-slate-800/80 select-none transition-colors ${
+                            fIdx < sheetData.fields.length - 1 ? 'border-r border-slate-300 dark:border-slate-700' : ''
+                          }`}
                         >
-                          <div className="flex items-center gap-1">
-                            <span className="truncate max-w-[120px]">{f.name}</span>
+                          <div className="flex items-center justify-center gap-1.5 mx-auto">
+                            <span className="truncate max-w-[150px] text-center font-semibold" title={f.name}>{f.name}</span>
                             {sortCol === f.name
-                              ? sortDir === 'asc' ? <ArrowUp size={11} className="text-[#2563EB] shrink-0" /> : <ArrowDown size={11} className="text-[#2563EB] shrink-0" />
-                              : <ArrowUpDown size={11} className="text-[var(--text-disabled)] shrink-0" />}
+                              ? sortDir === 'asc' ? <ArrowUp size={12} className="text-[#2563EB] shrink-0" /> : <ArrowDown size={12} className="text-[#2563EB] shrink-0" />
+                              : <ArrowUpDown size={12} className="text-[var(--text-disabled)] shrink-0" />}
                           </div>
                         </th>
                       ))}
@@ -1156,10 +1183,20 @@ export default function DataExplorer({
                         </td>
                       </tr>
                     ) : pagedRows.map((row, ri) => (
-                      <tr key={ri} className={`border-b border-[var(--border)] hover:bg-[var(--hover-bg)] transition-colors ${ri % 2 === 0 ? '' : 'bg-[var(--hover-bg)]'}`}>
-                        {sheetData.fields.map(f => (
-                          <td key={f.name} className="px-3 py-2.5 text-[var(--text-primary)] max-w-[180px]">
-                            <span className="block truncate" title={String(row[f.name] ?? '')}>
+                      <tr
+                        key={ri}
+                        className={`border-b border-slate-200 dark:border-slate-800 hover:bg-blue-50/40 dark:hover:bg-blue-950/30 transition-colors ${
+                          ri % 2 === 0 ? 'bg-transparent' : 'bg-slate-50/60 dark:bg-white/[0.02]'
+                        }`}
+                      >
+                        {sheetData.fields.map((f, fIdx) => (
+                          <td
+                            key={f.name}
+                            className={`px-3.5 py-2.5 text-center text-xs text-[var(--text-primary)] max-w-[180px] ${
+                              fIdx < sheetData.fields.length - 1 ? 'border-r border-slate-200 dark:border-slate-800' : ''
+                            }`}
+                          >
+                            <span className="block truncate text-center mx-auto" title={String(row[f.name] ?? '')}>
                               {row[f.name] == null ? <span className="text-[var(--text-disabled)] italic text-xs">null</span> : String(row[f.name])}
                             </span>
                           </td>

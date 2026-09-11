@@ -307,46 +307,82 @@ export default function ConsultantInsights({ isLoading: parentLoading, onNavigat
         />
 
         <div className="border border-slate-200/90 dark:border-slate-800/80 bg-white dark:bg-[#0d172a] rounded-2xl p-6 sm:p-7 shadow-xs space-y-6 transition-colors">
-          {/* 4 Compact Evidence Indicators */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-xs font-mono">
-            <div className="p-3.5 bg-slate-50/80 dark:bg-[#131f37] rounded-xl border border-slate-200/80 dark:border-slate-800/80 flex items-center gap-3.5 shadow-3xs">
-              <div className="w-9 h-9 rounded-lg bg-blue-500/10 dark:bg-blue-500/20 text-[#0F4C81] dark:text-[#3B82F6] flex items-center justify-center shrink-0">
-                <Database size={18} />
+          {/* 4 Upgraded Center-Aligned Evidence Indicator Cards */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 font-sans">
+            {/* Card 1: Evidence Base */}
+            <div className="relative overflow-hidden p-4 sm:p-5 rounded-2xl bg-gradient-to-b from-white via-slate-50/80 to-slate-100/50 dark:from-[#131f37] dark:via-[#111c33] dark:to-[#0e172a] border border-slate-200/90 dark:border-slate-800/90 hover:border-blue-500/40 dark:hover:border-blue-500/40 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group flex flex-col items-center justify-center text-center">
+              <div className="absolute top-0 inset-x-8 h-[2px] bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-80" />
+              <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-blue-500/10 dark:bg-blue-500/20 text-[#0F4C81] dark:text-[#3B82F6] border border-blue-500/25 flex items-center justify-center mb-3 shadow-xs shadow-blue-500/10 group-hover:scale-110 transition-transform duration-200">
+                <Database size={20} strokeWidth={2.2} />
               </div>
-              <div>
-                <span className="text-[10px] text-slate-400 block uppercase tracking-wider font-sans font-medium">Evidence Base</span>
-                <span className="font-bold text-slate-900 dark:text-white text-xs">{evidenceIndicators?.evidenceSourcesCount || 5} Tables &amp; Data Services</span>
-              </div>
+              <span className="text-[10px] sm:text-[10.5px] text-slate-500 dark:text-slate-400 uppercase tracking-widest font-semibold block mb-1">
+                Evidence Base
+              </span>
+              <span className="font-bold text-slate-900 dark:text-white text-xs sm:text-[13.5px] tracking-tight block leading-snug">
+                {evidenceIndicators?.evidenceSourcesCount || 5} Tables &amp; Data Services
+              </span>
+              <span className="inline-flex items-center gap-1.5 mt-2.5 px-2.5 py-0.5 rounded-full text-[9.5px] font-semibold bg-blue-500/10 dark:bg-blue-500/15 text-blue-700 dark:text-blue-300 border border-blue-500/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                CIHI SQLite Verified
+              </span>
             </div>
 
-            <div className="p-3.5 bg-slate-50/80 dark:bg-[#131f37] rounded-xl border border-slate-200/80 dark:border-slate-800/80 flex items-center gap-3.5 shadow-3xs">
-              <div className="w-9 h-9 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-                <FileCheck size={18} />
+            {/* Card 2: Hypotheses Synthesized */}
+            <div className="relative overflow-hidden p-4 sm:p-5 rounded-2xl bg-gradient-to-b from-white via-slate-50/80 to-slate-100/50 dark:from-[#131f37] dark:via-[#111c33] dark:to-[#0e172a] border border-slate-200/90 dark:border-slate-800/90 hover:border-emerald-500/40 dark:hover:border-emerald-500/40 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group flex flex-col items-center justify-center text-center">
+              <div className="absolute top-0 inset-x-8 h-[2px] bg-gradient-to-r from-transparent via-emerald-500 to-transparent opacity-80" />
+              <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center justify-center mb-3 shadow-xs shadow-emerald-500/10 group-hover:scale-110 transition-transform duration-200">
+                <FileCheck size={20} strokeWidth={2.2} />
               </div>
-              <div>
-                <span className="text-[10px] text-slate-400 block uppercase tracking-wider font-sans font-medium">Hypotheses Synthesized</span>
-                <span className="font-bold text-slate-900 dark:text-white text-xs">{evidenceIndicators?.hypothesesSynthesized || 'H1–H5 Completed'}</span>
-              </div>
+              <span className="text-[10px] sm:text-[10.5px] text-slate-500 dark:text-slate-400 uppercase tracking-widest font-semibold block mb-1">
+                Hypotheses Synthesized
+              </span>
+              <span className="font-bold text-slate-900 dark:text-white text-xs sm:text-[13.5px] tracking-tight block leading-snug">
+                {(() => {
+                  const raw = evidenceIndicators?.hypothesesSynthesized;
+                  if (!raw || raw === 'H1–H5' || raw === 'H1-H5') return 'H1–H5 Synthesized';
+                  return raw;
+                })()}
+              </span>
+              <span className="inline-flex items-center gap-1.5 mt-2.5 px-2.5 py-0.5 rounded-full text-[9.5px] font-semibold bg-emerald-500/10 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                All 5 Hypotheses Tested
+              </span>
             </div>
 
-            <div className="p-3.5 bg-slate-50/80 dark:bg-[#131f37] rounded-xl border border-slate-200/80 dark:border-slate-800/80 flex items-center gap-3.5 shadow-3xs">
-              <div className="w-9 h-9 rounded-lg bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
-                <Calculator size={18} />
+            {/* Card 3: Analytical Engines */}
+            <div className="relative overflow-hidden p-4 sm:p-5 rounded-2xl bg-gradient-to-b from-white via-slate-50/80 to-slate-100/50 dark:from-[#131f37] dark:via-[#111c33] dark:to-[#0e172a] border border-slate-200/90 dark:border-slate-800/90 hover:border-indigo-500/40 dark:hover:border-indigo-500/40 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group flex flex-col items-center justify-center text-center">
+              <div className="absolute top-0 inset-x-8 h-[2px] bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-80" />
+              <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 flex items-center justify-center mb-3 shadow-xs shadow-indigo-500/10 group-hover:scale-110 transition-transform duration-200">
+                <Calculator size={20} strokeWidth={2.2} />
               </div>
-              <div>
-                <span className="text-[10px] text-slate-400 block uppercase tracking-wider font-sans font-medium">Analytical Engines</span>
-                <span className="font-bold text-slate-900 dark:text-white text-xs">{evidenceIndicators?.modelTrendOutputsCount || '4 Evidence Streams'}</span>
-              </div>
+              <span className="text-[10px] sm:text-[10.5px] text-slate-500 dark:text-slate-400 uppercase tracking-widest font-semibold block mb-1">
+                Analytical Engines
+              </span>
+              <span className="font-bold text-slate-900 dark:text-white text-xs sm:text-[13.5px] tracking-tight block leading-snug">
+                {evidenceIndicators?.modelTrendOutputsCount || '4 Evidence Streams'}
+              </span>
+              <span className="inline-flex items-center gap-1.5 mt-2.5 px-2.5 py-0.5 rounded-full text-[9.5px] font-semibold bg-indigo-500/10 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                WLS &amp; Trend Models
+              </span>
             </div>
 
-            <div className="p-3.5 bg-slate-50/80 dark:bg-[#131f37] rounded-xl border border-slate-200/80 dark:border-slate-800/80 flex items-center gap-3.5 shadow-3xs">
-              <div className="w-9 h-9 rounded-lg bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
-                <Target size={18} />
+            {/* Card 4: Decision Scope */}
+            <div className="relative overflow-hidden p-4 sm:p-5 rounded-2xl bg-gradient-to-b from-white via-slate-50/80 to-slate-100/50 dark:from-[#131f37] dark:via-[#111c33] dark:to-[#0e172a] border border-slate-200/90 dark:border-slate-800/90 hover:border-amber-500/40 dark:hover:border-amber-500/40 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group flex flex-col items-center justify-center text-center">
+              <div className="absolute top-0 inset-x-8 h-[2px] bg-gradient-to-r from-transparent via-amber-500 to-transparent opacity-80" />
+              <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/20 flex items-center justify-center mb-3 shadow-xs shadow-amber-500/10 group-hover:scale-110 transition-transform duration-200">
+                <Target size={20} strokeWidth={2.2} />
               </div>
-              <div>
-                <span className="text-[10px] text-slate-400 block uppercase tracking-wider font-sans font-medium">Decision Scope</span>
-                <span className="font-bold text-slate-900 dark:text-white text-xs">{evidenceIndicators?.decisionScope || 'Aggregate-Level Planning'}</span>
-              </div>
+              <span className="text-[10px] sm:text-[10.5px] text-slate-500 dark:text-slate-400 uppercase tracking-widest font-semibold block mb-1">
+                Decision Scope
+              </span>
+              <span className="font-bold text-slate-900 dark:text-white text-xs sm:text-[13.5px] tracking-tight block leading-snug">
+                {evidenceIndicators?.decisionScope || 'Aggregate-Level Planning'}
+              </span>
+              <span className="inline-flex items-center gap-1.5 mt-2.5 px-2.5 py-0.5 rounded-full text-[9.5px] font-semibold bg-amber-500/10 dark:bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                System Governance Scope
+              </span>
             </div>
           </div>
 
@@ -1143,17 +1179,17 @@ export default function ConsultantInsights({ isLoading: parentLoading, onNavigat
           metadata="Governance Integrity"
         />
 
-        <div className="relative overflow-hidden p-6 sm:p-7 rounded-2xl bg-gradient-to-br from-blue-50/80 via-white to-slate-50/60 dark:from-[#0B132B] dark:to-[#111E35] border-l-4 border-l-blue-600 dark:border-l-blue-500 border-y border-r border-slate-200/90 dark:border-slate-800/90 space-y-3.5 text-left shadow-sm">
+        <div className="relative overflow-hidden p-6 sm:p-7 rounded-2xl bg-gradient-to-br from-blue-50/80 via-white to-slate-50/60 dark:from-[#0B132B] dark:via-[#0F1D38] dark:to-[#111E35] border-l-4 border-l-blue-600 dark:border-l-blue-500 border-y border-r border-slate-200/90 dark:border-slate-800/90 space-y-3.5 text-left shadow-sm">
           {/* Subtle Ambient Glow */}
           <div className="absolute top-0 right-0 w-80 h-32 bg-blue-500/5 dark:bg-blue-500/10 rounded-full blur-2xl pointer-events-none" />
 
-          <div className="relative inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-blue-500/10 dark:bg-blue-500/15 border border-blue-500/25 text-blue-700 dark:text-blue-400 text-[10.5px] font-mono font-bold uppercase tracking-wider">
+          <div className="relative inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 dark:bg-blue-500/15 border border-blue-500/25 dark:border-blue-400/30 text-blue-700 dark:text-blue-300 text-[10.5px] font-sans font-bold uppercase tracking-wider shadow-xs">
             <Sparkles size={13} className="text-blue-600 dark:text-blue-400" />
             <span id="section-08-title">
               Governance &amp; Executive Summary
             </span>
           </div>
-          <p className="relative text-xs sm:text-sm text-slate-800 dark:text-slate-200 leading-relaxed font-normal">
+          <p className="relative text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed font-normal">
             {finalConclusion}
           </p>
         </div>

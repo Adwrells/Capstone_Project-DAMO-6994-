@@ -566,7 +566,7 @@ export default function AboutProject({ onReset, isDarkMode = true, onBeginPrep }
                   tag: 'H5',
                   title: 'Patient Sex & Visit Disposition',
                   question: 'Is patient sex significantly associated with ED admission outcome?',
-                  method: 'Pearson Chi-Square Test (N = 175.8M)',
+                  method: 'Pearson Chi-Square Test',
                   statKey: 'V = 0.0102',
                   badge: 'Reject H₀ (Negligible)',
                   pVal: 'V = 0.0102',
@@ -600,7 +600,7 @@ export default function AboutProject({ onReset, isDarkMode = true, onBeginPrep }
                   </div>
 
                   <div className="pt-2.5 border-t border-slate-200/60 dark:border-white/[0.04] flex items-center justify-between text-[10.5px] font-mono text-slate-400 dark:text-slate-400">
-                    <span className="truncate mr-2">Method: {h.method}</span>
+                    <span className="truncate mr-2" title={`Method: ${h.method}`}>Method: {h.method}</span>
                     <span className="shrink-0 px-1.5 py-0.5 rounded bg-slate-200/60 dark:bg-white/[0.05] text-slate-600 dark:text-slate-300 font-semibold">
                       {h.statKey}
                     </span>

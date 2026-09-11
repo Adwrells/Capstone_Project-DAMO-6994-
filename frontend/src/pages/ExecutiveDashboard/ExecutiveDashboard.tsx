@@ -32,13 +32,14 @@ import ResourceBurdenTrend from './components/ResourceBurdenTrend';
 import HypothesisEvidenceHub from './components/HypothesisEvidenceHub';
 import DescriptiveStatsTable from './components/DescriptiveStatsTable';
 import CustomChartBuilder from '../../components/charts/CustomChartBuilder';
+import CustomChartCard from './components/CustomChartCard';
 import SectionHeader from '../../components/common/SectionHeader';
 
 import { DashboardKPIs, TrendDataPoint, FilterState } from './components/types';
 
 import { fetchDashboardKPIs, fetchDashboardTrends } from '../../services/apiService';
 import { KPIItem, CustomVisualization } from '../../utils/types';
-import { Sparkles, X, PlusCircle, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Sparkles, X, ArrowRight, CheckCircle2 } from 'lucide-react';
 
 interface ExecutiveDashboardProps {
   datasetName: string;
@@ -98,22 +99,47 @@ export default function ExecutiveDashboard({
 
   // ── Visual Studio / Custom Chart Builder State ─────────────────────────────
   const [isVisualBuilderOpen, setIsVisualBuilderOpen] = useState(false);
-  const [localCustomCharts, setLocalCustomCharts] = useState<CustomVisualization[]>(customCharts || []);
+  const [localCustomCharts, setLocalCustomCharts] = useState<CustomVisualization[]>(() => {
+    if (customCharts && customCharts.length > 0) return customCharts;
+    try {
+      const saved = localStorage.getItem('healthcare_analytics_custom_charts');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return [];
+  });
 
   useEffect(() => {
-    if (customCharts) {
+    if (customCharts && customCharts.length > 0) {
       setLocalCustomCharts(customCharts);
     }
   }, [customCharts]);
 
   const handleAddCustomChart = (chart: CustomVisualization) => {
-    setLocalCustomCharts(prev => [...prev, chart]);
+    setLocalCustomCharts(prev => {
+      const updated = [...prev, chart];
+      try {
+        localStorage.setItem('healthcare_analytics_custom_charts', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
     onAddChart?.(chart);
     setIsVisualBuilderOpen(false);
+
+    // Smoothly scroll down to the committed visual row
+    setTimeout(() => {
+      const el = document.getElementById('committed-visuals-section');
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 120);
   };
 
   const handleRemoveCustomChart = (id: string) => {
-    setLocalCustomCharts(prev => prev.filter(c => c.id !== id));
+    setLocalCustomCharts(prev => {
+      const updated = prev.filter(c => c.id !== id);
+      try {
+        localStorage.setItem('healthcare_analytics_custom_charts', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
     onRemoveChart?.(id);
   };
 
@@ -280,6 +306,29 @@ export default function ExecutiveDashboard({
         <VisitVolumeTrend data={activeTrendSeries} isDarkMode={dark} />
         <LOSTrend data={activeTrendSeries} isDarkMode={dark} />
       </div>
+
+      {/* ══ 4B. COMMITTED CUSTOM VISUALS ROW ═════════════════════════════════ */}
+      {localCustomCharts.length > 0 && (
+        <div className="space-y-6" id="committed-visuals-section">
+          <SectionHeader
+            category="CUSTOM ANALYTICS STUDIO · USER-COMMITTED VISUALS"
+            title={`Committed Visuals & Custom Analyses (${localCustomCharts.length})`}
+            right="Interactive Live Cross-Cuts"
+          />
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {localCustomCharts.map(chart => (
+              <CustomChartCard
+                key={chart.id}
+                chart={chart}
+                data={filteredData.length ? filteredData : data}
+                isDarkMode={dark}
+                onRemove={handleRemoveCustomChart}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ══ 5. HYPOTHESIS ANALYSIS SUITE (H1 – H5) ═══════════════════════════ */}
       <div className="space-y-6">

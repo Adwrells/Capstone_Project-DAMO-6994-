@@ -2086,6 +2086,23 @@ Return strictly JSON matching the response schema.`;
   }
 });
 
+// Endpoint to download official Final Report Capstone Project.pdf
+app.get("/api/reports/final-pdf", (_req, res) => {
+  const possiblePaths = [
+    "C:\\Users\\bhara\\OneDrive\\Desktop\\Final Report Capstone Project.pdf",
+    path.join(process.cwd(), "public", "reports", "Final Report Capstone Project.pdf"),
+    path.join(process.cwd(), "docs", "Reports", "Final Report Capstone Project.pdf"),
+  ];
+  for (const p of possiblePaths) {
+    if (fs.existsSync(p)) {
+      res.setHeader("Content-Disposition", 'attachment; filename="Final Report Capstone Project.pdf"');
+      res.setHeader("Content-Type", "application/pdf");
+      return res.sendFile(p);
+    }
+  }
+  res.status(404).json({ error: "Final Report PDF not found" });
+});
+
 // Configure Vite integration for Full-Stack development / Production
 async function startServer() {
   if (process.env.NODE_ENV !== "production") {

@@ -98,36 +98,45 @@ describe('Capstone Report Data and Integration', () => {
     expect(screen.getAllByText(/Sufyaan Khan Mohammed/).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Amit Raj Dev/).length).toBeGreaterThan(0);
 
-    // Verify Report view switcher buttons
-    expect(screen.getByRole('button', { name: /Executive Report/i })).toBeDefined();
-    expect(screen.getByRole('button', { name: /Final Report/i })).toBeDefined();
+    // Verify Final Report PDF preview is present on the 7th page by default
+    expect(screen.getAllByText(/Final Report Capstone Project\.pdf/i).length).toBeGreaterThan(0);
+    expect(screen.getByText('Final Report (Official PDF)')).toBeDefined();
+
+    // Verify embedded PDF viewer iframe exists
+    const pdfIframe = container.querySelector('iframe[title="Final Report Capstone Project PDF"]');
+    expect(pdfIframe).not.toBeNull();
+    expect(pdfIframe?.getAttribute('src')).toContain('Final%20Report%20Capstone%20Project.pdf');
+
+    // Verify switching to Executive Summary view works
+    const execSummaryBtns = screen.getAllByRole('button', { name: /Executive Summary/i });
+    expect(execSummaryBtns.length).toBeGreaterThan(0);
+    fireEvent.click(execSummaryBtns[0]);
+    expect(screen.getAllByText(/Executive Report/i).length).toBeGreaterThan(0);
+
+    // Switch back to Final Report
+    const finalReportBtn = screen.getByRole('button', { name: /Final Report \(Official PDF\)/i });
+    fireEvent.click(finalReportBtn);
+    expect(container.querySelector('iframe[title="Final Report Capstone Project PDF"]')).not.toBeNull();
 
     // Verify preview sheet container exists
     const previewSheet = container.querySelector('#report-preview-sheet');
     expect(previewSheet).not.toBeNull();
 
     // Verify Export Document button
-    const exportBtn = screen.getByRole('button', { name: /Download as/i });
+    const exportBtn = screen.getByRole('button', { name: /Download Report/i });
     expect(exportBtn).toBeDefined();
-
-    // Test switching to Final Report view
-    const finalReportBtn = screen.getByRole('button', { name: /Final Report/i });
-    fireEvent.click(finalReportBtn);
-
-    // Verify Cover page in Final Report view
-    expect(screen.getByText('Final Capstone Research Report')).toBeDefined();
-    const pageSheets = container.querySelectorAll('.academic-page-sheet');
-    expect(pageSheets.length).toBeGreaterThan(0);
 
     // Test opening Export Modal
     fireEvent.click(exportBtn);
-    expect(screen.getByText('Select Report')).toBeDefined();
-    expect(screen.getByText('Which report would you like to download?')).toBeDefined();
+    expect(screen.getByText('Download Report (PDF Format)')).toBeDefined();
+    expect(screen.getByText(/Reports are downloaded exclusively in/i)).toBeDefined();
 
-    // Select Final Report in modal to advance to step 2 (format selection)
-    const finalReportOption = screen.getByText(/Full 70-page academic report/i);
-    fireEvent.click(finalReportOption);
-    expect(screen.getByText('Select File Format')).toBeDefined();
-    expect(screen.getByText('.docx')).toBeDefined();
+    // Verify Final Report PDF option with exact pdf name exists
+    const finalReportOption = screen.getByText('Final Report (PDF)');
+    expect(finalReportOption).toBeDefined();
+    expect(screen.getAllByText(/Final Report Capstone Project\.pdf/i).length).toBeGreaterThan(0);
+
+    // Verify no Word or DOCX format option exists
+    expect(screen.queryByText(/\.docx/i)).toBeNull();
   });
 });
