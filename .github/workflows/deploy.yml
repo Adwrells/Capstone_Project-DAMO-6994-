@@ -1,0 +1,68 @@
+name: Build and Deploy (ECR)
+
+on:
+  push:
+    branches: [ main ]
+
+# Waits for the existing tests.yml to pass on this same commit before deploying — a red
+# test run never reaches production. Using workflow_run-style polling (not `needs:`)
+# because tests.yml is a separate workflow file, not a job in this one.
+jobs:
+  wait-for-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for Backend Test Suite
+        uses: lewagon/wait-on-check-action@v1.3.4
+        with:
+          ref: ${{ github.sha }}
+          check-name: 'Run Pytest Test Suite'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 10
+
+  build-and-push:
+    needs: wait-for-tests
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write   # required for OIDC -> AWS role assumption, no static AWS keys stored
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Login to ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push image
+        env:
+          REGISTRY: ${{ steps.ecr.outputs.registry }}
+        run: |
+          IMAGE=$REGISTRY/capstone_project
+          docker build -t "$IMAGE:latest" -t "$IMAGE:${{ github.sha }}" .
+          docker push "$IMAGE:latest"
+          docker push "$IMAGE:${{ github.sha }}"
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to EC2 over SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+            cd /opt/Capstone_Project-DAMO-6994-
+            set -a; source .env; set +a   # loads ECR_REGISTRY + AWS_REGION for this shell
+            aws ecr get-login-password --region "$AWS_REGION" | \
+              docker login --username AWS --password-stdin "$ECR_REGISTRY"
+            docker compose -f docker-compose.prod.yml pull
+            docker compose -f docker-compose.prod.yml up -d
+            docker image prune -f

@@ -60,6 +60,7 @@ guide_to_implement.md
 
 # Local CI/CD pipeline guide (Docker, GitHub Actions, AWS EC2) — not for distribution.
 guide_cicd_pipeline.md
+guide_cicd_pipeline_ecr.md
 
 # ─── Claude Code ────────────────────────────────────────────────────────
 # .claude/ and CLAUDE.md are local-only — kept out of the repo.
