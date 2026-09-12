@@ -1,0 +1,33 @@
+services:
+  node:
+    image: ${ECR_REGISTRY}/capstone_project:${IMAGE_TAG:-latest}
+    container_name: healthcare_analytics_node
+    command: ["npm", "start"]
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - PYTHON_API_URL=http://python:8000
+      - AUTH_USERNAME=${AUTH_USERNAME}
+      - AUTH_PASSWORD=${AUTH_PASSWORD}
+      - CORS_ORIGINS=${CORS_ORIGINS}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    restart: unless-stopped
+    depends_on:
+      - python
+
+  python:
+    image: ${ECR_REGISTRY}/capstone_project:${IMAGE_TAG:-latest}
+    container_name: healthcare_analytics_python
+    command: ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    expose:
+      - "8000"
+    environment:
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - DEBUG=false
+      - AUTH_USERNAME=${AUTH_USERNAME}
+      - AUTH_PASSWORD=${AUTH_PASSWORD}
+      - SECRET_KEY=${SECRET_KEY}
+      - CORS_ORIGINS=${CORS_ORIGINS}
+    restart: unless-stopped

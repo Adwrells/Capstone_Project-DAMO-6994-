@@ -7,3 +7,6 @@ dist/
 .git/
 .vscode/
 .DS_Store
+.env
+.env.*
+!.env.example
