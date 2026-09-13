@@ -110,6 +110,13 @@ export default function App() {
     }
   }, [isDarkMode]);
 
+  // Reset scroll position to the top when switching between sidebar stages —
+  // the workspace canvas below is a persistent scroll container, so it keeps
+  // whatever scrollTop the previous page left it at otherwise.
+  useEffect(() => {
+    document.getElementById('main-workspace-canvas')?.scrollTo({ top: 0 });
+  }, [currentSection]);
+
   // Modern Toast notification state
   const [notification, setNotification] = useState<{ text: string; type: 'info' | 'error' | 'success' } | null>(null);
 
