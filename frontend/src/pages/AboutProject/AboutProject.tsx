@@ -59,7 +59,7 @@ export default function AboutProject({ onReset, isDarkMode = true, onBeginPrep }
               What systemic and clinical factors drive ED stay duration and cumulative emergency strain?
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-3xl leading-relaxed font-normal">
-              Synthesizes 8,685+ pre-aggregated records across 175.8M visits to isolate independent predictors of operational delays, evaluate patient demographic disparities, and forecast near-term demand trajectories.
+              Synthesizes 8,685 raw records (7,296 analytical after roll-up removal) across 175.8M visits to isolate independent predictors of operational delays, evaluate patient demographic disparities, and forecast near-term demand trajectories.
             </p>
           </div>
 
@@ -88,8 +88,9 @@ export default function AboutProject({ onReset, isDarkMode = true, onBeginPrep }
             <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 font-mono tracking-tight my-0.5">
               8,685+
             </div>
-            <div className="inline-flex items-center gap-1 text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
-              6 Harmonized Worksheets
+            <div className="inline-flex flex-col items-center gap-0.5 mt-0.5">
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">6 Harmonized Worksheets</span>
+              <span className="text-[10px] text-blue-500 dark:text-blue-400 font-semibold">7,296 analytical after cleaning</span>
             </div>
           </div>
 

@@ -130,7 +130,7 @@ export default function H4AgeLOS({ isDarkMode }: H4AgeLOSProps) {
 
       {/* Analytical Takeaway Note */}
       <AnalyticalTakeaway title="DEMOGRAPHIC TRAJECTORY">
-        Aggregate stay duration increases monotonically across age brackets (<strong>+103.4% rise in 65+</strong> relative to pediatric cases; ε² = 0.722). Non-causal association.
+        Aggregate stay duration increases monotonically across age brackets (<strong>+103.4% rise in 65+</strong> relative to pediatric cases; ε² = 0.7218). Non-causal association.
       </AnalyticalTakeaway>
 
       {/* Statistical Result Strip */}
@@ -145,7 +145,7 @@ export default function H4AgeLOS({ isDarkMode }: H4AgeLOSProps) {
         </div>
         <div className="p-1.5 rounded-lg bg-slate-50 dark:bg-white/[0.03]">
           <span className="text-slate-400 block text-[9px] font-mono font-bold uppercase">Effect Size</span>
-          <span className="font-mono font-bold text-purple-600 dark:text-purple-400">ε² = 0.722</span>
+          <span className="font-mono font-bold text-purple-600 dark:text-purple-400">ε² = 0.7218</span>
         </div>
         <div className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
           <span className="text-emerald-600 dark:text-emerald-400 block text-[9px] font-mono font-bold uppercase">Significance</span>

@@ -128,7 +128,7 @@ export default function H2AdmissionLOS({ isDarkMode }: H2AdmissionLOSProps) {
 
       {/* Analytical Takeaway Note */}
       <AnalyticalTakeaway title="INPATIENT DISPARITY">
-        <strong>Δ = +8.10 h (+324% longer stay)</strong> for admitted patients (10.60 h vs 2.50 h for non-admitted visits; rank-biserial effect <em>r_b = 0.998</em>).
+        <strong>Δ = +8.10 h (+324% longer stay)</strong> for admitted patients (10.60 h vs 2.50 h for non-admitted visits; rank-biserial effect <em>r_b = 0.9981</em>).
       </AnalyticalTakeaway>
 
       {/* Statistical Result Strip */}
@@ -143,7 +143,7 @@ export default function H2AdmissionLOS({ isDarkMode }: H2AdmissionLOSProps) {
         </div>
         <div className="p-1.5 rounded-lg bg-slate-50 dark:bg-white/[0.03]">
           <span className="text-slate-400 block text-[9px] font-mono font-bold uppercase">Rank-Biserial</span>
-          <span className="font-mono font-bold text-purple-600 dark:text-purple-400">r_b = 0.998</span>
+          <span className="font-mono font-bold text-purple-600 dark:text-purple-400">r_b = 0.9981</span>
         </div>
         <div className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
           <span className="text-emerald-600 dark:text-emerald-400 block text-[9px] font-mono font-bold uppercase">Significance</span>
