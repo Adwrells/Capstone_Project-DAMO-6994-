@@ -102,10 +102,13 @@ describe('Capstone Report Data and Integration', () => {
     expect(screen.getAllByText(/Final Report Capstone Project\.pdf/i).length).toBeGreaterThan(0);
     expect(screen.getByText('Final Report (Official PDF)')).toBeDefined();
 
-    // Verify embedded PDF viewer iframe exists
+    // Verify embedded PDF viewer iframe exists and points at the API endpoint
+    // (not a static /reports/... path — that filename doesn't exist on disk
+    // and silently falls through to the SPA's own catch-all route instead of
+    // 404ing, so the iframe would render the whole app instead of a PDF)
     const pdfIframe = container.querySelector('iframe[title="Final Report Capstone Project PDF"]');
     expect(pdfIframe).not.toBeNull();
-    expect(pdfIframe?.getAttribute('src')).toContain('Final%20Report%20Capstone%20Project.pdf');
+    expect(pdfIframe?.getAttribute('src')).toContain('/api/reports/final-pdf');
 
     // Verify switching to Executive Summary view works
     const execSummaryBtns = screen.getAllByRole('button', { name: /Executive Summary/i });

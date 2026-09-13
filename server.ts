@@ -2086,21 +2086,18 @@ Return strictly JSON matching the response schema.`;
   }
 });
 
-// Endpoint to download official Final Report Capstone Project.pdf
+// Endpoint to serve the official Final Report Capstone Project.pdf.
+// Disposition defaults to inline so the iframe preview and "Pop Out" tab can
+// render it directly; explicit downloads are forced client-side via the
+// anchor's `download` attribute instead (see ExportReports.tsx).
 app.get("/api/reports/final-pdf", (_req, res) => {
-  const possiblePaths = [
-    "C:\\Users\\bhara\\OneDrive\\Desktop\\Final Report Capstone Project.pdf",
-    path.join(process.cwd(), "public", "reports", "Final Report Capstone Project.pdf"),
-    path.join(process.cwd(), "docs", "Reports", "Final Report Capstone Project.pdf"),
-  ];
-  for (const p of possiblePaths) {
-    if (fs.existsSync(p)) {
-      res.setHeader("Content-Disposition", 'attachment; filename="Final Report Capstone Project.pdf"');
-      res.setHeader("Content-Type", "application/pdf");
-      return res.sendFile(p);
-    }
+  const pdfPath = path.join(process.cwd(), "docs", "Reports", "Final Report Capstone Project.pdf");
+  if (!fs.existsSync(pdfPath)) {
+    return res.status(404).json({ error: "Final Report PDF not found" });
   }
-  res.status(404).json({ error: "Final Report PDF not found" });
+  res.setHeader("Content-Disposition", 'inline; filename="Final Report Capstone Project.pdf"');
+  res.setHeader("Content-Type", "application/pdf");
+  res.sendFile(pdfPath);
 });
 
 // Endpoint to download the Final Report as Markdown (.md)

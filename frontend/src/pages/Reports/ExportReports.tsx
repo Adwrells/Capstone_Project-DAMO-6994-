@@ -448,6 +448,7 @@ export default function ExportReports(_props: ExportReportsProps) {
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showSuccessToast, setShowSuccessToast] = useState<string | null>(null);
+  const [isPdfLoaded, setIsPdfLoaded] = useState<boolean>(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -528,7 +529,7 @@ export default function ExportReports(_props: ExportReportsProps) {
       // 1. Download official Final Report Capstone Project.pdf
       const downloadFinalReportPdf = () => {
         const link = document.createElement('a');
-        link.href = '/reports/Final Report Capstone Project.pdf';
+        link.href = '/api/reports/final-pdf';
         link.download = 'Final Report Capstone Project.pdf';
         document.body.appendChild(link);
         link.click();
@@ -701,7 +702,7 @@ export default function ExportReports(_props: ExportReportsProps) {
 
                 <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-2">
                   <a
-                    href="/reports/Final Report Capstone Project.pdf"
+                    href="/api/reports/final-pdf"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full py-2 px-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 bg-slate-50 dark:bg-slate-900/40 text-slate-700 dark:text-slate-200 font-semibold text-xs flex items-center justify-center gap-1.5 transition"
@@ -841,7 +842,7 @@ export default function ExportReports(_props: ExportReportsProps) {
                 </div>
               )}
               <a
-                href="/reports/Final Report Capstone Project.pdf"
+                href="/api/reports/final-pdf"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition"
@@ -902,7 +903,7 @@ export default function ExportReports(_props: ExportReportsProps) {
 
                       <div className="flex items-center gap-2">
                         <a
-                          href="/reports/Final Report Capstone Project.pdf"
+                          href="/api/reports/final-pdf"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1 transition border border-slate-700"
@@ -923,11 +924,18 @@ export default function ExportReports(_props: ExportReportsProps) {
 
                     {/* PDF iframe viewport */}
                     <div className="flex-1 w-full bg-slate-100 dark:bg-slate-950 relative">
+                      {!isPdfLoaded && (
+                        <div className="absolute inset-0 flex items-center justify-center gap-2 text-slate-400 dark:text-slate-500 text-xs font-medium">
+                          <div className="w-4 h-4 border-2 border-slate-300 dark:border-slate-700 border-t-blue-500 rounded-full animate-spin" />
+                          <span>Loading report preview…</span>
+                        </div>
+                      )}
                       <iframe
-                        src="/reports/Final%20Report%20Capstone%20Project.pdf#view=FitH&navpanes=1"
+                        src="/api/reports/final-pdf#view=FitH&navpanes=1"
                         title="Final Report Capstone Project PDF"
-                        className="w-full h-full border-0"
-                        style={{ minHeight: '800px', height: '100%' }}
+                        className="w-full h-full border-0 transition-opacity duration-300"
+                        style={{ minHeight: '800px', height: '100%', opacity: isPdfLoaded ? 1 : 0 }}
+                        onLoad={() => setIsPdfLoaded(true)}
                       />
                     </div>
                   </div>
@@ -940,7 +948,7 @@ export default function ExportReports(_props: ExportReportsProps) {
                     </div>
                     <div className="flex items-center gap-3">
                       <a
-                        href="/reports/Final Report Capstone Project.pdf"
+                        href="/api/reports/final-pdf"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-600 dark:text-blue-400 hover:underline font-semibold flex items-center gap-1"
