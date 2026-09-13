@@ -52,6 +52,12 @@ export default function App() {
   const [datasetId, setDatasetId] = useState<string | null>(null);
   const [fields, setFields] = useState<any[]>([]);
   const [rawData, setRawData] = useState<any[]>([]);
+  // True only once the user has actually picked a dataset (upload, or an explicit cohort
+  // selection) — separate from `rawData` itself, which the preload effect below populates
+  // automatically so other pages always have something to show. Data Cleaning needs to
+  // tell these apart: an auto-populated `rawData` should still fall through to its
+  // stack-everything default, not be silently treated as the user's choice.
+  const [datasetExplicitlySelected, setDatasetExplicitlySelected] = useState(false);
   const [cleanedData, setCleanedData] = useState<any[]>([]);
   const [persistedDatasetId, setPersistedDatasetId] = useState<string | null>(null);
   const [cleaningSummary, setCleaningSummary] = useState<CleaningSummary | null>(null);
@@ -164,6 +170,7 @@ export default function App() {
     setDatasetName(name);
     setFields(cols);
     setRawData(data);
+    setDatasetExplicitlySelected(true);
     setCleanedData(data);
     setCleaningSummary(null);
     setCustomCharts([]);
@@ -188,6 +195,7 @@ export default function App() {
     setDatasetName(name);
     setFields(cols);
     setRawData(data);
+    setDatasetExplicitlySelected(true);
     setCleanedData(data);
     const initialSemantic = buildSemanticModel(cols);
     setSemanticFields(initialSemantic);
@@ -274,6 +282,7 @@ export default function App() {
     setDatasetName(null);
     setFields([]);
     setRawData([]);
+    setDatasetExplicitlySelected(false);
     setCleanedData([]);
     setCleaningSummary(null);
     setCustomCharts([]);
@@ -593,6 +602,7 @@ export default function App() {
           preloadStatus={preloadStatus}
           onNavigateNext={handleNextStage}
           isDarkMode={isDarkMode}
+          datasetExplicitlySelected={datasetExplicitlySelected}
         />
       </div>
     )}

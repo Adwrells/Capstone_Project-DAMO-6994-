@@ -7,6 +7,20 @@ All notable changes to this project are documented in this file. The format foll
 This file starts at 1.1.0; versions 1.0.0–1.0.4 predate it and are recorded only as git tags,
 each named after the fix or feature it introduced.
 
+## [2.3.4] — 2026-09-13
+
+### Fixed
+- Data Cleaning's "nothing selected" default (stack all 6 preloaded tables) was a race
+  condition, not deterministic. `App.tsx` auto-populates `rawData` with a single table the
+  instant preloaded data resolves, so the Explorer/Dashboard always have something to show
+  — but Data Cleaning's own stacking fallback checked the same `rawData.length > 0` to
+  decide whether the user had chosen a dataset. Whichever effect won that race decided the
+  outcome: click "Clean Data" before the auto-select resolved and it stacked all 6 tables
+  (8,685 raw / 7,296 analytical); click after and it silently cleaned just the one
+  auto-picked table (912 rows) instead. Added an explicit `datasetExplicitlySelected` flag
+  set only when the user genuinely picks a dataset, so stacking all preloaded tables is
+  now the real, deterministic default.
+
 ## [2.3.3] — 2026-09-13
 
 ### Fixed

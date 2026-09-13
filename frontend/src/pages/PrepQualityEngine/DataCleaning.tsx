@@ -36,17 +36,24 @@ interface DataCleaningProps {
   preloadStatus?: 'idle' | 'loading' | 'loaded' | 'error';
   onNavigateNext?: () => void;
   isDarkMode?: boolean;
+  // Distinguishes App.tsx's own auto-populated `rawData` (set the instant preload
+  // resolves, so something is always available in the Explorer/Dashboard) from a dataset
+  // the user actually picked. Without this, whichever wins that race decides whether
+  // Clean Data stacks all 6 preloaded tables or silently cleans just the one auto-picked
+  // table — non-deterministic, and defeats the stacking default most of the time.
+  datasetExplicitlySelected?: boolean;
 }
 
-export default function DataCleaning({ 
-  fields, 
-  rawData, 
-  onDataCleaned, 
-  isLoading, 
-  preloadedDatasets = [], 
-  preloadStatus = 'idle', 
+export default function DataCleaning({
+  fields,
+  rawData,
+  onDataCleaned,
+  isLoading,
+  preloadedDatasets = [],
+  preloadStatus = 'idle',
   onNavigateNext,
-  isDarkMode = false
+  isDarkMode = false,
+  datasetExplicitlySelected = false
 }: DataCleaningProps) {
   // SQLite Connection Live Status State
   const [sqliteInfo, setSqliteInfo] = useState<{
@@ -155,7 +162,7 @@ export default function DataCleaning({
   const getInspectedData = () => {
     const dataset = mergedPreviewData.length > 0
       ? mergedPreviewData
-      : (rawData.length > 0 ? rawData : (preloadedDatasets.length > 0 ? buildStackedCohort().rows : []));
+      : ((rawData.length > 0 && datasetExplicitlySelected) ? rawData : (preloadedDatasets.length > 0 ? buildStackedCohort().rows : []));
     let result = [...dataset];
 
     if (inspectionSearch.trim()) {
@@ -223,11 +230,14 @@ export default function DataCleaning({
 
     await new Promise(r => setTimeout(r, 400));
 
-    // Construct enriched cleaned dataset. No single dataset actively selected (rawData
-    // empty) -> stack ALL preloaded datasets rather than silently defaulting to just the
-    // first one (was CTAS_Triage, 912 rows) when the user's intent is "clean everything".
-    const stackedCohort = rawData.length === 0 ? buildStackedCohort() : null;
-    const baseSource = rawData.length > 0 ? rawData : (stackedCohort?.rows || preloadedDatasets[0]?.data || []);
+    // Construct enriched cleaned dataset. `rawData` gets auto-populated by App.tsx the
+    // instant preload resolves, whether or not the user asked for that — so "explicitly
+    // selected" (not just "non-empty") is what decides a single dataset vs stacking ALL
+    // preloaded datasets. Without gating on the explicit flag this silently defaults to
+    // just the first table (was CTAS_Triage, 912 rows) whenever the user's intent is
+    // "clean everything".
+    const stackedCohort = (!datasetExplicitlySelected || rawData.length === 0) ? buildStackedCohort() : null;
+    const baseSource = (rawData.length > 0 && datasetExplicitlySelected) ? rawData : (stackedCohort?.rows || preloadedDatasets[0]?.data || []);
     const enrichedData = baseSource.map((row: any, idx: number) => {
       const losHours = parseFloat(row.median_los_hours || row['Median LOS Hours'] || row.length_of_stay_hours || '4.2') || 4.2;
       const volume = parseInt(row.visit_volume || row['Total Visits'] || row.volume || '15000', 10) || 15000;
@@ -245,7 +255,7 @@ export default function DataCleaning({
       };
     });
 
-    const activeFields = (fields.length > 0 ? fields : (stackedCohort?.fields || preloadedDatasets[0]?.fields || [])).concat([
+    const activeFields = ((fields.length > 0 && datasetExplicitlySelected) ? fields : (stackedCohort?.fields || preloadedDatasets[0]?.fields || [])).concat([
       { name: 'total_ed_minutes', type: 'numeric', isEngineered: true },
       { name: 'pandemic_flag', type: 'categorical', isEngineered: true },
       { name: 'ctas_numeric_encoding', type: 'numeric', isEngineered: true },
@@ -286,7 +296,7 @@ export default function DataCleaning({
 
   // Full-screen Inspection Panel View
   if (showInspectionPanel) {
-    const inspectedFields = mergedPreviewFields.length > 0 ? mergedPreviewFields : (fields.length > 0 ? fields : (preloadedDatasets.length > 0 ? buildStackedCohort().fields : []));
+    const inspectedFields = mergedPreviewFields.length > 0 ? mergedPreviewFields : ((fields.length > 0 && datasetExplicitlySelected) ? fields : (preloadedDatasets.length > 0 ? buildStackedCohort().fields : []));
     return (
       <div className="space-y-6 text-left font-sans animate-fade-in max-w-7xl mx-auto pb-16" id="full-inspection-panel">
         
