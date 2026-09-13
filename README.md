@@ -987,8 +987,10 @@ documented here stays checkable against the code that actually produced it.
 
 ---
 
-## Author
+## Authors (Group 5)
 
+**Amit Raj Dev**
 **Bharath Paramasivan**
+**Mohammed Sufyaan Khan**
 Master of Data Analytics — University of Niagara Falls Canada
 DAMO-699 Capstone Project
