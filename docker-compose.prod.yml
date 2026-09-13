@@ -6,6 +6,7 @@ services:
     ports:
       - "3000:3000"
     environment:
+      - NODE_ENV=production
       - PORT=3000
       - PYTHON_API_URL=http://python:8000
       - AUTH_USERNAME=${AUTH_USERNAME}

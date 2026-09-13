@@ -125,9 +125,37 @@ export default function DataCleaning({
   } | null>(null);
   const [modalSearch, setModalSearch] = useState<string>('');
 
-  // Calculated Dataset Inspection filtering, sorting, and pagination
+  // Stacks every preloaded dataset into one cohort when no single dataset is actively
+  // selected (rawData empty). These 6 tables are different cross-tabulations of the same
+  // underlying NACRS visit counts (ed_visits is a weight, not a per-visit record) and share
+  // no row-level join key — so this concatenates rows rather than joining them, tagging
+  // each with `source_table` so it stays traceable which cross-tab it came from. A join
+  // here would multiply-count `ed_visits` across mismatched dimension combinations.
+  const buildStackedCohort = (): { rows: any[]; fields: { name: string; type: any }[] } => {
+    const fieldTypes = new Map<string, any>();
+    preloadedDatasets.forEach(ds => {
+      (ds.fields || []).forEach(f => {
+        if (!fieldTypes.has(f.name)) fieldTypes.set(f.name, f.type);
+      });
+    });
+    const rows: any[] = [];
+    preloadedDatasets.forEach(ds => {
+      (ds.data || []).forEach(row => {
+        rows.push({ ...row, source_table: ds.sourceTable || ds.name });
+      });
+    });
+    const stackedFields = Array.from(fieldTypes.entries()).map(([name, type]) => ({ name, type }));
+    stackedFields.push({ name: 'source_table', type: 'categorical' });
+    return { rows, fields: stackedFields };
+  };
+
+  // Calculated Dataset Inspection filtering, sorting, and pagination. Matches
+  // executePipeline's fallback below: stack all preloaded datasets when nothing specific
+  // is selected, so the preview shown here matches what actually gets cleaned.
   const getInspectedData = () => {
-    const dataset = mergedPreviewData.length > 0 ? mergedPreviewData : (rawData.length > 0 ? rawData : (preloadedDatasets[0]?.data || []));
+    const dataset = mergedPreviewData.length > 0
+      ? mergedPreviewData
+      : (rawData.length > 0 ? rawData : (preloadedDatasets.length > 0 ? buildStackedCohort().rows : []));
     let result = [...dataset];
 
     if (inspectionSearch.trim()) {
@@ -195,8 +223,11 @@ export default function DataCleaning({
 
     await new Promise(r => setTimeout(r, 400));
 
-    // Construct enriched cleaned dataset
-    const baseSource = rawData.length > 0 ? rawData : (preloadedDatasets[0]?.data || []);
+    // Construct enriched cleaned dataset. No single dataset actively selected (rawData
+    // empty) -> stack ALL preloaded datasets rather than silently defaulting to just the
+    // first one (was CTAS_Triage, 912 rows) when the user's intent is "clean everything".
+    const stackedCohort = rawData.length === 0 ? buildStackedCohort() : null;
+    const baseSource = rawData.length > 0 ? rawData : (stackedCohort?.rows || preloadedDatasets[0]?.data || []);
     const enrichedData = baseSource.map((row: any, idx: number) => {
       const losHours = parseFloat(row.median_los_hours || row['Median LOS Hours'] || row.length_of_stay_hours || '4.2') || 4.2;
       const volume = parseInt(row.visit_volume || row['Total Visits'] || row.volume || '15000', 10) || 15000;
@@ -214,7 +245,7 @@ export default function DataCleaning({
       };
     });
 
-    const activeFields = (fields.length > 0 ? fields : (preloadedDatasets[0]?.fields || [])).concat([
+    const activeFields = (fields.length > 0 ? fields : (stackedCohort?.fields || preloadedDatasets[0]?.fields || [])).concat([
       { name: 'total_ed_minutes', type: 'numeric', isEngineered: true },
       { name: 'pandemic_flag', type: 'categorical', isEngineered: true },
       { name: 'ctas_numeric_encoding', type: 'numeric', isEngineered: true },
@@ -255,7 +286,7 @@ export default function DataCleaning({
 
   // Full-screen Inspection Panel View
   if (showInspectionPanel) {
-    const inspectedFields = mergedPreviewFields.length > 0 ? mergedPreviewFields : (fields.length > 0 ? fields : (preloadedDatasets[0]?.fields || []));
+    const inspectedFields = mergedPreviewFields.length > 0 ? mergedPreviewFields : (fields.length > 0 ? fields : (preloadedDatasets.length > 0 ? buildStackedCohort().fields : []));
     return (
       <div className="space-y-6 text-left font-sans animate-fade-in max-w-7xl mx-auto pb-16" id="full-inspection-panel">
         
