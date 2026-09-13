@@ -7,6 +7,19 @@ All notable changes to this project are documented in this file. The format foll
 This file starts at 1.1.0; versions 1.0.0–1.0.4 predate it and are recorded only as git tags,
 each named after the fix or feature it introduced.
 
+## [2.3.3] — 2026-09-13
+
+### Fixed
+- Cleaned cohorts persisted by the Data Cleaning step accumulated indefinitely instead of
+  replacing the previous run. Each click of "Clean Data" writes the result to its own
+  isolated SQLite table (`user_dataset_<id>`), scoped to the browser session so uploads
+  stay isolated from the seeded analytical tables — but nothing ever dropped a session's
+  earlier table before writing the next one, so every re-run of the pipeline left its
+  predecessor behind permanently. Weeks of local testing had left 19 orphaned tables in
+  `healthcare.db`, roughly doubling its size. `persist()` now deletes a session's existing
+  table(s) before writing the new one; the 19 stray tables were dropped and the database
+  vacuumed back down.
+
 ## [2.3.2] — 2026-09-13
 
 ### Fixed
