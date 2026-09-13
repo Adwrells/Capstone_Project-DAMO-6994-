@@ -7,6 +7,21 @@ All notable changes to this project are documented in this file. The format foll
 This file starts at 1.1.0; versions 1.0.0–1.0.4 predate it and are recorded only as git tags,
 each named after the fix or feature it introduced.
 
+## [2.3.2] — 2026-09-13
+
+### Fixed
+- Final Report PDF/Markdown endpoints returned a 500 in production right after the 2.3.1
+  fix shipped. `/api/reports/*` is also a registered prefix for a generic proxy to the
+  Python/FastAPI backend, and that proxy was registered before the new `final-pdf`/
+  `final-md` handlers — Express matches routes in registration order, so the wildcard
+  proxy always won and forwarded these requests to FastAPI instead. Moved both handlers
+  above the proxy registration.
+- Deploy pipeline was silently filling the EC2 instance's disk over repeated deploys.
+  Every deploy pins to a new commit-SHA image tag, and `docker image prune -f` only
+  reclaims dangling (untagged) images — so each deploy's previous image stayed on disk
+  permanently instead of being cleaned up. Seven deploys in one day re-consumed the
+  entire 20GB EBS resize from earlier. Switched to `docker image prune -af`.
+
 ## [2.3.1] — 2026-09-13
 
 ### Fixed
