@@ -64,6 +64,9 @@ guide_to_implement.md
 guide_cicd_pipeline.md
 guide_cicd_pipeline_ecr.md
 
+# Local defense/presentation Q&A study guide — not for distribution.
+DEFENSE_PREP_QA.md
+
 # ─── Claude Code ────────────────────────────────────────────────────────
 # .claude/ and CLAUDE.md are local-only — kept out of the repo.
 # Files remain on disk; only removed from git tracking.

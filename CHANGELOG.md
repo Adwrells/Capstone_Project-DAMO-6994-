@@ -7,6 +7,14 @@ All notable changes to this project are documented in this file. The format foll
 This file starts at 1.1.0; versions 1.0.0–1.0.4 predate it and are recorded only as git tags,
 each named after the fix or feature it introduced.
 
+## [2.2.4] — 2026-09-13
+
+### Fixed
+- CI/CD deploy pipeline (`.github/workflows/deploy.yml`) failing at AWS OIDC
+  authentication — trust policy didn't match GitHub's current OIDC subject-claim format.
+- `deploy` job failing at the SSH step — the deploy-key secret had been corrupted by a
+  browser paste; re-set via `gh secret set` instead.
+
 ## [2.2.3] — 2026-09-07
 
 ### Fixed
