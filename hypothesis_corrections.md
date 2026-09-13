@@ -154,7 +154,7 @@ and do **not** need to change.
 
 ---
 
-## 5.7 Comparative Synthesis Table (§5.6.7 in your document)
+## 5.7 Comparative Synthesis Table (§5.6.7 in document)
 
 Update the summary table to carry the corrected H1–H4 figures through:
 
