@@ -470,10 +470,40 @@ async function getFastApiToken(): Promise<string | null> {
   }
 }
 
+// Endpoint to serve the official Final Report Capstone Project.pdf.
+// Disposition defaults to inline so the iframe preview and "Pop Out" tab can
+// render it directly; explicit downloads are forced client-side via the
+// anchor's `download` attribute instead (see ExportReports.tsx).
+// Registered ahead of the /api/reports/* Python proxy below — Express matches
+// routes in registration order, and these two literal paths must win over
+// that wildcard or every request here gets forwarded to FastAPI instead.
+app.get("/api/reports/final-pdf", (_req, res) => {
+  const pdfPath = path.join(process.cwd(), "docs", "Reports", "Final Report Capstone Project.pdf");
+  if (!fs.existsSync(pdfPath)) {
+    return res.status(404).json({ error: "Final Report PDF not found" });
+  }
+  res.setHeader("Content-Disposition", 'inline; filename="Final Report Capstone Project.pdf"');
+  res.setHeader("Content-Type", "application/pdf");
+  res.sendFile(pdfPath);
+});
+
+// Endpoint to download the Final Report as Markdown (.md)
+app.get("/api/reports/final-md", (_req, res) => {
+  const mdPath = path.join(process.cwd(), "docs", "Reports", "Final Report Capstone Project.md");
+  if (!fs.existsSync(mdPath)) {
+    return res.status(404).json({ error: "Final Report Markdown not found" });
+  }
+  res.setHeader("Content-Disposition", 'attachment; filename="Final Report Capstone Project.md"');
+  res.setHeader("Content-Type", "text/markdown; charset=utf-8");
+  res.sendFile(mdPath);
+});
+
 // Routes handled by the Python backend rather than Express.
 // NOTE: deliberately excludes "/api/dataset" — server.ts already has native handlers for
 // /api/dataset/sheets, /api/dataset/:sheet and /api/dataset/statistics/:sheet (the Node-side
 // preload store, a different data source than FastAPI's). Adding it here would shadow those.
+// Also excludes "/api/reports/final-pdf" and "/api/reports/final-md" for the same reason —
+// registered above, immediately before this proxy.
 const PYTHON_PROXY_PREFIXES = [
   "/api/model-diagnostics",
   "/api/user-datasets",
@@ -2084,31 +2114,6 @@ Return strictly JSON matching the response schema.`;
       warning: "Operating via deterministic business analyst intelligence."
     });
   }
-});
-
-// Endpoint to serve the official Final Report Capstone Project.pdf.
-// Disposition defaults to inline so the iframe preview and "Pop Out" tab can
-// render it directly; explicit downloads are forced client-side via the
-// anchor's `download` attribute instead (see ExportReports.tsx).
-app.get("/api/reports/final-pdf", (_req, res) => {
-  const pdfPath = path.join(process.cwd(), "docs", "Reports", "Final Report Capstone Project.pdf");
-  if (!fs.existsSync(pdfPath)) {
-    return res.status(404).json({ error: "Final Report PDF not found" });
-  }
-  res.setHeader("Content-Disposition", 'inline; filename="Final Report Capstone Project.pdf"');
-  res.setHeader("Content-Type", "application/pdf");
-  res.sendFile(pdfPath);
-});
-
-// Endpoint to download the Final Report as Markdown (.md)
-app.get("/api/reports/final-md", (_req, res) => {
-  const mdPath = path.join(process.cwd(), "docs", "Reports", "Final Report Capstone Project.md");
-  if (!fs.existsSync(mdPath)) {
-    return res.status(404).json({ error: "Final Report Markdown not found" });
-  }
-  res.setHeader("Content-Disposition", 'attachment; filename="Final Report Capstone Project.md"');
-  res.setHeader("Content-Type", "text/markdown; charset=utf-8");
-  res.sendFile(mdPath);
 });
 
 // Configure Vite integration for Full-Stack development / Production
