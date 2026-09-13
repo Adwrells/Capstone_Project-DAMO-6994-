@@ -7,6 +7,19 @@ All notable changes to this project are documented in this file. The format foll
 This file starts at 1.1.0; versions 1.0.0–1.0.4 predate it and are recorded only as git tags,
 each named after the fix or feature it introduced.
 
+## [2.3.1] — 2026-09-13
+
+### Fixed
+- Final Report PDF preview (Reports & Export) rendered a second copy of the whole app
+  instead of the document. The iframe/links pointed at a static path whose filename
+  didn't match the file on disk; the 404 silently fell through to the SPA's catch-all
+  route instead of failing visibly. Routed all PDF references through the existing
+  `/api/reports/final-pdf` endpoint and switched its response to `inline` disposition
+  so the iframe and "Pop Out" tab render the document instead of forcing a download.
+- Switching sidebar stages kept the previous page's scroll position instead of starting
+  each new page at the top — the workspace canvas is a persistent scroll container
+  reused across every stage.
+
 ## [2.3.0] — 2026-09-13
 
 ### Added
