@@ -122,9 +122,14 @@ describe('Capstone Report Data and Integration', () => {
     const previewSheet = container.querySelector('#report-preview-sheet');
     expect(previewSheet).not.toBeNull();
 
-    // Verify Export Document button
-    const exportBtn = screen.getByRole('button', { name: /Download Report/i });
+    // Verify Export Document button (opens the PDF/Executive download modal;
+    // distinct from the standalone Markdown download button also on this page)
+    const exportBtn = screen.getByRole('button', { name: /Download Report \(PDF\)/i });
     expect(exportBtn).toBeDefined();
+
+    // Verify the standalone Markdown download button also exists
+    const markdownBtn = screen.getByRole('button', { name: /Download Report \(Markdown/i });
+    expect(markdownBtn).toBeDefined();
 
     // Test opening Export Modal
     fireEvent.click(exportBtn);
