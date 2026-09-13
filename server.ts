@@ -2103,6 +2103,17 @@ app.get("/api/reports/final-pdf", (_req, res) => {
   res.status(404).json({ error: "Final Report PDF not found" });
 });
 
+// Endpoint to download the Final Report as Markdown (.md)
+app.get("/api/reports/final-md", (_req, res) => {
+  const mdPath = path.join(process.cwd(), "docs", "Reports", "Final Report Capstone Project.md");
+  if (!fs.existsSync(mdPath)) {
+    return res.status(404).json({ error: "Final Report Markdown not found" });
+  }
+  res.setHeader("Content-Disposition", 'attachment; filename="Final Report Capstone Project.md"');
+  res.setHeader("Content-Type", "text/markdown; charset=utf-8");
+  res.sendFile(mdPath);
+});
+
 // Configure Vite integration for Full-Stack development / Production
 async function startServer() {
   if (process.env.NODE_ENV !== "production") {

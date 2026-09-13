@@ -510,6 +510,17 @@ export default function ExportReports(_props: ExportReportsProps) {
 </style></head><body>${body}</body></html>`;
   };
 
+  const downloadFinalReportMd = () => {
+    const link = document.createElement('a');
+    link.href = '/api/reports/final-md';
+    link.download = 'Final Report Capstone Project.md';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setShowSuccessToast('Downloaded Final Report Capstone Project.md (Markdown format)');
+    setTimeout(() => setShowSuccessToast(null), 5000);
+  };
+
   const handleDownload = (reportType: ReportType) => {
     setIsExporting(true);
 
@@ -603,7 +614,7 @@ export default function ExportReports(_props: ExportReportsProps) {
           <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0f172a] shadow-sm space-y-3">
             <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
               <Sliders size={15} className="text-blue-500" />
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">Export (PDF)</h3>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">Export</h3>
             </div>
             <button
               onClick={() => setShowModal(true)}
@@ -612,8 +623,15 @@ export default function ExportReports(_props: ExportReportsProps) {
               <Download size={15} />
               <span>Download Report (PDF)…</span>
             </button>
+            <button
+              onClick={downloadFinalReportMd}
+              className="w-full py-2.5 px-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 bg-slate-50 dark:bg-slate-900/40 text-slate-700 dark:text-slate-200 font-semibold text-xs flex items-center justify-center gap-2 transition cursor-pointer"
+            >
+              <FileDown size={14} />
+              <span>Download Report (Markdown .md)</span>
+            </button>
             <p className="text-[10px] text-slate-400 dark:text-slate-500 text-center leading-relaxed">
-              PDF format only · Final Report (1.68 MB) or Executive Report
+              Final Report — PDF (1.68 MB), Markdown (.md), or Executive Report
             </p>
           </div>
 
