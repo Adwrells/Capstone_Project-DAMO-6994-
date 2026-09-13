@@ -69,4 +69,8 @@ jobs:
               docker login --username AWS --password-stdin "$ECR_REGISTRY"
             docker compose -f docker-compose.prod.yml pull
             docker compose -f docker-compose.prod.yml up -d
-            docker image prune -f
+            # -a (not just dangling): every deploy pins IMAGE_TAG to a new commit SHA, so the
+            # previous deploy's image is still tagged (not dangling) once its container is
+            # replaced — a plain `docker image prune -f` never reclaims it, and these silently
+            # accumulate one per deploy until the disk fills up.
+            docker image prune -af
