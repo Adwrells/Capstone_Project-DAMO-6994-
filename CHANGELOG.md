@@ -7,7 +7,25 @@ All notable changes to this project are documented in this file. The format foll
 This file starts at 1.1.0; versions 1.0.0–1.0.4 predate it and are recorded only as git tags,
 each named after the fix or feature it introduced.
 
-## [2.2.4] — 2026-09-13
+## [2.3.0] — 2026-09-13
+
+### Added
+- Reports & Export now offers the Final Report as Markdown (`.md`) in addition to PDF,
+  via a new `/api/reports/final-md` endpoint and a matching download button.
+
+### Fixed
+- CI/CD deploy pipeline (`.github/workflows/deploy.yml`) failing at AWS OIDC
+  authentication — trust policy didn't match GitHub's current OIDC subject-claim format.
+- `deploy` job failing at the SSH step — the deploy-key secret had been corrupted by a
+  browser paste; re-set via `gh secret set` instead.
+- Automated deploys failing mid-image-pull with "no space left on device" — the EC2
+  instance's 8GB root volume had no headroom for a second image copy during the swap;
+  resized to 20GB.
+- `workflow.md` rendering as a wall of raw CSS at the top of the file on GitHub — an
+  inline `<style>` block and matching `<div style="...">` wrapper weren't being applied
+  by GitHub's renderer, just displayed as text.
+
+## [2.2.4] — 2026-09-13 *(superseded by 2.3.0 — never tagged)*
 
 ### Fixed
 - CI/CD deploy pipeline (`.github/workflows/deploy.yml`) failing at AWS OIDC
