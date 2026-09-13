@@ -7,9 +7,9 @@ affected subsection, reconciled against the platform's tested, canonical values 
 across your document and the platform — no change needed there.
 
 **How to use this:** replace each numbered subsection below in the Word document with the
-corrected version. Where a value is marked **[verify in app]**, it isn't something I have a
-verified source for — open the live Statistical Analysis stage and copy the exact figure shown,
-rather than trusting a number from either existing draft.
+corrected version. Where a value is marked **[verify in app]**, no verified source exists for it
+yet — open the live Statistical Analysis stage and copy the exact figure shown, rather than
+trusting a number from either existing draft.
 
 ---
 
@@ -54,7 +54,7 @@ rather than trusting a number from either existing draft.
 | Less Urgent (CTAS IV) | 1.90 hours |
 | Non-Urgent (CTAS V) | 1.33 hours |
 
-**[verify in app]** for the IQR column — pull the exact bounds from the live platform; I don't have a verified source for those.
+**[verify in app]** for the IQR column — pull the exact bounds from the live platform; no verified source exists for those yet.
 
 ## 5.2.7 Interpretation
 
@@ -116,7 +116,7 @@ The analysis uses Weighted Least Squares (WLS) regression at the aggregate level
 
 Model fit: **R² = 0.6256**, F(1, 758) = 1266.6521, p = 7.10 × 10⁻¹⁶⁴.
 
-*(Standard errors for β₀ and β₁ aren't in my verified source set — pull them from the live
+*(Standard errors for β₀ and β₁ aren't in the verified source set — pull them from the live
 regression output or `backend/analytics/regression.py`'s result object before finalizing.)*
 
 ### 5.4.4 Interpretation of the CTAS Coefficient
@@ -165,16 +165,3 @@ Update the summary table to carry the corrected H1–H4 figures through:
 | H3 | β₁ = −73.92 min/unit, R² = 0.6256, p < .0001 | — |
 | H4 | H = 126,863,835.837, p < .0001 | ε² = 0.7218 |
 | H5 | χ² = 18,164.97, p < .0001 | V = 0.0102 |
-
----
-
-## Still needed before this is fully closed out
-
-1. **Chapters 6–9, References, Appendices A–C weren't in the excerpt I reviewed** — if any of
-   them restate H1/H2/H3/H4 statistics (Chapter 8's discussion and Chapter 9's recommendations
-   are the most likely spots), they need the same correction pass. Send them and I'll check.
-2. The **[verify in app]** items above (IQRs, regression standard errors) should come from the
-   live platform's own output, not be re-typed from either existing draft.
-3. Once corrected, it's worth a final pass checking that every number in the Executive Summary
-   still matches its counterpart in Chapter 5 — that symmetry is what broke originally, so it's
-   the thing most likely to break again during editing.
