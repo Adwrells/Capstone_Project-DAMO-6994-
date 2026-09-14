@@ -27,6 +27,25 @@ import FitDiagnostics from './FitDiagnostics';
 import PageHeader from '../../components/common/PageHeader';
 import SectionHeader from '../../components/common/SectionHeader';
 
+// Mirrors backend/analytics/preprocessing/cleaning.py's AGGREGATE_ROW_LABELS exactly, so
+// the client-side pipeline and the seeded-table pipeline agree on what counts as a
+// roll-up/summary row. A row in this state duplicates the sum of the detail rows in the
+// same column (e.g. visit_disposition === 'Total' sums every other disposition) — left in,
+// a naive sum(ed_visits) double-counts every visit the roll-up summarizes.
+const AGGREGATE_ROW_LABELS: Record<string, string[]> = {
+  visit_disposition: ['Total'],
+  main_problem: ['Any'],
+  triage_level: ['Total'],
+};
+
+function stripRollupRows(rows: any[]): any[] {
+  return rows.filter(row =>
+    !Object.entries(AGGREGATE_ROW_LABELS).some(
+      ([col, labels]) => col in row && labels.includes(row[col])
+    )
+  );
+}
+
 interface DataCleaningProps {
   fields: any[];
   rawData: any[];
@@ -237,7 +256,16 @@ export default function DataCleaning({
     // just the first table (was CTAS_Triage, 912 rows) whenever the user's intent is
     // "clean everything".
     const stackedCohort = (!datasetExplicitlySelected || rawData.length === 0) ? buildStackedCohort() : null;
-    const baseSource = (rawData.length > 0 && datasetExplicitlySelected) ? rawData : (stackedCohort?.rows || preloadedDatasets[0]?.data || []);
+    const rawSource = (rawData.length > 0 && datasetExplicitlySelected) ? rawData : (stackedCohort?.rows || preloadedDatasets[0]?.data || []);
+
+    // Mirrors backend/analytics/preprocessing/cleaning.py's AGGREGATE_ROW_LABELS exactly —
+    // rows where one of these columns holds a roll-up/summary label (e.g. `visit_disposition
+    // === 'Total'`) duplicate the sum of the detail rows in that same column. Left in, a
+    // naive sum(ed_visits) double-counts every visit the roll-up summarizes. Previously this
+    // step was a no-op: the UI claimed to strip these rows but nothing actually filtered them.
+    const baseSource = stripRollupRows(rawSource);
+    const rollupRowsRemoved = rawSource.length - baseSource.length;
+
     const enrichedData = baseSource.map((row: any, idx: number) => {
       const losHours = parseFloat(row.median_los_hours || row['Median LOS Hours'] || row.length_of_stay_hours || '4.2') || 4.2;
       const volume = parseInt(row.visit_volume || row['Total Visits'] || row.volume || '15000', 10) || 15000;
@@ -269,7 +297,7 @@ export default function DataCleaning({
     const actions: CleaningAction[] = [
       { column: 'all_columns', issue: 'Column syntax naming', method: 'Standardized column references to snake_case', rowsAffected: activeFields.length },
       { column: 'median_los_hours', issue: 'Unit representation', method: 'Harmonized stay duration units to Total ED-Minutes (TEM)', rowsAffected: enrichedData.length },
-      { column: 'category_totals', issue: 'Aggregate roll-up overlap', method: 'Controlled roll-up totals (Total, Any) to prevent double counting', rowsAffected: 5 },
+      { column: 'category_totals', issue: 'Aggregate roll-up overlap', method: 'Controlled roll-up totals (Total, Any) to prevent double counting', rowsAffected: rollupRowsRemoved },
       { column: 'engineered_features', issue: 'Analytical feature need', method: 'Engineered TEM, Pandemic Period Indicator, and CTAS Numeric Encodings', rowsAffected: enrichedData.length }
     ];
 

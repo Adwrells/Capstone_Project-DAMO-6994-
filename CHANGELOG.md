@@ -7,6 +7,22 @@ All notable changes to this project are documented in this file. The format foll
 This file starts at 1.1.0; versions 1.0.0–1.0.4 predate it and are recorded only as git tags,
 each named after the fix or feature it introduced.
 
+## [2.3.6] — 2026-09-13
+
+### Fixed
+- The Data Cleaning pipeline's "Clean Data" step claimed to remove roll-up/summary rows
+  (`visit_disposition === 'Total'`, `main_problem === 'Any'`, etc. — see
+  `backend/analytics/preprocessing/cleaning.py`'s `AGGREGATE_ROW_LABELS`) but never
+  actually did: `executePipeline()` only mapped rows to add engineered columns, and the
+  "rowsAffected" figure shown for that step was a hardcoded constant, not a real count.
+  Every persisted "cleaned" cohort silently still contained whatever roll-up rows were in
+  the source. Added a `stripRollupRows()` step mirroring the backend's canonical
+  definition exactly, applied before engineering the derived columns, with the displayed
+  count now computed from the actual rows removed. No effect on today's preloaded CSVs
+  (they already had roll-ups stripped upstream by the cleaning notebooks, so the real
+  count is 0) — this protects any dataset that does contain them, including future
+  uploads.
+
 ## [2.3.5] — 2026-09-13
 
 ### Fixed
