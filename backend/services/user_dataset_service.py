@@ -134,6 +134,12 @@ class UserDatasetService:
     ) -> Dict[str, Any]:
         """Writes cleaned records to a new isolated table and registers it.
 
+        Replaces any dataset(s) already owned by `owner_id` first: a session re-running
+        the cleaning pipeline is producing a new copy of the same working cohort, not a
+        second upload, so persisting used to leave every previous run's table behind
+        forever. Without a scoping `owner_id` nothing is deleted, since there is no way to
+        tell whose table is whose.
+
         Returns the registry entry. Raises ValueError on empty input rather than creating
         an empty table nobody can use.
         """
@@ -152,6 +158,13 @@ class UserDatasetService:
         columns = list(schema)
 
         UserDatasetService._ensure_registry(db)
+
+        if owner_id is not None:
+            previous = db.execute_query(
+                f"SELECT dataset_id FROM {REGISTRY_TABLE} WHERE owner_id = ?", (str(owner_id),)
+            )
+            for row in previous:
+                UserDatasetService.delete_dataset(row["dataset_id"], owner_id=owner_id, manager=db)
 
         column_ddl = ", ".join(f'"{c}" {t}' for c, t in schema.items())
         db.execute_script(f'CREATE TABLE "{table_name}" ({column_ddl})')

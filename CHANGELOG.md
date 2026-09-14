@@ -7,6 +7,55 @@ All notable changes to this project are documented in this file. The format foll
 This file starts at 1.1.0; versions 1.0.0–1.0.4 predate it and are recorded only as git tags,
 each named after the fix or feature it introduced.
 
+## [2.3.5] — 2026-09-13
+
+### Fixed
+- Age/Sex was silently never one of the preloaded datasets, despite `Age_Sex.csv` existing
+  in `data/Explorer Dataset/` alongside its cleaning notebook and a populated `age_sex`
+  SQLite table — it was simply missing from `PRELOAD_DATASET_CONFIGS` in `server.ts`.
+  Every stacked-cohort total (and the "6 Harmonized Worksheets" claim on the About Project
+  page) was actually only ever 5 datasets. Added the missing config entry.
+- Two of the five existing preload configs (`ED Visits`, `Demographics`) pointed at CSV
+  filenames (`ED_Visits.csv`, `Demographics.csv`) that no longer exist on disk — the
+  cleaning notebooks now write `_Cleaned` suffixed files. These only kept working because
+  SQLite already had the tables cached from an earlier import; a fresh clone without a
+  pre-seeded `healthcare.db`, or after a re-import, would have silently failed to load
+  either. Corrected both paths to the current filenames.
+- Six dense stat grids (5 hypothesis dashboard cards' "Statistical Result Strip", plus two
+  CTAS/age-breakdown grids on Strategic Insights) forced 4-5 columns with no responsive
+  breakpoint, cramming values like "H = 1.26 × 10⁸" into unreadably narrow cells on phone
+  widths. Found via a mobile-viewport audit (390px). Added `grid-cols-2 sm:grid-cols-4`
+  (or `grid-cols-3 sm:grid-cols-5`) so they collapse to fewer columns below the `sm`
+  breakpoint. Everything else checked on About Project and Data Cleaning at mobile width
+  already reflowed correctly with no changes needed.
+
+## [2.3.4] — 2026-09-13
+
+### Fixed
+- Data Cleaning's "nothing selected" default (stack all 6 preloaded tables) was a race
+  condition, not deterministic. `App.tsx` auto-populates `rawData` with a single table the
+  instant preloaded data resolves, so the Explorer/Dashboard always have something to show
+  — but Data Cleaning's own stacking fallback checked the same `rawData.length > 0` to
+  decide whether the user had chosen a dataset. Whichever effect won that race decided the
+  outcome: click "Clean Data" before the auto-select resolved and it stacked all 6 tables
+  (8,685 raw / 7,296 analytical); click after and it silently cleaned just the one
+  auto-picked table (912 rows) instead. Added an explicit `datasetExplicitlySelected` flag
+  set only when the user genuinely picks a dataset, so stacking all preloaded tables is
+  now the real, deterministic default.
+
+## [2.3.3] — 2026-09-13
+
+### Fixed
+- Cleaned cohorts persisted by the Data Cleaning step accumulated indefinitely instead of
+  replacing the previous run. Each click of "Clean Data" writes the result to its own
+  isolated SQLite table (`user_dataset_<id>`), scoped to the browser session so uploads
+  stay isolated from the seeded analytical tables — but nothing ever dropped a session's
+  earlier table before writing the next one, so every re-run of the pipeline left its
+  predecessor behind permanently. Weeks of local testing had left 19 orphaned tables in
+  `healthcare.db`, roughly doubling its size. `persist()` now deletes a session's existing
+  table(s) before writing the new one; the 19 stray tables were dropped and the database
+  vacuumed back down.
+
 ## [2.3.2] — 2026-09-13
 
 ### Fixed

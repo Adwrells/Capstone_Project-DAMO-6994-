@@ -167,7 +167,7 @@ export default function H3UrgencyRegression({ isDarkMode }: H3UrgencyRegressionP
       </AnalyticalTakeaway>
 
       {/* Statistical Result Strip */}
-      <div className="pt-2 border-t border-slate-100 dark:border-white/[0.06] grid grid-cols-4 gap-2 text-center text-[10.5px]">
+      <div className="pt-2 border-t border-slate-100 dark:border-white/[0.06] grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-[10.5px]">
         <div className="p-1.5 rounded-lg bg-slate-50 dark:bg-white/[0.03]">
           <span className="text-slate-400 block text-[9px] font-mono font-bold uppercase">Slope (β₁)</span>
           <span className="font-mono font-bold text-slate-800 dark:text-slate-200">-1.23 h/score</span>
