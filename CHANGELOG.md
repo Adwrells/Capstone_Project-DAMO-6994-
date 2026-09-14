@@ -7,6 +7,16 @@ All notable changes to this project are documented in this file. The format foll
 This file starts at 1.1.0; versions 1.0.0–1.0.4 predate it and are recorded only as git tags,
 each named after the fix or feature it introduced.
 
+## [2.3.8] — 2026-09-13
+
+### Changed
+- Reports & Export: removed the Markdown download button, the standalone "Download PDF"
+  toolbar button, and the Academic Dossier panel; down to one export button offering
+  Executive / Final / Both. The Final Report is no longer viewable in-app (download only)
+  — Executive Report is now the only in-app view.
+- Updated the Final Report PDF to the latest version (2.01 MB, 83 pages) and corrected the
+  file-size/page-count text throughout the page to match.
+
 ## [2.3.7] — 2026-09-13
 
 ### Fixed

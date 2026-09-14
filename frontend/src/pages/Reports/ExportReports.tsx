@@ -8,10 +8,8 @@
  */
 import React, { useState, useMemo, useRef } from 'react';
 import {
-  ShieldCheck, Download, Sliders, RefreshCw,
-  FileDown, BookOpen, ExternalLink, Award, FileCheck,
-  CheckCircle2, Filter, X, FileText, Eye, Building2,
-  GraduationCap, Users, Calendar
+  Download, Sliders, RefreshCw,
+  FileDown, CheckCircle2, Filter, X, FileText
 } from 'lucide-react';
 import PageHeader from '../../components/common/PageHeader';
 
@@ -189,8 +187,8 @@ function DownloadModal({ onClose, onDownload, isExporting }: DownloadModalProps)
     {
       id: 'final',
       label: 'Final Report (PDF)',
-      desc: 'Official 70-page academic capstone report (Final Report Capstone Project.pdf)',
-      badge: '1.68 MB · PDF',
+      desc: 'Official 83-page academic capstone report (Final Report Capstone Project.pdf)',
+      badge: '2.01 MB · PDF',
       isPrimary: true,
     },
     {
@@ -202,7 +200,7 @@ function DownloadModal({ onClose, onDownload, isExporting }: DownloadModalProps)
     {
       id: 'both',
       label: 'Both Reports (PDF)',
-      desc: 'Download both the Final Report PDF (1.68 MB) and Executive Report PDF',
+      desc: 'Download both the Final Report PDF (2.01 MB) and Executive Report PDF',
       badge: '2 PDFs',
     },
   ];
@@ -437,8 +435,8 @@ function renderSection(section: ExecSection): React.ReactNode {
 }
 
 export default function ExportReports(_props: ExportReportsProps) {
-  // View mode tab: 'final' (Official Final Report PDF) or 'executive' (Interactive Executive Summary)
-  const [activeReportTab, setActiveReportTab] = useState<'final' | 'executive'>('final');
+  // Only the Executive Report is viewable in-app. The Final Report remains one of the
+  // download options (see DownloadModal) but is never rendered/opened for viewing here.
 
   // Executive report section filter
   const [selectedSectionIds, setSelectedSectionIds] = useState<string[]>(
@@ -448,7 +446,6 @@ export default function ExportReports(_props: ExportReportsProps) {
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showSuccessToast, setShowSuccessToast] = useState<string | null>(null);
-  const [isPdfLoaded, setIsPdfLoaded] = useState<boolean>(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -511,17 +508,6 @@ export default function ExportReports(_props: ExportReportsProps) {
 </style></head><body>${body}</body></html>`;
   };
 
-  const downloadFinalReportMd = () => {
-    const link = document.createElement('a');
-    link.href = '/api/reports/final-md';
-    link.download = 'Final Report Capstone Project.md';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    setShowSuccessToast('Downloaded Final Report Capstone Project.md (Markdown format)');
-    setTimeout(() => setShowSuccessToast(null), 5000);
-  };
-
   const handleDownload = (reportType: ReportType) => {
     setIsExporting(true);
 
@@ -534,7 +520,7 @@ export default function ExportReports(_props: ExportReportsProps) {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        setShowSuccessToast('Downloaded Final Report Capstone Project.pdf (1.68 MB Complete Academic Report)');
+        setShowSuccessToast('Downloaded Final Report Capstone Project.pdf (2.01 MB Complete Academic Report)');
       };
 
       // 2. Download / Print Executive Report PDF
@@ -624,169 +610,64 @@ export default function ExportReports(_props: ExportReportsProps) {
               <Download size={15} />
               <span>Download Report (PDF)…</span>
             </button>
-            <button
-              onClick={downloadFinalReportMd}
-              className="w-full py-2.5 px-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 bg-slate-50 dark:bg-slate-900/40 text-slate-700 dark:text-slate-200 font-semibold text-xs flex items-center justify-center gap-2 transition cursor-pointer"
-            >
-              <FileDown size={14} />
-              <span>Download Report (Markdown .md)</span>
-            </button>
             <p className="text-[10px] text-slate-400 dark:text-slate-500 text-center leading-relaxed">
-              Final Report — PDF (1.68 MB), Markdown (.md), or Executive Report
+              Executive Report, Final Report, or both — PDF format
             </p>
           </div>
 
-          {/* If activeReportTab === 'final': show Official Publication Dossier */}
-          {activeReportTab === 'final' ? (
-            <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0f172a] shadow-sm space-y-3 animate-fade-in">
-              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-                <div className="flex items-center gap-2">
-                  <Award size={15} className="text-blue-500" />
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">Academic Dossier</h3>
-                </div>
-                <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800">
-                  VERIFIED PDF
-                </span>
+          {/* Section Filter — the Executive Report is the only in-app view */}
+          <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0f172a] shadow-sm space-y-3 animate-fade-in">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <Filter size={14} className="text-blue-500" />
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">Section Filter</h3>
               </div>
-
-              <div className="space-y-2.5 text-xs">
-                <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800">
-                  <span className="text-[10px] font-medium text-slate-400 block uppercase">Document File</span>
-                  <span className="font-bold text-slate-900 dark:text-white text-[11px] break-all">
-                    Final Report Capstone Project.pdf
-                  </span>
-                  <div className="flex items-center gap-2 mt-1 text-[10px] text-slate-500 dark:text-slate-400">
-                    <span className="font-semibold text-blue-600 dark:text-blue-400">1.68 MB</span>
-                    <span>·</span>
-                    <span>70 Pages</span>
-                    <span>·</span>
-                    <span>Vector Graphics</span>
-                  </div>
-                </div>
-
-                <div className="space-y-2 text-[11px] pt-1">
-                  <div className="flex items-start gap-2">
-                    <Building2 size={13} className="text-blue-500 shrink-0 mt-0.5" />
-                    <div>
-                      <span className="text-[10px] text-slate-400 block">Institution</span>
-                      <span className="font-semibold text-slate-800 dark:text-slate-200">University of Niagara Falls Canada</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-2">
-                    <GraduationCap size={13} className="text-blue-500 shrink-0 mt-0.5" />
-                    <div>
-                      <span className="text-[10px] text-slate-400 block">Program &amp; Course</span>
-                      <span className="font-semibold text-slate-800 dark:text-slate-200">Master of Data Analytics · DAMO 699</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-2">
-                    <Users size={13} className="text-blue-500 shrink-0 mt-0.5" />
-                    <div>
-                      <span className="text-[10px] text-slate-400 block">Authors (Group 5)</span>
-                      <span className="font-semibold text-slate-800 dark:text-slate-200">
-                        Rajbharath P, Sufyaan Khan Mohammed, Amit Raj Dev
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-2">
-                    <ShieldCheck size={13} className="text-amber-500 shrink-0 mt-0.5" />
-                    <div>
-                      <span className="text-[10px] text-slate-400 block">Faculty Supervisor</span>
-                      <span className="font-semibold text-amber-600 dark:text-amber-400">Dr. Bilal El Toufaili</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-2">
-                  <a
-                    href="/api/reports/final-pdf"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full py-2 px-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 bg-slate-50 dark:bg-slate-900/40 text-slate-700 dark:text-slate-200 font-semibold text-xs flex items-center justify-center gap-1.5 transition"
-                  >
-                    <ExternalLink size={13} />
-                    <span>Open in Separate Tab</span>
-                  </a>
-                  <button
-                    type="button"
-                    onClick={() => setActiveReportTab('executive')}
-                    className="w-full py-2 px-3 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-blue-100 dark:hover:bg-blue-900/60 transition cursor-pointer"
-                  >
-                    <FileText size={13} />
-                    <span>View Executive Summary</span>
-                  </button>
-                </div>
-              </div>
+              <span className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800">
+                {visibleSections.length}/{ALL_EXEC_SECTIONS.filter((s) => s.level !== 1).length}
+              </span>
             </div>
-          ) : (
-            /* If activeReportTab === 'executive': show Section Filter */
-            <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0f172a] shadow-sm space-y-3 animate-fade-in">
-              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-                <div className="flex items-center gap-2">
-                  <Filter size={14} className="text-blue-500" />
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">Section Filter</h3>
-                </div>
-                <span className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800">
-                  {visibleSections.length}/{ALL_EXEC_SECTIONS.filter((s) => s.level !== 1).length}
-                </span>
-              </div>
 
-              <div className="flex gap-1.5">
-                <button type="button" onClick={handleSelectAll}
-                  className="flex-1 py-1 rounded-lg text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-blue-50 hover:text-blue-700 transition cursor-pointer">
-                  All
-                </button>
-                <button type="button" onClick={handleClearSelection}
-                  className="flex-1 py-1 rounded-lg text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-red-50 hover:text-red-600 transition cursor-pointer">
-                  None
-                </button>
-              </div>
+            <div className="flex gap-1.5">
+              <button type="button" onClick={handleSelectAll}
+                className="flex-1 py-1 rounded-lg text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-blue-50 hover:text-blue-700 transition cursor-pointer">
+                All
+              </button>
+              <button type="button" onClick={handleClearSelection}
+                className="flex-1 py-1 rounded-lg text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-red-50 hover:text-red-600 transition cursor-pointer">
+                None
+              </button>
+            </div>
 
-              <div className="space-y-1 max-h-[380px] overflow-y-auto pr-0.5">
-                {ALL_EXEC_SECTIONS.filter((s) => s.level !== 1).map((section) => {
-                  const isChecked = selectedSectionIds.includes(section.id);
-                  return (
-                    <div
-                      key={section.id}
-                      onClick={() => toggleSection(section.id)}
-                      className={`flex items-center gap-2 p-2 rounded-lg text-xs transition cursor-pointer ${
-                        isChecked
-                          ? 'bg-blue-50 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-900/60'
-                          : 'border border-transparent hover:border-slate-200 dark:hover:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900/30'
+            <div className="space-y-1 max-h-[380px] overflow-y-auto pr-0.5">
+              {ALL_EXEC_SECTIONS.filter((s) => s.level !== 1).map((section) => {
+                const isChecked = selectedSectionIds.includes(section.id);
+                return (
+                  <div
+                    key={section.id}
+                    onClick={() => toggleSection(section.id)}
+                    className={`flex items-center gap-2 p-2 rounded-lg text-xs transition cursor-pointer ${
+                      isChecked
+                        ? 'bg-blue-50 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-900/60'
+                        : 'border border-transparent hover:border-slate-200 dark:hover:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900/30'
+                    }`}
+                  >
+                    <input type="checkbox" checked={isChecked} onChange={() => {}}
+                      className="rounded text-blue-600 focus:ring-0 cursor-pointer shrink-0" />
+                    <span
+                      className={`truncate font-semibold text-[11px] ${
+                        section.level === 1
+                          ? 'text-slate-900 dark:text-white'
+                          : 'text-slate-600 dark:text-slate-400 pl-1'
                       }`}
                     >
-                      <input type="checkbox" checked={isChecked} onChange={() => {}}
-                        className="rounded text-blue-600 focus:ring-0 cursor-pointer shrink-0" />
-                      <span
-                        className={`truncate font-semibold text-[11px] ${
-                          section.level === 1
-                            ? 'text-slate-900 dark:text-white'
-                            : 'text-slate-600 dark:text-slate-400 pl-1'
-                        }`}
-                      >
-                        {section.level === 2 && <span className="text-[9px] mr-1 opacity-50">└</span>}
-                        {section.heading.length > 42 ? section.heading.slice(0, 42) + '…' : section.heading}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
-                <button
-                  type="button"
-                  onClick={() => setActiveReportTab('final')}
-                  className="w-full py-2 px-3 rounded-lg border border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-blue-100 transition cursor-pointer"
-                >
-                  <BookOpen size={13} />
-                  <span>Return to Final Report (PDF)</span>
-                </button>
-              </div>
+                      {section.level === 2 && <span className="text-[9px] mr-1 opacity-50">└</span>}
+                      {section.heading.length > 42 ? section.heading.slice(0, 42) + '…' : section.heading}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
-          )}
+          </div>
         </div>
 
         {/* Right Panel */}
@@ -794,71 +675,17 @@ export default function ExportReports(_props: ExportReportsProps) {
 
           {/* Toolbar */}
           <div className="p-3 rounded-2xl border border-slate-200/90 dark:border-slate-800/80 bg-white dark:bg-[#0f172a] shadow-sm flex flex-wrap items-center justify-between gap-3 text-xs">
-            {/* View Mode Tabs */}
-            <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/60">
-              <button
-                type="button"
-                onClick={() => setActiveReportTab('final')}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  activeReportTab === 'final'
-                    ? 'bg-blue-600 text-white shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                <BookOpen size={13} />
-                <span>Final Report (Official PDF)</span>
-                <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${
-                  activeReportTab === 'final' ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
-                }`}>
-                  1.68 MB · 70 Pages
-                </span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setActiveReportTab('executive')}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  activeReportTab === 'executive'
-                    ? 'bg-blue-600 text-white shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                <FileText size={13} />
-                <span>Executive Summary</span>
-                <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${
-                  activeReportTab === 'executive' ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
-                }`}>
-                  10 Sections
-                </span>
-              </button>
+            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold bg-blue-600 text-white shadow-sm">
+              <FileText size={13} />
+              <span>Executive Summary</span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full font-semibold bg-white/20 text-white">
+                10 Sections
+              </span>
             </div>
 
-            {/* Right Action Buttons */}
-            <div className="flex items-center gap-2">
-              {activeReportTab === 'executive' && (
-                <div className="hidden sm:flex items-center gap-1.5 text-slate-500 dark:text-slate-400 mr-1">
-                  <span className="font-semibold text-slate-800 dark:text-white">{visibleSections.length}</span>
-                  <span> of {ALL_EXEC_SECTIONS.filter((s) => s.level !== 1).length} sections</span>
-                </div>
-              )}
-              <a
-                href="/api/reports/final-pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition"
-                title="Open PDF in a new tab"
-              >
-                <ExternalLink size={13} />
-                <span className="hidden sm:inline">Open in Tab</span>
-              </a>
-              <button
-                type="button"
-                onClick={() => handleDownload('final')}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition cursor-pointer"
-              >
-                <Download size={13} />
-                <span>Download PDF</span>
-              </button>
+            <div className="hidden sm:flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+              <span className="font-semibold text-slate-800 dark:text-white">{visibleSections.length}</span>
+              <span> of {ALL_EXEC_SECTIONS.filter((s) => s.level !== 1).length} sections</span>
             </div>
           </div>
 
@@ -878,89 +705,8 @@ export default function ExportReports(_props: ExportReportsProps) {
                 }
               `}</style>
 
-              {activeReportTab === 'final' ? (
-                /* ── Official Final Report PDF Viewer ── */
-                <div className="w-full flex flex-col items-center animate-fade-in" style={{ maxWidth: '1080px' }}>
-                  <div className="w-full rounded-2xl overflow-hidden shadow-2xl border border-slate-300 dark:border-slate-800 bg-white dark:bg-[#0f172a] flex flex-col" style={{ minHeight: '860px', height: '82vh' }}>
-                    {/* Top PDF Header */}
-                    <div className="px-4 py-3 bg-slate-900 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3 text-white">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-red-600/25 text-red-400 border border-red-500/40 flex items-center justify-center font-bold text-xs tracking-wider">
-                          PDF
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs sm:text-sm font-bold text-white">Final Report Capstone Project.pdf</span>
-                            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                              Official Submission
-                            </span>
-                          </div>
-                          <p className="text-[10.5px] text-slate-400">
-                            1.68 MB · 70 Pages · University of Niagara Falls Canada (Group 5)
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <a
-                          href="/api/reports/final-pdf"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1 transition border border-slate-700"
-                        >
-                          <ExternalLink size={12} />
-                          <span>Pop Out</span>
-                        </a>
-                        <button
-                          type="button"
-                          onClick={() => handleDownload('final')}
-                          className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center gap-1.5 transition shadow-sm cursor-pointer"
-                        >
-                          <Download size={12} />
-                          <span>Download</span>
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* PDF iframe viewport */}
-                    <div className="flex-1 w-full bg-slate-100 dark:bg-slate-950 relative">
-                      {!isPdfLoaded && (
-                        <div className="absolute inset-0 flex items-center justify-center gap-2 text-slate-400 dark:text-slate-500 text-xs font-medium">
-                          <div className="w-4 h-4 border-2 border-slate-300 dark:border-slate-700 border-t-blue-500 rounded-full animate-spin" />
-                          <span>Loading report preview…</span>
-                        </div>
-                      )}
-                      <iframe
-                        src="/api/reports/final-pdf#view=FitH&navpanes=1"
-                        title="Final Report Capstone Project PDF"
-                        className="w-full h-full border-0 transition-opacity duration-300"
-                        style={{ minHeight: '800px', height: '100%', opacity: isPdfLoaded ? 1 : 0 }}
-                        onLoad={() => setIsPdfLoaded(true)}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Fallback & Helper Bar */}
-                  <div className="w-full mt-3 p-3 rounded-xl bg-white/80 dark:bg-[#0f172a]/80 backdrop-blur-sm border border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600 dark:text-slate-400">
-                    <div className="flex items-center gap-2">
-                      <FileCheck size={14} className="text-emerald-500" />
-                      <span>Official 70-page Capstone Report · Biostatistical &amp; Longitudinal Analysis</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <a
-                        href="/api/reports/final-pdf"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 dark:text-blue-400 hover:underline font-semibold flex items-center gap-1"
-                      >
-                        <ExternalLink size={12} />
-                        <span>Open in Native Fullscreen Viewer</span>
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                /* ── Executive Report View ── */
+              {/* ── Executive Report View (the only in-app view) ── */}
+              {(
                 <div
                   className="w-full animate-fade-in"
                   style={{ maxWidth: '816px' }}

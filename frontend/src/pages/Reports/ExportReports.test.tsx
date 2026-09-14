@@ -81,7 +81,7 @@ describe('Capstone Report Data and Integration', () => {
     expect(p?.style.textAlign).toBe('justify');
   });
 
-  it('renders ExportReports component with academic dossier and report controls', () => {
+  it('renders ExportReports component as an executive-report-only view with a single export button', () => {
     const { container } = render(
       <ExportReports
         datasetName="CIHI NACRS (2003-2026)"
@@ -98,50 +98,33 @@ describe('Capstone Report Data and Integration', () => {
     expect(screen.getAllByText(/Sufyaan Khan Mohammed/).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Amit Raj Dev/).length).toBeGreaterThan(0);
 
-    // Verify Final Report PDF preview is present on the 7th page by default
-    expect(screen.getAllByText(/Final Report Capstone Project\.pdf/i).length).toBeGreaterThan(0);
-    expect(screen.getByText('Final Report (Official PDF)')).toBeDefined();
-
-    // Verify embedded PDF viewer iframe exists and points at the API endpoint
-    // (not a static /reports/... path — that filename doesn't exist on disk
-    // and silently falls through to the SPA's own catch-all route instead of
-    // 404ing, so the iframe would render the whole app instead of a PDF)
-    const pdfIframe = container.querySelector('iframe[title="Final Report Capstone Project PDF"]');
-    expect(pdfIframe).not.toBeNull();
-    expect(pdfIframe?.getAttribute('src')).toContain('/api/reports/final-pdf');
-
-    // Verify switching to Executive Summary view works
-    const execSummaryBtns = screen.getAllByRole('button', { name: /Executive Summary/i });
-    expect(execSummaryBtns.length).toBeGreaterThan(0);
-    fireEvent.click(execSummaryBtns[0]);
+    // The Executive Report is the only in-app view — no Final Report tab/toggle,
+    // no embedded Final Report PDF iframe, and no way to switch to viewing it.
+    expect(screen.queryByRole('button', { name: /Final Report \(Official PDF\)/i })).toBeNull();
+    expect(container.querySelector('iframe[title="Final Report Capstone Project PDF"]')).toBeNull();
     expect(screen.getAllByText(/Executive Report/i).length).toBeGreaterThan(0);
-
-    // Switch back to Final Report
-    const finalReportBtn = screen.getByRole('button', { name: /Final Report \(Official PDF\)/i });
-    fireEvent.click(finalReportBtn);
-    expect(container.querySelector('iframe[title="Final Report Capstone Project PDF"]')).not.toBeNull();
 
     // Verify preview sheet container exists
     const previewSheet = container.querySelector('#report-preview-sheet');
     expect(previewSheet).not.toBeNull();
 
-    // Verify Export Document button (opens the PDF/Executive download modal;
-    // distinct from the standalone Markdown download button also on this page)
+    // Exactly one export/download button on the page, opening a modal with all
+    // three format choices — no standalone Markdown button, no Academic Dossier
+    // panel, and no secondary "Download PDF"/"Open in Tab" buttons elsewhere.
     const exportBtn = screen.getByRole('button', { name: /Download Report \(PDF\)/i });
     expect(exportBtn).toBeDefined();
+    expect(screen.queryByRole('button', { name: /Download Report \(Markdown/i })).toBeNull();
+    expect(screen.queryByText('Academic Dossier')).toBeNull();
+    expect(screen.queryByRole('button', { name: /^Download PDF$/i })).toBeNull();
 
-    // Verify the standalone Markdown download button also exists
-    const markdownBtn = screen.getByRole('button', { name: /Download Report \(Markdown/i });
-    expect(markdownBtn).toBeDefined();
-
-    // Test opening Export Modal
     fireEvent.click(exportBtn);
     expect(screen.getByText('Download Report (PDF Format)')).toBeDefined();
     expect(screen.getByText(/Reports are downloaded exclusively in/i)).toBeDefined();
 
-    // Verify Final Report PDF option with exact pdf name exists
-    const finalReportOption = screen.getByText('Final Report (PDF)');
-    expect(finalReportOption).toBeDefined();
+    // All three download options are present: Executive, Final, Both
+    expect(screen.getByText('Executive Report (PDF)')).toBeDefined();
+    expect(screen.getByText('Final Report (PDF)')).toBeDefined();
+    expect(screen.getByText('Both Reports (PDF)')).toBeDefined();
     expect(screen.getAllByText(/Final Report Capstone Project\.pdf/i).length).toBeGreaterThan(0);
 
     // Verify no Word or DOCX format option exists
