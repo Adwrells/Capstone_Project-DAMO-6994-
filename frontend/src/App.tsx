@@ -17,7 +17,7 @@ import ConsultantInsights from './pages/StrategicInsights/StrategicInsights';
 import ExportReports from './pages/Reports/Reports';
 import AboutProject from './pages/AboutProject/AboutProject';
 import { CleaningSummary, CustomVisualization, AIAnalysisResult, DatasetStats, PreloadedDataset } from './utils/types';
-import { persistCleanedDataset } from './services/userDatasetService';
+import { persistCleanedDataset, listUserDatasets, fetchUserDataset } from './services/userDatasetService';
 import { buildSemanticModel, SemanticField } from './utils/biEngine';
 import { fetchPreloadedDatasets, fetchAnalyzeDataset } from './services/apiService';
 
@@ -164,6 +164,38 @@ export default function App() {
         setPreloadStatus('error');
       });
   }, []);
+
+  // RESTORE THE LAST CLEANED COHORT ON MOUNT, IF ONE EXISTS FOR THIS SESSION
+  //
+  // The preload effect above stashes a raw, un-cleaned "primary" dataset into
+  // `cleanedData` just so downstream pages (Dataset Explorer's "Cleaned & Enriched
+  // Cohort" view included) always have *something* to render. That's a placeholder,
+  // not real cleaned output — it never ran through executePipeline()'s roll-up
+  // filtering or feature engineering. If this browser session already persisted a
+  // genuinely cleaned cohort in an earlier visit (X-Session-Id survives reloads via
+  // localStorage), pull it back and use that instead, so Dataset Explorer defaults
+  // to real cleaned data rather than a same-page-load stand-in.
+  //
+  // Gated on preloadStatus rather than running independently on mount: both effects
+  // write `cleanedData`, and two independent network calls racing would make which
+  // one "wins" non-deterministic. Starting this only once preload has already
+  // resolved (and written its own placeholder) guarantees this restore's write, if
+  // any, always happens strictly after and so always takes precedence.
+  useEffect(() => {
+    if (preloadStatus !== 'loaded') return;
+    listUserDatasets()
+      .then(entries => {
+        if (entries.length === 0) return;
+        const latest = entries[0]; // newest first, per the registry's own ordering
+        return fetchUserDataset(latest.dataset_id).then(result => {
+          if (result?.data?.length > 0) {
+            setCleanedData(result.data);
+            setPersistedDatasetId(latest.dataset_id);
+          }
+        });
+      })
+      .catch(err => console.warn('Could not restore a previously cleaned cohort:', err));
+  }, [preloadStatus]);
 
   const onDatasetSelected = (name: string, cols: any[], data: any[]) => {
     setCurrentSection('clean');

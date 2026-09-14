@@ -7,6 +7,16 @@ All notable changes to this project are documented in this file. The format foll
 This file starts at 1.1.0; versions 1.0.0–1.0.4 predate it and are recorded only as git tags,
 each named after the fix or feature it introduced.
 
+## [2.3.9] — 2026-09-14
+
+### Fixed
+- Dataset Explorer's "Cleaned & Enriched Cohort" only showed up once a user had already
+  run "Clean Data" earlier in that same page session — a fresh page load, or a returning
+  visit, fell back to a raw, un-cleaned placeholder dataset instead. On mount, the app now
+  restores the session's most recently persisted cleaned cohort from SQLite (if one
+  exists) after the initial preload settles, so the Summary Statistics table defaults to
+  genuinely cleaned data instead of requiring a re-run every visit.
+
 ## [2.3.8] — 2026-09-13
 
 ### Changed
