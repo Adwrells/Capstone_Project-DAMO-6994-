@@ -730,7 +730,7 @@ const PRELOAD_DATASET_CONFIGS = [
     key: "dataset_1",
     label: "Dataset 1",
     name: "ED Visits",
-    filePath: path.join(PRELOAD_DATA_DIR, "ED_Visits.csv")
+    filePath: path.join(PRELOAD_DATA_DIR, "ED_Visits_Cleaned.csv")
   },
   {
     key: "dataset_2",
@@ -754,7 +754,13 @@ const PRELOAD_DATASET_CONFIGS = [
     key: "dataset_5",
     label: "Dataset 5",
     name: "Demographics",
-    filePath: path.join(PRELOAD_DATA_DIR, "Demographics.csv")
+    filePath: path.join(PRELOAD_DATA_DIR, "Demographics_Cleaned.csv")
+  },
+  {
+    key: "dataset_6",
+    label: "Dataset 6",
+    name: "Age Sex",
+    filePath: path.join(PRELOAD_DATA_DIR, "Age_Sex.csv")
   }
 ];
 

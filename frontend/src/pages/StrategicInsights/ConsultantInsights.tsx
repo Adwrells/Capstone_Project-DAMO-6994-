@@ -519,7 +519,7 @@ export default function ConsultantInsights({ isLoading: parentLoading, onNavigat
                       <span className="text-[9px] uppercase tracking-wider text-slate-400 font-bold block">
                         Verified CTAS Median LOS Breakdown (N = 174.2M)
                       </span>
-                      <div className="grid grid-cols-5 gap-1.5 text-center">
+                      <div className="grid grid-cols-3 sm:grid-cols-5 gap-1.5 text-center">
                         <div className="p-1 rounded bg-red-500/10 border border-red-500/30 text-red-700 dark:text-red-300 font-bold">
                           <span className="block">CTAS I</span>
                           <span className="font-normal text-slate-700 dark:text-slate-300">4.60h</span>
@@ -592,7 +592,7 @@ export default function ConsultantInsights({ isLoading: parentLoading, onNavigat
                       <span className="text-[9px] uppercase tracking-wider text-slate-400 font-bold block">
                         Age-Stratified Median Stay Duration (N = 175.76M)
                       </span>
-                      <div className="grid grid-cols-4 gap-1.5 text-center">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-center">
                         <div className="p-1 rounded bg-cyan-500/10 border border-cyan-500/30">
                           <span className="text-cyan-700 dark:text-cyan-300 font-bold block">0–17 Ped</span>
                           <span className="text-slate-600 dark:text-slate-300">2.05h (123m)</span>
