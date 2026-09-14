@@ -7,6 +7,14 @@ All notable changes to this project are documented in this file. The format foll
 This file starts at 1.1.0; versions 1.0.0–1.0.4 predate it and are recorded only as git tags,
 each named after the fix or feature it introduced.
 
+## [2.3.7] — 2026-09-13
+
+### Fixed
+- Preloaded datasets could silently overwrite unrelated SQLite tables due to a stale table
+  name mapping shared between two unrelated features. Removed the collision and renamed
+  one dataset for a stable, correct match. Added startup and runtime checks so this class
+  of bug fails loudly instead of silently next time.
+
 ## [2.3.6] — 2026-09-13
 
 ### Fixed

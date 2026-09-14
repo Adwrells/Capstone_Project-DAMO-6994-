@@ -172,6 +172,20 @@ export default function DataCleaning({
     });
     const stackedFields = Array.from(fieldTypes.entries()).map(([name, type]) => ({ name, type }));
     stackedFields.push({ name: 'source_table', type: 'categorical' });
+
+    // Invariant: stacking must never multiply rows the way a join on a shared key would.
+    // The stacked total can only ever equal the sum of each source's own row count — if a
+    // future edit here introduces any kind of merge/join, this catches it immediately
+    // instead of silently inflating ed_visits (a frequency weight) downstream.
+    const expectedRows = preloadedDatasets.reduce((sum, ds) => sum + (ds.data?.length || 0), 0);
+    if (rows.length !== expectedRows) {
+      console.error(
+        `[STACKING_INVARIANT_VIOLATION] buildStackedCohort produced ${rows.length} rows but ` +
+        `the sum of individual preloaded datasets is ${expectedRows}. Stacking must only ` +
+        `concatenate rows, never join/merge them — a join here would double-count ed_visits.`
+      );
+    }
+
     return { rows, fields: stackedFields };
   };
 

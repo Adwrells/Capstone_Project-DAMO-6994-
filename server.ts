@@ -735,7 +735,7 @@ const PRELOAD_DATASET_CONFIGS = [
   {
     key: "dataset_2",
     label: "Dataset 2",
-    name: "CTAS Triage Levels",
+    name: "CTAS Triage",
     filePath: path.join(PRELOAD_DATA_DIR, "CTAS_Triage.csv")
   },
   {
@@ -763,6 +763,29 @@ const PRELOAD_DATASET_CONFIGS = [
     filePath: path.join(PRELOAD_DATA_DIR, "Age_Sex.csv")
   }
 ];
+
+// Guards against the exact bug this config array already shipped once: two preloaded
+// datasets resolving to the same SQLite table name (via `sanitizeIdentifier(config.name)`
+// in resolveDataset) and silently overwriting each other on every cold start. A stale,
+// unrelated DATASET_TABLE_MAP previously caused "ED Visits" to be written into a table
+// named `top_10_main_problems`. Runs once at startup — loud and immediate rather than a
+// silent data-corruption bug discovered days later.
+(function assertNoPreloadTableCollisions() {
+  const byTable = new Map<string, string[]>();
+  for (const cfg of PRELOAD_DATASET_CONFIGS) {
+    const table = sanitizeIdentifier(cfg.name);
+    const names = byTable.get(table) || [];
+    names.push(cfg.name);
+    byTable.set(table, names);
+  }
+  for (const [table, names] of byTable) {
+    if (names.length > 1) {
+      const details = `Preload datasets [${names.join(", ")}] all resolve to SQLite table "${table}" — each import will overwrite the last. Rename one of PRELOAD_DATASET_CONFIGS' \`name\` fields so sanitizeIdentifier() produces distinct table names.`;
+      console.error("[PRELOAD_CONFIG_COLLISION] " + details);
+      logEvent("PRELOAD_CONFIG_COLLISION", details, "system");
+    }
+  }
+})();
 
 // Column type inference (unchanged from original)
 function inferColumnType(values: any[]): 'numeric' | 'categorical' | 'date' | 'boolean' | 'text' {
@@ -848,7 +871,13 @@ let preloadedDatasetsCache: any[] | null = null;
 
 // Core resolution function: SQLite first, Excel import as fallback
 function resolveDataset(config: { key: string; label: string; name: string; filePath: string }) {
-  const canonicalTable = DATASET_TABLE_MAP[config.key] || sanitizeIdentifier(config.name);
+  // DATASET_TABLE_MAP is scoped to the older 3-dataset system it names in its own comment
+  // (dataset_1/2/3 there mean something unrelated) — this function's `config.key` values
+  // collide with those same strings by coincidence. Using the map here silently wrote each
+  // of the 6 preloaded datasets into someone else's table (e.g. "ED Visits" into
+  // top_10_main_problems), overwriting it on every cold start. Always derive the table name
+  // from this dataset's own name instead.
+  const canonicalTable = sanitizeIdentifier(config.name);
   const db = getSqliteDb();
   ensureIngestionMetaTable();
 
